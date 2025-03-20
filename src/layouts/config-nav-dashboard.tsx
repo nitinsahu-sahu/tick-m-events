@@ -14,33 +14,48 @@ export const navData = [
     icon: icon('ic-analytics'),
   },
   {
-    title: 'User',
-    path: '/user',
-    icon: icon('ic-user'),
+    title: 'Analytics',
+    path: '/analytics',
+    icon: icon('ic-analytics'),
   },
   {
-    title: 'Product',
-    path: '/products',
-    icon: icon('ic-cart'),
-    info: (
-      <Label color="error" variant="inverted">
-        +3
-      </Label>
-    ),
+    title: 'Event Details',
+    path: '/event-details',
+    icon: icon('ic-analytics'),
   },
   {
-    title: 'Blog',
-    path: '/blog',
-    icon: icon('ic-blog'),
+    title: 'Ticket & Reservation Management',
+    path: '/ticket-and-reservation-management',
+    icon: icon('ic-analytics'),
   },
   {
-    title: 'Sign in',
-    path: '/sign-in',
-    icon: icon('ic-lock'),
+    title: 'Entry Validation',
+    path: '/entry-validation',
+    icon: icon('ic-analytics'),
   },
   {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic-disabled'),
+    title: 'Marketing Engagenment',
+    path: '/marketing-engagenment',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Transection & Payment',
+    path: '/transection-and-payment',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Statistics & Reports',
+    path: '/statistics-and-reports',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Visibility & Access Settings',
+    path: '/visibility-and-access-settings',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Service Provider & Manage Contracts',
+    path: '/service-provider-and-manage-contracts',
+    icon: icon('ic-analytics'),
   },
 ];

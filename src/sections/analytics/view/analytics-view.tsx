@@ -3,6 +3,7 @@ import { Iconify } from "src/components/iconify";
 import { DashboardContent } from "src/layouts/dashboard";
 
 export function AnalyticsView() {
+  return (
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
@@ -16,5 +17,7 @@ export function AnalyticsView() {
           New post
         </Button>
       </Box>
-      </DashboardContent>
+    </DashboardContent>
+  )
+
 }

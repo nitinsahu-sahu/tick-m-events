@@ -7,6 +7,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
+import { TicketAndReservationManagementView } from 'src/sections/ticket-and-reservation-management/view';
 
 // ----------------------------------------------------------------------
 
@@ -16,6 +17,15 @@ export const UserPage = lazy(() => import('src/pages/user'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
+export const AnalyticsPage = lazy(() => import('src/pages/analytics'));
+export const EntryValidationPage = lazy(() => import('src/pages/entry-validation'));
+export const MarketingEngagenmentPage = lazy(() => import('src/pages/marketing-engagenment'));
+export const EventDetailsPage = lazy(() => import('src/pages/event-details'));
+export const TicketAndReservationManagementPage = lazy(() => import('src/pages/ticket-and-reservation-management'));
+export const StatisticsAndReportsPage = lazy(() => import('src/pages/statistics-and-reports'));
+export const VisibilityAndAccessSettingsPage = lazy(() => import('src/pages/visibility-and-access-settings'));
+export const TransectionAndPaymentPage = lazy(() => import('src/pages/transection-and-payment'));
+export const ServiceProviderAndManageContractsPage = lazy(() => import('src/pages/service-provider-and-manage-contracts'));
 
 // ----------------------------------------------------------------------
 
@@ -47,6 +57,15 @@ export function Router() {
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
+        { path: 'analytics', element: <AnalyticsPage /> },
+        { path: 'event-details', element: <EventDetailsPage /> },
+        { path: 'ticket-and-reservation-management', element: <TicketAndReservationManagementPage /> },
+        { path: 'entry-validation', element: <EntryValidationPage /> },
+        { path: 'marketing-engagenment', element: <MarketingEngagenmentPage /> },
+        { path: 'transection-and-payment', element: <TransectionAndPaymentPage /> },
+        { path: 'statistics-and-reports', element: <StatisticsAndReportsPage /> },
+        { path: 'visibility-and-access-settings', element: <VisibilityAndAccessSettingsPage /> },
+        { path: 'service-provider-and-manage-contracts', element: <ServiceProviderAndManageContractsPage /> },
       ],
     },
     {

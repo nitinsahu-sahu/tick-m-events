@@ -2,7 +2,7 @@
   "primary": {
     "lighter": "#D0ECFE",
     "light": "#73BAFB",
-    "main": "#1877F2",
+    "main": "#2395D4",
     "dark": "#0C44AE",
     "darker": "#042174",
     "contrastText": "#FFFFFF"
@@ -24,11 +24,11 @@
     "contrastText": "#FFFFFF"
   },
   "success": {
-    "lighter": "#D3FCD2",
+    "lighter": "#0B2E4E",
     "light": "#77ED8B",
     "main": "#22C55E",
     "dark": "#118D57",
-    "darker": "#065E49",
+    "darker": "#FFFFFF",
     "contrastText": "#ffffff"
   },
   "warning": {
@@ -54,10 +54,13 @@
     "300": "#DFE3E8",
     "400": "#C4CDD5",
     "500": "#919EAB",
-    "600": "#637381",
+    "600": "#3CB1F1",
     "700": "#454F5B",
     "800": "#1C252E",
     "900": "#141A21"
+  },
+  "blue":{
+    "dark": "#0B2E4E"
   },
   "common": {
     "black": "#000000",

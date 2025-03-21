@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { BlogView } from 'src/sections/blog/view';
+import { StatisticsAndReportsView } from 'src/sections/statistics-and-reports/view';
 
 // ----------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ export default function Page() {
         <title> {`Statistics & Reports - ${CONFIG.appName}`}</title>
       </Helmet>
 
-      <BlogView />
+      <StatisticsAndReportsView />
     </>
   );
 }

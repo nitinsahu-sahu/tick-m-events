@@ -1,14 +1,5 @@
+import { Box, Button, Typography,Card, CardContent, Grid, IconButton, TextField } from "@mui/material";
 import { useState } from "react";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  TextField,
-  Typography,
-  IconButton,
-} from "@mui/material";
 import { Iconify } from "src/components/iconify";
 import { DashboardContent } from "src/layouts/dashboard";
 
@@ -40,28 +31,27 @@ export function EventValidationView() {
       backgroundColor: "#FFD9A3", // Light Orange
     },
   ];
-
-  return (
-    <DashboardContent>
-      {/* Page Header */}
-      <Typography variant="h4" fontWeight="bold" mb={2}>
-        Entry Validation (QR Code Scan)
-      </Typography>
-
-      {/* Wrapped Ticket Scanner section inside a bordered and shadowed Box */}
-      <Box
-        sx={{
-          // border: "2px solid #0B2A4A",
-          boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
-          borderRadius: "12px",
-          padding: "20px",
-          backgroundColor: "#fff",
-        }}
-      >
-        {/* Ticket Scanner Heading */}
-        <Typography variant="h5" fontWeight="bold" mb={2}>
-          Ticket Scanner
+    return (
+      <DashboardContent>
+        {/* Page Header */}
+        <Typography variant="h4" fontWeight="bold" mb={2}>
+          Entry Validation (QR Code Scan)
         </Typography>
+  
+        {/* Wrapped Ticket Scanner section inside a bordered and shadowed Box */}
+        <Box
+          sx={{
+            // border: "2px solid #0B2A4A",
+            boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
+            borderRadius: "12px",
+            padding: "20px",
+            backgroundColor: "#fff",
+          }}
+        >
+          {/* Ticket Scanner Heading */}
+          <Typography variant="h5" fontWeight="bold" mb={2}>
+            Ticket Scanner
+            </Typography>
 
         {/* Scan a Ticket Bar */}
         <Box
@@ -90,7 +80,7 @@ export function EventValidationView() {
             variant="outlined"
             placeholder="Scan a Ticket"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e:any) => setSearch(e.target.value)}
             sx={{
               borderRadius: "8px",
             }}
@@ -182,5 +172,5 @@ export function EventValidationView() {
         </Grid>
       </Box>
     </DashboardContent>
-  );
+  )
 }

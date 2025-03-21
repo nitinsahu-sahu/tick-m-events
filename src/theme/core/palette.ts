@@ -77,6 +77,9 @@ export const warning = createPaletteChannel(COLORS.warning);
 // Error
 export const error = createPaletteChannel(COLORS.error);
 
+// blue
+export const blue = createPaletteChannel(COLORS.blue);
+
 // Common
 export const common = createPaletteChannel(COLORS.common);
 
@@ -124,6 +127,7 @@ export const basePalette = {
   warning,
   error,
   grey,
+  blue,
   common,
   divider: varAlpha(grey['500Channel'], 0.2),
   action,

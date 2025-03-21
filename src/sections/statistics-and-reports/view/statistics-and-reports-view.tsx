@@ -3,7 +3,8 @@ import { Iconify } from "src/components/iconify";
 import { DashboardContent } from "src/layouts/dashboard";
 
 export function StatisticsAndReportsView() {
-  <DashboardContent>
+  return(
+    <DashboardContent>
     <Box display="flex" alignItems="center" mb={5}>
       <Typography variant="h4" flexGrow={1}>
         Statistics And Reports
@@ -17,4 +18,5 @@ export function StatisticsAndReportsView() {
       </Button>
     </Box>
   </DashboardContent>
+  )
 }

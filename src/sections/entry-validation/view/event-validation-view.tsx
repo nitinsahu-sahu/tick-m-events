@@ -3,8 +3,8 @@ import { Iconify } from "src/components/iconify";
 import { DashboardContent } from "src/layouts/dashboard";
 
 export function EventValidationView() {
-  return(
-<DashboardContent>
+  return (
+    <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
           Event Validation
@@ -17,7 +17,7 @@ export function EventValidationView() {
           New post
         </Button>
       </Box>
-      </DashboardContent>
+    </DashboardContent>
   )
-    
+
 }

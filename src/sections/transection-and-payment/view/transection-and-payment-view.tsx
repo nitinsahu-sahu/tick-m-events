@@ -3,10 +3,11 @@ import { Iconify } from "src/components/iconify";
 import { DashboardContent } from "src/layouts/dashboard";
 
 export function TransectionAndPaymentView() {
+  return (
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-        Transection And Payment
+          Transection And Payment
         </Typography>
         <Button
           variant="contained"
@@ -16,5 +17,7 @@ export function TransectionAndPaymentView() {
           New post
         </Button>
       </Box>
-      </DashboardContent>
+    </DashboardContent>
+  )
+
 }

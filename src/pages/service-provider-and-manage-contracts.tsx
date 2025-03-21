@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { BlogView } from 'src/sections/blog/view';
+import { ServiceProviderAndManageContractView } from 'src/sections/service-provider-and-manage-contracts/view';
 
 // ----------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ export default function Page() {
         <title> {`Service Provider & Manage Contracts - ${CONFIG.appName}`}</title>
       </Helmet>
 
-      <BlogView />
+      <ServiceProviderAndManageContractView />
     </>
   );
 }

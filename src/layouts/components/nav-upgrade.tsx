@@ -1,54 +1,104 @@
-import type { StackProps } from '@mui/material/Stack';
+import { Box, Card, Typography, Link, useMediaQuery, useTheme } from "@mui/material";
 
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+export function NavUpgrade() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Responsive check
 
-import { textGradient } from 'src/theme/styles';
-
-// ----------------------------------------------------------------------
-
-export function NavUpgrade({ sx, ...other }: StackProps) {
   return (
-    <Box
-      display="flex"
-      alignItems="center"
-      flexDirection="column"
-      sx={{ mb: 4, textAlign: 'center', ...sx }}
-      {...other}
+    <Card
+      sx={{
+        p: { xs: 2, sm: 3 },
+        width: { xs: "90%", sm: 245 }, // Adjust width for mobile
+        height: { xs: 180, sm: 203 }, // Adjust height for mobile
+        borderRadius: 2,
+        background: "linear-gradient(135deg, #007bff 0%, #0056b3 100%)",
+        color: "common.white",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        position: "relative", // For positioning the background elements
+        overflow: "hidden",
+      }}
     >
-      <Typography
-        variant="h6"
-        sx={(theme) => ({
-          ...textGradient(
-            `to right, ${theme.vars.palette.secondary.main}, ${theme.vars.palette.warning.main}`
-          ),
-        })}
-      >
-        More features?
-      </Typography>
-      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-        {`From only `}
-        <Box component="strong" sx={{ color: 'text.primary' }}>
-          $69
-        </Box>
-      </Typography>
-
+      {/* Top Left SVG Icon */}
       <Box
         component="img"
-        alt="Minimal dashboard"
-        src="/assets/illustrations/illustration-dashboard.webp"
-        sx={{ width: 200, my: 2 }}
+        src="/assets/icons/ticket-sale/ic-wave.svg"
+        alt="Wave Icon"
+        sx={{
+          width: { xs: 20, sm: 24 },
+          height: { xs: 12, sm: 15 },
+          position: "absolute",
+          top: { xs: 10, sm: 16 },
+          left: { xs: 15, sm: 25 },
+        }}
       />
 
-      <Button
-        href="https://material-ui.com/store/items/minimal-dashboard/"
-        target="_blank"
-        variant="contained"
-        color="inherit"
+      {/* Title */}
+      <Box sx={{ mt: 2 }}>
+        <Typography
+          variant="h6"
+          fontWeight="bold"
+          sx={{
+            fontFamily: "Poppins, sans-serif",
+            fontWeight: 600,
+            fontSize: { xs: "16px", sm: "18px" }, // Adjust font size
+          }}
+        >
+          Ticket Sales
+        </Typography>
+        <Typography
+          variant="h6"
+          fontWeight="bold"
+          sx={{
+            fontFamily: "Poppins, sans-serif",
+            fontWeight: 600,
+            fontSize: { xs: "16px", sm: "18px" }, // Adjust font size
+          }}
+        >
+          Weekly Report
+        </Typography>
+      </Box>
+
+      {/* Link and Icon Inline Container */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between", // Space out link and icon
+          width: "100%", // Ensure it takes full width
+          mt: 1,
+          mb: 1,
+        }}
       >
-        Upgrade to Pro
-      </Button>
-    </Box>
+        {/* "Learn more" link */}
+        <Link
+          href="#"
+          underline="hover"
+          sx={{
+            color: "common.white",
+            fontWeight: 700,
+            fontSize: { xs: "12px", sm: "14px" }, // Adjust font size for mobile
+            fontFamily: "Open Sans, sans-serif",
+            display: "inline-block",
+          }}
+        >
+          Learn more
+        </Link>
+
+        {/* Bottom Right SVG Icon */}
+        <Box
+          component="img"
+          src="/assets/icons/ticket-sale/ic-point-burger.svg"
+          alt="Dots Icon"
+          sx={{
+            width: { xs: 16, sm: 20 },
+            height: { xs: 20, sm: 26 },
+            opacity: 0.5,
+          }}
+        />
+      </Box>
+
+    </Card>
   );
 }

@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { BlogView } from 'src/sections/blog/view';
+import { TicketAndReservationManagementView } from 'src/sections/ticket-and-reservation-management/view';
 
 // ----------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ export default function Page() {
         <title> {`Ticket & Reservation Management - ${CONFIG.appName}`}</title>
       </Helmet>
 
-      <BlogView />
+      <TicketAndReservationManagementView />
     </>
   );
 }

@@ -3,18 +3,21 @@ import { Iconify } from "src/components/iconify";
 import { DashboardContent } from "src/layouts/dashboard";
 
 export function MarketingEngagenmentView() {
-  <DashboardContent>
-    <Box display="flex" alignItems="center" mb={5}>
-      <Typography variant="h4" flexGrow={1}>
-        Marketing Engagenment
-      </Typography>
-      <Button
-        variant="contained"
-        color="inherit"
-        startIcon={<Iconify icon="mingcute:add-line" />}
-      >
-        New post
-      </Button>
-    </Box>
-  </DashboardContent>
+  return (
+    <DashboardContent>
+      <Box display="flex" alignItems="center" mb={5}>
+        <Typography variant="h4" flexGrow={1}>
+          Marketing Engagenment
+        </Typography>
+        <Button
+          variant="contained"
+          color="inherit"
+          startIcon={<Iconify icon="mingcute:add-line" />}
+        >
+          New post
+        </Button>
+      </Box>
+    </DashboardContent>
+  )
+
 }

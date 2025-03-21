@@ -3,7 +3,8 @@ import { Iconify } from "src/components/iconify";
 import { DashboardContent } from "src/layouts/dashboard";
 
 export function VisibilityAndAccessSettingsView() {
-    <DashboardContent>
+  return(
+<DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
         Visibility And Access Settings
@@ -17,4 +18,6 @@ export function VisibilityAndAccessSettingsView() {
         </Button>
       </Box>
       </DashboardContent>
+  )
+    
 }

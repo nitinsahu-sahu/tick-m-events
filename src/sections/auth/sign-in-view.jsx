@@ -1,51 +1,64 @@
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
-import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { useRouter } from 'src/routes/hooks';
-
 import { Iconify } from 'src/components/iconify';
+import { login } from 'src/redux/actions';
 
 // ----------------------------------------------------------------------
 
 export function SignInView() {
-  const router = useRouter();
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const auth = useSelector(state => state.auth);
+  const [formData, setFormData] = useState({ email: 'admin.rinku@gmail.com', password: 'admin@123' });
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignIn = useCallback(() => {
-    router.push('/');
-  }, [router]);
+  const handleChange = (event) => {
+    event.preventDefault(); // Prevent default form submission behavior
+    const { name, value } = event.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
 
+  const handleSignIn = useCallback(async (event) => {
+    event.preventDefault(); // Prevent default form submission behavior
+    const result = await dispatch(login(formData));
+  }, [formData, dispatch]);
+
+  if (auth?.authenticate) {
+    setTimeout(() => navigate("/"), 100);
+  }
+  
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
       <TextField
         fullWidth
+        required
         name="email"
+        type='email'
         label="Email address"
-        defaultValue="hello@gmail.com"
+        value={formData.email}
+        onChange={handleChange}
         InputLabelProps={{ shrink: true }}
         sx={{ mb: 3 }}
       />
 
-      <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-        Forgot password?
-      </Link>
-
       <TextField
         fullWidth
+        required
         name="password"
         label="Password"
-        defaultValue="@demo1234"
-        InputLabelProps={{ shrink: true }}
+        value={formData.password}
+        onChange={handleChange}
         type={showPassword ? 'text' : 'password'}
+        InputLabelProps={{ shrink: true }}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -64,7 +77,6 @@ export function SignInView() {
         type="submit"
         color="inherit"
         variant="contained"
-        onClick={handleSignIn}
       >
         Sign in
       </LoadingButton>
@@ -75,15 +87,10 @@ export function SignInView() {
     <>
       <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
         <Typography variant="h5">Sign in</Typography>
-        <Typography variant="body2" color="text.secondary">
-          Don’t have an account?
-          <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-            Get started
-          </Link>
-        </Typography>
       </Box>
-
-      {renderForm}
+      <form onSubmit={handleSignIn}>
+        {renderForm}
+      </form>
     </>
   );
 }

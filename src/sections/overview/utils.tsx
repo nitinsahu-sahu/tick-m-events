@@ -109,8 +109,8 @@ export const upcomingEvents = [
     cost: "$124,00",
     sold: 561,
     total: 600,
-    date: "24",
-    day: "24",
+    date: "22",
+    day: "Wed",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mini",
   },
   {
@@ -122,7 +122,7 @@ export const upcomingEvents = [
     sold: 561,
     total: 600,
     date: "24",
-    day: "24",
+    day: "Sun",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mini",
   },
   {
@@ -133,8 +133,8 @@ export const upcomingEvents = [
     cost: "$124,00",
     sold: 561,
     total: 600,
-    date: "24",
-    day: "24",
+    date: "23",
+    day: "Sat",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mini",
   }
 ]
@@ -168,3 +168,31 @@ export const salesRevenuChartOptions: ApexOptions = {
 };
 
 export const salesRevenuChartSeries = [{ name: "Sales", data: [600, 400, 500, 700, 800, 300, 200] }];
+
+export const latestSales = [
+  {
+    _id: "1",
+    img: "/assets/images/avatar/avatar-1.webp",
+    name: "Olivia Johanson",
+    description: "High Performance Conert 2020",
+  },
+  {
+    _id: "2",
+    img: "/assets/images/avatar/avatar-2.webp",
+    name: "Griezerman",
+    description: "Fireworks Show New Year 2020",
+  },
+  {
+    _id: "3",
+    img: "/assets/images/avatar/avatar-3.webp",
+    name: "Uli Trumb",
+    description: "High Performance Conert 2020..",
+  },
+  {
+    _id: "4",
+    img: "/assets/images/avatar/avatar-4.webp",
+    name: "Oconner",
+    description: "High Performance Conert 2020..",
+  }
+  
+]

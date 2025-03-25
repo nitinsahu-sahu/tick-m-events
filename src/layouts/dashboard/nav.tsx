@@ -115,7 +115,7 @@ export function DashboardHF({ title }: any) {
       fontSize: { xs: 14, sm: 16 },
       marginBottom: 1,
       marginTop: 1,
-      marginLeft:2
+      marginLeft: 2
     }}>
       {title}
 

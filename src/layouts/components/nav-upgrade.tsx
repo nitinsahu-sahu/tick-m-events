@@ -8,16 +8,18 @@ export function NavUpgrade() {
     <Card
       sx={{
         p: { xs: 2, sm: 3 },
-        width: { xs: "90%", sm: 245 }, // Adjust width for mobile
-        height: { xs: 180, sm: 203 }, // Adjust height for mobile
-        borderRadius: 2,
-        background: "linear-gradient(135deg, #007bff 0%, #0056b3 100%)",
+        width: { xs: "90%", sm: 245 },
+        minHeight: { xs: 140, sm: 160 }, // Use minHeight instead of fixed height
+        aspectRatio: "16 / 9", // Keeps a responsive height
+        borderRadius: "15px",
         color: "common.white",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        position: "relative", // For positioning the background elements
+        position: "relative",
         overflow: "hidden",
+        backgroundImage: "url('/assets/icons/ticket-sale/ticket-sale-bg.png')",
+        backgroundPosition: "center",
       }}
     >
       {/* Top Left SVG Icon */}

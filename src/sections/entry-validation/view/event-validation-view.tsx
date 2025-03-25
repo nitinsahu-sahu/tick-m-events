@@ -390,9 +390,9 @@
       </TableHead>
       <TableBody>
         <TableRow>
-          {["Jean M.", "VIP", "18:30", "Validated"].map((data, index) => (
+          {["Jean M.", "VIP", "18:30", "Validated"].map((item, index) => (
             <TableCell key={index} sx={{ textAlign: "center" }}>
-              {data}
+              {item}
             </TableCell>
           ))}
         </TableRow>
@@ -505,13 +505,15 @@
     </Paper>
 
 
-   <Box
-      sx={{
-        width: "900px",
-        maxWidth: "100%",
-        margin: "auto",
-      }}
-    >
+    <Box
+  sx={{
+    boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
+    borderRadius: "12px",
+    padding: "20px",
+    backgroundColor: "#fff",
+    mt: 4,
+  }}
+>
       {/* Main Box */}
       <Box
         sx={{

@@ -79,7 +79,6 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
             rightArea: (
               <Box display="flex" alignItems="center" gap={2}>
                 {/* Search Bar */}
-                {/* <Searchbar /> */}
                 <Box
                   sx={{
                     display: "flex",

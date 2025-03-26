@@ -1,12 +1,14 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense,useEffect } from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
-
+import { useDispatch, useSelector } from 'react-redux';
 import Box from '@mui/material/Box';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
+import { isUserLoggedIn } from 'src/redux/actions';
+import Protected from 'src/redux/helper/HOC';
 
 // ----------------------------------------------------------------------
 
@@ -40,14 +42,24 @@ const renderFallback = (
 );
 
 export function Router() {
+  const dispatch = useDispatch()
+  const auth = useSelector((state)=> state.auth);
+  useEffect(() => {
+    if (!auth?.authenticate) {
+      dispatch(isUserLoggedIn());
+    }
+  }, [dispatch,auth?.authenticate]); // ✅ Remove `auth` from dependencies
+  
   return useRoutes([
     {
       element: (
+        <Protected>
         <DashboardLayout>
           <Suspense fallback={renderFallback}>
             <Outlet />
           </Suspense>
         </DashboardLayout>
+        </Protected>
       ),
       children: [
         { element: <HomePage />, index: true },

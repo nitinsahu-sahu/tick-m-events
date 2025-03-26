@@ -1,7 +1,11 @@
 import { 
-  Box, Typography, TextField, InputAdornment, useMediaQuery, Select, 
+  Box, Typography, TextField, InputAdornment, useMediaQuery, Select, TextFieldProps , 
   MenuItem, Button, IconButton, RadioGroup, FormControlLabel, Radio,
-  Switch, Stepper, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Switch, Stepper, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import React, { useState } from "react";
@@ -15,6 +19,14 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import EventIcon from "@mui/icons-material/Event";
 import dayjs, { Dayjs } from "dayjs";
+import { styled } from "@mui/system";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+
+
+
+
+
+
 
 export function EventDetailsView() {
   const isMobile = useMediaQuery("(max-width:600px)");
@@ -25,6 +37,32 @@ export function EventDetailsView() {
   const [visibility, setVisibility] = useState("public");
   const [date, setDate] = useState<Dayjs | null>(dayjs());  // Ensure correct typing
   const [time, setTime] = useState<Dayjs | null>(dayjs());
+  const [selectedDate, setSelectedDate] = useState(null);
+const [selectedTime, setSelectedTime] = useState(dayjs());
+const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+const [selectedLogo, setSelectedLogo] = useState(null);
+const [selectedFrame, setSelectedFrame] = useState(null);
+const [selectedColor, setSelectedColor] = useState("#FF66A1");
+
+const UploadButton = styled("label")({
+  display: "inline-block",
+  backgroundColor: "#F1F1F1",
+  padding: "8px 12px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontSize: "14px",
+  textAlign: "center",
+});
+
+
+
+const handleLogoUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    setSelectedLogo(URL.createObjectURL(file));
+  }
+};
+
 
   
 
@@ -148,6 +186,164 @@ export function EventDetailsView() {
           Save and proceed to the next step
         </Button>
       </Box>
+
+{/* Event Customization */}
+<Card
+      sx={{
+        borderRadius: 4,
+        padding: 3,
+        boxShadow: 3,
+        margin: "auto",
+        border: "2px solid #E0E0E0",
+        marginTop: 4,
+      }}
+    >
+      <CardContent>
+        <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
+          {/* Left Section: Theme Selection */}
+          <Box>
+            <Typography variant="h5" fontWeight="bold">
+              Event Customization
+            </Typography>
+            <Typography variant="h6" fontWeight="bold" sx={{ mt: 2, color: "#1E1E1E" }}>
+              Choose Event Theme
+            </Typography>
+            <Typography variant="body2" sx={{ color: "#666" }}>
+              Choose main colors
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
+              {["#FF66A1", "#E63946", "#FFD700", "#4A90E2", "#E91E63"].map((color) => (
+                <Box
+                  key={color}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    backgroundColor: color,
+                    borderRadius: "50%",
+                    cursor: "pointer",
+                    border: selectedColor === color ? "2px solid black" : "none",
+                  }}
+                  onClick={() => setSelectedColor(color)}
+                />
+              ))}
+            </Box>
+
+            {/* Custom Gradient Colors */}
+            <Typography variant="body2" sx={{ color: "#666", mt: 2 }}>
+              Choose Custom Colors
+            </Typography>
+            <Box
+              sx={{
+                width: "200px",
+                height: "32px",
+                background: "linear-gradient(to right, yellow, orange)",
+                borderRadius: "8px",
+                mt: 1,
+                border: "1px solid #ccc",
+              }}
+            ></Box>
+          </Box>
+
+          {/* Right Section: Logo Upload & Frame Selection */}
+          <Box sx={{ textAlign: "start" }}>
+            <Typography variant="h6" fontWeight="bold">
+              Add logo
+            </Typography>
+
+            {/* Logo Display Box - Aligned to Start */}
+            <Box
+              sx={{
+                width: "90px",
+                height: "90px",
+                borderRadius: "12px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#FFF",
+                boxShadow: 2,
+                border: "1px solid #D3D3D3",
+                overflow: "hidden",
+                marginBottom: 4,
+                marginLeft: 0,
+              }}
+            >
+              {selectedLogo ? (
+                <img src={selectedLogo} alt="Uploaded" width="60px" />
+              ) : (
+                <Typography variant="body2" color="textSecondary">
+                  No Logo
+                </Typography>
+              )}
+            </Box>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
+              {/* Logo Upload Section */}
+              <Box>
+                <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
+                  Choose logo
+                </Typography>
+                <label
+                  htmlFor="logo-upload"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    backgroundColor: "#F1F1F1",
+                    padding: "10px 16px",
+                    borderRadius: "8px",
+                    cursor: "pointer",
+                    border: "1px solid #ccc",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                  }}
+                >
+                  Upload Image <CloudUploadIcon fontSize="small" />
+                  <input
+                    type="file"
+                    id="logo-upload"
+                    hidden
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setSelectedLogo(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+                </label>
+              </Box>
+
+              {/* Frame Selection Section */}
+              <Box>
+                <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
+                  Choose Frames
+                </Typography>
+                <Box sx={{ display: "flex", gap: 2 }}>
+                  {["circle", "triangle", "square"].map((frame) => (
+                    <Box
+                      key={frame}
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: frame === "circle" ? "50%" : "4px",
+                        border: "2px solid",
+                        borderColor: selectedFrame === frame ? "#007BFF" : "#D3D3D3",
+                        backgroundColor: "#E0E0E0",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      onClick={() => setSelectedFrame(frame)}
+                    />
+                  ))}
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+
 
       <Card sx={{ padding: 3, marginTop: 4, borderRadius: 2, border: "2px solid #B3B3B3" }}>
       <CardContent>
@@ -309,46 +505,245 @@ export function EventDetailsView() {
     </Box>
 
     {/* //  security & Confirmation */}
-    <Card sx={{ padding: 3, borderRadius: 3, boxShadow: 3 , margin: "auto" }}>
-    <CardContent>
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
-        Security & Confirmation
-      </Typography>
+  <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Card sx={{ padding: 3, borderRadius: 3, boxShadow: 3, margin: "auto" }}>
+        <CardContent>
+          <Typography variant="h6" fontWeight="bold" gutterBottom>
+            Security & Confirmation
+          </Typography>
 
-      <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>
-        Event Details
-      </Typography>
+          <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>
+            Event Details
+          </Typography>
 
-      {/* Input Fields */}
-      <div style={{ display: "flex", gap: "16px", marginBottom: "20px" }}>
-        <TextField fullWidth defaultValue="Tech Conference 2025" variant="outlined" />
+          {/* Input Fields */}
+          <Box sx={{ display: "flex", gap: "16px", marginBottom: "20px" }}>
+            <TextField
+              sx={{
+                width: "50%",
+                borderRadius: "8px",
+                "& .MuiOutlinedInput-root": { borderRadius: "8px" },
+              }}
+              defaultValue="Tech Conference 2025"
+              variant="outlined"
+            />
 
-        <TextField
-          fullWidth
-          placeholder="mm/dd/yyyy"
-          variant="outlined"
-          InputProps={{
-            endAdornment: <EventIcon />,
+            {/* Date Picker Field - Fixed Issues */}
+            <DatePicker
+              value={selectedDate}
+              onChange={(newValue) => setSelectedDate(newValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  sx={{
+                    width: "50%",
+                    borderRadius: "8px",
+                    "& .MuiOutlinedInput-root": { borderRadius: "8px" },
+                  }}
+                  variant="outlined"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <IconButton onClick={() => params.inputProps?.onClick?.()}>
+                        <EventIcon />
+                      </IconButton>
+                    ),
+                  }}
+                />
+              )}
+            />
+          </Box>
+
+          {/* Buttons */}
+          <Box sx={{ display: "flex", gap: "12px" }}>
+            <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white", fontWeight: "bold", borderRadius: "8px" }}>
+              Reschedule Event
+            </Button>
+            <Button variant="contained" sx={{ backgroundColor: "#D32F2F", color: "white", fontWeight: "bold", borderRadius: "8px" }}>
+              Delete Event
+            </Button>
+          </Box>
+
+          <Typography variant="caption" sx={{ display: "block", marginTop: "12px", color: "gray" }}>
+            All changes saved automatically.
+          </Typography>
+        </CardContent>
+      </Card>
+    </LocalizationProvider>
+
+{/* reschedule section */}
+
+<LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Box sx={{ display: "flex", gap: 3, justifyContent: "space-between", flexWrap: "wrap", mt: 4 , mb:4}}>
+        
+        {/* Reschedule Event Card */}
+        <Card
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            borderRadius: 4,
+            boxShadow: 3,
+            padding: 3,
+            backgroundColor: "#FFF",
           }}
-        />
-      </div>
+        >
+          <CardContent sx={{ width: "100%" }}>
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, textAlign: "left" }}>
+              Reschedule Event
+            </Typography>
 
-      {/* Buttons */}
-      <div style={{ display: "flex", gap: "12px" }}>
-        <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white", fontWeight: "bold", borderRadius: "8px" }}>
-          Reschedule Event
-        </Button>
-        <Button variant="contained" sx={{ backgroundColor: "#D32F2F", color: "white", fontWeight: "bold", borderRadius: "8px" }}>
-          Delete Event
-        </Button>
-      </div>
+            {/* Date & Time Picker Row */}
+            <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+              {/* Date Picker */}
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  Select a new date for the event:
+                </Typography>
+                <DatePicker
+                  value={selectedDate}
+                  onChange={(newValue) => setSelectedDate(newValue)}
+                  renderInput={(params) => <TextField {...params} fullWidth size="small" variant="outlined" />}
+                />
+              </Box>
 
-      <Typography variant="caption" sx={{ display: "block", marginTop: "12px", color: "gray" }}>
-        All changes saved automatically.
-      </Typography>
-    </CardContent>
-  </Card>
-</Box>
+              {/* Time Picker */}
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  Select a new Time for the event:
+                </Typography>
+                <TimePicker
+                  value={selectedTime}
+                  onChange={(newValue) => setSelectedTime(newValue)}
+                  renderInput={(params) => <TextField {...params} fullWidth size="small" variant="outlined" />}
+                />
+              </Box>
+            </Box>
 
+            {/* Buttons */}
+            <Box sx={{ display: "flex", gap: 2, justifyContent: "end" }}>
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: "#0B2E4C",
+                  color: "white",
+                  borderRadius: "8px",
+                  width: "150px",
+                  "&:hover": { backgroundColor: "#09263D" },
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: "#0B2E4C",
+                  color: "white",
+                  borderRadius: "8px",
+                  width: "180px",
+                  "&:hover": { backgroundColor: "#09263D" },
+                }}
+              >
+                Confirm Reschedule
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+
+         {/* Delete Confirmation Card */}
+         <Card
+  sx={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    borderRadius: 4,
+    boxShadow: 3,
+    padding: 3,
+    backgroundColor: "#FFF",
+  }}
+>
+  <CardContent sx={{ width: "100%" }}>
+    <Typography variant="h6" fontWeight="bold" sx={{ mb: 2,mt:2, textAlign: "left" }}>
+      Are you sure?
+    </Typography>
+    
+    {/* Fixes line break issue exactly like image */}
+    <Typography
+      variant="body2"
+      sx={{
+        mb: 3,
+        pr: 20,
+        mt:2,
+        lineHeight: 1.4, 
+        wordBreak: "break-word", 
+      }}
+    >
+      Are you sure you want to delete this event? This action is&nbsp; <br></br>
+      irreversible.
+    </Typography>
+
+    {/* Buttons */}
+    <Box sx={{ display: "flex", justifyContent: "end", gap: 2,mt:4 }}>
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: "#0B2E4C",
+          color: "white",
+          borderRadius: "8px",
+          minWidth: "120px",
+          fontSize: "14px",
+          textTransform: "none",
+          padding: "6px 16px",
+          "&:hover": { backgroundColor: "#09263D" },
+        }}
+      >
+        Cancel
+      </Button>
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: "#D32F2F",
+          color: "white",
+          borderRadius: "8px",
+          minWidth: "140px",
+          fontSize: "14px",
+          textTransform: "none",
+          padding: "6px 16px",
+          "&:hover": { backgroundColor: "#B71C1C" },
+        }}
+      >
+        Yes, Proceed
+      </Button>
+    </Box>
+  </CardContent>
+</Card>
+
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this event? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)} sx={{ color: "#0B2E4C" }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => setOpenDeleteDialog(false)}
+            sx={{ backgroundColor: "#D32F2F", color: "white" }}
+          >
+            Delete Event
+          </Button>
+        </DialogActions>
+      </Dialog>
+      </Box>
+    </LocalizationProvider>
+
+
+
+    </Box>
   );
 }

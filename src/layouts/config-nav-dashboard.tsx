@@ -40,11 +40,6 @@ export const navData = [
     ],
   },
   {
-    title: 'Analytics',
-    path: '/analytics',
-    icon: icon('ic-analytics'),
-  },
-  {
     title: 'Event Details',
     path: '/event-details',
     icon: icon('ic-analytics'),

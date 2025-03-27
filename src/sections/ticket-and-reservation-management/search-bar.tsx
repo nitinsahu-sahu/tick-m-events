@@ -1,4 +1,4 @@
-import { Box, InputBase,IconButton } from "@mui/material";
+import { Box, InputBase, IconButton } from "@mui/material";
 import { Iconify } from "src/components/iconify";
 
 export function SearchBar() {
@@ -8,7 +8,7 @@ export function SearchBar() {
                 display: "flex",
                 height: "40px",
                 alignItems: "center",
-                width: "200px",
+                width: { xs: "150px", sm: "180px", md: "200px" },
                 maxWidth: "300px",
                 border: "1px solid #ddd",
                 borderRadius: "8px",

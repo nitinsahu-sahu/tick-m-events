@@ -16,7 +16,6 @@ export const HomePage = lazy(() => import('src/pages/home'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
-export const AnalyticsPage = lazy(() => import('src/pages/analytics'));
 export const EntryValidationPage = lazy(() => import('src/pages/entry-validation'));
 export const MarketingEngagenmentPage = lazy(() => import('src/pages/marketing-engagenment'));
 export const EventDetailsPage = lazy(() => import('src/pages/event-details'));
@@ -64,7 +63,6 @@ export function Router() {
       children: [
         { element: <HomePage />, index: true },
         { path: 'blog', element: <BlogPage /> },
-        { path: 'analytics', element: <AnalyticsPage /> },
         { path: 'event-details', element: <EventDetailsPage /> },
         { path: 'ticket-and-reservation-management', element: <TicketAndReservationManagementPage /> },
         { path: 'entry-validation', element: <EntryValidationPage /> },

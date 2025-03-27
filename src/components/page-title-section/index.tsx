@@ -5,19 +5,24 @@ export function PageTitleSection({ title, desc, rightCom }: any) {
         <Box
             sx={{
                 display: "flex",
+                flexDirection: { xs: "row", md: "row" }, // Stack on small screens
                 justifyContent: "space-between",
-                alignItems: "center",
+                alignItems: { xs: "center", md: "center" }, // Align left on small, center on large
                 mb: { xs: 3, md: 5 },
+
             }}
+            mt={3}
         >
             {/* Left Side - Dashboard Title & Subtitle */}
-            <Box>
+            <Box sx={{ width: { xs: "50%", md: "auto" } }}>
                 <Typography
                     variant="h4"
                     sx={{
                         fontWeight: "bold",
                         color: "#000",
                         fontFamily: "Poppins, sans-serif",
+                        fontSize: { xs: "15px", sm: "18px", md: "34px" }, // Responsive size
+                        lineHeight: { xs: "20px"}, // Responsive size
                     }}
                 >
                     {title}
@@ -27,14 +32,19 @@ export function PageTitleSection({ title, desc, rightCom }: any) {
                     sx={{
                         color: "#C0C0C0",
                         fontFamily: "Poppins, sans-serif",
+                        fontSize: { xs: "12px", sm: "15px", md: "18px" }, // Adjust dynamically
                     }}
                 >
                     {desc}
                 </Typography>
             </Box>
 
-            {/* Right Side - Countdown Box */}
-            {rightCom ? <Box>{rightCom}</Box> : null}
+            {/* Right Side - Countdown/Search Bar, etc. */}
+            {rightCom && (
+                <Box display="flex" justifyContent="center" sx={{ width: { xs: "50%", md: "auto" }, textAlign: { xs: "left", md: "right" } }}>
+                    {rightCom}
+                </Box>
+            )}
         </Box>
     )
 }

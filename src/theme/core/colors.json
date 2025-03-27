@@ -57,7 +57,8 @@
     "600": "#3CB1F1",
     "700": "#454F5B",
     "800": "#1C252E",
-    "900": "#141A21"
+    "900": "#141A21",
+    "main":"#969696"
   },
   "blue": {
     "lighter": "#E3F2FD",
@@ -65,7 +66,7 @@
     "main": "#2196F3",
     "dark": "#0B2E4E",
     "darker": "#08192D",
-    "contrastText": "#FFFFFF"
+    "contrastText": "#0B2E4C"
   },
   "common": {
     "black": "#000000",

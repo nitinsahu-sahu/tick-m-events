@@ -63,17 +63,19 @@ export function TicketAndReservationManagementView() {
 
   const tableHeadersSecond = ["Name", "Email", "Ticket Type", "Purchase Date", "Status", "Actions"];
   const tableDataSecond = [
-    { type: "Jean M", price: "jean@email.com", total: "VIP", remaining: "02/02/2025", sold: ["Pending","Confirmed","Canceled"], revenue: "Cancel" },
-    { type: "Jean M", price: "jean@email.com", total: "VIP", remaining: "02/03/2025", sold: ["Pending","Confirmed","Canceled"], revenue: "Cancel" },
-    { type: "Jean M", price: "jean@email.com", total: "VIP", remaining: "02/04/2025", sold: ["Pending","Confirmed","Canceled"], revenue: "Cancel" },
+    { type: "Jean M", price: "jean@email.com", total: "VIP", remaining: "02/02/2025", sold: ["Pending", "Confirmed", "Canceled"], revenue: "Cancel" },
+    { type: "Jean M", price: "jean@email.com", total: "VIP", remaining: "02/03/2025", sold: ["Pending", "Confirmed", "Canceled"], revenue: "Cancel" },
+    { type: "Jean M", price: "jean@email.com", total: "VIP", remaining: "02/04/2025", sold: ["Pending", "Confirmed", "Canceled"], revenue: "Cancel" },
   ];
 
   const chartRealTimeOptions: ApexOptions = {
     series: [45, 30, 25], // Ticket Sold, Validation, Remaining
     labels: ["Ticket Sold", "Ticket Validation", "Remaining Tickets"],
     chart: { type: "donut" },
-    colors: ["#008FFB", "#00E396", "#FEB019"],
-    legend: { position: "bottom" },
+    colors: ["#2395D4", "#002E4E", "#29A71A"], // Match colors from screenshot
+    legend: { position: "bottom", markers: { strokeWidth: 8 } },
+    dataLabels: { enabled: true },
+    responsive: [{ breakpoint: 768, options: { legend: { position: "bottom" } } }],
   };
   return (
     <DashboardContent>
@@ -374,11 +376,41 @@ export function TicketAndReservationManagementView() {
         </Box>
 
         {/* Real-time Entry Statistics */}
-        <Box mt={4} p={3} bgcolor="#F5F5F5" borderRadius={3}>
-          <Typography variant="h6" fontWeight="bold">
-            Real-time Entry Statistics
-          </Typography>
-          <Chart options={chartRealTimeOptions} series={chartRealTimeOptions.series} type="donut" width="100%" height={250} />
+        <Box
+          mt={4}
+          p={3}
+          borderRadius={3}
+          sx={{
+            background: "linear-gradient(to right, #ffffff 82%, #2395D4 82%)",
+            position: "relative",
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              width: "120px", // Adjust circle size
+              height: "120px",
+              backgroundColor: "#2395D4",
+              borderRadius: "50%",
+              top: "50%",
+              right: "5%", // Adjust position
+              transform: "translateY(-50%)",
+            },
+            boxShadow: 3,
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {/* Left Side: Title */}
+          <Box flex={1} minWidth="250px">
+            <Typography variant="h6" fontWeight={500} color="#002E4E" fontSize={{ xs: 20, sm: 25, md: 43 }}>
+              Real-time Entry Statistics
+            </Typography>
+          </Box>
+
+          {/* Center: Chart */}
+          <Box flex={2} minWidth="300px">
+            <Chart options={chartRealTimeOptions} series={chartRealTimeOptions.series} type="donut" width="100%" height={250} />
+          </Box>
         </Box>
 
       </Box>

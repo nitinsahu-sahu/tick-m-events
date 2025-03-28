@@ -382,18 +382,6 @@ export function TicketAndReservationManagementView() {
           borderRadius={3}
           sx={{
             background: "linear-gradient(to right, #ffffff 82%, #2395D4 82%)",
-            position: "relative",
-            "&::after": {
-              content: '""',
-              position: "absolute",
-              width: "120px", // Adjust circle size
-              height: "120px",
-              backgroundColor: "#2395D4",
-              borderRadius: "50%",
-              top: "50%",
-              right: "5%", // Adjust position
-              transform: "translateY(-50%)",
-            },
             boxShadow: 3,
             display: "flex",
             alignItems: "center",

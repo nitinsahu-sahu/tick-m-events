@@ -1,22 +1,27 @@
-import { Box, Button, Typography } from "@mui/material";
-import { Iconify } from "src/components/iconify";
+import { PageTitleSection } from "src/components/page-title-section";
 import { DashboardContent } from "src/layouts/dashboard";
+import { LiveSalesRevenueData } from "../live-sales-&-revenue-data";
+import { MainDashboardStatistics } from "../main-dashboard-statistics";
+import { TicketDetailsAndCategories } from "../ticket-details-&-categories";
+import { MainChartComponents } from "../small-charts/main-chart-componets";
+import { ReportDataExport } from "../report-data-export";
 
 export function StatisticsAndReportsView() {
-  return(
+
+  return (
     <DashboardContent>
-    <Box display="flex" alignItems="center" mb={5}>
-      <Typography variant="h4" flexGrow={1}>
-        Statistics And Reports
-      </Typography>
-      <Button
-        variant="contained"
-        color="inherit"
-        startIcon={<Iconify icon="mingcute:add-line" />}
-      >
-        New post
-      </Button>
-    </Box>
-  </DashboardContent>
+      <PageTitleSection
+        title="Sales & Revenue Overview"
+      />
+      <LiveSalesRevenueData />
+
+      <MainDashboardStatistics />
+
+      <TicketDetailsAndCategories />
+
+      <MainChartComponents />
+
+      <ReportDataExport />
+    </DashboardContent>
   )
 }

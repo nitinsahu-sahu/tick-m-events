@@ -506,42 +506,28 @@ export function EventValidationView() {
 
 
       <Box
-        sx={{
-          boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
-          borderRadius: "12px",
-          padding: "20px",
-          backgroundColor: "#fff",
-          mt: 4,
-        }}
+        boxShadow={3}
+        borderRadius={3}
+        p={3}
+        mt={3}
+        bgcolor="#fff"
       >
-        {/* Main Box */}
-        <Box
-          sx={{
-            boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
-            borderRadius: "12px",
-            padding: "20px",
-            backgroundColor: "#fff",
-            mt: 4,
-          }}
-        >
-          {/* Title */}
-          <Typography variant="h6" fontWeight="bold">
-            Offline Mode (PWA)
-          </Typography>
+        <Typography variant="h6" fontWeight="bold">
+          Offline Mode (PWA)
+        </Typography>
 
-          {/* Status */}
-          <Typography variant="body1" sx={{ mt: 2 }}>
-            <strong>Status:</strong>{" "}
-            <span style={{ fontWeight: "bold", color: "#0B2A4A" }}>
-              Online – Sync Enabled
-            </span>
-          </Typography>
+        {/* Status */}
+        <Typography variant="body1">
+          <strong>Status:</strong>{" "}
+          <span style={{ fontWeight: "bold", color: "#0B2A4A" }}>
+            Online – Sync Enabled
+          </span>
+        </Typography>
 
-          {/* Stored Entries */}
-          <Typography variant="body1" sx={{ mt: 1 }}>
-            <strong>Stored Offline Entries:</strong> 0
-          </Typography>
-        </Box>
+        {/* Stored Entries */}
+        <Typography variant="body1">
+          <strong>Stored Offline Entries:</strong> 0
+        </Typography>
       </Box>
 
     </DashboardContent>

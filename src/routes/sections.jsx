@@ -15,6 +15,7 @@ import Protected from 'src/redux/helper/HOC';
 export const HomePage = lazy(() => import('src/pages/home'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
+export const FrontHomePage = lazy(() => import('src/pages/front-home'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const EntryValidationPage = lazy(() => import('src/pages/entry-validation'));
 export const MarketingEngagenmentPage = lazy(() => import('src/pages/marketing-engagenment'));
@@ -79,6 +80,12 @@ export function Router() {
         <AuthLayout>
           <SignInPage />
         </AuthLayout>
+      ),
+    },
+    {
+      path: 'home',
+      element: (
+        <FrontHomePage />
       ),
     },
     {

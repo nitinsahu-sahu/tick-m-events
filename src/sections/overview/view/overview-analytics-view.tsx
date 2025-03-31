@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMediaQuery, ToggleButtonGroup, List, Avatar, ListItemText, IconButton, ListItem, MenuItem, Box, Grid, Button, Card, CardContent, Typography, Paper, Select, Tabs, Tab, Stack, ListItemAvatar, Divider, CardMedia, ToggleButton, LinearProgress } from '@mui/material';
+import { useMediaQuery, ToggleButtonGroup, List, Avatar, ListItemText, IconButton, ListItem, MenuItem, Box, Grid, Button, Card, CardContent, Typography, Select, Stack, ListItemAvatar, Divider, CardMedia, ToggleButton, LinearProgress } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
@@ -10,7 +10,6 @@ import { Iconify } from 'src/components/iconify';
 import { PageTitleSection } from 'src/components/page-title-section';
 
 import { CountDownView } from '../count-down';
-import { AnalyticsCard } from "../analytics-card";
 import { latestSales, upcomingEvents, salesRevenuChartSeries, salesRevenuChartOptions, eventList, donutBestSellingChartSeries, donutBestSellingChartOptions, chartrevenuOptions, chartrevenuSeries, chartOptions, donutChartOptions } from "../utils";
 import { AnalyticsFourCards } from '../analytics-four-card';
 import { BestSelling } from '../best-selling';

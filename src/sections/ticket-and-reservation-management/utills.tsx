@@ -1,10 +1,7 @@
 import { ApexOptions } from "apexcharts";
-import { useTheme } from '@mui/material/styles';
 
-const theme = useTheme();
 
 export const chartOptions: ApexOptions = {
-    
     chart: {
         type: "line",
         toolbar: { show: false },
@@ -14,7 +11,7 @@ export const chartOptions: ApexOptions = {
     },
     stroke: { curve: "smooth" },
     markers: { size: 5 },
-    colors: [theme.palette.primary.main],
+    colors: ["#2395D4"],
 };
 
 export const chartSeries = [{ name: "Sales", data: [600, 400, 300, 450, 500, 200, 150] }];

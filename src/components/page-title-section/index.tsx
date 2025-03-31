@@ -17,6 +17,7 @@ export function PageTitleSection({ title, desc, rightCom }: any) {
             <Box sx={{ width: { xs: "50%", md: "auto" } }}>
                 <Typography
                     variant="h4"
+                    mb={2}
                     sx={{
                         fontWeight: "bold",
                         color: "#000",

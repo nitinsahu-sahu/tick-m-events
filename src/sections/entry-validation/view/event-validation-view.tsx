@@ -17,9 +17,11 @@ import {
   Paper,
 
 } from "@mui/material";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+
 import { Iconify } from "src/components/iconify";
 import { DashboardContent } from "src/layouts/dashboard";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { PageTitleSection } from "src/components/page-title-section";
 
 export function EventValidationView() {
   const [search, setSearch] = useState("");
@@ -67,9 +69,10 @@ export function EventValidationView() {
   return (
     <DashboardContent>
       {/* Page Header */}
-      <Typography variant="h4" fontWeight="bold" mb={2}>
-        Entry Validation (QR Code Scan)
-      </Typography>
+      <PageTitleSection
+        title="Entry Validation (QR Code Scan)"
+        desc="Lorem ipsum dolor sit amet"
+      />
 
       {/* Wrapped Ticket Scanner section inside a bordered and shadowed Box */}
       <Box

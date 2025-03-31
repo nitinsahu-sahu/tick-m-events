@@ -11,7 +11,7 @@ export function StatisticsAndReportsView() {
   return (
     <DashboardContent>
       <PageTitleSection
-        title="Sales & Revenue Overview"
+        title="Sales & Revenue Overviews"
       />
       <LiveSalesRevenueData />
 

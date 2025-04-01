@@ -5,17 +5,17 @@ export function CountDownView() {
         <Paper
             elevation={3}
             sx={{
-                px: 3,
+                px: { xs: 1, sm: 2, md: 3 },
                 py: 1.5,
                 borderRadius: "12px",
                 textAlign: "center",
-                minWidth: "180px",
+                minWidth: { xs: "120px", sm: "140px", md: "180px" },
             }}
         >
             <Typography
                 sx={{
                     fontWeight: "bold",
-                    fontSize: "14px",
+                    fontSize: { xs: "12px", sm: "13px", md: "14px" },
                     fontFamily: "Poppins, sans-serif",
                 }}
             >
@@ -23,7 +23,7 @@ export function CountDownView() {
             </Typography>
             <Typography
                 sx={{
-                    fontSize: "14px",
+                    fontSize: { xs: "12px", sm: "13px", md: "14px" },
                     fontFamily: "Poppins, sans-serif",
                     color: "#333",
                 }}

@@ -12,16 +12,26 @@ const chartOptions: ApexOptions = {
     chart: { type: "radialBar" },
     plotOptions: {
         radialBar: {
-            hollow: { size: "40%" },
+            hollow: { size: "50%" },
+            track: { background: "#F0F3FA" },
             dataLabels: {
                 name: { show: false },
-                value: { fontSize: "16px" },
+                value: { fontSize: "16px", fontWeight: "bold", color: "#333" }, // Customizing value labels
             },
         },
     },
     labels: ticketData.map((t) => t.type),
     colors: ticketData.map((t) => t.color),
+    legend: {
+        show: true,
+        position: "right", // Options: 'top', 'bottom', 'left', 'right'
+        fontSize: "14px",
+        fontWeight: 500,
+        labels: { colors: "#333" },
+        itemMargin: { horizontal: 25, vertical: 5 },
+    },
 };
+
 
 const chartSeries = ticketData.map((t) => t.percentage);
 export function TicketDetailsAndCategories() {
@@ -58,7 +68,7 @@ export function TicketDetailsAndCategories() {
                     </Table>
                 </TableContainer>
 
-                <Grid container spacing={3} mt={3} alignItems="center">
+                <Grid container mt={2} alignItems="center" sx={{ border: "2px solid grey", borderRadius: 3, py: 2, px:6 }}>
                     <Grid item xs={12} md={6}>
                         <Typography variant="h6" fontWeight="bold">Ticket Sales Distribution</Typography>
                     </Grid>
@@ -66,6 +76,7 @@ export function TicketDetailsAndCategories() {
                         <Chart options={chartOptions} series={chartSeries} type="radialBar" width={320} />
                     </Grid>
                 </Grid>
+
             </Card>
         </Box>
     )

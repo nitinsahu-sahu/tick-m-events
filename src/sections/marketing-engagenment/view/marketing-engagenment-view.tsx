@@ -1,55 +1,365 @@
-import { Box, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Card, CardContent } from "@mui/material";
-import { useState } from "react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  Box,
+  Button,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TextField,
+  Card,
+  CardContent,
+  Checkbox, FormControlLabel, Select, MenuItem ,
+ InputAdornment
+} from '@mui/material';
+import { useState } from 'react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
-import { PageTitleSection } from "src/components/page-title-section";
-import { DashboardContent } from "src/layouts/dashboard";
+import { PageTitleSection } from 'src/components/page-title-section';
+import { DashboardContent } from 'src/layouts/dashboard';
+import { DatePicker } from "@mui/x-date-pickers";
+import { FaCalendarAlt } from "react-icons/fa";
+import { Margin } from '@mui/icons-material';
+
 
 const data = [
-  { name: "April", sales: 200000 },
-  { name: "May", sales: 400000 },
-  { name: "June", sales: 600000 },
-  { name: "July", sales: 1000000 },
-  { name: "August", sales: 800000 },
-  { name: "September", sales: 600000 },
-  { name: "October", sales: 700000 },
-  { name: "November", sales: 900000 },
+  { name: 'April', sales: 20 },
+  { name: 'May', sales: 400000 },
+  { name: 'June', sales: 600000 },
+  { name: 'July', sales: 900000 },
+  { name: 'August', sales: 700000 },
+  { name: 'September', sales: 600000 },
+  { name: 'October', sales: 500000 },
+  { name: 'November', sales: 700000 },
 ];
 
 const promotionsData = [
-  { id: 1, type: "Spring Discount", date: "2025-03-10", discount: "20%", status: "Active" },
-  { id: 2, type: "VIP Sale", date: "2025-03-10", discount: "15%", status: "Active" },
-  { id: 3, type: "Flash Deal", date: "2025-03-10", discount: "25%", status: "Inactive" },
+  { id: 1, type: 'Spring Discount', date: '2025-03-10', discount: '20%', status: 'Active' },
+  { id: 2, type: 'VIP Sale', date: '2025-03-10', discount: '15%', status: 'Active' },
+  { id: 3, type: 'Flash Deal', date: '2025-03-10', discount: '25%', status: 'Inactive' },
 ];
 
 export function MarketingEngagenmentView() {
   const [promotions, setPromotions] = useState(promotionsData);
   const [description, setDescription] = useState(
-    "Join us for an unforgettable experience! Get your tickets now!"
+    'Join us for an unforgettable experience! Get your tickets now!'
   );
-  const [reservationLink, setReservationLink] = useState(
-    "https://eventbooking.com/my-event"
-  );
-  const [hashtag, setHashtag] = useState("#AmazingEvent2025");
+  const [reservationLink, setReservationLink] = useState('https://eventbooking.com/my-event');
+  const [hashtag, setHashtag] = useState('#AmazingEvent2025');
+  const [discountValue,setDiscountValue] = useState('Discount Value e.g., 10.00% off');
+  const [startDate,setStartDate] = useState('')
+  const [endDate,setEndDate] = useState('')
+  const [promoCode,setPromoCode] = useState('')
+  const [advantageType,setAdvantageType] = useState('')
+  const [usageLimit,setUsageLimit] = useState('') 
 
   return (
     <DashboardContent>
-      <PageTitleSection
-        title="Promotions & Special Offers"
-        desc="Lorem ipsum dolor sit amet"
+      <PageTitleSection title="Promotions & Special Offers" desc="Lorem ipsum dolor sit amet" />
+
+{/* Promotions & special offer section */}
+<Box
+        sx={{
+          // margin: "auto",
+          padding: 3,
+          border: '1px solid #00000059',
+          boxShadow: '0px 0px 16px 0px #00000040',
+          borderRadius: '30px',
+          background: 'white',
+          marginTop: '20px',
+          marginBottom: '20px',
+        }}
+      >
+<div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
+      {/* Header Section */}
+      <h2 className="text-xl font-semibold mb-4">Promotions & Special Offers</h2>
+      <Button
+          fullWidth
+          sx={{
+            bgcolor: '#0B2E4C',
+            color: 'white',
+            mt: 2,
+            mb: 2,  
+            padding: '10px',
+            borderRadius: '10px',
+            '&:hover': { bgcolor: '#083048' },
+          }}
+        >
+    Create a new Promotion
+        </Button>
+
+      {/* Promotion Form Section */}
+      <Paper sx={{ p: 2, borderRadius: '10px', background: '#f5f5f5' }}>
+          <Typography variant="subtitle1" fontWeight="bold" mb={1}>
+          Create a Promotion
+          </Typography>
+
+      <div>
+        {/* Discount Type Checkbox Options */}
+        <div style={{ display: "flex", justifyContent: "space-around", marginBottom: "20px", marginTop: "20px"  }}>
+
+  {[
+    "Percentage Discount",
+    "Fixed Value Discount",
+    "Group Offer",
+    "Early Buyer Discount",
+  ].map((label) => (
+    <label key={label} className="flex items-center gap-2">
+      <input type="checkbox" className="form-checkbox" />
+      {label}
+    </label>
+  ))}
+</div>
+
+
+
+        {/* Discount Value */}
+<Typography variant="body2" fontWeight="bold" mb={1}>
+          Discount value
+          </Typography>
+          <TextField
+            fullWidth
+            value={discountValue}
+            onChange={(e) => setDiscountValue(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+
+        {/* Ticket Selection */}
+      <Typography variant="body2" fontWeight="bold" mb={1}>
+        Ticket Selection
+      </Typography>
+      <Select fullWidth sx={{ mb: 2 }}>
+        <MenuItem value="Standard">Standard</MenuItem>
+      </Select>
+ {/* Validity Period Label */}
+ <Typography variant="body2" fontWeight="bold" mb={1}>
+        Validity Period
+      </Typography>
+
+      {/* Input Fields */}
+      <div className="flex gap-4 mb-4">
+        {/* Start Date Input */}
+        <TextField
+           sx={{ width: "48%", }}
+          variant="outlined"
+          placeholder="mm/dd/yyyy"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <FaCalendarAlt className="text-gray-500" />
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        {/* End Date Input */}
+        <TextField
+        sx={{ width: "48%", marginLeft:"4%"}}
+          variant="outlined"
+          placeholder="mm/dd/yyyy"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <FaCalendarAlt className="text-gray-500" />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </div>
+      {/* Promo Code */}
+      <Typography variant="body2" fontWeight="bold" mb={1}>
+        Promo Code (Optional)
+      </Typography>
+      <TextField
+        fullWidth
+        placeholder="Promo Code"
+        value={promoCode}
+        onChange={(e) => setPromoCode(e.target.value)}
+        sx={{ mb: 2 }}
       />
+
+      {/* Advantage Type */}
+      <Typography variant="body2" fontWeight="bold" mb={1}>
+        Advantage Type
+      </Typography>
+      <Select fullWidth value={advantageType} onChange={(e) => setAdvantageType(e.target.value)} sx={{ mb: 2 }}>
+        <MenuItem value="Discount">Discount</MenuItem>
+      </Select>
+
+      {/* Usage Limit */}
+      <Typography variant="body2" fontWeight="bold" mb={1}>
+        Usage Limit
+      </Typography>
+      <TextField
+        fullWidth
+        placeholder="Usage Limit"
+        value={usageLimit}
+        onChange={(e) => setUsageLimit(e.target.value)}
+        sx={{ mb: 2 }}
+      />
+
+        {/* Submit Button */}
+        <Button
+          fullWidth
+          sx={{
+            bgcolor: '#0B2E4C',
+            color: 'white',
+            mt: 2,
+            padding: '10px',
+            borderRadius: '10px',
+            '&:hover': { bgcolor: '#083048' },
+          }}
+        >
+    Save Promotion
+        </Button>
+
+      </div>
+      </Paper>
+    </div>
+    
+</Box>
+
+{/* Notifications & Auto Reminder section */}
+<Box
+        sx={{
+          // margin: "auto",
+          padding: 3,
+          border: '1px solid #00000059',
+          boxShadow: '0px 0px 16px 0px #00000040',
+          borderRadius: '30px',
+          background: 'white',
+          marginTop: '20px',
+          marginBottom: '20px',
+        }}
+      >
+<div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
+      {/* Header Section */}
+      <h2 className="text-xl font-semibold mb-4">Notifications & Automatic Reminders</h2>
+      <Button
+          fullWidth
+          sx={{
+            bgcolor: '#0B2E4C',
+            color: 'white',
+            mt: 2,
+            mb: 2,  
+            padding: '10px',
+            borderRadius: '10px',
+            '&:hover': { bgcolor: '#083048' },
+          }}
+        >
+   Create a New Notification
+        </Button>
+
+<div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md border">
+      {/* Notification Type Dropdown */}
+      <Typography variant="body2" fontWeight="bold" mb={1}>
+      Select Notification Type
+      </Typography>
+      <Select fullWidth sx={{ mb: 2 }}>
+        <MenuItem value="Standard">Web Push</MenuItem>
+      </Select>
+
+
+      {/* Recipient Selection */}
+      <label className="block font-semibold mb-2">Recipient Selection</label>
+      <div className="flex flex-col gap-2 mb-4">
+        {["All registered participants (Ticket holders)",
+          "Interested participants (Waitlist but no purchase yet)",
+          "Pending payment participants (Unfinished reservations)"]
+        .map((label) => (
+          <label key={label} className="flex items-center gap-2">
+            <input type="checkbox" className="form-checkbox" />
+            {label}
+          </label>
+        ))}
+      </div>
+
+      {/* Enter Message */}
+      <label className="block font-semibold mb-2">Enter Message</label>
+      <textarea
+        className="w-full p-2 border rounded mb-4"
+        placeholder="Example: 'Don’t miss the festival! Only 100 tickets left!'"
+      />
+
+      {/* Add CTA Button */}
+      <label className="block font-semibold mb-2">Add CTA Button</label>
+      <input
+        type="text"
+        className="w-full p-2 border rounded mb-4"
+        placeholder="CTA Button (e.g., 'Buy Now', 'Reserve', 'Share')"
+      />
+
+      {/* Schedule Options */}
+      <div className="mb-4">
+        <label className="block font-semibold mb-2">Schedule Options</label>
+        <label className="flex items-center gap-2 mb-2">
+          <input type="radio" name="schedule" className="form-radio" /> Send now
+        </label>
+        <label className="flex items-center gap-2">
+          <input type="radio" name="schedule" className="form-radio" />
+          Schedule for a specific date/time
+        </label>
+      </div>
+
+      {/* Date and Time Selection */}
+      <div className="flex gap-4 mb-4">
+        <div className="relative w-full">
+          <input
+            type="text"
+            placeholder="mm/dd/yyyy"
+            className="w-full p-2 border rounded"
+          />
+          <FaCalendarAlt className="absolute right-3 top-3 text-gray-500" />
+        </div>
+        <div className="relative w-full">
+          <input
+            type="text"
+            placeholder="00:00"
+            className="w-full p-2 border rounded"
+          />
+        </div>
+      </div>
+
+      {/* Real-Time Campaign Statistics */}
+      <h3 className="text-md font-semibold mb-2">Real-Time Campaign Statistics</h3>
+      <p className="text-sm mb-1">Open Rate: 0%</p>
+      <p className="text-sm mb-1">Link Clicks: 0</p>
+      <p className="text-sm mb-4">Conversions: 0</p>
+
+      {/* Send Notifications Button */}
+      <button className="w-full bg-blue-900 text-white py-2 rounded">
+        Send Notifications
+      </button>
+    </div>
+    </div>
+    </Box>
 
       {/* Media sharing  section */}
       <Box
         sx={{
           // margin: "auto",
           padding: 3,
-          border: "1px solid #00000059",
-          boxShadow: "0px 0px 16px 0px #00000040",
-          borderRadius: "30px",
-          background: "white",
-          marginTop: "20px",
-          marginBottom: "20px"
+          border: '1px solid #00000059',
+          boxShadow: '0px 0px 16px 0px #00000040',
+          borderRadius: '30px',
+          background: 'white',
+          marginTop: '20px',
+          marginBottom: '20px',
         }}
       >
         <Typography variant="h6" fontWeight="bold" mb={2}>
@@ -58,25 +368,25 @@ export function MarketingEngagenmentView() {
 
         {/* Social Media Buttons */}
         <Box display="flex" justifyContent="space-around" mb={2}>
-          <Button sx={{ bgcolor: "#1877F2", color: "white", borderRadius: "10px", pl: 4, pr: 4 }}>
+          <Button sx={{ bgcolor: '#1877F2', color: 'white', borderRadius: '10px', pl: 4, pr: 4 }}>
             Share on Facebook
           </Button>
-          <Button sx={{ bgcolor: "#25D366", color: "white", borderRadius: "10px", pl: 4, pr: 4 }}>
+          <Button sx={{ bgcolor: '#25D366', color: 'white', borderRadius: '10px', pl: 4, pr: 4 }}>
             Send via WhatsApp
           </Button>
-          <Button sx={{ bgcolor: "#000000", color: "white", borderRadius: "10px", pl: 4, pr: 4 }}>
+          <Button sx={{ bgcolor: '#000000', color: 'white', borderRadius: '10px', pl: 4, pr: 4 }}>
             Post on TikTok
           </Button>
-          <Button sx={{ bgcolor: "#000000", color: "white", borderRadius: "10px", pl: 4, pr: 4 }}>
+          <Button sx={{ bgcolor: '#000000', color: 'white', borderRadius: '10px', pl: 4, pr: 4 }}>
             Post on X
           </Button>
-          <Button sx={{ bgcolor: "#006294", color: "white", borderRadius: "10px", pl: 4, pr: 4 }}>
+          <Button sx={{ bgcolor: '#006294', color: 'white', borderRadius: '10px', pl: 4, pr: 4 }}>
             Share on LinkedIn
           </Button>
         </Box>
 
         {/* Edit Your Post */}
-        <Paper sx={{ p: 2, borderRadius: "10px", background: "#f5f5f5" }}>
+        <Paper sx={{ p: 2, borderRadius: '10px', background: '#f5f5f5' }}>
           <Typography variant="subtitle1" fontWeight="bold" mb={1}>
             Edit Your Post
           </Typography>
@@ -89,11 +399,11 @@ export function MarketingEngagenmentView() {
             fullWidth
             InputProps={{
               sx: {
-                borderRadius: "10px",
-                border: "1px solid #ccc",
-                backgroundColor: "#F9F9F9",
-                padding: "10px",
-                marginBottom: "4px"
+                borderRadius: '10px',
+                border: '1px solid #ccc',
+                backgroundColor: '#F9F9F9',
+                padding: '10px',
+                marginBottom: '4px',
               },
             }}
           />
@@ -135,12 +445,12 @@ export function MarketingEngagenmentView() {
         <Button
           fullWidth
           sx={{
-            bgcolor: "#0B2E4C",
-            color: "white",
+            bgcolor: '#0B2E4C',
+            color: 'white',
             mt: 2,
-            padding: "10px",
-            borderRadius: "10px",
-            "&:hover": { bgcolor: "#083048" },
+            padding: '10px',
+            borderRadius: '10px',
+            '&:hover': { bgcolor: '#083048' },
           }}
         >
           Post
@@ -148,118 +458,124 @@ export function MarketingEngagenmentView() {
       </Box>
       {/* Marketing perform section */}
 
-      <div className="flex justify-center items-center min-h-screen bg-gray-100 p-8">
-        <Paper
-          elevation={3}
-          className="p-8 rounded-[30px] shadow-lg border border-[#00000059] w-full max-w-6xl bg-white"
+      <Box
+      className="p-6 bg-gray-100 min-h-screen"
+      sx={{
+        background: "#FFFFFF",
+        border: "1px solid #00000059",
+        boxShadow: "0px 0px 16px 0px #00000040",
+        borderRadius: "30px",
+        padding: "24px",
+      
+        // margin: "auto",
+        mt: 4,
+        mb: 4,
+      }}
+    >
+      <Box className="p-6 bg-white rounded-lg">
+        <Typography variant="h5" className="font-bold mb-2">
+          Marketing Performance & Statistics
+        </Typography>
+        <Typography variant="body1" className="mb-4">
+          Performance Tracking Table
+        </Typography>
+
+        {/* Table */}
+        <TableContainer
+          component={Paper}
+          className="rounded-lg"
+          sx={{
+            borderRadius: "20px",
+            // boxShadow: "0px 0px 15px 0px #0000003B",
+            mb: 4,
+            mt: 4  
+          }}
         >
-          {/* Header */}
-          <Typography
-            variant="h6"
-            fontWeight="bold"
-            className="ml-6 mb-1 text-gray-900 "
-            sx={{ marginLeft: "40px", paddingTop: "40px" }}
-
-          >
-            Marketing Performance & Statistics
-          </Typography>
-          <Typography
-            variant="body2"
-            className="ml-6 mb-6"
-            sx={{ marginLeft: "40px" }}
-          >
-            Performance Tracking Table
-          </Typography>
-
-          <TableContainer
-            component={Paper}
-            className="rounded-lg overflow-hidden border border-gray-300 p-6"
-            sx={{ marginLeft: "40px" }}
-          >
-            <Table>
-              <TableHead>
-                <TableRow className="bg-[#3AACE7] h-14">
-                  {[
-                    "Action",
-                    "Participants Reached",
-                    "Open Rate",
-                    "Click Rate",
-                    "Sales Conversions",
-                  ].map((header) => (
-                    <TableCell
-                      key={header}
-                      className="text-white font-bold px-6 py-4"
-                      align="left"
-                    >
-                      {header}
+          <Table>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: "#3AACE7" }}>
+                {["Action", "Participants Reached", "Open Rate", "Click Rate", "Sales Conversions"].map((header) => (
+                  <TableCell key={header} sx={{ color: "white", fontWeight: "bold", padding: "12px" }}>
+                    {header}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {[
+                ["24h Reminder Notification", "500", "80%", "40%", "100 tickets sold"],
+                ["48h Follow-Up", "400", "-", "-", "50 tickets sold"],
+              ].map((row, index) => (
+                <TableRow key={index} className="border-b border-gray-300">
+                  {row.map((cell, i) => (
+                    <TableCell key={i} sx={{ padding: "12px" }}>
+                      {cell}
                     </TableCell>
                   ))}
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {[
-                  ["24h Reminder Notification", "500", "80%", "40%", "100 tickets sold"],
-                  ["24h Reminder Notification", "500", "-", "-", "50 tickets sold"],
-                ].map((row, index) => (
-                  <TableRow key={index} className="border-b border-gray-300 h-12">
-                    {row.map((cell, i) => (
-                      <TableCell key={i} className="px-6 py-4" align="left">
-                        {cell}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
+        {/* Graph */}
+        <Box
+          className="bg-white p-4 rounded-lg mt-6 shadow-md"
+          sx={{
+            background: "#FFFFFF",
+            border: "1px solid #00000059",
+            boxShadow: "0px 0px 16px 0px #00000040",
+            borderRadius: "20px",
+            padding: "20px",
+            mt: 4,
+            mb: 4
+          }}
+        >
+          <Typography variant="h6" className="font-bold mb-2">
+            Booking Trends
+          </Typography>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="sales" stroke="#3AACE7" strokeWidth={3} />
+            </LineChart>
+          </ResponsiveContainer>
+        </Box>
 
-          {/* Graph */}
-          <div className="mt-8 bg-white p-6 rounded-[20px] shadow-md border border-gray-200">
-            <Typography variant="subtitle1" fontWeight="bold" className="mb-4">
-              Booking Trends
-            </Typography>
-            <div className="flex justify-between items-center text-sm text-gray-500 mb-3">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full" />
-                <span>Booking Before Promotion</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-blue-300 rounded-full" />
-                <span>Booking After Promotion</span>
-              </div>
-              <div className="text-blue-500 font-semibold">Monthly</div>
-            </div>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={data}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="sales" stroke="#007bff" strokeWidth={3} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+        {/* Follow-up Section */}
+        <Box
+          className="p-4 rounded-lg mt-6 shadow-md border-l-4 border-blue-500"
+          sx={{
+            background: " #F1F1F1",
+            boxShadow: "0px 0px 16px 0px #00000040",
+            padding: "30px",
+          }}
+        >
+          <Typography variant="body1" className="font-bold">
+            Follow up with participants who viewed the event but didn’t buy. Consider sending a special offer to encourage them to complete their purchase.
+          </Typography>
+        </Box>
 
-          {/* Follow-up Message */}
-          <div className="p-6 bg-gray-100 border border-gray-300 rounded-lg mt-8">
-            <Typography variant="body2" className="text-gray-700">
-              Follow up with participants who viewed the event but didn’t buy.
-              Consider sending a special offer to encourage them to complete
-              their purchase.
-            </Typography>
-          </div>
-
-          {/* Send Follow-up Button */}
-          <Button
-            fullWidth
-            variant="contained"
-            className="bg-[#0B2E4C] text-white py-3 rounded-lg mt-6 text-lg"
-          >
-            Send Follow-up
-          </Button>
-        </Paper>
-      </div>
+        <Button
+          fullWidth
+          variant="contained"
+          sx={{
+            backgroundColor: "#0B2A4A",
+            color: "white",
+            borderRadius: "8px",
+            marginTop: 2,
+            fontWeight: "bold",
+            padding: "12px",
+            "&:hover": { backgroundColor: "#09324A" },
+          }}
+        >
+          Send Follow-up
+        </Button>
+      </Box>
+    </Box>
     </DashboardContent>
-  )
-
+  );
 }

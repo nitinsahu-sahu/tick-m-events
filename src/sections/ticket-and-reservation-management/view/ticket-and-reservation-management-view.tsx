@@ -312,7 +312,10 @@ export function TicketAndReservationManagementView() {
             <TableHead>
               <TableRow sx={{ bgcolor: "#009FE3", color: "white" }}>
                 {["Name", "Email", "Ticket Type", "Purchase Date", "Status", "Actions"].map((header) => (
-                  <TableCell key={header} sx={{ color: "white", fontWeight: "bold" }}>
+                  <TableCell key={header} sx={{ 
+                    color: theme.palette.common.white,
+                                    backgroundColor: theme.palette.primary.main,
+                    fontWeight: "bold" }}>
                     {header}
                   </TableCell>
                 ))}

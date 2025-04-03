@@ -13,8 +13,11 @@ import {
   Card,
   CardContent,
   Checkbox, FormControlLabel, Select, MenuItem ,
- InputAdornment
+ InputAdornment,  
+ Radio, RadioGroup
 } from '@mui/material';
+;
+
 import { useState } from 'react';
 import {
   LineChart,
@@ -51,7 +54,7 @@ const promotionsData = [
 ];
 
 export function MarketingEngagenmentView() {
-  const [promotions, setPromotions] = useState(promotionsData);
+  const [selectedPromo, setSelectedPromo] = useState(promotionsData[0]);
   const [description, setDescription] = useState(
     'Join us for an unforgettable experience! Get your tickets now!'
   );
@@ -67,6 +70,80 @@ export function MarketingEngagenmentView() {
   return (
     <DashboardContent>
       <PageTitleSection title="Promotions & Special Offers" desc="Lorem ipsum dolor sit amet" />
+
+{/* Active Promotion */}
+<Box
+      sx={{
+        padding: 3,
+        border: "1px solid #00000059",
+        boxShadow: "0px 0px 16px 0px #00000040",
+        borderRadius: "15px",
+        background: "white",
+        marginTop: "20px",
+        marginBottom: "20px",
+      }}
+    >
+      <Typography variant="h6" fontWeight="bold" mb={2}>
+        Active Promotions
+      </Typography>
+      <Table>
+        <TableHead>
+          <TableRow sx={{ backgroundColor: "#D9D9D9",  }}>
+            <TableCell sx={{color:"#000000"}}><b>Type</b></TableCell>
+            <TableCell sx={{color:"#000000"}}><b>Date</b></TableCell>
+            <TableCell sx={{color:"#000000"}}><b>Discount</b></TableCell>
+            <TableCell sx={{color:"#000000"}}><b>Status</b></TableCell>
+            <TableCell sx={{color:"#000000"}}><b>Actions</b></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody> 
+          {promotionsData.map((promo, index) => (
+            <TableRow key={index}>
+              <TableCell>{promo.type}</TableCell>
+              <TableCell>{promo.date}</TableCell>
+              <TableCell>{promo.discount}</TableCell>
+              <TableCell sx={{ color: promo.status === "Active" ? "green" : "red" }}>
+                {promo.status}
+              </TableCell>
+              <TableCell>
+                <Button
+                  variant="contained"
+                  sx={{ backgroundColor: " #0B2E4C", color: "white", marginRight: 1 }}
+                  size="small"
+                  onClick={() => setSelectedPromo(promo)}
+                >
+                  Modify
+                </Button>
+                <Button variant="contained"   sx={{ backgroundColor: " #0B2E4C", color: "white", }}  size="small">
+                  Cancel
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {/* Edit Promotion Section */}
+      <Paper sx={{ p: 3, borderRadius: "15px", background: "#F9F9F9", marginTop: 3 }}>
+        <Typography variant="h6" fontWeight="bold" mb={2}>
+          Edit Promotion
+        </Typography>
+        <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={2}>
+          <TextField fullWidth label="Name" value={selectedPromo.type} />
+          <TextField fullWidth label="Date" type="date" defaultValue="2025-06-15" />
+          <TextField fullWidth label="Discount" value={selectedPromo.discount} />
+          <Select fullWidth value={selectedPromo.status}>
+            <MenuItem value="Active">Active</MenuItem>
+            <MenuItem value="Inactive">Inactive</MenuItem>
+          </Select>
+        </Box>
+        <Box display="flex" justifyContent="start" mt={3} gap={2}>
+          <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white" }}>Save</Button>
+          <Button variant="contained" sx={{backgroundColor:  "#D9D9D9",color: "#000" }} >Cancel</Button>
+        </Box>  
+      </Paper>
+    </Box>
+
 
 {/* Promotions & special offer section */}
 <Box
@@ -236,117 +313,147 @@ export function MarketingEngagenmentView() {
 
 {/* Notifications & Auto Reminder section */}
 <Box
+      sx={{
+        padding: 3,
+        border: "1px solid #00000059",
+        boxShadow: "0px 0px 16px 0px #00000040",
+        borderRadius: "15px",
+        background: "white",
+     
+     
+      }}
+    >
+      {/* Header */}
+      <Typography variant="h6" fontWeight="bold" mb={2}>
+        Notifications & Automatic Reminders
+      </Typography>
+      <Button
+        fullWidth
         sx={{
-          // margin: "auto",
-          padding: 3,
-          border: '1px solid #00000059',
-          boxShadow: '0px 0px 16px 0px #00000040',
-          borderRadius: '30px',
-          background: 'white',
-          marginTop: '20px',
-          marginBottom: '20px',
+          bgcolor: "#0B2E4C",
+          color: "white",
+          padding: "10px",
+          borderRadius: "10px",
+          "&:hover": { bgcolor: "#083048" },
         }}
       >
-<div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
-      {/* Header Section */}
-      <h2 className="text-xl font-semibold mb-4">Notifications & Automatic Reminders</h2>
-      <Button
-          fullWidth
-          sx={{
-            bgcolor: '#0B2E4C',
-            color: 'white',
-            mt: 2,
-            mb: 2,  
-            padding: '10px',
-            borderRadius: '10px',
-            '&:hover': { bgcolor: '#083048' },
-          }}
-        >
-   Create a New Notification
-        </Button>
+        Create a New Notification
+      </Button>
 
-<div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md border">
-      {/* Notification Type Dropdown */}
-      <Typography variant="body2" fontWeight="bold" mb={1}>
-      Select Notification Type
+      {/* Select Notification Type */}
+      <Typography variant="body2" fontWeight="bold" mt={3} mb={1}>
+        Select Notification Type
       </Typography>
-      <Select fullWidth sx={{ mb: 2 }}>
-        <MenuItem value="Standard">Web Push</MenuItem>
+      <Select fullWidth defaultValue="Web Push" sx={{ mb: 3 }}>
+        <MenuItem value="Web Push">Web Push</MenuItem>
       </Select>
 
-
       {/* Recipient Selection */}
-      <label className="block font-semibold mb-2">Recipient Selection</label>
-      <div className="flex flex-col gap-2 mb-4">
-        {["All registered participants (Ticket holders)",
+      <Typography variant="body1" fontWeight="bold" mb={1}>
+        Recipient Selection
+      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "8px",
+    
+          padding: "12px",  
+        
+          mb: 3,
+        }}
+      >
+        {[
+          "All registered participants (Ticket holders)",
           "Interested participants (Waitlist but no purchase yet)",
-          "Pending payment participants (Unfinished reservations)"]
-        .map((label) => (
+          "Pending payment participants (Unfinished reservations)",
+        ].map((label) => (
           <label key={label} className="flex items-center gap-2">
-            <input type="checkbox" className="form-checkbox" />
-            {label}
+            <input
+              type="checkbox"
+              className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+            />
+            <span className="text-gray-700 text-sm">{label}</span>
           </label>
         ))}
-      </div>
+      </Box>
 
       {/* Enter Message */}
-      <label className="block font-semibold mb-2">Enter Message</label>
-      <textarea
-        className="w-full p-2 border rounded mb-4"
+      <Typography fontWeight="bold" mb={1}>
+        Enter Message
+      </Typography>
+      <TextField
+        fullWidth
         placeholder="Example: 'Don’t miss the festival! Only 100 tickets left!'"
+        sx={{ mb: 3 }}
       />
 
       {/* Add CTA Button */}
-      <label className="block font-semibold mb-2">Add CTA Button</label>
-      <input
-        type="text"
-        className="w-full p-2 border rounded mb-4"
+      <Typography fontWeight="bold" mb={1}>
+        Add CTA Button
+      </Typography>
+      <TextField
+        fullWidth
         placeholder="CTA Button (e.g., 'Buy Now', 'Reserve', 'Share')"
+        sx={{ mb: 3 }}
       />
 
       {/* Schedule Options */}
-      <div className="mb-4">
-        <label className="block font-semibold mb-2">Schedule Options</label>
-        <label className="flex items-center gap-2 mb-2">
-          <input type="radio" name="schedule" className="form-radio" /> Send now
-        </label>
-        <label className="flex items-center gap-2">
-          <input type="radio" name="schedule" className="form-radio" />
-          Schedule for a specific date/time
-        </label>
-      </div>
+      <Typography fontWeight="bold" mb={1}>
+        Schedule Options
+      </Typography>
+      <RadioGroup defaultValue="send-now">
+        <FormControlLabel value="send-now" control={<Radio />} label="Send now" />
+        <FormControlLabel
+          value="schedule"
+          control={<Radio />}
+          label="Schedule for a specific date/time"
+        />
+      </RadioGroup>
 
       {/* Date and Time Selection */}
-      <div className="flex gap-4 mb-4">
-        <div className="relative w-full">
-          <input
-            type="text"
-            placeholder="mm/dd/yyyy"
-            className="w-full p-2 border rounded"
-          />
-          <FaCalendarAlt className="absolute right-3 top-3 text-gray-500" />
-        </div>
-        <div className="relative w-full">
-          <input
-            type="text"
-            placeholder="00:00"
-            className="w-full p-2 border rounded"
-          />
-        </div>
-      </div>
+      <Box sx={{ display: "flex", gap: "16px", mt: 2, mb: 3 }}>
+        <Box sx={{ position: "relative", flex: 1 }}>select date
+          <TextField fullWidth placeholder="mm/dd/yyyy" />
+          <FaCalendarAlt style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", color: "#6b7280" }} />
+        </Box>
+        <Box sx={{ flex: 1 }}>select time
+          <TextField fullWidth placeholder="00:00" />
+        </Box>
+      </Box>
 
-      {/* Real-Time Campaign Statistics */}
-      <h3 className="text-md font-semibold mb-2">Real-Time Campaign Statistics</h3>
-      <p className="text-sm mb-1">Open Rate: 0%</p>
-      <p className="text-sm mb-1">Link Clicks: 0</p>
-      <p className="text-sm mb-4">Conversions: 0</p>
+     {/* Real-Time Campaign Statistics */}
+<Typography fontWeight="bold" mb={1}>
+  Real-Time Campaign Statistics
+</Typography>
+
+<Box sx={{ display: "flex", flexDirection: "column", gap: 2 ,mb:4}}>
+  {[
+    { label: "Open Rate: 0%" },
+    { label: "Link Clicks: 0" },
+    { label: "Conversions: 0" },
+  ].map((item, index) => (
+    <Box key={index}>
+      <Typography variant="body2" mb={0.5}>{item.label}</Typography>
+      <Box sx={{ height: "8px", background: "#E5E7EB", borderRadius: "5px" }} />
+    </Box>
+  ))}
+</Box>
+
 
       {/* Send Notifications Button */}
-      <button className="w-full bg-blue-900 text-white py-2 rounded">
+      <Button
+        fullWidth
+        sx={{
+          bgcolor: "#0B2E4C",
+          color: "white",
+          padding: "10px",
+          borderRadius: "10px",
+          "&:hover": { bgcolor: "#083048" },
+        }}
+      >
         Send Notifications
-      </button>
-    </div>
-    </div>
+      </Button>
     </Box>
 
       {/* Media sharing  section */}

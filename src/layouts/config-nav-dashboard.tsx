@@ -44,6 +44,7 @@ export const navData = [
     path: '/event-details',
     icon: icon('ic-analytics'),
   },
+
   {
     title: 'Ticket & Reservation Management',
     path: '/ticket-and-reservation-management',
@@ -75,8 +76,54 @@ export const navData = [
     icon: icon('ic-analytics'),
   },
   {
-    title: 'Service Provider & Manage Contracts',
-    path: '/service-provider-and-manage-contracts',
+    title: 'Home & Recommendations',
+    path: '/home-and-recommendations',
     icon: icon('ic-analytics'),
   },
+  {
+    title: 'Event Search & Details',
+    path: '/event-search-and-details',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Ticket Purchase Process',
+    path: '/ticket-purchase-process',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Ticket Management',
+    path: '/ticket-management',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Ticket Validation at Entry',
+    path: '/ticket-validation-at-entry',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Loyalty Program',
+    path: '/loyalty-program',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Custom Photo/Video Filters for Events',
+    path: '/custom-photo-or-video-filters-for-events',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Home & Global View',
+    path: '/home-and-global-view',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Reservations & Contracts',
+    path: '/reservations-and-contracts',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Confirmed Service Calendar',
+    path: '/confirmed-service-calendar',
+    icon: icon('ic-analytics'),
+  },
+
 ];

@@ -1,7 +1,7 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
-
+import { useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { Avatar,InputBase, Typography, Button, Box, Alert, Popover, useMediaQuery, Popper, IconButton } from '@mui/material';
+import { InputBase, Button, Box, Alert, Popover, useMediaQuery, IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { _langs, _notifications } from 'src/_mock';
 import { Iconify } from 'src/components/iconify';
@@ -10,11 +10,9 @@ import { Main } from './main';
 import { layoutClasses } from '../classes';
 import { NavMobile, NavDesktop } from './nav';
 import { navData } from '../config-nav-dashboard';
-import { Searchbar } from '../components/searchbar';
 import { MenuButton } from '../components/menu-button';
 import { LayoutSection } from '../core/layout-section';
 import { HeaderSection } from '../core/header-section';
-import { LanguagePopover } from '../components/language-popover';
 import { NotificationsPopover } from '../components/notifications-popover';
 import { MessagePopover } from '../components/message-popover';
 import { GiftPopover } from '../components/gift-popover';
@@ -33,8 +31,9 @@ export type DashboardLayoutProps = {
 
 export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) {
   const theme = useTheme();
+  const location = useLocation();
   const isMobileOrTablet = useMediaQuery(theme.breakpoints.down("md")); // Hide on md & below
-
+  const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program'];
   const [navOpen, setNavOpen] = useState(false);
 
   const layoutQuery: Breakpoint = 'lg';
@@ -82,7 +81,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 <Box
                   sx={{
                     display: "flex",
-                    height:"40px",
+                    height: "40px",
                     alignItems: "center",
                     width: "200px",
                     maxWidth: "300px",
@@ -124,34 +123,38 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 {/* Buttons (Hidden on Mobile & Tablet) */}
                 {!isMobileOrTablet && (
                   <>
-                    <Button
-                      variant="contained"
-                      sx={{
-                        backgroundColor: "#0C2340",
-                        color: "white",
-                        borderRadius: "8px",
-                        px: 1,
-                        fontSize: 16,
-                        fontFamily: "Poppins, sans-serif",
-                        fontWeight: 600
-                      }}
-                    >
-                      Save Changes
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      sx={{
-                        borderRadius: "8px",
-                        px: 1,
-                        borderColor: "#C8C8C8",
-                        color: "#0C2340",
-                        fontSize: 16,
-                        fontFamily: "Poppins, sans-serif",
-                        fontWeight: 600
-                      }}
-                    >
-                      Publish Event
-                    </Button>
+                    {!hiddenPaths.some(path => location.pathname.includes(path)) &&
+                      <>
+                        <Button
+                          variant="contained"
+                          sx={{
+                            backgroundColor: "#0C2340",
+                            color: "white",
+                            borderRadius: "8px",
+                            px: 1,
+                            fontSize: 16,
+                            fontFamily: "Poppins, sans-serif",
+                            fontWeight: 600
+                          }}
+                        >
+                          Save Changes
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          sx={{
+                            borderRadius: "8px",
+                            px: 1,
+                            borderColor: "#C8C8C8",
+                            color: "#0C2340",
+                            fontSize: 16,
+                            fontFamily: "Poppins, sans-serif",
+                            fontWeight: 600
+                          }}
+                        >
+                          Publish Event
+                        </Button>
+                      </>
+                    }
                   </>
                 )}
 

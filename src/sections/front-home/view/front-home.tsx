@@ -14,7 +14,8 @@ import {
     useMediaQuery,
     useTheme,
     Grid,
-    Card
+    Card,
+    TextField
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -22,12 +23,17 @@ import ShareIcon from '@mui/icons-material/Share'; // Import the Share icon
 
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
-import RemoveIcon from "@mui/icons-material/Remove";
-import AddIcon from "@mui/icons-material/Add";
+
 // import { NavHomeTwo } from "../nav-two";
 import { Breadcrumb } from "src/components/breadcrumb/breadcrumb";
 import { BannerGallery } from "../banner-gallery";
-import { TextField } from "@mui/material";
+import { TrackingSystem } from "../tracking-system";
+import { ContactAndSharing } from "../contact-and-sharing";
+import { CountDownCounter } from "../count-down-counter";
+import { RateAndReview } from "../rate-and-review";
+import { CompanyMarquee } from "../company-marquee";
+import { FriendWhoBooked } from "../friend-who-booked";
+import { LiveChat } from "../live-chat";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
     display: "flex",
@@ -159,8 +165,7 @@ export function NavHomeOne() {
 }
 
 export function FrontHome() {
-    const [vipCount, setVipCount] = useState(0);
-    const [standardCount, setStandardCount] = useState(0);
+
 
     return (
         <>
@@ -223,141 +228,26 @@ export function FrontHome() {
                     </Box>
                 </Card>
 
-                <Box mt={3}>
-                    {/* Ticketing Section */}
-                    <Typography variant="h4" fontWeight="bold">
-                        Ticketing System
-                    </Typography>
+                {/* Tracking system */}
+                <TrackingSystem />
 
-                    <Grid container spacing={3} mt={2}>
-                        <Grid item xs={12} md={6}>
-                            <Card variant="outlined" sx={{ p: 3 }}>
-                                <Typography fontWeight="bold">
-                                    VIP Ticket <span style={{ color: "blue" }}>(Sold Out)</span>
-                                </Typography>
-                                <Typography>10,000 XAF</Typography>
-                                <Box display="flex" alignItems="center" mt={1}>
-                                    <IconButton disabled>
-                                        <RemoveIcon />
-                                    </IconButton>
-                                    <Typography mx={1}>{vipCount}</Typography>
-                                    <IconButton disabled>
-                                        <AddIcon />
-                                    </IconButton>
-                                </Box>
+                {/* Contact and Sharing Section */}
+                <ContactAndSharing />
 
-                                <Typography fontWeight="bold" mt={2}>
-                                    Standard Ticket
-                                </Typography>
-                                <Typography>100 XAF</Typography>
-                                <Box display="flex" alignItems="center" mt={1}>
-                                    <IconButton onClick={() => setStandardCount(Math.max(0, standardCount - 1))}>
-                                        <RemoveIcon />
-                                    </IconButton>
-                                    <Typography mx={1}>{standardCount}</Typography>
-                                    <IconButton onClick={() => setStandardCount(standardCount + 1)}>
-                                        <AddIcon />
-                                    </IconButton>
-                                </Box>
+                {/* Count Down System */}
+                <CountDownCounter />
 
-                                <Typography mt={2}>Total: {standardCount * 100} XAF</Typography>
-                                <Typography sx={{ color: "green" }}>Discount Applied: 10,000 XAF</Typography>
-                                <TextField
-                                    fullWidth
-                                    variant="outlined"
-                                    size="small"
-                                    placeholder="Enter Promo Code"
-                                    sx={{ my: 2 }}
-                                />
-                                <Button variant="contained">Apply Promo Code</Button>
+                {/* Rate and Review */}
+                <RateAndReview />
 
-                                <Typography mt={2}>
-                                    <strong>Net Amount To Pay:</strong> {standardCount * 100} XAF
-                                </Typography>
+                {/* Rate and Review */}
+                <CompanyMarquee />
 
-                                {/* Purchase Buttons */}
-                                <Grid container spacing={2} mt={2}>
-                                    <Grid item xs={4}>
-                                        <Button fullWidth variant="contained">
-                                            Buy Online
-                                        </Button>
-                                    </Grid>
-                                    <Grid item xs={4}>
-                                        <Button fullWidth variant="outlined">
-                                            Buy At a Physical Store
-                                        </Button>
-                                    </Grid>
-                                    <Grid item xs={4}>
-                                        <Button fullWidth variant="contained" sx={{ backgroundColor: "green" }}>
-                                            Buy Via WhatsApp
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-
-                                <Typography mt={2} fontSize="small" textAlign="center">
-                                    Event Time: March 28, 2025, 19:00 GMT
-                                </Typography>
-                            </Card>
-                        </Grid>
-
-                        {/* Location Map Section */}
-                        <Grid item xs={12} md={6}>
-                            <Card variant="outlined" sx={{ p: 3 }}>
-                                <Typography fontWeight="bold">Location</Typography>
-                                <Typography>
-                                    <strong>Full Address:</strong> Palais des Papes Convention Center, Avignon, France
-                                </Typography>
-                                <iframe
-                                    title="Google Map"
-                                    width="100%"
-                                    height="200"
-                                    style={{ border: 0, marginTop: "10px" }}
-                                    src="https://www.google.com/maps/embed?..."
-                                    allowFullScreen
-                                ></iframe>
-                            </Card>
-                        </Grid>
-                    </Grid>
-
-                    {/* Contact and Sharing Section */}
-                    <Card variant="outlined" sx={{ p: 3, mt: 3 }}>
-                        <Typography variant="h5" fontWeight="bold">
-                            Contact and Sharing
-                        </Typography>
-
-                        <Typography fontWeight="bold" mt={2}>Organizer Contact Information</Typography>
-                        <Typography>Name: Jhon Doe</Typography>
-                        <Typography>Email: johndoe@example.com</Typography>
-
-                        <Button fullWidth variant="contained" sx={{ my: 2, backgroundColor: "#0a2940" }}>
-                            Contact the Organizer
-                        </Button>
-
-                        {/* Social Media Buttons */}
-                        <Grid container spacing={2}>
-                            <Grid item xs={3}>
-                                <Button fullWidth variant="contained" sx={{ backgroundColor: "#1877F2" }}>
-                                    Facebook
-                                </Button>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Button fullWidth variant="contained" sx={{ backgroundColor: "black" }}>
-                                    Twitter
-                                </Button>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Button fullWidth variant="contained" sx={{ backgroundColor: "#0A66C2" }}>
-                                    LinkedIn
-                                </Button>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Button fullWidth variant="contained" sx={{ backgroundColor: "green" }}>
-                                    WhatsApp
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </Card>
-                </Box>
+                {/* Rate and Review */}
+                <FriendWhoBooked />
+                
+                {/* Rate and Review */}
+                <LiveChat />
             </Box>
         </>
     );

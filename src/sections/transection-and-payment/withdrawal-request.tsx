@@ -66,7 +66,7 @@ export function WithdrawalRequest() {
                             <Typography>Card Holder: John Doe</Typography>
                             <Typography>Card Number: **** **** **** 1234</Typography>
                             <Typography>Expiration: 12/23</Typography>
-                            <Button variant="contained" sx={{ mt: 2, backgroundColor:"#0B2E4C" }} >Confirm</Button>
+                            <Button variant="contained" sx={{ mt: 2, backgroundColor: "#0B2E4C" }} >Confirm</Button>
                         </Box>
                     )}
 
@@ -92,9 +92,9 @@ export function WithdrawalRequest() {
                         Request Withdrawal
                     </Button>
                 </Paper>
-                
+
                 {/* Withdrawal Processing Times */}
-                <Paper sx={{ p: 3, m: 3, backgroundColor: "#f2f2f2", borderRadius: 3, border:"1px solid black" }}>
+                <Paper sx={{ p: 3, m: 3, backgroundColor: "#f2f2f2", borderRadius: 3, border: "1px solid black" }}>
                     <Typography fontWeight="bold">Withdrawal Processing Times</Typography>
                     <Typography sx={{ mt: 1 }}>
                         <strong>Mobile Money:</strong> Instantaneous

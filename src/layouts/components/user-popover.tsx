@@ -2,8 +2,8 @@ import { useTheme } from '@mui/material/styles';
 import { Avatar, Box, Button, Popover, Typography, useMediaQuery } from "@mui/material";
 import { useState } from "react";
 import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
 
+import { usePathname } from 'src/routes/hooks';
 import { _notifications } from 'src/_mock';
 import { RootState } from 'src/redux/store';
 
@@ -15,8 +15,9 @@ import { GiftPopover } from './gift-popover';
 export function UserPopover() {
     const [anchorEl, setAnchorEl] = useState(null);
     const theme = useTheme();
-    const location = useLocation();
-    const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program'];
+    const pathname = usePathname()
+
+    const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program', "/ticket-management"];
 
     const { _id, name, role, avatar } = useSelector((state: RootState) => state?.auth?.user);
 
@@ -71,8 +72,25 @@ export function UserPopover() {
                         <Typography textTransform="capitalize" fontSize={12} color="gray" fontFamily="Poppins, sans-serif">
                             {role}
                         </Typography>
+
+                        {pathname.includes('/ticket-management') && (
+                            <Button
+                                variant="contained"
+                                sx={{
+                                    backgroundColor: "#0C2340",
+                                    color: "white",
+                                    borderRadius: "8px",
+                                    px: 1,
+                                    fontSize: 16,
+                                    fontFamily: "Poppins, sans-serif",
+                                    fontWeight: 600
+                                }}
+                            >
+                                My Tickets
+                            </Button>
+                        )}
                     </Box>
-                    {!hiddenPaths.some(path => location.pathname.includes(path)) &&
+                    {!hiddenPaths.some(path => pathname.includes(path)) &&
                         <Box display="flex" gap={1} alignItems="center">
                             <NotificationsPopover data={_notifications} />
                             <MessagePopover totalUnRead="1" />
@@ -83,7 +101,7 @@ export function UserPopover() {
                     }
 
 
-                    {!hiddenPaths.some(path => location.pathname.includes(path)) &&
+                    {!hiddenPaths.some(path => pathname.includes(path)) &&
                         <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
                             <Button
                                 sx={{

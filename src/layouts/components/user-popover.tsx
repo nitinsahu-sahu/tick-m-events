@@ -15,9 +15,9 @@ import { GiftPopover } from './gift-popover';
 export function UserPopover() {
     const [anchorEl, setAnchorEl] = useState(null);
     const theme = useTheme();
-      const location = useLocation();
-  const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program'];
-    
+    const location = useLocation();
+    const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program'];
+
     const { _id, name, role, avatar } = useSelector((state: RootState) => state?.auth?.user);
 
     const isMobileOrTablet = useMediaQuery(theme.breakpoints.down("md")); // Hide on md & below
@@ -72,47 +72,50 @@ export function UserPopover() {
                             {role}
                         </Typography>
                     </Box>
-                    <Box display="flex" gap={1} alignItems="center">
-                        <NotificationsPopover data={_notifications} />
-                        <MessagePopover totalUnRead="1" />
-                        <GiftPopover totalUnRead="5" />
-                        <EmailPopover totalUnRead="2" />
-                        {/* <LanguagePopover data={_langs}/> */}
-                    </Box>
+                    {!hiddenPaths.some(path => location.pathname.includes(path)) &&
+                        <Box display="flex" gap={1} alignItems="center">
+                            <NotificationsPopover data={_notifications} />
+                            <MessagePopover totalUnRead="1" />
+                            <GiftPopover totalUnRead="5" />
+                            <EmailPopover totalUnRead="2" />
+                            {/* <LanguagePopover data={_langs}/> */}
+                        </Box>
+                    }
+
 
                     {!hiddenPaths.some(path => location.pathname.includes(path)) &&
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
-                    <Button
-                        sx={{
-                            backgroundColor: "#0C2340",
-                            color: "white",
-                            borderRadius: "8px",
-                            px: 1,
-                            marginY: 1,
-                            fontSize: 16,
-                            fontFamily: "Poppins, sans-serif",
-                            fontWeight: 600,
-                        }}
-                    >
-                        Save Changes
-                    </Button>
-                    <Button
-                        sx={{
-                            borderRadius: "8px",
-                            px: 1,
-                            marginY: 1,
-                            borderColor: "#C8C8C8",
-                            color: "#0C2340",
-                            fontSize: 16,
-                            fontFamily: "Poppins, sans-serif",
-                            fontWeight: 600,
-                        }}
-                    >
-                        Publish Events
-                    </Button>
-                </Box>
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
+                            <Button
+                                sx={{
+                                    backgroundColor: "#0C2340",
+                                    color: "white",
+                                    borderRadius: "8px",
+                                    px: 1,
+                                    marginY: 1,
+                                    fontSize: 16,
+                                    fontFamily: "Poppins, sans-serif",
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Save Changes
+                            </Button>
+                            <Button
+                                sx={{
+                                    borderRadius: "8px",
+                                    px: 1,
+                                    marginY: 1,
+                                    borderColor: "#C8C8C8",
+                                    color: "#0C2340",
+                                    fontSize: 16,
+                                    fontFamily: "Poppins, sans-serif",
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Publish Events
+                            </Button>
+                        </Box>
                     }
-                    
+
 
                 </Popover>
             )}

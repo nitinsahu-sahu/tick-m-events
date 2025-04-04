@@ -1,10 +1,13 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { InputBase, Button, Box, Alert, Popover, useMediaQuery, IconButton } from '@mui/material';
+import { InputBase, Button, Box, Alert, Popover, useMediaQuery, IconButton, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useSelector } from 'react-redux';
+
 import { _langs, _notifications } from 'src/_mock';
 import { Iconify } from 'src/components/iconify';
+import { RootState } from 'src/redux/store';
 
 import { Main } from './main';
 import { layoutClasses } from '../classes';
@@ -31,6 +34,8 @@ export type DashboardLayoutProps = {
 
 export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) {
   const theme = useTheme();
+  const { _id, name } = useSelector((state: RootState) => state?.auth?.user);
+
   const location = useLocation();
   const isMobileOrTablet = useMediaQuery(theme.breakpoints.down("md")); // Hide on md & below
   const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program'];
@@ -73,51 +78,61 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   open={navOpen}
                   onClose={() => setNavOpen(false)}
                 />
+                {hiddenPaths.some(path => location.pathname.includes(path)) &&
+                  <Typography fontWeight={600} fontSize={{ xs: "18px", sm: "24px", md: "30px" }} key={_id}>Hey Welcome, <span>{name}</span>!</Typography>
+                }
               </>
             ),
             rightArea: (
-              <Box display="flex" alignItems="center" gap={2}>
+              <Box display="flex" alignItems="center" gap={2} >
                 {/* Search Bar */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    height: "40px",
-                    alignItems: "center",
-                    width: "200px",
-                    maxWidth: "300px",
-                    border: "1px solid #ddd",
-                    borderRadius: "8px",
-                    padding: "8px 12px",
-                    backgroundColor: "#fff",
-                    boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  {/* Search Icon */}
-                  <IconButton >
-                    <Iconify icon="eva:search-fill" />
-                  </IconButton>
-
-                  {/* Search Input */}
-                  <InputBase
-                    placeholder="Search here"
+                {!hiddenPaths.some(path => location.pathname.includes(path)) &&
+                  <Box
                     sx={{
-                      flex: 1,
-                      fontSize: "14px",
-                      color: "#666",
-                      "&::placeholder": { color: "#bbb" },
+                      display: "flex",
+                      height: "40px",
+                      alignItems: "center",
+                      width: "200px",
+                      maxWidth: "300px",
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      padding: "8px 12px",
+                      backgroundColor: "#fff",
+                      boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
                     }}
-                  />
-                </Box>
+                  >
+                    {/* Search Icon */}
+                    <IconButton >
+                      <Iconify icon="eva:search-fill" />
+                    </IconButton>
+
+                    {/* Search Input */}
+                    <InputBase
+                      placeholder="Search here"
+                      sx={{
+                        flex: 1,
+                        fontSize: "14px",
+                        color: "#666",
+                        "&::placeholder": { color: "#bbb" },
+                      }}
+                    />
+                  </Box>
+                }
+
 
                 {/* Notifications & Popovers (Hidden on Mobile & Tablet) */}
                 {!isMobileOrTablet && (
-                  <Box display="flex" gap={1} alignItems="center">
-                    <NotificationsPopover data={_notifications} />
-                    <MessagePopover totalUnRead="1" />
-                    <GiftPopover totalUnRead="5" />
-                    <EmailPopover totalUnRead="2" />
-                    {/* <LanguagePopover data={_langs}/> */}
-                  </Box>
+                  <>
+                    {!hiddenPaths.some(path => location.pathname.includes(path)) &&
+                      <Box display="flex" gap={1} alignItems="center">
+                        <NotificationsPopover data={_notifications} />
+                        <MessagePopover totalUnRead="1" />
+                        <GiftPopover totalUnRead="5" />
+                        <EmailPopover totalUnRead="2" />
+                        {/* <LanguagePopover data={_langs}/> */}
+                      </Box>
+                    }
+                  </>
                 )}
 
                 {/* Buttons (Hidden on Mobile & Tablet) */}

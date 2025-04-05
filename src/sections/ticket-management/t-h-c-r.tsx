@@ -4,17 +4,10 @@ import {
     CardContent,
     Grid,
     Typography,
-    Container,
-    Avatar
 } from "@mui/material";
 
-export const TicketHistoryCancelRefundCard = ({ items, index, type }: any) => {
-    const buttonColors = {
-        "Download Invoice": "#0B2E4C",
-        "Leave a Review": "#1F8FCD",
-        "Request Refund": "#E53935", // Example for additional buttons
-        "View Details": "#43A047"    // Example for additional buttons
-    };
+export function TicketHistoryCancelRefundCard  ({ items, index }: any) {
+
     return (
         <Grid item xs={12} key={index}>
             <Card sx={{ borderRadius: 3, boxShadow: 3 }}>

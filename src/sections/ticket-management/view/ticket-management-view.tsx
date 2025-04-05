@@ -14,8 +14,6 @@ import { DashboardContent } from "src/layouts/dashboard";
 import { TicketHistoryCancelRefundCard } from "../t-h-c-r";
 import { TicketCard } from "../ticket-card";
 
-
-
 export function TicketManagementView() {
     const ticketst = [
         {
@@ -182,7 +180,6 @@ export function TicketManagementView() {
                     QR Code & Ticket Validation
                 </Typography>
                 <Box display="flex" justifyContent="center">
-
                     <Card
                         sx={{
                             width: { xs: "100%", sm: "400px", md: "450px", lg: "500px" },

@@ -1,5 +1,4 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
-import { useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { InputBase, Button, Box, Alert, Popover, useMediaQuery, IconButton, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -8,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { _langs, _notifications } from 'src/_mock';
 import { Iconify } from 'src/components/iconify';
 import { RootState } from 'src/redux/store';
+import { usePathname } from 'src/routes/hooks';
 
 import { Main } from './main';
 import { layoutClasses } from '../classes';
@@ -35,10 +35,10 @@ export type DashboardLayoutProps = {
 export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) {
   const theme = useTheme();
   const { _id, name } = useSelector((state: RootState) => state?.auth?.user);
+  const pathname = usePathname()
 
-  const location = useLocation();
   const isMobileOrTablet = useMediaQuery(theme.breakpoints.down("md")); // Hide on md & below
-  const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program'];
+  const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program', "/ticket-management"];
   const [navOpen, setNavOpen] = useState(false);
 
   const layoutQuery: Breakpoint = 'lg';
@@ -78,7 +78,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   open={navOpen}
                   onClose={() => setNavOpen(false)}
                 />
-                {hiddenPaths.some(path => location.pathname.includes(path)) &&
+                {hiddenPaths.some(path => pathname.includes(path)) &&
                   <Typography fontWeight={600} fontSize={{ xs: "18px", sm: "24px", md: "30px" }} key={_id}>Hey Welcome, <span>{name}</span>!</Typography>
                 }
               </>
@@ -86,7 +86,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
             rightArea: (
               <Box display="flex" alignItems="center" gap={2} >
                 {/* Search Bar */}
-                {!hiddenPaths.some(path => location.pathname.includes(path)) &&
+                {!hiddenPaths.some(path => pathname.includes(path)) &&
                   <Box
                     sx={{
                       display: "flex",
@@ -123,7 +123,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 {/* Notifications & Popovers (Hidden on Mobile & Tablet) */}
                 {!isMobileOrTablet && (
                   <>
-                    {!hiddenPaths.some(path => location.pathname.includes(path)) &&
+                    {!hiddenPaths.some(path => pathname.includes(path)) &&
                       <Box display="flex" gap={1} alignItems="center">
                         <NotificationsPopover data={_notifications} />
                         <MessagePopover totalUnRead="1" />
@@ -138,7 +138,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 {/* Buttons (Hidden on Mobile & Tablet) */}
                 {!isMobileOrTablet && (
                   <>
-                    {!hiddenPaths.some(path => location.pathname.includes(path)) &&
+                    {!hiddenPaths.some(path => pathname.includes(path)) &&
                       <>
                         <Button
                           variant="contained"
@@ -170,6 +170,23 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                         </Button>
                       </>
                     }
+                    {pathname.includes('/ticket-management') && (
+                      <Button
+                        variant="contained"
+                        sx={{
+                          backgroundColor: "#0C2340",
+                          color: "white",
+                          borderRadius: "8px",
+                          px: 1,
+                          fontSize: 16,
+                          fontFamily: "Poppins, sans-serif",
+                          fontWeight: 600
+                        }}
+                      >
+                        My Tickets
+                      </Button>
+                    )}
+
                   </>
                 )}
 

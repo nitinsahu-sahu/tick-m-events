@@ -56,6 +56,7 @@ export function StatisticsAndReportsView() {
       <MainChartComponents />
 
       <ReportDataExport />
+      
     </DashboardContent>
   )
 }

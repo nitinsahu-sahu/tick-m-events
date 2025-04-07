@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { MenuItem, Select, FormControlLabel, Checkbox, Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, TextField, FormControl, InputLabel } from "@mui/material";
+import { Tabs, Tab, MenuItem, Select, FormControlLabel, Checkbox, Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, TextField, FormControl, InputLabel } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
 import { PageTitleSection } from "src/components/page-title-section";
 import { DashboardContent } from "src/layouts/dashboard";
-import { AnalyticsTable } from "src/components/tables/analytics-table";
-
+import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
 import { SearchBar } from "../search-bar";
+
 
 import("../style.css")
 
@@ -48,8 +48,8 @@ export function TicketAndReservationManagementView() {
     },
   ];
 
-  const tableHeaders = ["Ticket Type", "Price", "Total Stock", "Remaining Stock", "Tickets Sold", "Revenue Generated"];
-  const tableData = [
+  const realTimeSalseTrackingTableHeaders = ["Ticket Type", "Price", "Total Stock", "Remaining Stock", "Tickets Sold", "Revenue Generated"];
+  const realTimeSalseTrackingTableData = [
     { type: "Standard", price: "10,000 XAF", total: 500, remaining: 230, sold: 270, revenue: "2,700,000 XAF" },
     { type: "VIP", price: "20,000 XAF", total: 200, remaining: 50, sold: 150, revenue: "3,000,000 XAF" },
     { type: "Advanced", price: "30,000 XAF", total: 300, remaining: 100, sold: 200, revenue: "6,000,000 XAF" },
@@ -57,8 +57,8 @@ export function TicketAndReservationManagementView() {
 
   const tableHeadersFirst = ["Ticket Name", "Price", "Quantity Available", "Ticket Description", "Remaining Stock", "Actions"];
   const tableDataFirst = [
-    { type: "Standard", price: "20", total: 100, remaining: "Access to general areas", sold: 800, revenue: "2,700,000 XAF" },
-    { type: "VIP", price: "Free", total: "Unlimited", remaining: "Access to VIP areas", sold: 30, revenue: "3,000,000 XAF" },
+    { type: "Standard", price: "20", total: 100, remaining: "Access to general areas", sold: 800, action: "Edit" },
+    { type: "VIP", price: "Free", total: "Unlimited", remaining: "Access to VIP areas", sold: 30, action: "Edit" },
   ];
 
   const tableHeadersSecond = ["Name", "Email", "Ticket Type", "Purchase Date", "Status", "Actions"];
@@ -86,9 +86,10 @@ export function TicketAndReservationManagementView() {
       />
 
       {/* Table Section */}
-      <AnalyticsTable headers={tableHeadersFirst} data={tableDataFirst} type="1" />
-
-
+      <Typography variant="h5" fontSize={{ xs: "24px", sm: "28px", md: "33px" }} color={theme.palette.common.black} fontWeight={600}>
+        Ticket Management
+      </Typography>
+      <TicketReservationManagementTable headers={tableHeadersFirst} data={tableDataFirst} type="1" />
 
       {/* Add Ticket Button */}
       <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
@@ -286,13 +287,21 @@ export function TicketAndReservationManagementView() {
           </Box>
 
           {/* Table */}
-          <AnalyticsTable headers={tableHeaders} data={tableData} />
+          <TicketReservationManagementTable type="2" headers={realTimeSalseTrackingTableHeaders} data={realTimeSalseTrackingTableData} />
 
           {/* Sales Graph */}
           <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" sx={{ mb: 1 }}>
-              Sales Graph
-            </Typography>
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Sales Graph
+              </Typography>
+              <Tabs textColor="primary" variant="scrollable" scrollButtons="auto" >
+                <Tab label="Monthly" sx={{ fontSize: { xs: "10px", sm: "12px", md: "14px" } }} />
+                <Tab label="Weekly" sx={{ fontSize: { xs: "10px", sm: "12px", md: "14px" } }} />
+                <Tab label="Daily" sx={{ fontSize: { xs: "10px", sm: "12px", md: "14px" } }} />
+              </Tabs>
+            </Box>
+
             <Chart options={chartOptions} series={chartSeries} type="line" height={300} />
           </Box>
         </Paper>
@@ -312,10 +321,11 @@ export function TicketAndReservationManagementView() {
             <TableHead>
               <TableRow sx={{ bgcolor: "#009FE3", color: "white" }}>
                 {["Name", "Email", "Ticket Type", "Purchase Date", "Status", "Actions"].map((header) => (
-                  <TableCell key={header} sx={{ 
+                  <TableCell key={header} sx={{
                     color: theme.palette.common.white,
-                                    backgroundColor: theme.palette.primary.main,
-                    fontWeight: "bold" }}>
+                    backgroundColor: theme.palette.primary.main,
+                    fontWeight: "bold"
+                  }}>
                     {header}
                   </TableCell>
                 ))}

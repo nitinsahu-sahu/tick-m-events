@@ -126,4 +126,66 @@ export const navData = [
     icon: icon('ic-analytics'),
   },
 
+  // New
+  {
+    title: 'Transaction & Payment Management',
+    path: '/transaction-&-payment-management',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Messaging & Client Relationship',
+    path: '/messaging-&-client-relationship',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Statistics & Performance',
+    path: '/statistics-&-performance',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Search& Select Service Providers',
+    path: '/search-&-select-service-providers',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Service Request & Negotiation',
+    path: '/service-request-&-negotiation',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Tracking of Booked Services & Providers',
+    path: '/tracking-of-booked-services-&-providers',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Global Overview & General Statistics',
+    path: '/global-overview-&-general-statistics',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'User Management',
+    path: '/user-management',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Ticketing & Transactions Supervision',
+    path: '/ticketing-&-transactions-supervision',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Marketplace & Service Provider Supervision',
+    path: '/marketplace-&-service-provider-supervision',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Password Recovery',
+    path: '/password-recovery',
+    icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Profile & Services Management',
+    path: '/profile-&-services-management',
+    icon: icon('ic-analytics'),
+  },
+
 ];

@@ -1,5 +1,5 @@
 import {
-  Box,
+  Stack,
   Button,
   Typography,
   Table,
@@ -14,9 +14,11 @@ import {
   CardContent,
   Checkbox, FormControlLabel, Select, MenuItem ,
  InputAdornment,  
- Radio, RadioGroup
+ Radio, RadioGroup, useMediaQuery,
+ useTheme,Box,Grid,ToggleButton,ToggleButtonGroup,Tabs, Tab 
 } from '@mui/material';
-;
+
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 import { useState } from 'react';
 import {
@@ -55,6 +57,8 @@ const promotionsData = [
 
 export function MarketingEngagenmentView() {
   const [selectedPromo, setSelectedPromo] = useState(promotionsData[0]);
+  const[ onSave,setOnSave]= useState();
+  const [ onCancel , setOnCancel ]= useState();
   const [description, setDescription] = useState(
     'Join us for an unforgettable experience! Get your tickets now!'
   );
@@ -66,250 +70,370 @@ export function MarketingEngagenmentView() {
   const [promoCode,setPromoCode] = useState('')
   const [advantageType,setAdvantageType] = useState('')
   const [usageLimit,setUsageLimit] = useState('') 
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [selectedTab, setSelectedTab] = useState("monthly");
+  const handleTabChange = (_: React.SyntheticEvent, newTab: number) => {
+    if (newTab !== null) setSelectedTab(newTab);
+  };
+  
+  const [tabValue, setTabValue] = useState(0);
 
   return (
     <DashboardContent>
       <PageTitleSection title="Promotions & Special Offers" desc="Lorem ipsum dolor sit amet" />
 
 {/* Active Promotion */}
+
+<Box
+  sx={{
+    padding: 3,
+    border: "1px solid #00000059",
+    boxShadow: "0px 0px 16px 0px #00000040",
+    borderRadius: "15px",
+    background: "white",
+    marginTop: "20px",
+    marginBottom: "20px",
+  }}
+>
+  <Typography variant="h6" fontWeight="bold" mb={2}>
+    Active Promotions
+  </Typography>
+
+{/* Filter Header Section */}
+<Box
+  sx={{
+    display: "flex",
+    justifyContent: "start",
+    gap: 3, // spacing between labels
+    pb: 1,
+    mb: 2,
+    overflowX: "auto",
+    borderBottom: "4px solid #ccc",
+     width: "fit-content",
+  }}
+>
+  {["Type", "Discount", "Ticket Type", "Validity", "Status"].map((label, index) => (
+    <Typography
+      key={index}
+      variant="subtitle2"
+      sx={{
+        fontWeight: 500,
+        color: "#000",
+        textAlign: "left",
+        paddingBottom: "4px",
+      }}
+    >
+      {label}
+    </Typography>
+  ))}
+</Box>
+
+
+
+  {/* Responsive Table */}
+  <TableContainer sx={{ overflowX: "auto" }}>
+    <Table>
+      <TableHead>
+        <TableRow sx={{ backgroundColor: "#D9D9D9" }}>
+          <TableCell sx={{ color: "#000000", whiteSpace: "nowrap" }}><b>Type</b></TableCell>
+          <TableCell sx={{ color: "#000000", whiteSpace: "nowrap" }}><b>Date</b></TableCell>
+          <TableCell sx={{ color: "#000000", whiteSpace: "nowrap" }}><b>Discount</b></TableCell>
+          {!isMobile && <TableCell sx={{ color: "#000000" }}><b>Status</b></TableCell>}
+          <TableCell sx={{ color: "#000000" }}><b>Actions</b></TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {promotionsData.map((promo, index) => (
+          <TableRow key={index}>
+            <TableCell>{promo.type}</TableCell>
+            <TableCell>{promo.date}</TableCell>
+            <TableCell>{promo.discount}</TableCell>
+            {!isMobile && (
+              <TableCell sx={{ color: promo.status === "Active" ? "green" : "red" }}>
+                {promo.status}
+              </TableCell>
+            )}
+            <TableCell>
+              <Button
+                variant="contained"
+                sx={{ backgroundColor: "#0B2E4C", color: "white", marginRight: 1 }}
+                size="small"
+                onClick={() => setSelectedPromo(promo)}
+              >
+                Modify
+              </Button>
+              <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white" }} size="small">
+                Cancel
+              </Button>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+
+  {/* Edit Promotion Section */}
+  <Paper
+      elevation={3}
+      sx={{
+        p: 3,
+        borderRadius: "12px",
+        backgroundColor: "#F9F9F9",
+        mt: 3,
+      }}
+    >
+      <Typography variant="h6" fontWeight="bold" mb={3}>
+        Edit Promotion
+      </Typography>
+
+      <Grid container spacing={3}>
+        {/* Name */}
+        <Grid item xs={12} sm={6}>
+          <Typography fontSize="13px" fontWeight={500} mb={1}>
+            Name
+          </Typography>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Spring Discount"
+            value={selectedPromo.type}
+          />
+        </Grid>
+
+        {/* Date */}
+        <Grid item xs={12} sm={6}>
+          <Typography fontSize="13px" fontWeight={500} mb={1}>
+            Date
+          </Typography>
+          <TextField
+            fullWidth
+            size="small"
+            type="date"
+            value={selectedPromo.date}
+          />
+        </Grid>
+
+        {/* Discount */}
+        <Grid item xs={12} sm={6}>
+          <Typography fontSize="13px" fontWeight={500} mb={1}>
+            Discount
+          </Typography>
+          <TextField
+            fullWidth
+            size="small"
+            value={selectedPromo.discount}
+            placeholder="20%"
+          />
+        </Grid>
+
+        {/* Status */}
+        <Grid item xs={12} sm={6}>
+          <Typography fontSize="13px" fontWeight={500} mb={1}>
+            Status
+          </Typography>
+          <Select fullWidth size="small" value={selectedPromo.status}>
+            <MenuItem value="Active">Active</MenuItem>
+            <MenuItem value="Inactive">Inactive</MenuItem>
+          </Select>
+        </Grid>
+      </Grid>
+
+      {/* Buttons */}
+      <Box
+        mt={4}
+        display="flex"
+        justifyContent={isMobile ? "center" : "flex-start"}
+        flexDirection={isMobile ? "column" : "row"}
+        gap={2}
+      >
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: "#0B2E4C",
+            color: "#fff",
+            px: 4,
+            "&:hover": {
+              backgroundColor: "#093b65",
+            },
+          }}
+          onClick={onSave}
+        >
+          Save
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: "#D9D9D9",
+            color: "#000",
+            px: 4,
+            "&:hover": {
+              backgroundColor: "#c0c0c0",
+            },
+          }}
+          onClick={onCancel}
+        >
+          Cancel
+        </Button>
+      </Box>
+    </Paper>
+</Box>
+
+
+
+{/* Promotions & special offer section */}
 <Box
       sx={{
         padding: 3,
         border: "1px solid #00000059",
         boxShadow: "0px 0px 16px 0px #00000040",
-        borderRadius: "15px",
+        borderRadius: "30px",
         background: "white",
-        marginTop: "20px",
-        marginBottom: "20px",
+        mt: 3,
+        mb: 3,
       }}
     >
       <Typography variant="h6" fontWeight="bold" mb={2}>
-        Active Promotions
+        Promotions & Special Offers
       </Typography>
-      <Table>
-        <TableHead>
-          <TableRow sx={{ backgroundColor: "#D9D9D9",  }}>
-            <TableCell sx={{color:"#000000"}}><b>Type</b></TableCell>
-            <TableCell sx={{color:"#000000"}}><b>Date</b></TableCell>
-            <TableCell sx={{color:"#000000"}}><b>Discount</b></TableCell>
-            <TableCell sx={{color:"#000000"}}><b>Status</b></TableCell>
-            <TableCell sx={{color:"#000000"}}><b>Actions</b></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody> 
-          {promotionsData.map((promo, index) => (
-            <TableRow key={index}>
-              <TableCell>{promo.type}</TableCell>
-              <TableCell>{promo.date}</TableCell>
-              <TableCell>{promo.discount}</TableCell>
-              <TableCell sx={{ color: promo.status === "Active" ? "green" : "red" }}>
-                {promo.status}
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="contained"
-                  sx={{ backgroundColor: " #0B2E4C", color: "white", marginRight: 1 }}
-                  size="small"
-                  onClick={() => setSelectedPromo(promo)}
-                >
-                  Modify
-                </Button>
-                <Button variant="contained"   sx={{ backgroundColor: " #0B2E4C", color: "white", }}  size="small">
-                  Cancel
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
 
-      {/* Edit Promotion Section */}
-      <Paper sx={{ p: 3, borderRadius: "15px", background: "#F9F9F9", marginTop: 3 }}>
-        <Typography variant="h6" fontWeight="bold" mb={2}>
-          Edit Promotion
-        </Typography>
-        <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={2}>
-          <TextField fullWidth label="Name" value={selectedPromo.type} />
-          <TextField fullWidth label="Date" type="date" defaultValue="2025-06-15" />
-          <TextField fullWidth label="Discount" value={selectedPromo.discount} />
-          <Select fullWidth value={selectedPromo.status}>
-            <MenuItem value="Active">Active</MenuItem>
-            <MenuItem value="Inactive">Inactive</MenuItem>
-          </Select>
-        </Box>
-        <Box display="flex" justifyContent="start" mt={3} gap={2}>
-          <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white" }}>Save</Button>
-          <Button variant="contained" sx={{backgroundColor:  "#D9D9D9",color: "#000" }} >Cancel</Button>
-        </Box>  
-      </Paper>
-    </Box>
-
-
-{/* Promotions & special offer section */}
-<Box
+      <Button
+        fullWidth
         sx={{
-          // margin: "auto",
-          padding: 3,
-          border: '1px solid #00000059',
-          boxShadow: '0px 0px 16px 0px #00000040',
-          borderRadius: '30px',
-          background: 'white',
-          marginTop: '20px',
-          marginBottom: '20px',
+          bgcolor: "#0B2E4C",
+          color: "white",
+          mb: 3,
+          py: 1.5,
+          borderRadius: "10px",
+          "&:hover": { bgcolor: "#083048" },
         }}
       >
-<div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
-      {/* Header Section */}
-      <h2 className="text-xl font-semibold mb-4">Promotions & Special Offers</h2>
-      <Button
-          fullWidth
-          sx={{
-            bgcolor: '#0B2E4C',
-            color: 'white',
-            mt: 2,
-            mb: 2,  
-            padding: '10px',
-            borderRadius: '10px',
-            '&:hover': { bgcolor: '#083048' },
-          }}
-        >
-    Create a new Promotion
-        </Button>
+        Create a new Promotion
+      </Button>
 
-      {/* Promotion Form Section */}
-      <Paper sx={{ p: 2, borderRadius: '10px', background: '#f5f5f5' }}>
-          <Typography variant="subtitle1" fontWeight="bold" mb={1}>
+      <Paper sx={{ p: 3, borderRadius: "10px", background: "#f5f5f5" }}>
+        <Typography variant="subtitle1" fontWeight="bold" mb={2}>
           Create a Promotion
-          </Typography>
+        </Typography>
 
-      <div>
-        {/* Discount Type Checkbox Options */}
-        <div style={{ display: "flex", justifyContent: "space-around", marginBottom: "20px", marginTop: "20px"  }}>
-
-  {[
-    "Percentage Discount",
-    "Fixed Value Discount",
-    "Group Offer",
-    "Early Buyer Discount",
-  ].map((label) => (
-    <label key={label} className="flex items-center gap-2">
-      <input type="checkbox" className="form-checkbox" />
-      {label}
-    </label>
-  ))}
-</div>
-
-
+        {/* Discount Type Checkboxes */}
+        <Grid container spacing={2} mb={3}>
+          {[
+            "Percentage Discount",
+            "Fixed Value Discount",
+            "Group Offer",
+            "Early Buyer Discount",
+          ].map((label) => (
+            <Grid item xs={12} sm={6} md={3} key={label}>
+              <FormControlLabel
+                control={<Checkbox />}
+                label={label}
+                sx={{ fontSize: "14px" }}
+              />
+            </Grid>
+          ))}
+        </Grid>
 
         {/* Discount Value */}
-<Typography variant="body2" fontWeight="bold" mb={1}>
+        <Typography variant="body2" fontWeight="bold" mb={1}>
           Discount value
-          </Typography>
-          <TextField
-            fullWidth
-            value={discountValue}
-            onChange={(e) => setDiscountValue(e.target.value)}
-            sx={{ mb: 2 }}
-          />
+        </Typography>
+        <TextField
+          fullWidth
+          value={discountValue}
+          onChange={(e) => setDiscountValue(e.target.value)}
+          sx={{ mb: 2 }}
+        />
 
         {/* Ticket Selection */}
-      <Typography variant="body2" fontWeight="bold" mb={1}>
-        Ticket Selection
-      </Typography>
-      <Select fullWidth sx={{ mb: 2 }}>
-        <MenuItem value="Standard">Standard</MenuItem>
-      </Select>
- {/* Validity Period Label */}
- <Typography variant="body2" fontWeight="bold" mb={1}>
-        Validity Period
-      </Typography>
+        <Typography variant="body2" fontWeight="bold" mb={1}>
+          Ticket Selection
+        </Typography>
+        <Select fullWidth defaultValue="Standard" sx={{ mb: 2 }}>
+          <MenuItem value="Standard">Standard</MenuItem>
+        </Select>
 
-      {/* Input Fields */}
-      <div className="flex gap-4 mb-4">
-        {/* Start Date Input */}
+        {/* Validity Period */}
+        <Typography variant="body2" fontWeight="bold" mb={1}>
+          Validity Period
+        </Typography>
+        <Grid container spacing={2} mb={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              placeholder="Start Date (mm/dd/yyyy)"
+              value={startDate}
+              type='date'
+              onChange={(e) => setStartDate(e.target.value)}
+             
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              placeholder="End Date (mm/dd/yyyy)"
+              value={endDate}
+              type='date'
+              onChange={(e) => setEndDate(e.target.value)}
+            
+            />
+          </Grid>
+        </Grid>
+
+        {/* Promo Code */}
+        <Typography variant="body2" fontWeight="bold" mb={1}>
+          Promo Code (Optional)
+        </Typography>
         <TextField
-           sx={{ width: "48%", }}
-          variant="outlined"
-          placeholder="mm/dd/yyyy"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <FaCalendarAlt className="text-gray-500" />
-              </InputAdornment>
-            ),
-          }}
+          fullWidth
+          placeholder="Promo Code"
+          value={promoCode}
+          onChange={(e) => setPromoCode(e.target.value)}
+          sx={{ mb: 2 }}
         />
 
-        {/* End Date Input */}
+        {/* Advantage Type */}
+        <Typography variant="body2" fontWeight="bold" mb={1}>
+          Advantage Type
+        </Typography>
+        <Select
+          fullWidth
+          value={advantageType}
+          onChange={(e) => setAdvantageType(e.target.value)}
+          sx={{ mb: 2 }}
+        >
+          <MenuItem value="Discount">Discount</MenuItem>
+        </Select>
+
+        {/* Usage Limit */}
+        <Typography variant="body2" fontWeight="bold" mb={1}>
+          Usage Limit
+        </Typography>
         <TextField
-        sx={{ width: "48%", marginLeft:"4%"}}
-          variant="outlined"
-          placeholder="mm/dd/yyyy"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <FaCalendarAlt className="text-gray-500" />
-              </InputAdornment>
-            ),
-          }}
+          fullWidth
+          placeholder="Usage Limit"
+          value={usageLimit}
+          onChange={(e) => setUsageLimit(e.target.value)}
+          sx={{ mb: 2 }}
         />
-      </div>
-      {/* Promo Code */}
-      <Typography variant="body2" fontWeight="bold" mb={1}>
-        Promo Code (Optional)
-      </Typography>
-      <TextField
-        fullWidth
-        placeholder="Promo Code"
-        value={promoCode}
-        onChange={(e) => setPromoCode(e.target.value)}
-        sx={{ mb: 2 }}
-      />
-
-      {/* Advantage Type */}
-      <Typography variant="body2" fontWeight="bold" mb={1}>
-        Advantage Type
-      </Typography>
-      <Select fullWidth value={advantageType} onChange={(e) => setAdvantageType(e.target.value)} sx={{ mb: 2 }}>
-        <MenuItem value="Discount">Discount</MenuItem>
-      </Select>
-
-      {/* Usage Limit */}
-      <Typography variant="body2" fontWeight="bold" mb={1}>
-        Usage Limit
-      </Typography>
-      <TextField
-        fullWidth
-        placeholder="Usage Limit"
-        value={usageLimit}
-        onChange={(e) => setUsageLimit(e.target.value)}
-        sx={{ mb: 2 }}
-      />
 
         {/* Submit Button */}
         <Button
           fullWidth
           sx={{
-            bgcolor: '#0B2E4C',
-            color: 'white',
-            mt: 2,
-            padding: '10px',
-            borderRadius: '10px',
-            '&:hover': { bgcolor: '#083048' },
+            bgcolor: "#0B2E4C",
+            color: "white",
+            mt: 3,
+            py: 1.5,
+            borderRadius: "10px",
+            "&:hover": { bgcolor: "#083048" },
           }}
         >
-    Save Promotion
+          Save Promotion
         </Button>
-
-      </div>
       </Paper>
-    </div>
-    
-</Box>
+    </Box>
 
 {/* Notifications & Auto Reminder section */}
 <Box
@@ -414,11 +538,12 @@ export function MarketingEngagenmentView() {
       {/* Date and Time Selection */}
       <Box sx={{ display: "flex", gap: "16px", mt: 2, mb: 3 }}>
         <Box sx={{ position: "relative", flex: 1 }}>select date
-          <TextField fullWidth placeholder="mm/dd/yyyy" />
-          <FaCalendarAlt style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", color: "#6b7280" }} />
+          <TextField fullWidth placeholder="mm/dd/yyyy" type='date' />
+         
+
         </Box>
         <Box sx={{ flex: 1 }}>select time
-          <TextField fullWidth placeholder="00:00" />
+          <TextField fullWidth placeholder="00:00"  type='time'/>
         </Box>
       </Box>
 
@@ -566,56 +691,91 @@ export function MarketingEngagenmentView() {
       {/* Marketing perform section */}
 
       <Box
-      className="p-6 bg-gray-100 min-h-screen"
       sx={{
         background: "#FFFFFF",
         border: "1px solid #00000059",
         boxShadow: "0px 0px 16px 0px #00000040",
         borderRadius: "30px",
-        padding: "24px",
-      
-        // margin: "auto",
+        p: { xs: 2, sm: 3, md: 4 },
         mt: 4,
         mb: 4,
+        maxWidth: "100%",
+        overflow: "hidden",
       }}
     >
-      <Box className="p-6 bg-white rounded-lg">
-        <Typography variant="h5" className="font-bold mb-2">
+      <Box sx={{ p: { xs: 2, sm: 3 }, background: "white", borderRadius: "15px" }}>
+        <Typography variant="h5" fontWeight="bold" mb={2}>
           Marketing Performance & Statistics
         </Typography>
-        <Typography variant="body1" className="mb-4">
+        <Typography variant="body1" mb={4}>
           Performance Tracking Table
         </Typography>
 
-        {/* Table */}
+        {/* Responsive Table */}
         <TableContainer
           component={Paper}
-          className="rounded-lg"
           sx={{
             borderRadius: "20px",
-            // boxShadow: "0px 0px 15px 0px #0000003B",
+            overflowX: "auto",
             mb: 4,
-            mt: 4  
           }}
         >
-          <Table>
+          <Table sx={{ minWidth: 600 }}>
             <TableHead>
               <TableRow sx={{ backgroundColor: "#3AACE7" }}>
-                {["Action", "Participants Reached", "Open Rate", "Click Rate", "Sales Conversions"].map((header) => (
-                  <TableCell key={header} sx={{ color: "white", fontWeight: "bold", padding: "12px" }}>
-                    {header}
-                  </TableCell>
-                ))}
+                {["Action", "Participants Reached", "Open Rate", "Click Rate", "Sales Conversions"].map(
+                  (header, i) => (
+                    <TableCell
+                      key={i}
+                      sx={{
+                        color: "white",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        backgroundColor: "#3AACE7",
+                        ...(i === 0 && {
+                          borderTopLeftRadius: "20px",
+                          borderBottomLeftRadius: "20px",
+                        }),
+                        ...(i === 4 && {
+                          borderTopRightRadius: "20px",
+                          borderBottomRightRadius: "20px",
+                          whiteSpace: "nowrap",
+                        }),
+                      }}
+                    >
+                      {header}
+                    </TableCell>
+                  )
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
               {[
                 ["24h Reminder Notification", "500", "80%", "40%", "100 tickets sold"],
                 ["48h Follow-Up", "400", "-", "-", "50 tickets sold"],
-              ].map((row, index) => (
-                <TableRow key={index} className="border-b border-gray-300">
-                  {row.map((cell, i) => (
-                    <TableCell key={i} sx={{ padding: "12px" }}>
+              ].map((row, rowIndex, rowArray) => (
+                <TableRow
+                  key={rowIndex}
+                  sx={{
+                    ...(rowIndex === rowArray.length - 1 && {
+                      "& td:first-of-type": {
+                        borderBottomLeftRadius: "20px",
+                      },
+                      "& td:last-of-type": {
+                        borderBottomRightRadius: "20px",
+                      },
+                    }),
+                  }}
+                >
+                  {row.map((cell, cellIndex) => (
+                    <TableCell
+                      key={cellIndex}
+                      sx={{
+                        p: 1.5,
+                        border: "none",
+                        textAlign: "center",
+                      }}
+                    >
                       {cell}
                     </TableCell>
                   ))}
@@ -625,44 +785,121 @@ export function MarketingEngagenmentView() {
           </Table>
         </TableContainer>
 
-        {/* Graph */}
+        {/* Responsive Graph Section */}
         <Box
-          className="bg-white p-4 rounded-lg mt-6 shadow-md"
           sx={{
             background: "#FFFFFF",
             border: "1px solid #00000059",
             boxShadow: "0px 0px 16px 0px #00000040",
             borderRadius: "20px",
-            padding: "20px",
+            p: { xs: 2, sm: 3 },
             mt: 4,
-            mb: 4
+            mb: 4,
+            width: "100%",
+            overflowX: "auto",
           }}
         >
-          <Typography variant="h6" className="font-bold mb-2">
-            Booking Trends
-          </Typography>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="sales" stroke="#3AACE7" strokeWidth={3} />
-            </LineChart>
-          </ResponsiveContainer>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems="center"
+            spacing={2}
+            mb={3}
+            flexWrap="wrap"
+          >
+            <Stack direction="row" alignItems="center" spacing={4}>
+              <Typography variant="h6" fontWeight="bold">
+                Booking Trends
+              </Typography>
+
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <Box
+                  sx={{
+                    width: 30,
+                    height: 14,
+                    borderRadius: 10,
+                    backgroundColor: "#3AACE7",
+                    border: "2px solid #3AACE7",
+                  }}
+                />
+                <Typography variant="caption" color="#333">
+                  Booking Before Promotion
+                </Typography>
+              </Stack>
+
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <Box
+                  sx={{
+                    width: 30,
+                    height: 14,
+                    borderRadius: 10,
+                    backgroundColor: "#fff",
+                    border: "2px solid #3AACE7",
+                  }}
+                />
+                <Typography variant="caption" color="#333">
+                  Booking After Promotion
+                </Typography>
+              </Stack>
+            </Stack>
+
+            <Tabs
+              value={tabValue}
+              onChange={(e, newValue) => setTabValue(newValue)}
+              textColor="primary"
+              indicatorColor="primary"
+              sx={{
+                "& .MuiTab-root": {
+                  minWidth: 80,
+                  fontSize: 14,
+                  color: "#7C7C7C",
+                  textTransform: "none",
+                },
+                "& .Mui-selected": {
+                  color: "#3AACE7",
+                  fontWeight: "bold",
+                },
+                "& .MuiTabs-indicator": {
+                  height: "2px",
+                  borderRadius: "2px",
+                  backgroundColor: "#3AACE7",
+                },
+              }}
+            >
+              <Tab label="Monthly" />
+              <Tab label="Weekly" />
+              <Tab label="Daily" />
+            </Tabs>
+          </Stack>
+
+          <Box sx={{ width: "100%", height: 300 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="sales" stroke="#3AACE7" strokeWidth={3} dot />
+              </LineChart>
+            </ResponsiveContainer>
+          </Box>
         </Box>
 
         {/* Follow-up Section */}
         <Box
-          className="p-4 rounded-lg mt-6 shadow-md border-l-4 border-blue-500"
           sx={{
-            background: " #F1F1F1",
-            boxShadow: "0px 0px 16px 0px #00000040",
-            padding: "30px",
+            background: "#F1F1F1",
+            p: { xs: 2, sm: 3 },
+            borderLeft: "4px solid #3AACE7",
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "center", sm: "flex-start" },
+            textAlign: { xs: "center", sm: "left" },
           }}
         >
-          <Typography variant="body1" className="font-bold">
-            Follow up with participants who viewed the event but didn’t buy. Consider sending a special offer to encourage them to complete their purchase.
+          <Typography variant="body1" fontWeight="bold">
+            Follow up with participants who viewed the event but didn’t buy. Consider sending a special
+            offer to encourage them to complete their purchase.
           </Typography>
         </Box>
 
@@ -673,9 +910,9 @@ export function MarketingEngagenmentView() {
             backgroundColor: "#0B2A4A",
             color: "white",
             borderRadius: "8px",
-            marginTop: 2,
+            mt: 2,
             fontWeight: "bold",
-            padding: "12px",
+            py: 1.5,
             "&:hover": { backgroundColor: "#09324A" },
           }}
         >

@@ -9,6 +9,7 @@ import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
 import { isUserLoggedIn } from 'src/redux/actions';
 import Protected from 'src/redux/helper/HOC';
+import { TrackingBookedServicesAndProvidersView } from 'src/sections/tracking-of-booked-services-&-providers/view';
 
 // ----------------------------------------------------------------------
 
@@ -35,6 +36,21 @@ export const ReservationsAndContractsPage = lazy(() => import('src/pages/reserva
 export const TicketManagementViewPage = lazy(() => import('src/pages/ticket-management'));
 export const TicketPurchaseProcessPage = lazy(() => import('src/pages/ticket-purchase-process'));
 export const TicketValidationAtEntryPage = lazy(() => import('src/pages/ticket-validation-at-entry'));
+
+// New
+export const TransactionAndPaymentManagementPage = lazy(() => import('src/pages/transaction-&-payment-management'));
+export const MessagingAndClientRelationshipPage = lazy(() => import('src/pages/messaging-&-client-relationship'));
+export const StatisticsAndPerformancePage = lazy(() => import('src/pages/statistics-&-performance'));
+export const SearchAndSelectServiceProvidersPage = lazy(() => import('src/pages/search-&-select-service-providers'));
+export const ServiceRequestAndNegotiationPage = lazy(() => import('src/pages/service-request-&-negotiation'));
+export const trackingOfBookedServicesAndProvidersPage = lazy(() => import('src/pages/tracking-of-booked-services-&-providers'));
+export const GlobalOverviewAndGeneralStatisticsPage = lazy(() => import('src/pages/global-overview-&-general-statistics'));
+export const UserManagementPage = lazy(() => import('src/pages/user-management'));
+export const TicketingAndTransactionsSupervisionPage = lazy(() => import('src/pages/ticketing-&-transactions-supervision'));
+export const MarketplaceAndServiceProviderSupervisionPage = lazy(() => import('src/pages/marketplace-&-service-provider-supervision'));
+export const PasswordRecoveryPage = lazy(() => import('src/pages/password-recovery'));
+export const ProfileAndServicesManagementPage = lazy(() => import('src/pages/profile-&-services-management'));
+
 // ----------------------------------------------------------------------
 
 const renderFallback = (
@@ -80,7 +96,6 @@ export function Router() {
         { path: 'transection-and-payment', element: <TransectionAndPaymentPage /> },
         { path: 'statistics-and-reports', element: <StatisticsAndReportsPage /> },
         { path: 'visibility-and-access-settings', element: <VisibilityAndAccessSettingsPage /> },
-
         { path: 'home-and-recommendations', element: <HomeAndRecommendationsPage /> },
         { path: 'event-search-and-details', element: <EventSearchAndDetailsPage /> },
         { path: 'ticket-purchase-process', element: <TicketPurchaseProcessPage /> },
@@ -91,6 +106,21 @@ export function Router() {
         { path: 'home-and-global-view', element: <HomeAndGlobalPage /> },
         { path: 'reservations-and-contracts', element: <ReservationsAndContractsPage /> },
         { path: 'confirmed-service-calendar', element: <ConfirmedServiceCalendarPage /> },
+
+
+        // New
+        { path: 'transaction-&-payment-management', element: <TransactionAndPaymentManagementPage /> },
+        { path: 'messaging-&-client-relationship', element: <MessagingAndClientRelationshipPage /> },
+        { path: 'statistics-&-performance', element: <StatisticsAndPerformancePage /> },
+        { path: 'search-&-select-service-providers', element: <SearchAndSelectServiceProvidersPage /> },
+        { path: 'service-request-&-negotiation', element: <ServiceRequestAndNegotiationPage /> },
+        { path: 'tracking-of-booked-services-&-providers', element: <TrackingBookedServicesAndProvidersView /> },
+        { path: 'global-overview-&-general-statistics', element: <GlobalOverviewAndGeneralStatisticsPage /> },
+        { path: 'user-management', element: <UserManagementPage /> },
+        { path: 'ticketing-&-transactions-supervision', element: <TicketingAndTransactionsSupervisionPage /> },
+        { path: 'marketplace-&-service-provider-supervision', element: <MarketplaceAndServiceProviderSupervisionPage /> },
+        { path: 'password-recovery', element: <PasswordRecoveryPage /> },
+        { path: 'profile-&-services-management', element: <ProfileAndServicesManagementPage /> },
 
       ],
     },

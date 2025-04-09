@@ -100,7 +100,7 @@ export function EventDetailsView() {
         }}
       >
         <img
-          src="https://s3-alpha-sig.figma.com/img/0fe2/8d2c/b9040ce5285238d2d74fc2a36809e101?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=KJrd9bjK7T0ybl8iU71L7gTZlcZuaX9fvR7sp49tLHaWyqvurWUsmu~0sUnx0Z2kkHYZFjAksdIz4yQoahPadTLpBtvC2JMOqZHcWCBhnB-xaPakvuilhVrZZut0~M98zjhlTlqZOrhMNKk1amsJOn-~FRqUqKcfd5Blg26GHf9EERFqzDO2GHZVDP6ldEWXZPqskWGbXqHBqrXhnRgfQPq2DvsoJgS6CisnIqyjmSa8y6VK9oSTKPPzwkIrahd5Fi~t4JGL4QKR3RxyGIoulUn7OfzflWuxjgSWQBakvXrraZC8ceycmTP-kezfbcV1nLMWK-1YUDBcJniEuzl79g__"
+          src="assets/images/event/event-img.jpg"
           alt="Event Banner"
           style={{
             width: "100%",
@@ -129,17 +129,24 @@ export function EventDetailsView() {
             <DatePicker value={date} onChange={setDate} />
             <TimePicker value={time} onChange={setTime} />
             <TextField
-              label="Event Location"
-              placeholder="Your location here"
-              fullWidth
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <LocationOnIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
+  label="Event Location"
+  placeholder="Your location here"
+  fullWidth
+  InputProps={{
+    endAdornment: (
+      <InputAdornment position="end">
+        <IconButton
+          onClick={() =>
+            window.open("https://www.google.com/maps")
+          }
+          edge="end"
+        >
+          <LocationOnIcon sx={{ color: "#3AACE7" }} />
+        </IconButton>
+      </InputAdornment>
+    ),
+  }}
+/>
           </Box>
         </LocalizationProvider>
 
@@ -654,13 +661,6 @@ export function EventDetailsView() {
                         borderRadius: "8px",
                         "& .MuiOutlinedInput-root": { borderRadius: "8px" },
                       },
-                      InputProps: {
-                        endAdornment: (
-                          <IconButton onClick={() => console.log("Date picker clicked")}>
-                            <EventIcon />
-                          </IconButton>
-                        ),
-                      },
                     },
                   }}
                 />
@@ -722,13 +722,6 @@ export function EventDetailsView() {
                           fullWidth: true,
                           size: "small",
                           variant: "outlined",
-                          InputProps: {
-                            endAdornment: (
-                              <IconButton>
-                                <EventIcon />
-                              </IconButton>
-                            ),
-                          },
                         },
                       }}
                     />

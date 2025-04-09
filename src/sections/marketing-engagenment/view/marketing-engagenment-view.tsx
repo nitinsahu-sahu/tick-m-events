@@ -19,18 +19,8 @@ import {
 } from '@mui/material';
 
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-
+import { BookingTrends } from "../graph";
 import { useState } from 'react';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
-
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { DatePicker } from "@mui/x-date-pickers";
@@ -38,16 +28,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { Margin } from '@mui/icons-material';
 
 
-const data = [
-  { name: 'April', sales: 20 },
-  { name: 'May', sales: 400000 },
-  { name: 'June', sales: 600000 },
-  { name: 'July', sales: 900000 },
-  { name: 'August', sales: 700000 },
-  { name: 'September', sales: 600000 },
-  { name: 'October', sales: 500000 },
-  { name: 'November', sales: 700000 },
-];
+
 
 const promotionsData = [
   { id: 1, type: 'Spring Discount', date: '2025-03-10', discount: '20%', status: 'Active' },
@@ -74,10 +55,6 @@ export function MarketingEngagenmentView() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [selectedTab, setSelectedTab] = useState("monthly");
-  const handleTabChange = (_: React.SyntheticEvent, newTab: number) => {
-    if (newTab !== null) setSelectedTab(newTab);
-  };
-  
   const [tabValue, setTabValue] = useState(0);
 
   return (
@@ -786,105 +763,10 @@ export function MarketingEngagenmentView() {
         </TableContainer>
 
         {/* Responsive Graph Section */}
-        <Box
-          sx={{
-            background: "#FFFFFF",
-            border: "1px solid #00000059",
-            boxShadow: "0px 0px 16px 0px #00000040",
-            borderRadius: "20px",
-            p: { xs: 2, sm: 3 },
-            mt: 4,
-            mb: 4,
-            width: "100%",
-            overflowX: "auto",
-          }}
-        >
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            justifyContent="space-between"
-            alignItems="center"
-            spacing={2}
-            mb={3}
-            flexWrap="wrap"
-          >
-            <Stack direction="row" alignItems="center" spacing={4}>
-              <Typography variant="h6" fontWeight="bold">
-                Booking Trends
-              </Typography>
+        
 
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Box
-                  sx={{
-                    width: 30,
-                    height: 14,
-                    borderRadius: 10,
-                    backgroundColor: "#3AACE7",
-                    border: "2px solid #3AACE7",
-                  }}
-                />
-                <Typography variant="caption" color="#333">
-                  Booking Before Promotion
-                </Typography>
-              </Stack>
-
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Box
-                  sx={{
-                    width: 30,
-                    height: 14,
-                    borderRadius: 10,
-                    backgroundColor: "#fff",
-                    border: "2px solid #3AACE7",
-                  }}
-                />
-                <Typography variant="caption" color="#333">
-                  Booking After Promotion
-                </Typography>
-              </Stack>
-            </Stack>
-
-            <Tabs
-              value={tabValue}
-              onChange={(e, newValue) => setTabValue(newValue)}
-              textColor="primary"
-              indicatorColor="primary"
-              sx={{
-                "& .MuiTab-root": {
-                  minWidth: 80,
-                  fontSize: 14,
-                  color: "#7C7C7C",
-                  textTransform: "none",
-                },
-                "& .Mui-selected": {
-                  color: "#3AACE7",
-                  fontWeight: "bold",
-                },
-                "& .MuiTabs-indicator": {
-                  height: "2px",
-                  borderRadius: "2px",
-                  backgroundColor: "#3AACE7",
-                },
-              }}
-            >
-              <Tab label="Monthly" />
-              <Tab label="Weekly" />
-              <Tab label="Daily" />
-            </Tabs>
-          </Stack>
-
-          <Box sx={{ width: "100%", height: 300 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="sales" stroke="#3AACE7" strokeWidth={3} dot />
-              </LineChart>
-            </ResponsiveContainer>
-          </Box>
-        </Box>
-
+        <BookingTrends />
+        
         {/* Follow-up Section */}
         <Box
           sx={{

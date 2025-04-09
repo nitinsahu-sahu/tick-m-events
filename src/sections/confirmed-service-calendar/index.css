@@ -1,0 +1,8 @@
+.react-calendar__navigation{
+    display: none;
+}
+
+.react-calendar__month-view__days__day{
+    max-height: 200px;
+    max-width: 900px;
+}

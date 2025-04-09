@@ -14,14 +14,15 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
+  Paper,useTheme, useMediaQuery
 
 } from "@mui/material";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-
+import Chart from "react-apexcharts";
 import { Iconify } from "src/components/iconify";
 import { DashboardContent } from "src/layouts/dashboard";
 import { PageTitleSection } from "src/components/page-title-section";
+import { ApexOptions } from "apexcharts";
 
 export function EventValidationView() {
   const [search, setSearch] = useState("");
@@ -60,11 +61,63 @@ export function EventValidationView() {
     entry.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const data = [
-    { name: "Validated Tickets", value: 350, color: "#4CAF50" },
-    { name: "Pending Tickets", value: 150, color: "#FFC107" },
-    { name: "Invalid Tickets", value: 5, color: "#E53935" },
-  ];
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const chartOptions: ApexOptions = {
+    chart: {
+      type: "pie",
+    },
+    labels: ["Validated Tickets", "Pending Tickets", "Invalid Tickets"],
+    legend: {
+      position: "bottom",
+      horizontalAlign: "center",
+      fontSize: "14px",
+      markers: {
+        radius: 12,
+      },
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: function (val: number, opts: { w: any; seriesIndex: number }): string {
+        return opts.w.globals.series[opts.seriesIndex];
+      },
+      style: {
+        fontSize: "14px",
+        fontWeight: 600,
+        colors: ["#fff"],
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: (val: number): string => `${val} Tickets`,
+      },
+    },
+    
+    colors: ["#4CAF50", "#FFC107", "#D32F2F"], // Green, Yellow, Red
+    // tooltip: {
+    //   y: {
+    //     formatter: (val) => `${val} Tickets`,
+    //   },
+    // },
+    responsive: [
+      {
+        breakpoint: 600,
+        options: {
+          chart: {
+            width: "100%",
+          },
+          legend: {
+            fontSize: "12px",
+          },
+        },
+      },
+    ],
+  };
+
+  const chartSeries = [350, 150, 5,];
+
+
 
   return (
     <DashboardContent>
@@ -476,7 +529,7 @@ export function EventValidationView() {
         </Grid>
 
         {/* Chart Section */}
-        <Paper
+        {/* <Paper
           sx={{
             padding: "15px",
             borderRadius: "12px",
@@ -504,7 +557,27 @@ export function EventValidationView() {
               <Tooltip />
             </PieChart>
           </ResponsiveContainer>
-        </Paper>
+        </Paper> */}
+    <Paper
+      sx={{
+        padding: "15px",
+        borderRadius: "12px",
+        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+      }}
+    >
+      <Typography variant="body1" fontWeight="bold" mb={2}>
+        Entry Data Visualization
+      </Typography>
+      <Chart
+        options={chartOptions}
+        series={chartSeries}
+        type="pie"
+        height={isMobile ? 280 : 320}
+      />
+    </Paper>
+
+
+
       </Paper>
 
 

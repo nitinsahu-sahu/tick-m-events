@@ -6,7 +6,9 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
+  DialogTitle,Grid,
+  useTheme,  Divider,
+  Stack,
 } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -29,7 +31,8 @@ export function EventDetailsView() {
   const [description, setDescription] = useState("");
   const [highlighting, setHighlighting] = useState(false);
   const [autoShare, setAutoShare] = useState(false);
-  const [visibility, setVisibility] = useState("public");
+  const [visibility, setVisibility] = useState("public");  
+  
   const [date, setDate] = useState<Dayjs | null>(dayjs());  // Ensure correct typing
   const [time, setTime] = useState<Dayjs | null>(dayjs());
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
@@ -38,6 +41,25 @@ export function EventDetailsView() {
   const [selectedLogo, setSelectedLogo] = useState<string | null>(null);
   const [selectedFrame, setSelectedFrame] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState("#FF66A1");
+  const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const data = [
+    {
+      type: "Standard",
+      sold: 250,
+      available: 250,
+      revenue: "1,250,000 XAF",
+      refunds: "2 canceled",
+    },
+    {
+      type: "VIP",
+      sold: 80,
+      available: 20,
+      revenue: "1,200,000 XAF",
+      refunds: "1 canceled",
+    },
+  ];
 
   // const UploadButton = styled("label")({
   //   display: "inline-block",
@@ -78,7 +100,7 @@ export function EventDetailsView() {
         }}
       >
         <img
-          src="https://s3-alpha-sig.figma.com/img/0fe2/8d2c/b9040ce5285238d2d74fc2a36809e101?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=KJrd9bjK7T0ybl8iU71L7gTZlcZuaX9fvR7sp49tLHaWyqvurWUsmu~0sUnx0Z2kkHYZFjAksdIz4yQoahPadTLpBtvC2JMOqZHcWCBhnB-xaPakvuilhVrZZut0~M98zjhlTlqZOrhMNKk1amsJOn-~FRqUqKcfd5Blg26GHf9EERFqzDO2GHZVDP6ldEWXZPqskWGbXqHBqrXhnRgfQPq2DvsoJgS6CisnIqyjmSa8y6VK9oSTKPPzwkIrahd5Fi~t4JGL4QKR3RxyGIoulUn7OfzflWuxjgSWQBakvXrraZC8ceycmTP-kezfbcV1nLMWK-1YUDBcJniEuzl79g__"
+          src="assets/images/event/event-img.jpg"
           alt="Event Banner"
           style={{
             width: "100%",
@@ -107,17 +129,24 @@ export function EventDetailsView() {
             <DatePicker value={date} onChange={setDate} />
             <TimePicker value={time} onChange={setTime} />
             <TextField
-              label="Event Location"
-              placeholder="Your location here"
-              fullWidth
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <LocationOnIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
+  label="Event Location"
+  placeholder="Your location here"
+  fullWidth
+  InputProps={{
+    endAdornment: (
+      <InputAdornment position="end">
+        <IconButton
+          onClick={() =>
+            window.open("https://www.google.com/maps")
+          }
+          edge="end"
+        >
+          <LocationOnIcon sx={{ color: "#3AACE7" }} />
+        </IconButton>
+      </InputAdornment>
+    ),
+  }}
+/>
           </Box>
         </LocalizationProvider>
 
@@ -153,323 +182,446 @@ export function EventDetailsView() {
 
       {/* Event Customization */}
       <Card
-        sx={{
-          borderRadius: 4,
-          padding: 3,
-          boxShadow: 3,
-          margin: "auto",
-          border: "2px solid #E0E0E0",
-          marginTop: 4,
-        }}
-      >
-        <CardContent>
-          <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
-            {/* Left Section: Theme Selection */}
-            <Box>
-              <Typography variant="h5" fontWeight="bold">
-                Event Customization
-              </Typography>
-              <Typography variant="h6" fontWeight="bold" sx={{ mt: 2, color: "#1E1E1E" }}>
-                Choose Event Theme
-              </Typography>
-              <Typography variant="body2" sx={{ color: "#666" }}>
-                Choose main colors
-              </Typography>
-              <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-                {["#FF66A1", "#E63946", "#FFD700", "#4A90E2", "#E91E63"].map((color) => (
-                  <Box
-                    key={color}
-                    sx={{
-                      width: 32,
-                      height: 32,
-                      backgroundColor: color,
-                      borderRadius: "50%",
-                      cursor: "pointer",
-                      border: selectedColor === color ? "2px solid black" : "none",
-                    }}
-                    onClick={() => setSelectedColor(color)}
-                  />
-                ))}
-              </Box>
+  sx={{
+    borderRadius: 4,
+    padding: 3,
+    boxShadow: 3,
+    margin: "auto",
+    border: "2px solid #E0E0E0",
+    marginTop: 4,
+  }}
+>
+  <CardContent>
+    <Grid container spacing={4}>
+      {/* Left Section: Theme Selection */}
+      <Grid item xs={12} md={6}>
+        <Typography variant="h5" fontWeight="bold">
+          Event Customization
+        </Typography>
 
-              {/* Custom Gradient Colors */}
-              <Typography variant="body2" sx={{ color: "#666", mt: 2 }}>
-                Choose Custom Colors
-              </Typography>
-              <Box
-                sx={{
-                  width: "200px",
-                  height: "32px",
-                  background: "linear-gradient(to right, yellow, orange)",
-                  borderRadius: "8px",
-                  mt: 1,
-                  border: "1px solid #ccc",
+        <Typography variant="h6" fontWeight="bold" sx={{ mt: 2, color: "#1E1E1E" }}>
+          Choose Event Theme
+        </Typography>
+        <Typography variant="body2" sx={{ color: "#666" }}>
+          Choose main colors
+        </Typography>
+
+        <Box sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap" }}>
+          {["#FF66A1", "#E63946", "#FFD700", "#4A90E2", "#E91E63"].map((color) => (
+            <Box
+              key={color}
+              sx={{
+                width: 32,
+                height: 32,
+                backgroundColor: color,
+                borderRadius: "50%",
+                cursor: "pointer",
+                border: selectedColor === color ? "2px solid black" : "none",
+              }}
+              onClick={() => setSelectedColor(color)}
+            />
+          ))}
+        </Box>
+
+        <Typography variant="body2" sx={{ color: "#666", mt: 2 }}>
+          Choose Custom Colors
+        </Typography>
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: "200px",
+            height: "32px",
+            background: "linear-gradient(to right, yellow, orange)",
+            borderRadius: "8px",
+            mt: 1,
+            border: "1px solid #ccc",
+          }}
+        />
+      </Grid>
+
+      {/* Right Section: Logo Upload & Frame Selection */}
+      <Grid item xs={12} md={6}>
+        <Typography variant="h6" fontWeight="bold">
+          Add logo
+        </Typography>
+
+        <Box
+          sx={{
+            width: "90px",
+            height: "90px",
+            borderRadius: "12px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#FFF",
+            boxShadow: 2,
+            border: "1px solid #D3D3D3",
+            overflow: "hidden",
+            marginBottom: 4,
+          }}
+        >
+          {selectedLogo ? (
+            <img src={selectedLogo} alt="Uploaded" width="60px" />
+          ) : (
+            <Typography variant="body2" color="textSecondary">
+              No Logo
+            </Typography>
+          )}
+        </Box>
+
+        <Grid container spacing={3}>
+          {/* Logo Upload Section */}
+          <Grid item xs={12} sm={6}>
+            <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
+              Choose logo
+            </Typography>
+            <label
+              htmlFor="logo-upload"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                backgroundColor: "#F1F1F1",
+                padding: "10px 16px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                border: "1px solid #ccc",
+                fontSize: "14px",
+                fontWeight: "500",
+              }}
+            >
+              Upload Image <CloudUploadIcon fontSize="small" />
+              <input
+                type="file"
+                id="logo-upload"
+                hidden
+                onChange={(e) => {
+                  const files = e.target.files;
+                  if (!files || files.length === 0) return;
+                  const file = files[0];
+                  setSelectedLogo(URL.createObjectURL(file));
                 }}
               />
-            </Box>
+            </label>
+          </Grid>
 
-            {/* Right Section: Logo Upload & Frame Selection */}
-            <Box sx={{ textAlign: "start" }}>
-              <Typography variant="h6" fontWeight="bold">
-                Add logo
+          {/* Frame Selection Section */}
+          <Grid item xs={12} sm={6}>
+            <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
+              Choose Frames
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2 }}>
+              {["circle", "triangle", "square"].map((frame) => (
+                <Box
+                  key={frame}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: frame === "circle" ? "50%" : "4px",
+                    border: "2px solid",
+                    borderColor: selectedFrame === frame ? "#007BFF" : "#D3D3D3",
+                    backgroundColor: "#E0E0E0",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  onClick={() => setSelectedFrame(frame)}
+                />
+              ))}
+            </Box>
+          </Grid>
+        </Grid>
+      </Grid>
+    </Grid>
+  </CardContent>
+</Card>
+
+
+{/*  Publication & Visibility  section */}
+
+<Card
+      sx={{
+        padding: 3,
+        marginTop: 4,
+        borderRadius: 2,
+        border: "2px solid #B3B3B3",
+      }}
+    >
+      <CardContent>
+        {/* Section Title */}
+        <Typography variant="h6" fontWeight="bold">
+          Publication & Visibility Options
+        </Typography>
+
+        {/* Visibility Settings */}
+        <Typography variant="subtitle1" fontWeight="bold" mt={2}>
+          Visibility Settings
+        </Typography>
+        <RadioGroup
+          value={visibility}
+          onChange={(e) => setVisibility(e.target.value)}
+          sx={{ marginLeft: 1 }}
+        >
+          <FormControlLabel
+            value="public"
+            control={<Radio sx={{ color: "#0B2E4C" }} />}
+            label={
+              <Typography variant="body2">
+                Public Event (Accessible to everyone)
               </Typography>
-
-              {/* Logo Display Box - Aligned to Start */}
-              <Box
-                sx={{
-                  width: "90px",
-                  height: "90px",
-                  borderRadius: "12px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: "#FFF",
-                  boxShadow: 2,
-                  border: "1px solid #D3D3D3",
-                  overflow: "hidden",
-                  marginBottom: 4,
-                  marginLeft: 0,
-                }}
-              >
-                {selectedLogo ? (
-                  <img src={selectedLogo} alt="Uploaded" width="60px" />
-                ) : (
-                  <Typography variant="body2" color="textSecondary">
-                    No Logo
-                  </Typography>
-                )}
-              </Box>
-
-              <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
-                {/* Logo Upload Section */}
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
-                    Choose logo
-                  </Typography>
-                  <label
-                    htmlFor="logo-upload"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      backgroundColor: "#F1F1F1",
-                      padding: "10px 16px",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                      border: "1px solid #ccc",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Upload Image <CloudUploadIcon fontSize="small" />
-                    <input
-                      type="file"
-                      id="logo-upload"
-                      hidden
-                      onChange={(e) => {
-                        const files = e.target.files;
-                        if (!files || files.length === 0) return; // Ensure files exist
-
-                        const file = files[0];
-                        setSelectedLogo(URL.createObjectURL(file));
-                      }}
-                    />
-
-                  </label>
-                </Box>
-
-                {/* Frame Selection Section */}
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
-                    Choose Frames
-                  </Typography>
-                  <Box sx={{ display: "flex", gap: 2 }}>
-                    {["circle", "triangle", "square"].map((frame) => (
-                      <Box
-                        key={frame}
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: frame === "circle" ? "50%" : "4px",
-                          border: "2px solid",
-                          borderColor: selectedFrame === frame ? "#007BFF" : "#D3D3D3",
-                          backgroundColor: "#E0E0E0",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                        onClick={() => setSelectedFrame(frame)} // ✅ Now TypeScript won't complain
-                      />
-
-                    ))}
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
-
-
-      <Card sx={{ padding: 3, marginTop: 4, borderRadius: 2, border: "2px solid #B3B3B3" }}>
-        <CardContent>
-          {/* Section Title */}
-          <Typography variant="h6" fontWeight="bold">
-            Publication & Visibility Options
-          </Typography>
-
-          {/* Visibility Settings */}
-          <Typography variant="subtitle1" fontWeight="bold" mt={2}>
-            Visibility Settings
-          </Typography>
-          <RadioGroup
-            value={visibility}
-            onChange={(e) => setVisibility(e.target.value)}
-            sx={{ marginLeft: 2 }}
-          >
-            <FormControlLabel
-              value="public"
-              control={<Radio sx={{ color: "#0B2E4C" }} />}
-              label={<Typography variant="body2">Public Event (Accessible to everyone)</Typography>}
-            />
-            <FormControlLabel
-              value="private"
-              control={<Radio sx={{ color: "#0B2E4C" }} />}
-              label={<Typography variant="body2">Private Event (Accessible via invitation only)</Typography>}
-            />
-          </RadioGroup>
-
-          {/* Custom URL Field */}
-          <Typography variant="subtitle1" fontWeight="bold" mt={3}>
-            Custom URL:
-          </Typography>
-          <TextField
-            fullWidth
-            variant="outlined"
-            value="e.g. tickm.com/event-tech-2025"
-            disabled
-            sx={{ backgroundColor: "#E0E0E0", marginTop: 1, borderRadius: 1 }}
+            }
           />
+          <FormControlLabel
+            value="private"
+            control={<Radio sx={{ color: "#0B2E4C" }} />}
+            label={
+              <Typography variant="body2">
+                Private Event (Accessible via invitation only)
+              </Typography>
+            }
+          />
+        </RadioGroup>
 
-          {/* Promotion & Highlighting */}
-          <Typography variant="subtitle1" fontWeight="bold" mt={4}>
-            Promotion & Highlighting
-          </Typography>
-          <Box display="flex" justifyContent="flex-start" mt={2}>
-            <Switch
-              checked={highlighting}
-              onChange={() => setHighlighting(!highlighting)}
-              sx={{ "& .MuiSwitch-switchBase.Mui-checked": { color: "#0B2E4C" } }}
-            />
-            <Typography variant="body2">
-              Enable Homepage Highlighting (Paid option for increased visibility)
-            </Typography>
+        {/* Custom URL Field */}
+        <Typography variant="subtitle1" fontWeight="bold" mt={3}>
+          Custom URL:
+        </Typography>
+        <TextField
+          fullWidth
+          variant="outlined"
+          value="e.g. tickm.com/event-tech-2025"
+          disabled
+          sx={{
+            backgroundColor: "#E0E0E0",
+            marginTop: 1,
+            borderRadius: 1,
+          }}
+        />
 
-          </Box>
-          <Box display="flex" justifyContent="flex-start" mt={2}>
-            <Switch
-              checked={autoShare}
-              onChange={() => setAutoShare(!autoShare)}
-              sx={{ "& .MuiSwitch-switchBase.Mui-checked": { color: "#0B2E4C" } }}
-            />
-            <Typography variant="body2">
-              Automatically share on Social Media after publication (Facebook, WhatsApp, TikTok...)
-            </Typography>
+        {/* Promotion & Highlighting */}
+        <Typography variant="subtitle1" fontWeight="bold" mt={4}>
+          Promotion & Highlighting
+        </Typography>
 
-          </Box>
+        <Grid container spacing={2} mt={1}>
+          <Grid item xs={12} sm={12}>
+            <Box display="flex" alignItems="center">
+              <Switch
+                checked={highlighting}
+                onChange={() => setHighlighting(!highlighting)}
+                sx={{
+                  "& .MuiSwitch-switchBase.Mui-checked": {
+                    color: "#0B2E4C",
+                  },
+                }}
+              />
+              <Typography variant="body2">
+                Enable Homepage Highlighting (Paid option for increased visibility)
+              </Typography>
+            </Box>
+          </Grid>
 
-          {/* Action Buttons */}
-          <Box display="flex" justifyContent="flex-start" mt={4} gap={4}>
+          <Grid item xs={12} sm={12}>
+            <Box display="flex" alignItems="center">
+              <Switch
+                checked={autoShare}
+                onChange={() => setAutoShare(!autoShare)}
+                sx={{
+                  "& .MuiSwitch-switchBase.Mui-checked": {
+                    color: "#0B2E4C",
+                  },
+                }}
+              />
+              <Typography variant="body2">
+                Automatically share on Social Media after publication (Facebook, WhatsApp, TikTok...)
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
+
+        {/* Action Buttons */}
+        <Grid
+          container
+          spacing={2}
+          mt={4}
+          direction={isSmall ? "column" : "row"}
+          justifyContent="flex-start"
+        >
+          <Grid item xs={12} sm="auto">
             <Button
+              fullWidth={isSmall}
               variant="contained"
-              sx={{ backgroundColor: "#0B2E4C", color: "white", borderRadius: 2, paddingX: 10 }}
+              sx={{
+                backgroundColor: "#0B2E4C",
+                color: "white",
+                borderRadius: 2,
+                px: 5,
+              }}
             >
               Publish Event
             </Button>
+          </Grid>
+          <Grid item xs={12} sm="auto">
             <Button
+              fullWidth={isSmall}
               variant="contained"
-              sx={{ backgroundColor: "#B3B3B3", color: "white", borderRadius: 2, paddingX: 10 }}
+              sx={{
+                backgroundColor: "#B3B3B3",
+                color: "white",
+                borderRadius: 2,
+                px: 5,
+              }}
             >
               Save as Draft
             </Button>
-          </Box>
-        </CardContent>
-      </Card>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+
+
       {/* sales managment */}
       <Box>
-        <Card sx={{ padding: 3, marginTop: 4, marginBottom: 4 }}>
-          <CardContent>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Sales Management & Tracking
-            </Typography>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow sx={{ "&.MuiTableRow-root": { backgroundColor: "#3AACE7" } }}>
-                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>Ticket Type</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>Sold</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>Available</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>Total Revenue</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>Refunds</TableCell>
-                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>Action</TableCell>
-                  </TableRow>
-                </TableHead>
+      <Card sx={{ padding: 3, marginTop: 4, marginBottom: 4 }}>
+        <CardContent>
+          <Typography variant="h6" fontWeight="bold" gutterBottom>
+            Sales Management & Tracking
+          </Typography>
+
+          <TableContainer sx={{ overflowX: "auto", borderRadius: "20px" }}>
+
+            <Table sx={{ minWidth: 600 }}>
+              <TableHead>
+  <TableRow
+    sx={{
+      backgroundColor: "#3AACE7",
+    }}
+  >
+    <TableCell
+      sx={{
+        color: "white",
+        fontWeight: "bold",
+        borderTopLeftRadius: "20px",
+        borderBottomLeftRadius: "20px",
+        backgroundColor: "#3AACE7"
+      }}
+    >
+      Ticket Type
+    </TableCell>
+    <TableCell sx={{ color: "white", fontWeight: "bold",backgroundColor: "#3AACE7" }}>Sold</TableCell>
+    <TableCell sx={{ color: "white", fontWeight: "bold",backgroundColor: "#3AACE7" }}>Available</TableCell>
+    <TableCell sx={{ color: "white", fontWeight: "bold",backgroundColor: "#3AACE7" }}>
+      Total Revenue
+    </TableCell>
+    <TableCell sx={{ color: "white", fontWeight: "bold",backgroundColor: "#3AACE7" }}>Refunds</TableCell>
+    <TableCell
+      sx={{
+        color: "white",
+        fontWeight: "bold",
+        minWidth: 150,
+        whiteSpace: "nowrap",
+        borderTopRightRadius: "20px",
+        borderBottomRightRadius: "20px",
+        backgroundColor: "#3AACE7"
+      }}
+    >
+      Action
+    </TableCell>
+  </TableRow>
+</TableHead>
 
 
+              <TableBody>
+                {/* Standard Row - No Action Button */}
+                <TableRow>
+                  <TableCell>Standard</TableCell>
+                  <TableCell>250</TableCell>
+                  <TableCell>250</TableCell>
+                  <TableCell>1,250,000 XAF</TableCell>
+                  <TableCell>2 canceled</TableCell>
+                  <TableCell />
+                </TableRow>
 
-                <TableBody>
-                  <TableRow>
+                {/* VIP Row - With Action Button */}
+                <TableRow>
+                  <TableCell>VIP</TableCell>
+                  <TableCell>80</TableCell>
+                  <TableCell>20</TableCell>
+                  <TableCell>1,200,000 XAF</TableCell>
+                  <TableCell>1 canceled</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      fullWidth={isMobile}
+                      sx={{
+                        backgroundColor: "#0B2E4C",
+                        color: "white",
+                        borderRadius: "12px",
+                        textTransform: "none",
+                      }}
+                    >
+                      Process a refund
+                    </Button>
+                  </TableCell>
+                </TableRow>
 
-                    <TableCell>Standard</TableCell>
-                    <TableCell>250</TableCell>
-                    <TableCell>250</TableCell>
-                    <TableCell>1,250,000 XAF</TableCell>
-                    <TableCell>2 canceled</TableCell>
+                {/* Extra Row - Button Only */}
+                <TableRow>
+                  <TableCell colSpan={5} />
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      fullWidth={isMobile}
+                      sx={{
+                        backgroundColor: "#0B2E4C",
+                        color: "white",
+                        borderRadius: "12px",
+                        textTransform: "none",
+                      }}
+                    >
+                      Process a refund
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-                  </TableRow>
-                  <TableRow >
+          {/* Footer Buttons */}
+          <Stack
+            direction={isMobile ? "column" : "row"}
+            spacing={2}
+            sx={{ mt: 3 }}
+          >
+            <Button
+              variant="contained"
+              sx={{ backgroundColor: "#0B2E4C", color: "white" }}
+              fullWidth={isMobile}
+            >
+              View Detailed Statistics
+            </Button>
+            <Button
+              variant="contained"
+              sx={{ backgroundColor: "#0B2E4C", color: "white" }}
+              fullWidth={isMobile}
+            >
+              Send Alert to Buyers
+            </Button>
+            <Button
+              variant="contained"
+              sx={{ backgroundColor: "#0B2E4C", color: "white" }}
+              fullWidth={isMobile}
+            >
+              Update Statistics
+            </Button>
+          </Stack>
+        </CardContent>
+      </Card>
+    </Box>
 
-                    <TableCell>VIP</TableCell>
-                    <TableCell>80</TableCell>
-                    <TableCell>20</TableCell>
-                    <TableCell>1,200,000 XAF</TableCell>
-                    <TableCell>1 canceled</TableCell>
-                    <TableCell>
-                      <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white" }}>
-                        Process a refund
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell />
-                    <TableCell />
-                    <TableCell />
-                    <TableCell />
-                    <TableCell />
-                    <TableCell>
-                      <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white" }}>
-                        Process a refund
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <div style={{ display: "flex", justifyContent: "start", marginTop: "-20px", gap: "8px" }}>
-              <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white" }}>
-                View Detailed Statistics
-              </Button>
-              <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white" }}>
-                Send Alert to Buyers
-              </Button>
-              <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white" }}>
-                Update Statistics
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </Box>
 
       {/* //  security & Confirmation */}
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -508,13 +660,6 @@ export function EventDetailsView() {
                         width: "50%",
                         borderRadius: "8px",
                         "& .MuiOutlinedInput-root": { borderRadius: "8px" },
-                      },
-                      InputProps: {
-                        endAdornment: (
-                          <IconButton onClick={() => console.log("Date picker clicked")}>
-                            <EventIcon />
-                          </IconButton>
-                        ),
                       },
                     },
                   }}
@@ -577,13 +722,6 @@ export function EventDetailsView() {
                           fullWidth: true,
                           size: "small",
                           variant: "outlined",
-                          InputProps: {
-                            endAdornment: (
-                              <IconButton>
-                                <EventIcon />
-                              </IconButton>
-                            ),
-                          },
                         },
                       }}
                     />
@@ -608,7 +746,7 @@ export function EventDetailsView() {
                         },
                       }}
                     />
-                  </LocalizationProvider>;
+                  </LocalizationProvider>
                 </Box>
               </Box>
 

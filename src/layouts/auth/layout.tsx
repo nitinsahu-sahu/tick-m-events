@@ -70,7 +70,7 @@ export function AuthLayout({ sx, children, header }: AuthLayoutProps) {
       /** **************************************
        * Style
        *************************************** */
-      cssVars={{ '--layout-auth-content-width': '420px' }}
+      cssVars={{ '--layout-auth-content-width': '900px' }}
       sx={{
         '&::before': {
           width: 1,

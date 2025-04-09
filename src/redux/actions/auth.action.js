@@ -9,7 +9,6 @@ export const login = (data) => async (dispatch) => {
 
     try {
         const response = await axios.post("/auth/login", { email, password });
-
         const { token, user, message, expiresIn } = response.data;
 
         // Calculate expiration time (current time + expiresIn)
@@ -35,16 +34,24 @@ export const login = (data) => async (dispatch) => {
         });
 
         // ✅ Explicitly return the response data
-        return { type: authConstants.LOGIN_SUCCESS };
+        return {
+            type: authConstants.LOGIN_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
 
     } catch (error) {
         // Dispatch failure
         dispatch({
             type: authConstants.LOGIN_FAILURE,
-            payload: { error: error.response?.data?.errors || "Unknown error" },
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
         });
 
-        return { type: authConstants.LOGIN_FAILURE, payload: { error: error.response?.data?.errors } };
+        return {
+            type: authConstants.LOGIN_FAILURE,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status
+        };
     }
 };
 

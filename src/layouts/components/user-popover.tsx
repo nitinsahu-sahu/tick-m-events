@@ -1,11 +1,13 @@
 import { useTheme } from '@mui/material/styles';
 import { Avatar, Box, Button, Popover, Typography, useMediaQuery } from "@mui/material";
 import { useState } from "react";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { usePathname } from 'src/routes/hooks';
 import { _notifications } from 'src/_mock';
 import { RootState } from 'src/redux/store';
+import { logout } from 'src/redux/actions';
 
 import { NotificationsPopover } from './notifications-popover';
 import { MessagePopover } from './message-popover';
@@ -16,7 +18,8 @@ export function UserPopover() {
     const [anchorEl, setAnchorEl] = useState(null);
     const theme = useTheme();
     const pathname = usePathname()
-
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program', "/ticket-management"];
 
     const { _id, name, role, avatar } = useSelector((state: RootState) => state?.auth?.user);
@@ -33,6 +36,11 @@ export function UserPopover() {
         setAnchorEl(null);
     };
 
+    const handleLogout = async () => {
+        await dispatch(logout() as any); // Ensure TypeScript recognizes the async action
+        navigate("/sign-in"); // Redirect after logout
+    };
+
     return (
         <Box display="flex" alignItems="center" gap={1}>
             {/* Name & Role (Only visible on Desktop) */}
@@ -42,7 +50,19 @@ export function UserPopover() {
                         {name}
                     </Typography>
                     <Typography textTransform="capitalize" fontSize={12} color="gray" fontFamily="Poppins, sans-serif">
-                        {role}
+                        {role} | <span
+                            role="button"
+                            tabIndex={0}
+                            style={{ cursor: 'pointer', color: 'red' }}
+                            onClick={() => handleLogout()}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    console.log('logout');
+                                }
+                            }}
+                        >
+                            Logout
+                        </span>
                     </Typography>
                 </Box>
             )}

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-
+import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
@@ -11,12 +11,17 @@ import InputAdornment from '@mui/material/InputAdornment';
 
 import { Iconify } from 'src/components/iconify';
 import { login } from 'src/redux/actions';
+import { toast } from 'react-toastify';
+import { Button, Divider, Grid } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
 export function SignInView() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [active, setActive] = useState("google");
+
+  const getWidth = (key) => (active === key ? "50%" : "10%");
   const auth = useSelector(state => state.auth);
   const [formData, setFormData] = useState({ email: 'admin.rinku@gmail.com', password: 'admin@123' });
   const [showPassword, setShowPassword] = useState(false);
@@ -30,12 +35,20 @@ export function SignInView() {
   const handleSignIn = useCallback(async (event) => {
     event.preventDefault(); // Prevent default form submission behavior
     const result = await dispatch(login(formData));
+
+    if (result.status === 200) {
+      toast.success(result?.message);
+    } else {
+      toast.error(result?.message);
+    }
   }, [formData, dispatch]);
+
 
   if (auth?.authenticate) {
     setTimeout(() => navigate("/"), 100);
   }
-  
+
+
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
       <TextField
@@ -44,6 +57,7 @@ export function SignInView() {
         name="email"
         type='email'
         label="Email address"
+        placeholder='Email / Username'
         value={formData.email}
         onChange={handleChange}
         InputLabelProps={{ shrink: true }}
@@ -84,13 +98,115 @@ export function SignInView() {
   );
 
   return (
-    <>
-      <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
-        <Typography variant="h5">Sign in</Typography>
-      </Box>
-      <form onSubmit={handleSignIn}>
-        {renderForm}
-      </form>
-    </>
+    <Grid container sx={{ minHeight: "50vh" }}>
+      {/* Left image (hide on xs/sm) */}
+      <Grid
+        item
+        xs={0}
+        md={6}
+        sx={{
+          display: { xs: "none", md: "block" },
+          backgroundImage: `url('./assets/images/login-banner.png')`, // replace with actual image path
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+
+      {/* Right content */}
+      <Grid
+        item
+        xs={12}
+        md={6}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          px: 3,
+        }}
+      >
+        <Box sx={{ width: "100%", maxWidth: 400 }} textAlign="center">
+          <Button variant="h6" fontWeight={600} mb={2} sx={{ backgroundColor: "#1F8FCD", color: "white" }}>
+            Sign In
+          </Button>
+
+          <Typography variant="h4" fontWeight={600} mb={2}>
+            Welcome back
+          </Typography>
+
+          <form onSubmit={handleSignIn}>
+            {renderForm}
+          </form>
+          {/* Divider */}
+          <Divider
+            sx={{
+              my: 2,
+              "&::before, &::after": { borderTopStyle: "dashed" },
+            }}
+          >
+            <Typography variant="overline" color="black">
+              Or connect with your social account
+            </Typography>
+          </Divider>
+
+          {/* Social buttons */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 2,
+              mb: 2,
+            }}
+          >
+            <IconButton
+              onMouseEnter={() => setActive("google")}
+              onClick={() => setActive("google")}
+              sx={{
+                borderRadius: 1,
+                border: "1px solid black",
+                backgroundColor: "#cee1e5",
+                transition: "width 0.3s ease",
+                width: getWidth("google"),
+              }}
+            >
+              <Iconify icon="flat-color-icons:google" />
+            </IconButton>
+
+            <IconButton
+              onMouseEnter={() => setActive("facebook")}
+              onClick={() => setActive("facebook")}
+              sx={{
+                borderRadius: 1,
+                border: "1px solid black",
+                backgroundColor: "#cee1e5",
+                transition: "width 0.3s ease",
+                width: getWidth("facebook"),
+              }}
+            >
+              <Iconify icon="logos:facebook" />
+            </IconButton>
+
+            <IconButton
+              onMouseEnter={() => setActive("apple")}
+              onClick={() => setActive("apple")}
+              sx={{
+                borderRadius: 1,
+                border: "1px solid black",
+                backgroundColor: "#cee1e5",
+                transition: "width 0.3s ease",
+                width: getWidth("apple"),
+              }}
+            >
+              <Iconify icon="ic:twotone-apple" />
+            </IconButton>
+          </Box>
+          <Typography variant="body2" mb={3}>
+            Don’t have an account?
+            <Link href="#" sx={{ ml: 0.5 }}>
+              Register Here !
+            </Link>
+          </Typography>
+        </Box>
+      </Grid>
+    </Grid>
   );
 }

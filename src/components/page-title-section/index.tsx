@@ -8,7 +8,7 @@ export function PageTitleSection({ title, desc, rightCom }: any) {
                 flexDirection: { xs: "row", md: "row" }, // Stack on small screens
                 justifyContent: "space-between",
                 alignItems: { xs: "center", md: "center" }, // Align left on small, center on large
-                mb: { xs: 3, md: 5 },
+                mb: { xs: 2, md: 3 },
 
             }}
             mt={3}
@@ -17,13 +17,13 @@ export function PageTitleSection({ title, desc, rightCom }: any) {
             <Box sx={{ width: { xs: "50%", md: "auto" } }}>
                 <Typography
                     variant="h4"
-                    mb={2}
                     sx={{
+                        mb: { xs: 1, sm: 2, md: 3 },
                         fontWeight: "bold",
                         color: "#000",
                         fontFamily: "Poppins, sans-serif",
                         fontSize: { xs: "15px", sm: "18px", md: "34px" }, // Responsive size
-                        lineHeight: { xs: "20px"}, // Responsive size
+                        lineHeight: { xs: "20px" }, // Responsive size
                     }}
                 >
                     {title}
@@ -41,11 +41,13 @@ export function PageTitleSection({ title, desc, rightCom }: any) {
             </Box>
 
             {/* Right Side - Countdown/Search Bar, etc. */}
-            {rightCom && (
-                <Box display="flex" justifyContent="center" sx={{ width: { xs: "50%", md: "auto" }, textAlign: { xs: "left", md: "right" } }}>
-                    {rightCom}
-                </Box>
-            )}
-        </Box>
+            {
+                rightCom && (
+                    <Box display="flex" justifyContent="center" sx={{ width: { xs: "50%", md: "auto" }, textAlign: { xs: "left", md: "right" } }}>
+                        {rightCom}
+                    </Box>
+                )
+            }
+        </Box >
     )
 }

@@ -63,7 +63,7 @@ export const BookingTrends = () => {
       },
     },
     tooltip: {
-      custom: function ({ series, seriesIndex, dataPointIndex }) {
+      custom({ series, seriesIndex, dataPointIndex }) {
         return `
           <div style="background:#0B2E4C;padding:10px 12px;border-radius:10px;color:white;min-width:140px;">
             <div style="font-size:16px;font-weight:bold;">

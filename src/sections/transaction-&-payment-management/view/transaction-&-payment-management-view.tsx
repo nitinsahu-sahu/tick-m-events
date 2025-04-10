@@ -1,11 +1,12 @@
-import { Typography } from "@mui/material";
 import { DashboardContent } from "src/layouts/dashboard";
+import { TabWithTableView } from "../tab-with-table";
 
 export function TransactionAndPaymentManagementView() {
     return (
         <DashboardContent>
-            <Typography>TransactionAndPaymentManagementView</Typography>
+
+            <TabWithTableView />
 
         </DashboardContent>
-    )
+    );
 }

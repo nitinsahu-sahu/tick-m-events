@@ -73,13 +73,10 @@ export function EventValidationView() {
       position: "bottom",
       horizontalAlign: "center",
       fontSize: "14px",
-      markers: {
-        radius: 12,
-      },
     },
     dataLabels: {
       enabled: true,
-      formatter: function (val: number, opts: { w: any; seriesIndex: number }): string {
+      formatter(val: number, opts: { w: any; seriesIndex: number }): string {
         return opts.w.globals.series[opts.seriesIndex];
       },
       style: {
@@ -116,8 +113,6 @@ export function EventValidationView() {
   };
 
   const chartSeries = [350, 150, 5,];
-
-
 
   return (
     <DashboardContent>

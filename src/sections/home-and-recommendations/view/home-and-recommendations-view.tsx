@@ -2,9 +2,9 @@ import { Typography, Grid, Box, Paper, Card, CardContent, Button, IconButton } f
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { UpComingCard } from '../UpComingCard';
+import { TicketCard } from 'src/components/event-card/event-card';
 
-import { TicketCard } from '../EventCard';
+import { UpComingCard } from '../UpComingCard';
 import { PopularEvent } from '../PopularEvent';
 import { ExploreMoreSection } from '../ExploreMore';
 

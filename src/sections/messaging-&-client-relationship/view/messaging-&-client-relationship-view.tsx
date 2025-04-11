@@ -1,7 +1,12 @@
-import { Typography } from "@mui/material";
+import { DashboardContent } from "src/layouts/dashboard";
+import { TabWithTableView } from "../tab-with-table";
 
 export function MessagingAndClientRelationshipView() {
-    return(
-        <Typography>Messaging & Client Relationship</Typography>
+    return (
+        <DashboardContent>
+
+            <TabWithTableView />
+
+        </DashboardContent>
     )
 }

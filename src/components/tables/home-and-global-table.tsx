@@ -5,11 +5,11 @@ import {
     TableBody,
     Paper,
     TableHead,
-    TableCell
+    TableCell,Button
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
-export function MusicFestivalTable({
+export function HomeAndGlobalTable({
     headers,
     data,
     type,
@@ -51,16 +51,48 @@ export function MusicFestivalTable({
                             }}
                         >
                             <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                {row.ticket}
+                                {row.service}
                             </TableCell>
                             <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                {row.price}
+                                {row.organizer || row.location || row.client}
                             </TableCell>
                             <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                {row.benefits}
+                                {row.amountDue || row.datePosted || row.dateTime || row.lastMessage}
                             </TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                {row.availability}
+                            {
+                                type === "4" ? <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                                    {row.method}
+                                </TableCell>
+
+                                    : null
+                            }
+                            {
+                                type === "4" ? <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                                    {row.status}
+                                </TableCell>
+
+                                    : null
+                            }
+
+                            {
+                                type === "3"||type==="4" ? null : <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                                    {row.budget || row.finalBudget}
+                                </TableCell>
+                            }
+
+                            <TableCell align="center" sx={{ width: type === "2" ? "46%" : "25%" }}>
+                                {row.actions?.map((action: any) => (
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        sx={{
+                                            marginX: 0.5,
+                                            color: "white",
+                                            borderColor: "gray",
+                                            backgroundColor: "#0B2E4C"
+                                        }}>{action}
+                                    </Button>
+                                ))}
                             </TableCell>
                         </TableRow>
                     ))}

@@ -1,7 +1,17 @@
-import { Typography } from "@mui/material";
+import { DashboardContent } from "src/layouts/dashboard";
+
+
+import { TabWithTableView } from "../tab-with-table";
+
+
+
 
 export function HomeAndGlobalView() {
-    return(
-        <Typography>Home & Global View</Typography>
+    return (
+        <DashboardContent>
+
+            <TabWithTableView />
+
+        </DashboardContent>
     )
 }

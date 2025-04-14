@@ -1,6 +1,38 @@
 import { authConstants } from "./constants";
 import axios from "../helper/axios";
 
+// Checking SINGUP login or not
+export const signup = (data) => async (dispatch) => {
+    dispatch({ type: authConstants.SIGNUP_REQUEST});
+
+    try {
+        const response = await axios.post("/auth/signup", data);
+
+        dispatch({
+            type: authConstants.SIGNUP_SUCCESS,
+            payload: { message: response?.data?.message },
+        });
+
+        return {
+            type: authConstants.SIGNUP_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
+
+    } catch (error) {
+        dispatch({
+            type: authConstants.SIGNUP_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+
+        return {
+            type: authConstants.SIGNUP_FAILURE,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status
+        };
+    }
+};
+
 // Checking admin login or not
 export const login = (data) => async (dispatch) => {
     const { email, password } = data;

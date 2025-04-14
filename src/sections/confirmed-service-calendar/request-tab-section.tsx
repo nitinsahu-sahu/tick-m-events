@@ -1,7 +1,5 @@
-import { Typography } from "@mui/material";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { ConfirmedServiceCalenderTable } from "src/components/tables/confirmed-service-calender-table";
-
-
 
 interface RequestSectionProps {
     title: string;
@@ -18,9 +16,7 @@ export function RequestTabSection({
 }: RequestSectionProps) {
     return (
         <>
-            <Typography variant="h5" fontWeight="bold" gutterBottom>
-                {title}
-            </Typography>
+            <HeadingCommon variant="h5" weight={600} title={title} baseSize="26px"/>
 
             <ConfirmedServiceCalenderTable headers={headers} data={data} type={type} />
         </>

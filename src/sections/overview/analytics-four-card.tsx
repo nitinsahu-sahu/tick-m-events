@@ -1,11 +1,12 @@
-import { Grid, Paper,Box,Typography } from "@mui/material";
+import { Grid, Paper, Box, Typography } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 
 import { Chart } from "src/components/chart";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 import { AnalyticsCard } from "./analytics-card";
 
-export function AnalyticsFourCards({ up,chartOptions,percentage,donutChartOptions}: any) {
+export function AnalyticsFourCards({ up, chartOptions, percentage, donutChartOptions }: any) {
     const theme = useTheme();
 
     return (
@@ -59,9 +60,7 @@ export function AnalyticsFourCards({ up,chartOptions,percentage,donutChartOption
                 <Paper elevation={3} sx={{ p: 2, borderRadius: "12px", display: "flex", alignItems: "center" }}>
                     {/* Left Section */}
                     <Box sx={{ flex: 1 }}>
-                        <Typography sx={{ fontSize: "13px", fontWeight: "600" }}>
-                            {percentage}% of tickets purchased are confirmed
-                        </Typography>
+                        <HeadingCommon title={`${percentage}% of tickets purchased are confirmed`} weight={700} baseSize="14px" />
                         <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
                             {/* Bullet Icon */}
                             <Box
@@ -73,13 +72,10 @@ export function AnalyticsFourCards({ up,chartOptions,percentage,donutChartOption
                                     fill: theme.palette.success.main
                                 }}
                             />
-                            <Typography sx={{ fontSize: "9px", color: "black", fontWeight: 100 }}>
-                                Total number of tickets sold:
-                            </Typography>
+                            <HeadingCommon title="Total number of tickets sold:" weight={300} baseSize="10px" />
                         </Box>
-                        <Typography sx={{ fontSize: "12px", color: "black", fontWeight: "bold" }}>
-                            215 vs. Number of tickets scanned at the entrance: 100
-                        </Typography>
+                        <HeadingCommon title="215 vs. Number of tickets scanned at the entrance: 100" weight={700} baseSize="14px" />
+
                     </Box>
 
                     {/* Right Section - Donut Chart */}
@@ -90,6 +86,7 @@ export function AnalyticsFourCards({ up,chartOptions,percentage,donutChartOption
                             type="donut"
                             height={100}
                         />
+
                         <Typography
                             sx={{
                                 fontSize: "11px",

@@ -50,7 +50,6 @@ export function PaymentHistory() {
                         />
                     </Box>
 
-
                     {/* Table with filtered data */}
                     <TransactionAndPaymentTable
                         headers={tableHeaders}

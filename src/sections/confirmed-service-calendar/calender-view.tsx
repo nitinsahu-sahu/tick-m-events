@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+
 import "./index.css"
 
 const eventDays: { [key: string]: string } = {
@@ -88,9 +90,7 @@ export const CalenderView = () => {
                 bgcolor="#1F8FCD"
                 p={2}
             >
-                <Typography variant="h6" fontWeight="bold" color="white" sx={{ px: 2, py: 1, borderRadius: 2 }}>
-                    Service Calendar View
-                </Typography>
+                <HeadingCommon baseSize="26px" variant="h6" weight={600} title="Service Calendar View" color="white"/>
 
                 <Box display="flex" alignItems="center" gap={2}>
                     <Button onClick={handlePrev} sx={{ borderRadius: 3, color: "black", backgroundColor: "white", p: "5px", minWidth: "38px" }}>

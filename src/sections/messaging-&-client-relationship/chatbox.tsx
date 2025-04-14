@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { AttachFile, Send, Call, AddBox, Close, VideoCall } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
+
 export const ChatBox = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));

@@ -21,6 +21,7 @@ export function ConfirmedServiceCalendarView() {
             <MatrixThreeCard metrics={stats} />
             
             <TabWithTableView />
+            
         </DashboardContent>
     )
 }

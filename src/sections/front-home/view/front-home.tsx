@@ -13,9 +13,7 @@ import {
     Divider,
     useMediaQuery,
     useTheme,
-    Grid,
     Card,
-    TextField
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import FavoriteIcon from '@mui/icons-material/Favorite';

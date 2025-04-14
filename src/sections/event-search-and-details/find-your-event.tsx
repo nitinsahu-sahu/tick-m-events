@@ -1,10 +1,10 @@
-import { Checkbox,FormControlLabel,MenuItem,Select,Grid,FormControl,InputLabel,Typography,IconButton,Box, TextField } from "@mui/material";
+import { Checkbox, FormControlLabel, MenuItem, Select, Grid, FormControl, InputLabel,  IconButton, Box, TextField } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { eventsTickets } from "./utills";
 import { PopularEvent } from "./PopularEvent";
-
 
 export function FindYourEvent() {
     return (
@@ -35,9 +35,8 @@ export function FindYourEvent() {
 
             {/* Filter Fields */}
             <Box sx={{ mx: 3, my: 3 }}>
-                <Typography variant="h3" fontWeight={600} mb={2}>
-                    Find Your Event
-                </Typography>
+                <HeadingCommon title="Find Your Event" weight={600} baseSize="34px" />
+
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6} md={3}>
                         <FormControl fullWidth>
@@ -262,16 +261,8 @@ export function FindYourEvent() {
                                 mt: 2,
                             }}
                         >
-                            <Typography
-                                variant="subtitle2"
-                                sx={{
-                                    fontWeight: 500,
-                                    fontSize: '14px',
-                                    color: 'black',
-                                }}
-                            >
-                                Available Tickets
-                            </Typography>
+                            <HeadingCommon variant="subtitle2" title="Available Tickets" weight={400} baseSize="16px"/>
+                           
                             <FormControlLabel control={<Checkbox />} label="Only show available tickets" />
                         </Box>
                     </Grid>

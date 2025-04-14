@@ -6,6 +6,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { useState } from 'react';
 import StarIcon from '@mui/icons-material/Star';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
 import { tabs, typeMap, reviews } from './utills';
 
@@ -23,9 +24,7 @@ export function MusicFestivalTwo() {
             <Card sx={{ borderRadius: 4, boxShadow: 3, p: 1, mt: 3 }}>
                 <CardContent>
                     {/* Title */}
-                    <Typography variant="h5" fontWeight={600} mb={2}>
-                        Urban Music Festival 2025
-                    </Typography>
+                    <HeadingCommon title="Urban Music Festival 2025" weight={600} baseSize="30px" />
 
                     {/* Banner */}
                     <Box
@@ -48,24 +47,23 @@ export function MusicFestivalTwo() {
                         spacing={2}
                         alignItems="center"
                         justifyContent="flex-start"
-                        mb={2}
+
                     >
                         <Stack direction="row" spacing={1} alignItems="center">
                             <CalendarMonthIcon fontSize="small" />
-                            <Typography fontSize="14px">February 10, 2025, 8 PM – 2 AM</Typography>
+                            <HeadingCommon title="February 10, 2025, 8 PM – 2 AM" weight={400} baseSize="16px" />
                         </Stack>
 
-                        <Stack direction="row" spacing={1} alignItems="center">
+                        <Stack direction="row" spacing={1} alignItems="center" >
                             <LocationOnIcon fontSize="small" />
-                            <Typography fontSize="14px">Main Square, Douala</Typography>
+                            <HeadingCommon title="Main Square, Douala" weight={400} baseSize="16px" />
+
                         </Stack>
                     </Stack>
 
                     {/* Description */}
-                    <Typography fontSize="14px" mb={3}>
-                        Join us for the biggest Urban Music Festival featuring top artists, DJs, and an
-                        unforgettable nightlife experience.
-                    </Typography>
+                    <HeadingCommon mb={2} title="Join us for the biggest Urban Music Festival featuring top artists, DJs, and an
+                        unforgettable nightlife experience." weight={400} baseSize="16px" />
 
                     <Box
                         mt={3}
@@ -76,12 +74,7 @@ export function MusicFestivalTwo() {
                             maxWidth: '100%',
                         }}
                     >
-                        <Typography
-                            variant={isMobile ? 'subtitle1' : 'h6'}
-                            sx={{ fontWeight: 'bold', mb: 1 }}
-                        >
-                            Participant Reviews & Experiences
-                        </Typography>
+                        <HeadingCommon variant="h6" title="Participant Reviews & Experiences" weight={500} baseSize="26px" />
 
                         <Typography variant="body2" sx={{ mb: 2 }}>
                             Overall Rating:{' '}
@@ -137,12 +130,7 @@ export function MusicFestivalTwo() {
                                         backgroundColor: '#fff',
                                     }}
                                 >
-                                    <Typography
-                                        variant="subtitle1"
-                                        sx={{ fontWeight: 600, fontSize: isMobile ? '0.95rem' : '1rem' }}
-                                    >
-                                        {review.name}
-                                    </Typography>
+                                    <HeadingCommon variant="subtitle1" title={review.name} weight={500} baseSize="16px" />
 
                                     <Box
                                         display="flex"
@@ -152,26 +140,14 @@ export function MusicFestivalTwo() {
                                         {Array.from({ length: review.rating }).map((_, i) => (
                                             <StarIcon key={i} fontSize="small" />
                                         ))}
+
                                         <Typography variant="caption" sx={{ ml: 0.5 }}>
                                             ({review.rating}/5)
                                         </Typography>
                                     </Box>
+                                    <HeadingCommon variant="caption" color="#C9C9C9" title={review.date} weight={400} baseSize="14px" mt={0.5} />
+                                    <HeadingCommon variant="body2" title={review.comment} weight={400} baseSize="14px" mt={0.5} />
 
-                                    <Typography
-                                        variant="caption"
-                                        color="textSecondary"
-                                        sx={{ display: 'block', mt: 0.5 }}
-                                    >
-                                        {review.date}
-                                    </Typography>
-
-                                    <Typography
-                                        variant="body2"
-                                        mt={1}
-                                        sx={{ fontSize: isMobile ? '0.85rem' : '1rem' }}
-                                    >
-                                        &ldquo;{review.comment}&rdquo;
-                                    </Typography>
                                 </Paper>
                             ))}
                         </Box>

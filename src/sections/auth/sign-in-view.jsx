@@ -13,6 +13,7 @@ import { Iconify } from 'src/components/iconify';
 import { login } from 'src/redux/actions';
 import { toast } from 'react-toastify';
 import { Button, Divider, Grid } from '@mui/material';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
 // ----------------------------------------------------------------------
 
@@ -129,9 +130,7 @@ export function SignInView() {
             Sign In
           </Button>
 
-          <Typography variant="h4" fontWeight={600} mb={2}>
-            Welcome back
-          </Typography>
+          <HeadingCommon variant="h4" title="Welcome back" weight={600} mb={2}/>
 
           <form onSubmit={handleSignIn}>
             {renderForm}
@@ -143,9 +142,8 @@ export function SignInView() {
               "&::before, &::after": { borderTopStyle: "dashed" },
             }}
           >
-            <Typography variant="overline" color="black">
-              Or connect with your social account
-            </Typography>
+            <HeadingCommon baseSize="12px" variant="overline" title="Or connect with your social account"/>
+           
           </Divider>
 
           {/* Social buttons */}

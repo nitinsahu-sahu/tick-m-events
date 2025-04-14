@@ -1,12 +1,14 @@
 import {
-    Box, Typography, CardContent, Button,
-    Card,Stack
+    Box, CardContent, Button,
+    Card, Stack
 } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import { MusicFestivalTable } from 'src/components/tables/music-festival-table';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+
 import { musicFestivalTableData, musicFestivalTableHeaders } from './utills';
 
 
@@ -16,9 +18,8 @@ export function MusicFestival() {
             <Card sx={{ borderRadius: 4, boxShadow: 3, p: 1, mt: 3 }}>
                 <CardContent>
                     {/* Title */}
-                    <Typography variant="h5" fontWeight={600} mb={2}>
-                        Urban Music Festival 2025
-                    </Typography>
+                    <HeadingCommon title="Urban Music Festival 2025" weight={600} baseSize="30px" />
+
 
                     {/* Banner */}
                     <Box
@@ -41,24 +42,23 @@ export function MusicFestival() {
                         spacing={2}
                         alignItems="center"
                         justifyContent="flex-start"
-                        mb={2}
+
                     >
                         <Stack direction="row" spacing={1} alignItems="center">
                             <CalendarMonthIcon fontSize="small" />
-                            <Typography fontSize="14px">February 10, 2025, 8 PM – 2 AM</Typography>
+                            <HeadingCommon title="February 10, 2025, 8 PM – 2 AM" weight={400} baseSize="16px" />
                         </Stack>
 
-                        <Stack direction="row" spacing={1} alignItems="center">
+                        <Stack direction="row" spacing={1} alignItems="center" >
                             <LocationOnIcon fontSize="small" />
-                            <Typography fontSize="14px">Main Square, Douala</Typography>
+                            <HeadingCommon title="Main Square, Douala" weight={400} baseSize="16px" />
+
                         </Stack>
                     </Stack>
 
                     {/* Description */}
-                    <Typography fontSize="14px" mb={3}>
-                        Join us for the biggest Urban Music Festival featuring top artists, DJs, and an
-                        unforgettable nightlife experience.
-                    </Typography>
+                    <HeadingCommon mb={2} title="Join us for the biggest Urban Music Festival featuring top artists, DJs, and an
+                        unforgettable nightlife experience." weight={400} baseSize="16px" />
 
                     {/* Organizer Section */}
                     <Box
@@ -69,9 +69,7 @@ export function MusicFestival() {
                             mb: 4,
                         }}
                     >
-                        <Typography fontWeight={600} mb={1}>
-                            Organizer: Music Events Africa
-                        </Typography>
+                        <HeadingCommon title="Organizer: Music Events Africa" weight={500} baseSize="26px" />
 
                         <Button variant="contained" size="small" sx={{ mb: 2, backgroundColor: '#0B2E4C' }}>
                             View More Events
@@ -80,20 +78,18 @@ export function MusicFestival() {
                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                             <Stack direction="row" alignItems="center" spacing={1}>
                                 <EmailIcon sx={{ color: '#0B2E4C' }} fontSize="small" />
-                                <Typography fontSize="14px">contact@musicevents.com</Typography>
+                                <HeadingCommon title="contact@musicevents.com" weight={400} baseSize="16px" />
                             </Stack>
 
                             <Stack direction="row" alignItems="center" spacing={1}>
                                 <PhoneIcon sx={{ color: '#0B2E4C' }} fontSize="small" />
-                                <Typography fontSize="14px">+237 123 456 789</Typography>
+                                <HeadingCommon title="+237 123 456 789" weight={400} baseSize="16px" />
                             </Stack>
                         </Stack>
                     </Box>
 
                     {/* Schedule */}
-                    <Typography variant="h6" fontWeight={600} mb={2}>
-                        Event Schedule
-                    </Typography>
+                    <HeadingCommon variant="h6" title="Event Schedule" weight={500} baseSize="26px" />
 
                     <Stack spacing={1.5}>
                         {[
@@ -111,17 +107,15 @@ export function MusicFestival() {
                                     borderRadius: 1.5,
                                 }}
                             >
-                                <Typography fontWeight={600}>{item.time}</Typography>
-                                <Typography fontSize="14px">{item.title}</Typography>
+                                <HeadingCommon title={item.time} weight={600} baseSize="18px" />
+                                <HeadingCommon color="#B3B3B3" title={item.title} weight={400} baseSize="18px" />
                             </Box>
                         ))}
                     </Stack>
 
                     <Box sx={{ mx: 'auto', mt: 4 }}>
                         {/* Section Title */}
-                        <Typography variant="h6" fontWeight={600} mb={2}>
-                            Available Tickets
-                        </Typography>
+                        <HeadingCommon title=" Available Tickets" weight={500} baseSize="26px" />
 
                         {/* Responsive Table */}
                         <MusicFestivalTable headers={musicFestivalTableHeaders} data={musicFestivalTableData} type="1" />

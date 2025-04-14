@@ -1,12 +1,14 @@
-import { Box, Typography, Button, useTheme,
-  useMediaQuery } from "@mui/material";
+import {
+    Box, Button, useTheme,
+    useMediaQuery
+} from "@mui/material";
 import { Iconify } from "src/components/iconify";
-
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { friends } from "./utills";
 
 export function EventShare() {
-      const theme = useTheme();
-      const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     return (
         <Box
             sx={{
@@ -19,9 +21,7 @@ export function EventShare() {
             }}
         >
             {/* Title */}
-            <Typography variant="h6" fontWeight="bold" mb={2}>
-                Share This Event
-            </Typography>
+            <HeadingCommon variant="h6" title="Share This Event" weight={600} baseSize="34px" />
 
             {/* Social Buttons */}
             <Box
@@ -42,7 +42,7 @@ export function EventShare() {
                         textTransform: 'none',
                     }}
                 >
-                    <Iconify icon="ic:baseline-whatsapp"/> Whatsapp
+                    <Iconify icon="ic:baseline-whatsapp" /> Whatsapp
                 </Button>
                 <Button
                     variant="contained"
@@ -54,7 +54,7 @@ export function EventShare() {
                         textTransform: 'none',
                     }}
                 >
-                    <Iconify icon="lucide:facebook"/> Facebook
+                    <Iconify icon="lucide:facebook" /> Facebook
                 </Button>
                 <Button
                     variant="contained"
@@ -66,7 +66,7 @@ export function EventShare() {
                         textTransform: 'none',
                     }}
                 >
-                    <Iconify icon="ic:baseline-tiktok"/> Ticktok
+                    <Iconify icon="ic:baseline-tiktok" /> Ticktok
                 </Button>
             </Box>
 
@@ -78,9 +78,7 @@ export function EventShare() {
                     borderRadius: 2,
                 }}
             >
-                <Typography fontWeight="bold" mb={2}>
-                    Friends Who Booked
-                </Typography>
+                <HeadingCommon title="Friends Who Booked" weight={500} baseSize="26px" />
 
                 {friends.map((name, index) => (
                     <Box

@@ -10,7 +10,7 @@ export function RefundAndCancellationManangement() {
   ];
 
   return (
-    <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
+    <Box mt={3} mb={5} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
 
       {/* Title */}
       <Typography variant="h6" fontWeight="bold" gutterBottom>

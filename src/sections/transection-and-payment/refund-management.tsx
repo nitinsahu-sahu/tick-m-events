@@ -15,18 +15,15 @@ export function RefundManagementHistory() {
                 Refund Management
             </Typography>
 
-            <Box mt={2} boxShadow={3} borderRadius={3} >
+            <Box mt={2} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
                 {/* Card Wrapper */}
-                <Paper sx={{ p: { xs: 2, sm: 2.5, md: 3 }, borderRadius: 2, maxWidth: "1000px", mx: "auto" }}>
-                    {/* Table with filtered data */}
-                    <TransactionAndPaymentTable
+                <TransactionAndPaymentTable
                         headers={RefundTableHeaders}
                         data={RefundTableData}
                         type="2"
                     />
-                </Paper>
 
-                <Box sx={{ p: 3 }}>
+                <Box mt={3}>
                     <Typography variant="h6" fontWeight="bold" gutterBottom>
                         Configurable Refund Policies
                     </Typography>

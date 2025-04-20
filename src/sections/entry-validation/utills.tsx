@@ -67,6 +67,8 @@ export const STATS_DATA = [
     { label: "Invalid Tickets", value: 5 }
 ];
 
+
+
 export const tickets: Ticket[] = [
     {
         id: 1,

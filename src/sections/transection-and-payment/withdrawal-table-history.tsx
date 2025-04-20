@@ -9,17 +9,14 @@ export function WithdrawalTableHistory() {
                 Withdrawal Table History
             </Typography>
 
-            <Box mt={2} boxShadow={3} borderRadius={3} >
-                {/* Card Wrapper */}
-                <Paper sx={{ p: { xs: 2, sm: 2.5, md: 3 }, borderRadius: 2, maxWidth: "1000px", mx: "auto" }}>
-                    {/* Table with filtered data */}
-                    <TransactionAndPaymentTable
-                        headers={WithdrawalTableHeaders}
-                        data={WithdrawalTableData}
-                        type="1"
-                    />
-                </Paper>
-            </Box>
+            <Paper sx={{ p: { xs: 2, sm: 2.5, md: 3 }, borderRadius: 3, boxShadow:3 }}>
+                {/* Table with filtered data */}
+                <TransactionAndPaymentTable
+                    headers={WithdrawalTableHeaders}
+                    data={WithdrawalTableData}
+                    type="1"
+                />
+            </Paper>
         </>
 
     )

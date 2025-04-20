@@ -18,7 +18,6 @@ export function SignInView() {
   const [showSignup, setShowSignup] = useState(false);
   const [transition, setTransition] = useState(false);
   const [avatar, setAvatar] = useState(null); // Correct initialization
-  console.log(avatar);
 
   const getWidth = (key) => (active === key ? "50%" : "10%");
   const auth = useSelector(state => state.auth);
@@ -164,30 +163,30 @@ export function SignInView() {
 
       {/* Gender Radio Buttons */}
       <Box sx={{ width: '100%' }} mt={2}>
-  <Box display="flex" gap={2} alignItems="center">
-    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-      Gender *
-    </Typography>
+        <Box display="flex" gap={2} alignItems="center">
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            Gender *
+          </Typography>
 
-    {['Male', 'Female', 'Other'].map((gender) => (
-      <Box key={gender} display="flex" alignItems="center">
-        <input
-          type="radio"
-          id={`gender-${gender}`}
-          name="gender"
-          value={gender}
-          checked={formRegisterData.gender === gender}
-          onChange={handleRegisterChange}
-          required={formRegisterData.gender === ''} // Show required only if nothing selected
-          style={{ marginRight: 8 }}
-        />
-        <label htmlFor={`gender-${gender}`}>
-          <Typography variant="body2">{gender}</Typography>
-        </label>
+          {['Male', 'Female', 'Other'].map((gender) => (
+            <Box key={gender} display="flex" alignItems="center">
+              <input
+                type="radio"
+                id={`gender-${gender}`}
+                name="gender"
+                value={gender}
+                checked={formRegisterData.gender === gender}
+                onChange={handleRegisterChange}
+                required={formRegisterData.gender === ''} // Show required only if nothing selected
+                style={{ marginRight: 8 }}
+              />
+              <label htmlFor={`gender-${gender}`}>
+                <Typography variant="body2">{gender}</Typography>
+              </label>
+            </Box>
+          ))}
+        </Box>
       </Box>
-    ))}
-  </Box>
-</Box>
 
       <TextField
         label="Avatar"

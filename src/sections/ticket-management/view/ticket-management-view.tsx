@@ -11,6 +11,8 @@ import QrCodeIcon from "@mui/icons-material/QrCode";
 
 import { PageTitleSection } from "src/components/page-title-section";
 import { DashboardContent } from "src/layouts/dashboard";
+import { MatrixThreeCard } from "src/components/matrix-three-cards/matrix-three-cards";
+
 import { TicketHistoryCancelRefundCard } from "../t-h-c-r";
 import { TicketCard } from "../ticket-card";
 
@@ -91,35 +93,7 @@ export function TicketManagementView() {
                 </Grid>
             </Grid>
 
-            <Grid container spacing={2} mt={2}>
-                {metrics.map((metric, index) => (
-                    <Grid item xs={12} sm={6} md={3} key={index} sx={{ textAlign: "center" }}>
-                        <Card sx={{
-                            height: "100%",
-                            borderRadius: 2,
-                            boxShadow: 3,
-                            transition: "box-shadow 0.3s ease", // Smooth transition
-                        }}>
-                            <CardContent>
-                                <Typography
-                                    variant="subtitle2"
-                                    color="black"
-                                    fontSize={20}
-                                    fontWeight={600}
-                                    gutterBottom
-                                >
-                                    {metric.title}
-                                </Typography>
-                                <Typography
-                                    variant="h4"
-                                >
-                                    {metric.value}
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
+            <MatrixThreeCard metrics={metrics} sm={3} md={3}/>
 
             <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
                 <Typography variant="h5" fontWeight={600} mb={3} fontSize={{ xs: "20px", sm: "26px", md: "34px" }}>

@@ -1,26 +1,26 @@
-import { eventConstants } from "../actions/constants";
+import { promotionConstants } from "../actions/constants";
 
 const initialState = {
-    stepper: 1,
+    promotions: [],
     message: '',
 };
 
-const eventReducer = (state, action) => {
+const promotionReducer = (state, action) => {
     if (state === undefined) {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
-        case eventConstants.EVENT_CREATE_REQUEST:
+        case promotionConstants.GET_REQUEST:
             return { ...state };
 
-        case eventConstants.EVENT_CREATE_SUCCESS:
+        case promotionConstants.GET_SUCCESS:
             return {
                 ...state,
-                stepper: action.payload.stepper,
-                token: action.payload.token
+                message: action.payload.message,
+                promotions: action.payload.promotions
             };
 
-        case eventConstants.EVENT_CREATE_FAILURE:
+        case promotionConstants.GET_FAILURE:
             return {
                 ...state,
                 message: action.payload.message,
@@ -32,4 +32,4 @@ const eventReducer = (state, action) => {
 };
 
 
-export default eventReducer;
+export default promotionReducer;

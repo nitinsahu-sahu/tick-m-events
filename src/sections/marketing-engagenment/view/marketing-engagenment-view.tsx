@@ -8,17 +8,22 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TextField,
-  Checkbox, FormControlLabel, Select, MenuItem,
+  TextField, FormControlLabel, Select, MenuItem,
   Radio, RadioGroup, useMediaQuery,
-  useTheme, Box, Grid
+  useTheme, Box
 } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
+import { promotionGet } from 'src/redux/actions';
+import { AppDispatch } from 'src/redux/store';
 
 import { BookingTrends } from "../graph";
+import { PromotionsAndOffers } from '../promotion-&-offer';
+import { ActivePromotion } from '../active-promotion';
+
 
 const promotionsData = [
   { id: 1, type: 'Spring Discount', date: '2025-03-10', discount: '20%', status: 'Active' },
@@ -30,388 +35,34 @@ export function MarketingEngagenmentView() {
   const [selectedPromo, setSelectedPromo] = useState(promotionsData[0]);
   const [onSave, setOnSave] = useState();
   const [onCancel, setOnCancel] = useState();
+  const dispatch = useDispatch<AppDispatch>();
+
   const [description, setDescription] = useState(
     'Join us for an unforgettable experience! Get your tickets now!'
   );
   const [reservationLink, setReservationLink] = useState('https://eventbooking.com/my-event');
   const [hashtag, setHashtag] = useState('#AmazingEvent2025');
-  const [discountValue, setDiscountValue] = useState('Discount Value e.g., 10.00% off');
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
-  const [promoCode, setPromoCode] = useState('')
-  const [advantageType, setAdvantageType] = useState('')
-  const [usageLimit, setUsageLimit] = useState('')
+
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [selectedTab, setSelectedTab] = useState("monthly");
-  const [tabValue, setTabValue] = useState(0);
+
+  useEffect(() => {
+    dispatch(promotionGet())
+  }, [dispatch])
 
   return (
     <DashboardContent>
       <PageTitleSection title="Promotions & Special Offers" desc="Lorem ipsum dolor sit amet" />
 
       {/* Active Promotion */}
-
-      <Box
-        sx={{
-          padding: 3,
-          border: "1px solid #00000059",
-          boxShadow: "0px 0px 16px 0px #00000040",
-          borderRadius: "15px",
-          background: "white",
-          marginTop: "20px",
-          marginBottom: "20px",
-        }}
-      >
-        <Typography variant="h6" fontWeight="bold" mb={2}>
-          Active Promotions
-        </Typography>
-
-        {/* Filter Header Section */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "start",
-            gap: 3, // spacing between labels
-            pb: 1,
-            mb: 2,
-            overflowX: "auto",
-            borderBottom: "4px solid #ccc",
-            width: "fit-content",
-          }}
-        >
-          {["Type", "Discount", "Ticket Type", "Validity", "Status"].map((label, index) => (
-            <Typography
-              key={index}
-              variant="subtitle2"
-              sx={{
-                fontWeight: 500,
-                color: "#000",
-                textAlign: "left",
-                paddingBottom: "4px",
-              }}
-            >
-              {label}
-            </Typography>
-          ))}
-        </Box>
-
-
-
-        {/* Responsive Table */}
-        <TableContainer sx={{ overflowX: "auto" }}>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#D9D9D9" }}>
-                <TableCell sx={{ color: "#000000", whiteSpace: "nowrap" }}><b>Type</b></TableCell>
-                <TableCell sx={{ color: "#000000", whiteSpace: "nowrap" }}><b>Date</b></TableCell>
-                <TableCell sx={{ color: "#000000", whiteSpace: "nowrap" }}><b>Discount</b></TableCell>
-                {!isMobile && <TableCell sx={{ color: "#000000" }}><b>Status</b></TableCell>}
-                <TableCell sx={{ color: "#000000" }}><b>Actions</b></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {promotionsData.map((promo, index) => (
-                <TableRow key={index}>
-                  <TableCell>{promo.type}</TableCell>
-                  <TableCell>{promo.date}</TableCell>
-                  <TableCell>{promo.discount}</TableCell>
-                  {!isMobile && (
-                    <TableCell sx={{ color: promo.status === "Active" ? "green" : "red" }}>
-                      {promo.status}
-                    </TableCell>
-                  )}
-                  <TableCell>
-                    <Button
-                      variant="contained"
-                      sx={{ backgroundColor: "#0B2E4C", color: "white", marginRight: 1 }}
-                      size="small"
-                      onClick={() => setSelectedPromo(promo)}
-                    >
-                      Modify
-                    </Button>
-                    <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white" }} size="small">
-                      Cancel
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        {/* Edit Promotion Section */}
-        <Paper
-          elevation={3}
-          sx={{
-            p: 3,
-            borderRadius: "12px",
-            backgroundColor: "#F9F9F9",
-            mt: 3,
-          }}
-        >
-          <Typography variant="h6" fontWeight="bold" mb={3}>
-            Edit Promotion
-          </Typography>
-
-          <Grid container spacing={3}>
-            {/* Name */}
-            <Grid item xs={12} sm={6}>
-              <Typography fontSize="13px" fontWeight={500} mb={1}>
-                Name
-              </Typography>
-              <TextField
-                fullWidth
-                size="small"
-                placeholder="Spring Discount"
-                value={selectedPromo.type}
-              />
-            </Grid>
-
-            {/* Date */}
-            <Grid item xs={12} sm={6}>
-              <Typography fontSize="13px" fontWeight={500} mb={1}>
-                Date
-              </Typography>
-              <TextField
-                fullWidth
-                size="small"
-                type="date"
-                value={selectedPromo.date}
-              />
-            </Grid>
-
-            {/* Discount */}
-            <Grid item xs={12} sm={6}>
-              <Typography fontSize="13px" fontWeight={500} mb={1}>
-                Discount
-              </Typography>
-              <TextField
-                fullWidth
-                size="small"
-                value={selectedPromo.discount}
-                placeholder="20%"
-              />
-            </Grid>
-
-            {/* Status */}
-            <Grid item xs={12} sm={6}>
-              <Typography fontSize="13px" fontWeight={500} mb={1}>
-                Status
-              </Typography>
-              <Select fullWidth size="small" value={selectedPromo.status}>
-                <MenuItem value="Active">Active</MenuItem>
-                <MenuItem value="Inactive">Inactive</MenuItem>
-              </Select>
-            </Grid>
-          </Grid>
-
-          {/* Buttons */}
-          <Box
-            mt={4}
-            display="flex"
-            justifyContent={isMobile ? "center" : "flex-start"}
-            flexDirection={isMobile ? "column" : "row"}
-            gap={2}
-          >
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: "#0B2E4C",
-                color: "#fff",
-                px: 4,
-                "&:hover": {
-                  backgroundColor: "#093b65",
-                },
-              }}
-              onClick={onSave}
-            >
-              Save
-            </Button>
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: "#D9D9D9",
-                color: "#000",
-                px: 4,
-                "&:hover": {
-                  backgroundColor: "#c0c0c0",
-                },
-              }}
-              onClick={onCancel}
-            >
-              Cancel
-            </Button>
-          </Box>
-        </Paper>
-      </Box>
-
-
+      <ActivePromotion />
 
       {/* Promotions & special offer section */}
-      <Box
-        sx={{
-          padding: 3,
-          border: "1px solid #00000059",
-          boxShadow: "0px 0px 16px 0px #00000040",
-          borderRadius: "30px",
-          background: "white",
-          mt: 3,
-          mb: 3,
-        }}
-      >
-        <Typography variant="h6" fontWeight="bold" mb={2}>
-          Promotions & Special Offers
-        </Typography>
-
-        <Button
-          fullWidth
-          sx={{
-            bgcolor: "#0B2E4C",
-            color: "white",
-            mb: 3,
-            py: 1.5,
-            borderRadius: "10px",
-            "&:hover": { bgcolor: "#083048" },
-          }}
-        >
-          Create a new Promotion
-        </Button>
-
-        <Paper sx={{ p: 3, borderRadius: "10px", background: "#f5f5f5" }}>
-          <Typography variant="subtitle1" fontWeight="bold" mb={2}>
-            Create a Promotion
-          </Typography>
-
-          {/* Discount Type Checkboxes */}
-          <Grid container spacing={2} mb={3}>
-            {[
-              "Percentage Discount",
-              "Fixed Value Discount",
-              "Group Offer",
-              "Early Buyer Discount",
-            ].map((label) => (
-              <Grid item xs={12} sm={6} md={3} key={label}>
-                <FormControlLabel
-                  control={<Checkbox />}
-                  label={label}
-                  sx={{ fontSize: "14px" }}
-                />
-              </Grid>
-            ))}
-          </Grid>
-
-          {/* Discount Value */}
-          <Typography variant="body2" fontWeight="bold" mb={1}>
-            Discount value
-          </Typography>
-          <TextField
-            fullWidth
-            value={discountValue}
-            onChange={(e) => setDiscountValue(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-
-          {/* Ticket Selection */}
-          <Typography variant="body2" fontWeight="bold" mb={1}>
-            Ticket Selection
-          </Typography>
-          <Select fullWidth defaultValue="Standard" sx={{ mb: 2 }}>
-            <MenuItem value="Standard">Standard</MenuItem>
-          </Select>
-
-          {/* Validity Period */}
-          <Typography variant="body2" fontWeight="bold" mb={1}>
-            Validity Period
-          </Typography>
-          <Grid container spacing={2} mb={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                placeholder="Start Date (mm/dd/yyyy)"
-                value={startDate}
-                type='date'
-                onChange={(e) => setStartDate(e.target.value)}
-
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                placeholder="End Date (mm/dd/yyyy)"
-                value={endDate}
-                type='date'
-                onChange={(e) => setEndDate(e.target.value)}
-
-              />
-            </Grid>
-          </Grid>
-
-          {/* Promo Code */}
-          <Typography variant="body2" fontWeight="bold" mb={1}>
-            Promo Code (Optional)
-          </Typography>
-          <TextField
-            fullWidth
-            placeholder="Promo Code"
-            value={promoCode}
-            onChange={(e) => setPromoCode(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-
-          {/* Advantage Type */}
-          <Typography variant="body2" fontWeight="bold" mb={1}>
-            Advantage Type
-          </Typography>
-          <Select
-            fullWidth
-            value={advantageType}
-            onChange={(e) => setAdvantageType(e.target.value)}
-            sx={{ mb: 2 }}
-          >
-            <MenuItem value="Discount">Discount</MenuItem>
-          </Select>
-
-          {/* Usage Limit */}
-          <Typography variant="body2" fontWeight="bold" mb={1}>
-            Usage Limit
-          </Typography>
-          <TextField
-            fullWidth
-            placeholder="Usage Limit"
-            value={usageLimit}
-            onChange={(e) => setUsageLimit(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-
-          {/* Submit Button */}
-          <Button
-            fullWidth
-            sx={{
-              bgcolor: "#0B2E4C",
-              color: "white",
-              mt: 3,
-              py: 1.5,
-              borderRadius: "10px",
-              "&:hover": { bgcolor: "#083048" },
-            }}
-          >
-            Save Promotion
-          </Button>
-        </Paper>
-      </Box>
+      <PromotionsAndOffers />
 
       {/* Notifications & Auto Reminder section */}
-      <Box
-        sx={{
-          padding: 3,
-          border: "1px solid #00000059",
-          boxShadow: "0px 0px 16px 0px #00000040",
-          borderRadius: "15px",
-          background: "white",
-        }}
-      >
+      <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: "1px solid black" }}>
         {/* Header */}
         <Typography variant="h6" fontWeight="bold" mb={2}>
           Notifications & Automatic Reminders
@@ -550,18 +201,7 @@ export function MarketingEngagenmentView() {
       </Box>
 
       {/* Media sharing  section */}
-      <Box
-        sx={{
-          // margin: "auto",
-          padding: 3,
-          border: '1px solid #00000059',
-          boxShadow: '0px 0px 16px 0px #00000040',
-          borderRadius: '30px',
-          background: 'white',
-          marginTop: '20px',
-          marginBottom: '20px',
-        }}
-      >
+      <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: "1px solid black" }}>
         <Typography variant="h6" fontWeight="bold" mb={2}>
           Social Media Sharing
         </Typography>
@@ -658,140 +298,126 @@ export function MarketingEngagenmentView() {
       </Box>
       {/* Marketing perform section */}
 
-      <Box
-        sx={{
-          background: "#FFFFFF",
-          border: "1px solid #00000059",
-          boxShadow: "0px 0px 16px 0px #00000040",
-          borderRadius: "30px",
-          p: { xs: 2, sm: 3, md: 4 },
-          mt: 4,
-          mb: 4,
-          maxWidth: "100%",
-          overflow: "hidden",
-        }}
-      >
-        <Box sx={{ p: { xs: 2, sm: 3 }, background: "white", borderRadius: "15px" }}>
-          <Typography variant="h5" fontWeight="bold" mb={2}>
-            Marketing Performance & Statistics
-          </Typography>
-          <Typography variant="body1" mb={4}>
-            Performance Tracking Table
-          </Typography>
+      <Box p={3} boxShadow={3} bgcolor="white" my={3} borderRadius={3} sx={{ border: "1px solid black" }}>
+        <Typography variant="h5" fontWeight="bold" mb={2}>
+          Marketing Performance & Statistics
+        </Typography>
+        <Typography variant="body1" mb={4}>
+          Performance Tracking Table
+        </Typography>
 
-          {/* Responsive Table */}
-          <TableContainer
-            component={Paper}
-            sx={{
-              borderRadius: "20px",
-              overflowX: "auto",
-              mb: 4,
-            }}
-          >
-            <Table sx={{ minWidth: 600 }}>
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "#3AACE7" }}>
-                  {["Action", "Participants Reached", "Open Rate", "Click Rate", "Sales Conversions"].map(
-                    (header, i) => (
-                      <TableCell
-                        key={i}
-                        sx={{
-                          color: "white",
-                          fontWeight: "bold",
-                          textAlign: "center",
-                          backgroundColor: "#3AACE7",
-                          ...(i === 0 && {
-                            borderTopLeftRadius: "20px",
-                            borderBottomLeftRadius: "20px",
-                          }),
-                          ...(i === 4 && {
-                            borderTopRightRadius: "20px",
-                            borderBottomRightRadius: "20px",
-                            whiteSpace: "nowrap",
-                          }),
-                        }}
-                      >
-                        {header}
-                      </TableCell>
-                    )
-                  )}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {[
-                  ["24h Reminder Notification", "500", "80%", "40%", "100 tickets sold"],
-                  ["48h Follow-Up", "400", "-", "-", "50 tickets sold"],
-                ].map((row, rowIndex, rowArray) => (
-                  <TableRow
-                    key={rowIndex}
-                    sx={{
-                      ...(rowIndex === rowArray.length - 1 && {
-                        "& td:first-of-type": {
+        {/* Responsive Table */}
+        <TableContainer
+          component={Paper}
+          sx={{
+            borderRadius: "20px",
+            overflowX: "auto",
+            mb: 4,
+          }}
+        >
+          <Table sx={{ minWidth: 600 }}>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: "#3AACE7" }}>
+                {["Action", "Participants Reached", "Open Rate", "Click Rate", "Sales Conversions"].map(
+                  (header, i) => (
+                    <TableCell
+                      key={i}
+                      sx={{
+                        color: "white",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        backgroundColor: "#3AACE7",
+                        ...(i === 0 && {
+                          borderTopLeftRadius: "20px",
                           borderBottomLeftRadius: "20px",
-                        },
-                        "& td:last-of-type": {
+                        }),
+                        ...(i === 4 && {
+                          borderTopRightRadius: "20px",
                           borderBottomRightRadius: "20px",
-                        },
-                      }),
-                    }}
-                  >
-                    {row.map((cell, cellIndex) => (
-                      <TableCell
-                        key={cellIndex}
-                        sx={{
-                          p: 1.5,
-                          border: "none",
-                          textAlign: "center",
-                        }}
-                      >
-                        {cell}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                          whiteSpace: "nowrap",
+                        }),
+                      }}
+                    >
+                      {header}
+                    </TableCell>
+                  )
+                )}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {[
+                ["24h Reminder Notification", "500", "80%", "40%", "100 tickets sold"],
+                ["48h Follow-Up", "400", "-", "-", "50 tickets sold"],
+              ].map((row, rowIndex, rowArray) => (
+                <TableRow
+                  key={rowIndex}
+                  sx={{
+                    ...(rowIndex === rowArray.length - 1 && {
+                      "& td:first-of-type": {
+                        borderBottomLeftRadius: "20px",
+                      },
+                      "& td:last-of-type": {
+                        borderBottomRightRadius: "20px",
+                      },
+                    }),
+                  }}
+                >
+                  {row.map((cell, cellIndex) => (
+                    <TableCell
+                      key={cellIndex}
+                      sx={{
+                        p: 1.5,
+                        border: "none",
+                        textAlign: "center",
+                      }}
+                    >
+                      {cell}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-          {/* Responsive Graph Section */}
+        {/* Responsive Graph Section */}
 
 
-          <BookingTrends />
+        <BookingTrends />
 
-          {/* Follow-up Section */}
-          <Box
-            sx={{
-              background: "#F1F1F1",
-              p: { xs: 2, sm: 3 },
-              borderLeft: "4px solid #3AACE7",
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              alignItems: { xs: "center", sm: "flex-start" },
-              textAlign: { xs: "center", sm: "left" },
-            }}
-          >
-            <Typography variant="body1" fontWeight="bold">
-              Follow up with participants who viewed the event but didn’t buy. Consider sending a special
-              offer to encourage them to complete their purchase.
-            </Typography>
-          </Box>
-
-          <Button
-            fullWidth
-            variant="contained"
-            sx={{
-              backgroundColor: "#0B2A4A",
-              color: "white",
-              borderRadius: "8px",
-              mt: 2,
-              fontWeight: "bold",
-              py: 1.5,
-              "&:hover": { backgroundColor: "#09324A" },
-            }}
-          >
-            Send Follow-up
-          </Button>
+        {/* Follow-up Section */}
+        <Box
+          sx={{
+            background: "#F1F1F1",
+            p: { xs: 2, sm: 3 },
+            borderLeft: "4px solid #3AACE7",
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "center", sm: "flex-start" },
+            textAlign: { xs: "center", sm: "left" },
+          }}
+        >
+          <Typography variant="body1" fontWeight="bold">
+            Follow up with participants who viewed the event but didn’t buy. Consider sending a special
+            offer to encourage them to complete their purchase.
+          </Typography>
         </Box>
+
+        <Button
+          fullWidth
+          variant="contained"
+          sx={{
+            backgroundColor: "#0B2A4A",
+            color: "white",
+            borderRadius: "8px",
+            mt: 2,
+            fontWeight: "bold",
+            py: 1.5,
+            "&:hover": { backgroundColor: "#09324A" },
+          }}
+        >
+          Send Follow-up
+        </Button>
       </Box>
     </DashboardContent>
   );

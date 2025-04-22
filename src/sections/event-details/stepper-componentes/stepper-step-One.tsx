@@ -3,11 +3,10 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import {
     Box, Typography, TextField, Select,
-    MenuItem, Button, IconButton,
+    MenuItem, IconButton,
     Grid, FormControl, InputLabel
 } from "@mui/material";
 import PublicIcon from '@mui/icons-material/Public';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import UploadIcon from '@mui/icons-material/CloudUpload';
 import { toast } from 'react-toastify';
@@ -24,7 +23,6 @@ import { AppDispatch } from 'src/redux/store';
 export function StepperStepOne() {
     const quillRef = useRef<ReactQuill>(null);
     const dispatch = useDispatch<AppDispatch>();
-    const navigate = useNavigate();
     const [eventBanner, setEventBanner] = useState(null); // Correct initialization
 
     const [eventFormData, setEventFormData] = useState({
@@ -73,13 +71,10 @@ export function StepperStepOne() {
         formEventData.append("format", eventFormData.eventFormat);
         formEventData.append("website", eventFormData.website);
         formEventData.append("number", eventFormData.phone);
-        const socialMediaData = {
-            whatsapp: eventFormData.whatsApp || "",
-            linkedin: eventFormData.linkedIn || "",
-            facebook: eventFormData.facebook || "",
-            tiktok: eventFormData.tiktok || ""
-        };
-        formEventData.append("socialMedia", JSON.stringify(socialMediaData));
+        formEventData.append("whatsapp", eventFormData.whatsApp);
+        formEventData.append("linkedin", eventFormData.linkedIn);
+        formEventData.append("facebook", eventFormData.facebook);
+        formEventData.append("tiktok", eventFormData.tiktok);
 
         formEventData.append("description", quillRef?.current?.value as string);        // Append avatar if it exists
         if (eventBanner) {
@@ -87,8 +82,8 @@ export function StepperStepOne() {
         }
         try {
             const res = await dispatch(eventCreate(formEventData));
-            console.log(res,'res');
-            
+            console.log(res, 'res');
+
         } catch (error) {
             toast.error("Event creation failed");
         }
@@ -317,7 +312,8 @@ export function StepperStepOne() {
                             type='text'
                             value={eventFormData.website}
                             onChange={handleEventChange}
-                            fullWidth label="Website (optional)" />
+                            fullWidth label="Website (optional)"
+                        />
                     </Grid>
 
                     {/* Social Media - Reorganized for mobile */}

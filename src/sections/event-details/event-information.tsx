@@ -15,7 +15,11 @@ export function EventInformation() {
   const stepComponents = [<StepperStepOne />, <StepperStepTwo />, <StepperStepThree />, <StepperStepFour />, <StepperSucessful />];
   const steps = ['0', '1', '2', '3'];
   const { stepper } = useSelector((state: RootState) => state?.event);
-  const [activeStep, setActiveStep] = useState(stepper);
+  const [activeStep, setActiveStep] = useState(0);
+
+  useEffect(() => {
+    setActiveStep( stepper);
+  }, [stepper]);
 
   useEffect(() => {
     if (activeStep === 4) {

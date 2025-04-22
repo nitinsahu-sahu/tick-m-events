@@ -1,0 +1,95 @@
+import { promotionConstants } from "./constants";
+import axios from "../helper/axios";
+
+export const promotionUpdate = ({formEventData,_id}) => async (dispatch) => {
+    dispatch({ type: promotionConstants.CREATE_REQUEST });
+
+    try {
+        const response = await axios.put(`/promotion/${_id}`, formEventData);
+
+        dispatch({
+            type: promotionConstants.CREATE_SUCCESS,
+            payload: { message: response?.data?.message },
+            
+        });
+        dispatch(promotionGet())
+        return {
+            type: promotionConstants.CREATE_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
+    } catch (error) {
+        dispatch({
+            type: promotionConstants.CREATE_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+
+        return {
+            type: promotionConstants.CREATE_FAILURE,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status
+        };
+    }
+};
+
+export const promotionCreate = (data) => async (dispatch) => {
+    dispatch({ type: promotionConstants.CREATE_REQUEST });
+
+    try {
+        const response = await axios.post("/promotion", data);
+
+        dispatch({
+            type: promotionConstants.CREATE_SUCCESS,
+            payload: { message: response?.data?.message },
+            
+        });
+        dispatch(promotionGet())
+        return {
+            type: promotionConstants.CREATE_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
+    } catch (error) {
+        dispatch({
+            type: promotionConstants.CREATE_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+
+        return {
+            type: promotionConstants.CREATE_FAILURE,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status
+        };
+    }
+};
+
+export const promotionGet = (data) => async (dispatch) => {
+    dispatch({ type: promotionConstants.GET_REQUEST });
+
+    try {
+        const response = await axios.get("/promotion");
+        dispatch({
+            type: promotionConstants.GET_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                promotions: response?.data?.promotions
+            },
+
+        });
+        return {
+            type: promotionConstants.GET_SUCCESS,
+            promotions: response?.data?.promotions
+        };
+    } catch (error) {
+        dispatch({
+            type: promotionConstants.GET_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+
+        return {
+            type: promotionConstants.GET_FAILURE,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status
+        };
+    }
+};

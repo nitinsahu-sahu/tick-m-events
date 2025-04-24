@@ -1,16 +1,16 @@
 import { promotionConstants } from "./constants";
 import axios from "../helper/axios";
 
-export const promotionUpdate = ({formEventData,_id}) => async (dispatch) => {
+export const promotionUpdate = ({ formEventData, _id }) => async (dispatch) => {
     dispatch({ type: promotionConstants.CREATE_REQUEST });
 
     try {
-        const response = await axios.put(`/promotion/${_id}`, formEventData);
+        const response = await axios.patch(`/promotion/${_id}`, formEventData);
 
         dispatch({
             type: promotionConstants.CREATE_SUCCESS,
             payload: { message: response?.data?.message },
-            
+
         });
         dispatch(promotionGet())
         return {
@@ -41,7 +41,7 @@ export const promotionCreate = (data) => async (dispatch) => {
         dispatch({
             type: promotionConstants.CREATE_SUCCESS,
             payload: { message: response?.data?.message },
-            
+
         });
         dispatch(promotionGet())
         return {

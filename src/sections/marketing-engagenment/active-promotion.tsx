@@ -70,8 +70,8 @@ export function ActivePromotion() {
         formEventData.append("discountValue", promotionRowData.discountValue);
         formEventData.append("status", promotionRowData.status);
         try {
-            const result = await dispatch(promotionUpdate({formEventData, _id:promotionRowData._id}));
-            if ((result as ApiResult)?.status === 201) {
+            const result = await dispatch(promotionUpdate({ formEventData, _id: promotionRowData._id }));
+            if ((result as ApiResult)?.status === 200) {
                 toast.success(result?.message);
                 setPromotionRowData({
                     _id: "",
@@ -88,7 +88,7 @@ export function ActivePromotion() {
         } catch (error) {
             toast.error("Promotion creation failed");
         }
-    }, [promotionRowData,dispatch])
+    }, [promotionRowData, dispatch])
 
     return (
         <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: "1px solid black" }}>

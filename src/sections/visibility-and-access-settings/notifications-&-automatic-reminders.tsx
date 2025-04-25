@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -7,13 +7,55 @@ import {
   Radio,
   TextField,
   MenuItem,
-  FormGroup,
-  Checkbox,
-  Button,
-  Container
+  Button
 } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { saveReminderSettings } from 'src/redux/actions/reminderActions';
+import { AppDispatch } from 'src/redux/store';
 
-export function NotificationAutomaticReminders  ()  {
+export function NotificationAutomaticReminders() {
+  const dispatch = useDispatch<AppDispatch>();
+
+  // Form states
+  const [reminderTime, setReminderTime] = useState("1hr");
+  const [recipient, setRecipient] = useState("all");
+  const [customMessage, setCustomMessage] = useState("");
+  const [ctaButton, setCtaButton] = useState("");
+  const [notificationMethod, setNotificationMethod] = useState("email");
+
+  // const handleSave = () => {
+  //   const now = new Date();
+  //   const eventDate = new Date(now.getTime() + 2 * 60 * 1000); // 2 minutes from now
+
+  //   const payload = {
+  //     eventDate, // dynamically set to 2 minutes later
+  //     reminderTime: parseInt(reminderTime), // make sure it's a number
+  //     recipient,
+  //     customMessage,
+  //     ctaButton,
+  //     notificationMethod,
+  //     notificationType: "reminder" // static field (if required)
+  //   };
+  //   console.log(payload);
+  //   dispatch(saveReminderSettings(payload));
+  // };
+
+  const handleSave = () => {
+    const now = new Date();
+    const eventDate = new Date(now.getTime() + 2 * 60 * 1000); 
+    console.log(eventDate);// 2 minutes from now
+    const payload = {
+      eventDate, // Current system date and time
+      reminderTime: 1, // 1 hour before event
+      notificationMethod: "email",
+      recipient: "nitinsahu911111@gmail.com", // Recipient email
+      customMessage: "This is your reminderee!",
+      ctaButton: "Click here for more info",
+      notificationType: "reminder" // Assuming this is required
+    };
+    dispatch(saveReminderSettings(payload));
+  };
+
   return (
     <Box
       boxShadow={3}
@@ -31,7 +73,7 @@ export function NotificationAutomaticReminders  ()  {
         <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
           Scheduled Reminders
         </Typography>
-        <RadioGroup defaultValue="1hr">
+        <RadioGroup value={reminderTime} onChange={(e) => setReminderTime(e.target.value)}>
           <FormControlLabel
             value="24hr"
             control={<Radio />}
@@ -56,15 +98,14 @@ export function NotificationAutomaticReminders  ()  {
           Customizable Notifications
         </Typography>
 
-        {/* Recipients */}
         <Typography variant="subtitle2" mt={2} mb={1}>
           Recipients:
         </Typography>
         <TextField
           select
           fullWidth
-          defaultValue="all"
-          size="medium"
+          value={recipient}
+          onChange={(e) => setRecipient(e.target.value)}
           variant="outlined"
         >
           <MenuItem value="all">All attendees</MenuItem>
@@ -72,7 +113,6 @@ export function NotificationAutomaticReminders  ()  {
           <MenuItem value="custom">Custom list</MenuItem>
         </TextField>
 
-        {/* Custom Message */}
         <Typography variant="subtitle2" mt={3} mb={1}>
           Custom Message:
         </Typography>
@@ -80,16 +120,19 @@ export function NotificationAutomaticReminders  ()  {
           fullWidth
           multiline
           minRows={3}
+          value={customMessage}
+          onChange={(e) => setCustomMessage(e.target.value)}
           placeholder="The event is starting soon! Get ready."
           variant="outlined"
         />
 
-        {/* CTA Button */}
         <Typography variant="subtitle2" mt={3} mb={1}>
           CTA Button:
         </Typography>
         <TextField
           fullWidth
+          value={ctaButton}
+          onChange={(e) => setCtaButton(e.target.value)}
           placeholder="View My Ticket"
           variant="outlined"
         />
@@ -100,7 +143,7 @@ export function NotificationAutomaticReminders  ()  {
         <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
           Notification Methods
         </Typography>
-        <RadioGroup defaultValue="email">
+        <RadioGroup value={notificationMethod} onChange={(e) => setNotificationMethod(e.target.value)}>
           <FormControlLabel
             value="push"
             control={<Radio />}
@@ -122,6 +165,7 @@ export function NotificationAutomaticReminders  ()  {
       {/* Save Button */}
       <Box mt={4}>
         <Button
+          onClick={handleSave}
           fullWidth
           variant="contained"
           sx={{
@@ -138,5 +182,4 @@ export function NotificationAutomaticReminders  ()  {
       </Box>
     </Box>
   );
-};
-
+}

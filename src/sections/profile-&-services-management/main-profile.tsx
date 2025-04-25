@@ -1,5 +1,6 @@
 import { Avatar, Box, Button, Grid, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { RootState } from "src/redux/store";
 
 export function MainProfile({ onModify }: any) {
@@ -51,12 +52,8 @@ export function MainProfile({ onModify }: any) {
                 </Box>
 
                 <Box sx={{marginTop:"-43px"}}>
-                    <Typography fontWeight="bold" fontSize="18px">
-                    {profile?.name}
-                    </Typography>
-                    <Typography fontSize="14px" color="#000000">
-                    {profile?.username}
-                    </Typography>
+                    <HeadingCommon variant="body1" title={profile?.name} weight={600} mb={0}/>
+                    <HeadingCommon variant="body" title={profile?.username} weight={400} baseSize="16px"/>
                 </Box>
             </Box>
 

@@ -8,6 +8,7 @@ import {
   Select,
   FormControl,
   Stack,
+  Grid,
 } from '@mui/material';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
@@ -33,7 +34,7 @@ const ServiceRequestForm = () => {
     budget: '',
     requirements: '',
     additionalOptions: '',
-    status: '' 
+    status: ''
   });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -73,7 +74,7 @@ const ServiceRequestForm = () => {
           budget: '',
           requirements: '',
           additionalOptions: '',
-          status:''
+          status: ''
         })
         setEventBanner(null)
       } else {
@@ -98,7 +99,7 @@ const ServiceRequestForm = () => {
         boxShadow: '0 0 10px rgba(0, 0, 0, 0.4)',
       }}
     >
-      <Typography variant="h5" fontWeight={700} mb={4}>
+      <Typography variant="h5" fontWeight={700}>
         Service Request Form
       </Typography>
 
@@ -106,17 +107,22 @@ const ServiceRequestForm = () => {
         <form encType='multipart/form-data' onSubmit={handleSubmit}>
 
           {/* Service Type */}
-          <Box>
+          <Box mt={2}>
             <Typography fontWeight={600} color="text.primary" mb={1}>
               Type of Service Needed
             </Typography>
-            <FormControl fullWidth>
+            <FormControl fullWidth sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: 'black' },
+                '&:hover fieldset': { borderColor: 'black' },
+                '&.Mui-focused fieldset': { borderColor: 'black' }
+              }
+            }}>
               <Select
-              required
+                required
                 value={formData.serviceType}
                 onChange={handleSelectChange}
                 displayEmpty
-                sx={{ borderRadius: 2 }}
               >
                 <MenuItem value="">Select Services</MenuItem>
                 <MenuItem value="Catering">Catering</MenuItem>
@@ -127,22 +133,28 @@ const ServiceRequestForm = () => {
           </Box>
 
           {/* Location */}
-          <Box>
+          <Box mt={2}>
             <Typography fontWeight={600} color="text.primary" mb={1}>
               Event Location
             </Typography>
             <TextField
-            required
+              required
               name="location"
               value={formData.location}
               onChange={handleChange}
               fullWidth
-              sx={{ borderRadius: 2 }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'black' },
+                  '&:hover fieldset': { borderColor: 'black' },
+                  '&.Mui-focused fieldset': { borderColor: 'black' }
+                }
+              }}
             />
           </Box>
 
           {/* Date & Time */}
-          <Box>
+          <Box mt={2}>
             <Typography fontWeight={600} color="text.primary" mb={1}>
               Date & Time of the Service
             </Typography>
@@ -155,27 +167,39 @@ const ServiceRequestForm = () => {
               onChange={handleChange}
               fullWidth
               InputLabelProps={{ shrink: true }}
-              sx={{ borderRadius: 2 }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'black' },
+                  '&:hover fieldset': { borderColor: 'black' },
+                  '&.Mui-focused fieldset': { borderColor: 'black' }
+                }
+              }}
             />
           </Box>
 
           {/* Budget */}
-          <Box>
+          <Box mt={2}>
             <Typography fontWeight={600} color="text.primary" mb={1}>
               Estimated Budget
             </Typography>
             <TextField
-            required
+              required
               name="budget"
               value={formData.budget}
               onChange={handleChange}
               fullWidth
-              sx={{ borderRadius: 2 }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'black' },
+                  '&:hover fieldset': { borderColor: 'black' },
+                  '&.Mui-focused fieldset': { borderColor: 'black' }
+                }
+              }}
             />
           </Box>
 
           {/* Requirements */}
-          <Box>
+          <Box mt={2}>
             <Typography fontWeight={600} color="text.primary" mb={1}>
               Full Description of Requirements
             </Typography>
@@ -187,50 +211,43 @@ const ServiceRequestForm = () => {
               multiline
               rows={4}
               fullWidth
-              sx={{ borderRadius: 2 }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'black' },
+                  '&:hover fieldset': { borderColor: 'black' },
+                  '&.Mui-focused fieldset': { borderColor: 'black' }
+                }
+              }}
             />
           </Box>
 
           {/* File Upload */}
-          <Box>
+          <Grid item xs={12} mt={2}>
             <Typography fontWeight={600} color="text.primary" mb={1}>
               File Upload (Optional)
             </Typography>
-            <Box
+            <TextField
+              type="file"
+              fullWidth
+              name="coverImage"
+              onChange={handleEventBanner}
               sx={{
-                border: '1px solid #ccc',
-                borderRadius: '14px',
-                p: 1.2,
-                backgroundColor: '#f9f9f9',
-                display: 'inline-block',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: '#f0f0f0',
-                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'black' },
+                  '&:hover fieldset': { borderColor: 'black' },
+                  '&.Mui-focused fieldset': { borderColor: 'black' }
+                }
               }}
-            >
-              <TextField
-                type="file"
-                fullWidth
-                required
-                name='coverImage'
-                onChange={handleEventBanner}
-                InputProps={{
-                  sx: {
-                    borderRadius: '10px',
-                    border: '1px solid #ccc',
-                    backgroundColor: '#F9F9F9',
-                  },
-                  inputProps: {
-                    accept: "image/*",  // Move accept here
-                  },
-                }}
-              />
-            </Box>
-          </Box>
+              InputProps={{
+                inputProps: {
+                  accept: "image/*"
+                }
+              }}
+            />
+          </Grid>
 
           {/* Additional Options */}
-          <Box>
+          <Box mt={2}>
             <Typography fontWeight={600} color="text.primary" mb={1}>
               Additional Options
             </Typography>
@@ -241,7 +258,13 @@ const ServiceRequestForm = () => {
               multiline
               rows={3}
               fullWidth
-              sx={{ borderRadius: 2 }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'black' },
+                  '&:hover fieldset': { borderColor: 'black' },
+                  '&.Mui-focused fieldset': { borderColor: 'black' }
+                }
+              }}
             />
           </Box>
 

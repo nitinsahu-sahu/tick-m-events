@@ -1,28 +1,26 @@
-import { authConstants } from "../actions/constants";
+import { promotionConstants } from "../actions/constants";
 
 const initialState = {
-    profile: {},
-    services: [],
+    promotions: [],
     message: '',
 };
 
-const promotionReducer = (state, action) => {
+const userPersonalServiceReqReducer = (state, action) => {
     if (state === undefined) {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
-        case authConstants.GET_REQUEST:
+        case promotionConstants.GET_REQUEST:
             return { ...state };
 
-        case authConstants.GET_SUCCESS:
+        case promotionConstants.GET_SUCCESS:
             return {
                 ...state,
                 message: action.payload.message,
-                profile: action.payload.profile,
-                services: action.payload.services
+                promotions: action.payload.promotions
             };
 
-        case authConstants.GET_FAILURE:
+        case promotionConstants.GET_FAILURE:
             return {
                 ...state,
                 message: action.payload.message,
@@ -34,4 +32,4 @@ const promotionReducer = (state, action) => {
 };
 
 
-export default promotionReducer;
+export default userPersonalServiceReqReducer;

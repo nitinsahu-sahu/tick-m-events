@@ -11,7 +11,10 @@ import { toast } from 'react-toastify';
 
 import { profileUpdate } from "src/redux/actions";
 import { AppDispatch, RootState } from "src/redux/store";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+
 import { profileFields, socialMediaFields } from "./utills";
+
 
 interface ApiResult {
     status: number;
@@ -20,7 +23,7 @@ interface ApiResult {
     // Add other properties if needed
 }
 
-const FormTextField = ({ name, type = 'text', value, onChange, placeholder, transform, multiline, minRows }:any) => (
+const FormTextField = ({ name, type = 'text', value, onChange, placeholder, transform, multiline, minRows }: any) => (
     <TextField
         name={name}
         type={type}
@@ -54,7 +57,7 @@ const FormTextField = ({ name, type = 'text', value, onChange, placeholder, tran
 
 export function UpdateProfile({ profileData, socialLinks, setProfileData, setSocialLinks }: any) {
     const dispatch = useDispatch<AppDispatch>();
-    const { _id,username } = useSelector((state: RootState) => state?.profile?.profile);
+    const { _id, username } = useSelector((state: RootState) => state?.profile?.profile);
     const { profile } = useSelector((state: RootState) => state?.profile);
 
     const handleProfileUpdateChange = (event: any) => {
@@ -135,12 +138,8 @@ export function UpdateProfile({ profileData, socialLinks, setProfileData, setSoc
                     />
                 </Box>
                 <Box>
-                    <Typography variant="h6" fontWeight="bold">
-                        {profile?.name}
-                    </Typography>
-                    <Typography variant="body2">
-                        {username}
-                    </Typography>
+                    <HeadingCommon variant="body1" title={profile?.name} weight={600} mb={0} />
+                    <HeadingCommon variant="body" title={profile?.username} weight={400} baseSize="16px" />
                 </Box>
             </Box>
 

@@ -76,3 +76,51 @@ export const days = [
   "Saturday",
   "Sunday",
 ];
+
+export const offterTableHeaders = ["Service", "Indicative Price", "Location",  "Actions"];
+export const offterTableData = [
+    { service: "DJ & Entertainment", indicativePrice: "20000 XAF", location: "America" },
+    { service: "DJ & Entertainment", indicativePrice: "20000 XAF", location: "America" },
+];
+
+type AddServiceForm = {
+  serviceName: string;
+  location: string;
+  description: string;
+  budget: string;
+  // Add other fields if needed
+};
+type FormField = {
+  name: keyof AddServiceForm; // Ensures name matches form keys
+  label: string;
+  required?: boolean;
+  multiline?: boolean;
+  minRows?: number;
+};
+export const formFields: FormField[] = [
+  {
+    name: 'serviceName',
+    label: 'Service Name',
+    required: true,
+    multiline: false
+  },
+  {
+    name: 'description',
+    label: 'Description',
+    required: true,
+    multiline: true,
+    minRows: 3
+  },
+  {
+    name: 'budget',
+    label: 'Indicative Price',
+    required: true,
+    multiline: false
+  },
+  {
+    name: 'location',
+    label: 'Location',
+    required: true,
+    multiline: false
+  }
+];

@@ -6,7 +6,7 @@ export function HeadingCommon({
     color = "black",
     weight = 500,
     baseSize = "26px",
-    mb, mt,width
+    mb, mt, width
 }: any) {
     // Convert base size string (e.g., "26px") to number
     const baseSizeNum = parseInt(baseSize, 10);

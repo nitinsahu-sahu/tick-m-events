@@ -26,6 +26,7 @@ export function UserPopover() {
 
     const isMobileOrTablet = useMediaQuery(theme.breakpoints.down("md")); // Hide on md & below
 
+    const hiddenSearchSelect = ['/search-&-select-service-providers'];
     const handleOpen = (event: any) => {
         if (isMobileOrTablet) {
             setAnchorEl(event.currentTarget);

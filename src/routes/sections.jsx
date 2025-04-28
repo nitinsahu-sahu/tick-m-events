@@ -9,26 +9,33 @@ import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
 import { isUserLoggedIn } from 'src/redux/actions';
 import Protected from 'src/redux/helper/HOC';
+import { RoleProtectedRoute } from 'src/redux/helper/RoleWise';
 import { TrackingBookedServicesAndProvidersView } from 'src/sections/tracking-of-booked-services-&-providers/view';
 
-// ----------------------------------------------------------------------
+// ----------------------------Organizer Routes------------------------------------------
+export const MarketingEngagenmentPage = lazy(() => import('src/pages/marketing-engagenment'));
+export const EventDetailsPage = lazy(() => import('src/pages/event-details'));
+export const EntryValidationPage = lazy(() => import('src/pages/entry-validation'));
+export const TransectionAndPaymentPage = lazy(() => import('src/pages/transection-and-payment'));
+export const StatisticsAndReportsPage = lazy(() => import('src/pages/statistics-and-reports'));
+export const VisibilityAndAccessSettingsPage = lazy(() => import('src/pages/visibility-and-access-settings'));
+export const SearchAndSelectServiceProvidersPage = lazy(() => import('src/pages/search-&-select-service-providers'));
+
+// ----------------------------Admin Routes------------------------------------------
+// ----------------------------Participant Routes------------------------------------------
+export const EventSearchAndDetailsPage = lazy(() => import('src/pages/event-search-and-details'));
+
+// ----------------------------Service Provider Routes------------------------------------------
 
 export const HomePage = lazy(() => import('src/pages/home'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const FrontHomePage = lazy(() => import('src/pages/front-home'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
-export const EntryValidationPage = lazy(() => import('src/pages/entry-validation'));
-export const MarketingEngagenmentPage = lazy(() => import('src/pages/marketing-engagenment'));
-export const EventDetailsPage = lazy(() => import('src/pages/event-details'));
 export const TicketAndReservationManagementPage = lazy(() => import('src/pages/ticket-and-reservation-management'));
-export const StatisticsAndReportsPage = lazy(() => import('src/pages/statistics-and-reports'));
-export const VisibilityAndAccessSettingsPage = lazy(() => import('src/pages/visibility-and-access-settings'));
-export const TransectionAndPaymentPage = lazy(() => import('src/pages/transection-and-payment'));
 
 export const ConfirmedServiceCalendarPage = lazy(() => import('src/pages/confirmed-service-calendar'));
 export const CustomPhotoAndVideoFiltersforEventsPage = lazy(() => import('src/pages/custom-photo-or-video-filters-for-events'));
-export const EventSearchAndDetailsPage = lazy(() => import('src/pages/event-search-and-details'));
 export const HomeAndGlobalPage = lazy(() => import('src/pages/home-and-global-view'));
 export const HomeAndRecommendationsPage = lazy(() => import('src/pages/home-and-recommendations'));
 export const LoyaltyProgramPage = lazy(() => import('src/pages/loyalty-program'));
@@ -41,7 +48,6 @@ export const TicketValidationAtEntryPage = lazy(() => import('src/pages/ticket-v
 export const TransactionAndPaymentManagementPage = lazy(() => import('src/pages/transaction-&-payment-management'));
 export const MessagingAndClientRelationshipPage = lazy(() => import('src/pages/messaging-&-client-relationship'));
 export const StatisticsAndPerformancePage = lazy(() => import('src/pages/statistics-&-performance'));
-export const SearchAndSelectServiceProvidersPage = lazy(() => import('src/pages/search-&-select-service-providers'));
 export const ServiceRequestAndNegotiationPage = lazy(() => import('src/pages/service-request-&-negotiation'));
 export const trackingOfBookedServicesAndProvidersPage = lazy(() => import('src/pages/tracking-of-booked-services-&-providers'));
 export const GlobalOverviewAndGeneralStatisticsPage = lazy(() => import('src/pages/global-overview-&-general-statistics'));
@@ -51,6 +57,7 @@ export const MarketplaceAndServiceProviderSupervisionPage = lazy(() => import('s
 export const PasswordRecoveryPage = lazy(() => import('src/pages/password-recovery'));
 export const ProfileAndServicesManagementPage = lazy(() => import('src/pages/profile-&-services-management'));
 
+// src/types/user.ts
 // ----------------------------------------------------------------------
 
 const renderFallback = (
@@ -74,6 +81,9 @@ export function Router() {
       dispatch(isUserLoggedIn());
     }
   }, [dispatch, auth?.authenticate]); // ✅ Remove `auth` from dependencies
+
+  // Get current user role from auth state
+  const currentRole = auth?.user?.role
 
   return useRoutes([
     {
@@ -106,16 +116,18 @@ export function Router() {
         { path: 'home-and-global-view', element: <HomeAndGlobalPage /> },
         { path: 'reservations-and-contracts', element: <ReservationsAndContractsPage /> },
         { path: 'confirmed-service-calendar', element: <ConfirmedServiceCalendarPage /> },
-
-
-        // New
         { path: 'transaction-&-payment-management', element: <TransactionAndPaymentManagementPage /> },
         { path: 'messaging-&-client-relationship', element: <MessagingAndClientRelationshipPage /> },
         { path: 'statistics-&-performance', element: <StatisticsAndPerformancePage /> },
         { path: 'search-&-select-service-providers', element: <SearchAndSelectServiceProvidersPage /> },
         { path: 'service-request-&-negotiation', element: <ServiceRequestAndNegotiationPage /> },
         { path: 'tracking-of-booked-services-&-providers', element: <TrackingBookedServicesAndProvidersView /> },
-        { path: 'global-overview-&-general-statistics', element: <GlobalOverviewAndGeneralStatisticsPage /> },
+
+        {
+          path: 'global-overview-&-general-statistics',
+          element: <GlobalOverviewAndGeneralStatisticsPage />
+        },
+
         { path: 'user-management', element: <UserManagementPage /> },
         { path: 'ticketing-&-transactions-supervision', element: <TicketingAndTransactionsSupervisionPage /> },
         { path: 'marketplace-&-service-provider-supervision', element: <MarketplaceAndServiceProviderSupervisionPage /> },

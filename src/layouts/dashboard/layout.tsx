@@ -8,6 +8,7 @@ import { _langs, _notifications } from 'src/_mock';
 import { Iconify } from 'src/components/iconify';
 import { RootState } from 'src/redux/store';
 import { usePathname } from 'src/routes/hooks';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
 import { Main } from './main';
 import { layoutClasses } from '../classes';
@@ -39,6 +40,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
 
   const isMobileOrTablet = useMediaQuery(theme.breakpoints.down("md")); // Hide on md & below
   const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program', "/ticket-management"];
+  const hiddenSearchSelect = ['/search-&-select-service-providers'];
   const [navOpen, setNavOpen] = useState(false);
 
   const layoutQuery: Breakpoint = 'lg';
@@ -78,6 +80,9 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   open={navOpen}
                   onClose={() => setNavOpen(false)}
                 />
+                {
+                  hiddenSearchSelect.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon title="Search & Select Service Providers" />
+                }
                 {hiddenPaths.some(path => pathname.includes(path)) &&
                   <Typography fontWeight={600} fontSize={{ xs: "18px", sm: "24px", md: "30px" }} key={_id}>Hey Welcome, <span>{name}</span>!</Typography>
                 }
@@ -125,10 +130,16 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   <>
                     {!hiddenPaths.some(path => pathname.includes(path)) &&
                       <Box display="flex" gap={1} alignItems="center">
+
                         <NotificationsPopover data={_notifications} />
-                        <MessagePopover totalUnRead="1" />
-                        <GiftPopover totalUnRead="5" />
-                        <EmailPopover totalUnRead="2" />
+                        {
+                          !hiddenSearchSelect.some(path => pathname.includes(path)) && <><MessagePopover totalUnRead="1" />
+                            <GiftPopover totalUnRead="5" />
+
+                            <EmailPopover totalUnRead="2" />
+                          </>
+                        }
+
                         {/* <LanguagePopover data={_langs}/> */}
                       </Box>
                     }
@@ -139,6 +150,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 {!isMobileOrTablet && (
                   <>
                     {!hiddenPaths.some(path => pathname.includes(path)) &&
+                      !hiddenSearchSelect.some(path => pathname.includes(path)) &&
                       <>
                         <Button
                           variant="contained"
@@ -152,7 +164,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                             fontWeight: 600
                           }}
                         >
-                          Save Changes
+                          Save Changesss
                         </Button>
                         <Button
                           variant="outlined"

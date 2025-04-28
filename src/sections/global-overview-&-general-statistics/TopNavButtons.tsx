@@ -1,4 +1,6 @@
-import { Button, Grid, useTheme, useMediaQuery } from '@mui/material';
+import React, { useRef } from 'react';
+import { Box, Button, IconButton, useMediaQuery, useTheme } from '@mui/material';
+import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 
 interface TopNavButtonsProps {
   active: string;
@@ -14,25 +16,51 @@ const options = [
 
 export function TopNavButtons({ active, onChange }: TopNavButtonsProps) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // <600px
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const container = scrollRef.current;
+      const scrollAmount = 150;
+
+      container.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
 
   return (
-    <Grid
-      container
-      spacing={1}
-      justifyContent="center"
-      sx={{ mb: 3, mx: 'auto', maxWidth: 900 }}
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        mb: 3,
+        px: isMobile ? 1 : 0,
+      }}
     >
-      {options.map((label) => (
-        <Grid
-          item
-          key={label}
-          xs={12}   // full width on mobile
-          sm={6}    // half width on small screens
-          md={3}    // quarter width on medium and up (i.e., all in one row)
-        >
+      {isMobile && (
+        <IconButton onClick={() => scroll('left')}>
+          <ChevronLeft />
+        </IconButton>
+      )}
+
+      <Box
+        ref={scrollRef}
+        sx={{
+          display: 'flex',
+          overflowX: isMobile ? 'auto' : 'unset',
+          gap: 1,
+          scrollBehavior: 'smooth',
+          px: 1,
+          '&::-webkit-scrollbar': { display: 'none' },
+        }}
+      >
+        {options.map((label) => (
           <Button
-            fullWidth
+            key={label}
             onClick={() => onChange(label)}
             variant="outlined"
             sx={{
@@ -40,10 +68,11 @@ export function TopNavButtons({ active, onChange }: TopNavButtonsProps) {
               textTransform: 'none',
               fontWeight: 500,
               px: 3,
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
               backgroundColor: active === label ? '#0B2E4C' : 'white',
               color: active === label ? 'white' : '#0B2E4C',
               borderColor: '#0B2E4C',
-              whiteSpace: 'nowrap',
               '&:hover': {
                 borderColor: '#0B2E4C',
                 backgroundColor:
@@ -54,8 +83,14 @@ export function TopNavButtons({ active, onChange }: TopNavButtonsProps) {
           >
             {label}
           </Button>
-        </Grid>
-      ))}
-    </Grid>
+        ))}
+      </Box>
+
+      {isMobile && (
+        <IconButton onClick={() => scroll('right')}>
+          <ChevronRight />
+        </IconButton>
+      )}
+    </Box>
   );
 }

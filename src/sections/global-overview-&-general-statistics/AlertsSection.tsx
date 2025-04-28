@@ -28,11 +28,11 @@ export function AlertsSection() {
     <Box
       sx={{
         p: { xs: 2, sm: 3 },
-        borderRadius: 3,
+        borderRadius: 2.5,
         border: '1px solid #E0E0E0',
         boxShadow: '0 0 10px rgba(0, 0, 0, 0.4)',
         backgroundColor: '#fff',
-        mt: 3,
+        
         mb:3
       }}
     >
@@ -66,7 +66,8 @@ export function AlertsSection() {
               sx={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr 1fr 1fr',
-                backgroundColor: '#1976d2',
+                backgroundColor: '#1F8FCD',
+               
                 color: 'white',
                 py: 1.5,
                 px: 2,

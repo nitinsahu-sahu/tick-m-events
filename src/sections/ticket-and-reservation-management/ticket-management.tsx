@@ -22,7 +22,7 @@ export function TicketManagement() {
                 <Button
                     variant="contained"
                     sx={{
-                        backgroundColor: theme.palette.blue.dark,
+                        backgroundColor: "#0B2E4E",
                         color: "#fff",
                         width: "90%",
                     }}

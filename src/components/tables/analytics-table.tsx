@@ -51,7 +51,7 @@ export function AnalyticsTable({ headers, data, type }: any) {
                                    <Button
                                        variant="contained"
                                        sx={{
-                                           backgroundColor: theme.palette.blue.dark,
+                                           backgroundColor: "#0B2E4E",
                                            color: theme.palette.common.white,
                                            "&:hover": { backgroundColor: "#0b243d" },
                                            fontSize: { xs: "0.7rem", sm: "1rem" },

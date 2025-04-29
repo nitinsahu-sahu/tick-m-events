@@ -104,7 +104,7 @@ export function OverviewAnalyticsView() {
           <Chart options={chartrevenuOptions} series={chartrevenuSeries} type="line" height={200} />
           <Button variant="contained" sx={{
             mt: 1,
-            backgroundColor: theme.palette.blue.dark, // No need for template literals
+            backgroundColor: '#0B2E4E', // No need for template literals
 
           }}>Boost Sales</Button>
         </CardContent>
@@ -183,7 +183,7 @@ export function OverviewAnalyticsView() {
                       </Grid>
                     ))}
                   </Grid>
-                  <Button fullWidth variant="contained" sx={{ mt: 2, backgroundColor: theme.palette.blue.dark }}>
+                  <Button fullWidth variant="contained" sx={{ mt: 2, backgroundColor: '#0B2E4E' }}>
                     Load More
                   </Button>
                 </CardContent>
@@ -252,7 +252,7 @@ export function OverviewAnalyticsView() {
                     ))}
                   </Grid>
 
-                  <Button fullWidth variant="contained" sx={{ mt: 2, backgroundColor: theme.palette.blue.dark }}>
+                  <Button fullWidth variant="contained" sx={{ mt: 2, backgroundColor: '#0B2E4E' }}>
                     Load More
                   </Button>
                 </CardContent>

@@ -99,7 +99,7 @@ export function BestSelling(
                     {/* Progress Bar */}
                     <Stack direction={{ xs: "column", sm: "row" }} alignItems="center" mt={1} spacing={1}>
                         <Typography sx={{ backgroundColor: theme.palette.common.white, color: theme.palette.primary.main, px: 1, borderRadius: 1 }} fontSize="12px">986 pcs left</Typography>
-                        <Box sx={{ width: "100%", height: 8, backgroundColor: theme.palette.blue.light, borderRadius: 4, overflow: "hidden" }}>
+                        <Box sx={{ width: "100%", height: 8, backgroundColor: "#64B5F6", borderRadius: 4, overflow: "hidden" }}>
                             <Box sx={{ width: "80%", height: "100%", backgroundColor: theme.palette.common.white }} />
                         </Box>
                     </Stack>

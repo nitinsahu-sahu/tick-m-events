@@ -97,43 +97,148 @@ export function Router() {
         </Protected>
       ),
       children: [
-        { element: <HomePage />, index: true },
-        { path: 'blog', element: <BlogPage /> },
-        { path: 'event-details', element: <EventDetailsPage /> },
-        { path: 'ticket-and-reservation-management', element: <TicketAndReservationManagementPage /> },
-        { path: 'entry-validation', element: <EntryValidationPage /> },
-        { path: 'marketing-engagenment', element: <MarketingEngagenmentPage /> },
-        { path: 'transection-and-payment', element: <TransectionAndPaymentPage /> },
-        { path: 'statistics-and-reports', element: <StatisticsAndReportsPage /> },
-        { path: 'visibility-and-access-settings', element: <VisibilityAndAccessSettingsPage /> },
-        { path: 'home-and-recommendations', element: <HomeAndRecommendationsPage /> },
-        { path: 'event-search-and-details', element: <EventSearchAndDetailsPage /> },
-        { path: 'ticket-purchase-process', element: <TicketPurchaseProcessPage /> },
-        { path: 'ticket-management', element: <TicketManagementViewPage /> },
-        { path: 'ticket-validation-at-entry', element: <TicketValidationAtEntryPage /> },
-        { path: 'loyalty-program', element: <LoyaltyProgramPage /> },
-        { path: 'custom-photo-or-video-filters-for-events', element: <CustomPhotoAndVideoFiltersforEventsPage /> },
-        { path: 'home-and-global-view', element: <HomeAndGlobalPage /> },
-        { path: 'reservations-and-contracts', element: <ReservationsAndContractsPage /> },
-        { path: 'confirmed-service-calendar', element: <ConfirmedServiceCalendarPage /> },
-        { path: 'transaction-&-payment-management', element: <TransactionAndPaymentManagementPage /> },
-        { path: 'messaging-&-client-relationship', element: <MessagingAndClientRelationshipPage /> },
-        { path: 'statistics-&-performance', element: <StatisticsAndPerformancePage /> },
-        { path: 'search-&-select-service-providers', element: <SearchAndSelectServiceProvidersPage /> },
-        { path: 'service-request-&-negotiation', element: <ServiceRequestAndNegotiationPage /> },
-        { path: 'tracking-of-booked-services-&-providers', element: <TrackingBookedServicesAndProvidersView /> },
-
+        // Participant Route
         {
-          path: 'global-overview-&-general-statistics',
-          element: <GlobalOverviewAndGeneralStatisticsPage />
+          path: 'home-and-recommendations',
+          element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><HomeAndRecommendationsPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'event-search-and-details',
+          element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><EventSearchAndDetailsPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'ticket-purchase-process',
+          element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><TicketPurchaseProcessPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'ticket-management',
+          element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><TicketManagementViewPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'ticket-validation-at-entry',
+          element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><TicketValidationAtEntryPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'loyalty-program',
+          element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><LoyaltyProgramPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'custom-photo-or-video-filters-for-events',
+          element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><CustomPhotoAndVideoFiltersforEventsPage /></RoleProtectedRoute>
+        },
+        // -----------------------**************-------------------------
+
+        // Organizer Route
+        {
+          path: 'event-details',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><EventDetailsPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'entry-validation',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><EntryValidationPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'ticket-and-reservation-management',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><TicketAndReservationManagementPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'marketing-engagenment',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><MarketingEngagenmentPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'transection-and-payment',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><TransectionAndPaymentPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'statistics-and-reports',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><StatisticsAndReportsPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'visibility-and-access-settings',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><VisibilityAndAccessSettingsPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'marketplace-&-service-provider-supervision',
+          element: <RoleProtectedRoute allowedRoles={['organizer', 'admin']} currentRole={currentRole}><MarketplaceAndServiceProviderSupervisionPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'tracking-of-booked-services-&-providers',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><TrackingBookedServicesAndProvidersView /></RoleProtectedRoute>
+        },
+        {
+          path: 'search-&-select-service-providers',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><SearchAndSelectServiceProvidersPage /></RoleProtectedRoute>
         },
 
-        { path: 'user-management', element: <UserManagementPage /> },
-        { path: 'ticketing-&-transactions-supervision', element: <TicketingAndTransactionsSupervisionPage /> },
-        { path: 'marketplace-&-service-provider-supervision', element: <MarketplaceAndServiceProviderSupervisionPage /> },
-        { path: 'password-recovery', element: <PasswordRecoveryPage /> },
-        { path: 'profile-&-services-management', element: <ProfileAndServicesManagementPage /> },
 
+        // -----------------------**************-------------------------
+
+        // Service Provider Route
+        {
+          path: 'home-and-global-view',
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><HomeAndGlobalPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'profile-&-services-management',
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'confirmed-service-calendar',
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><ConfirmedServiceCalendarPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'reservations-and-contracts',
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><ReservationsAndContractsPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'transaction-&-payment-management',
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><TransactionAndPaymentManagementPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'messaging-&-client-relationship',
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><MessagingAndClientRelationshipPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'statistics-&-performance',
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><StatisticsAndPerformancePage /> </RoleProtectedRoute>
+        },
+        {
+          path: 'service-request-&-negotiation',
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><ServiceRequestAndNegotiationPage /></RoleProtectedRoute>
+        },
+        // -----------------------**************-------------------------
+
+        // Admin Route
+        // {
+        //   path: "/",  // Add this missing path property
+        //   index: true,
+        //   element: (
+        //     <RoleProtectedRoute 
+        //       allowedRoles={['admin']} 
+        //       currentRole={currentRole}
+        //     >
+        //       <HomePage />
+        //     </RoleProtectedRoute>
+        //   )
+        // },
+        {
+          path: 'global-overview-&-general-statistics',
+          element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><GlobalOverviewAndGeneralStatisticsPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'user-management',
+          element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><UserManagementPage /></RoleProtectedRoute>
+        },
+        {
+          path: 'ticketing-&-transactions-supervision',
+          element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><TicketingAndTransactionsSupervisionPage /></RoleProtectedRoute>
+        },
+
+        // -----------------------**************-------------------------
+
+        { element: <HomePage />, index: true, },
+
+        { path: 'password-recovery', element: <PasswordRecoveryPage /> },
       ],
     },
     {

@@ -95,7 +95,7 @@ export function TicketCreationAndConfiguration() {
         <Box boxShadow={3} borderRadius={3} mt={3}>
             <Paper sx={{ width: "100%", p: 3, maxWidth: { xs: "800px", sm: "800px", md: "100%" } }}>
                 {/* Section Title */}
-                <Typography variant="h5" color={theme.palette.blue.contrastText} fontWeight="bold">
+                <Typography variant="h5" color="#0B2E4C" fontWeight="bold">
                     Ticket Creation & Configuration
                 </Typography>
 
@@ -129,7 +129,7 @@ export function TicketCreationAndConfiguration() {
                 </Box>
 
                 {/* Form Section */}
-                <Typography variant="h6" color={theme.palette.blue.contrastText} fontWeight="bold" sx={{ mt: 3 }}>
+                <Typography variant="h6" color="#0B2E4C" fontWeight="bold" sx={{ mt: 3 }}>
                     Create a Ticket Type
                 </Typography>
 
@@ -243,14 +243,14 @@ export function TicketCreationAndConfiguration() {
                 >
                     <Button
                         variant="contained"
-                        sx={{ backgroundColor: theme.palette.blue.contrastText }}
+                        sx={{ backgroundColor: "#0B2E4C" }}
                         onClick={handleSubmit}
                     >
                         Save & Publish Tickets
                     </Button>
                     <Button
                         variant="outlined"
-                        sx={{ color: theme.palette.blue.contrastText, backgroundColor: "#E2E2E2" }}
+                        sx={{ color: "#0B2E4C", backgroundColor: "#E2E2E2" }}
                     >
                         Add Ticket
                     </Button>

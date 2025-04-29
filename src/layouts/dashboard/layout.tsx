@@ -1,6 +1,6 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
 import { useState } from 'react';
-import { InputBase, Button, Box, Alert, Popover, useMediaQuery, IconButton, Typography } from '@mui/material';
+import { InputBase, Button, Box, Alert, useMediaQuery, IconButton, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 
@@ -9,6 +9,7 @@ import { Iconify } from 'src/components/iconify';
 import { RootState } from 'src/redux/store';
 import { usePathname } from 'src/routes/hooks';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { getFilteredNavItems } from 'src/routes/hooks/getFilterNavItesm';
 
 import { Main } from './main';
 import { layoutClasses } from '../classes';
@@ -35,12 +36,35 @@ export type DashboardLayoutProps = {
 
 export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) {
   const theme = useTheme();
-  const { _id, name } = useSelector((state: RootState) => state?.auth?.user);
+  const { _id, name, role } = useSelector((state: RootState) => state?.auth?.user);
+  const filteredNavItems = getFilteredNavItems(navData, role);
   const pathname = usePathname()
 
   const isMobileOrTablet = useMediaQuery(theme.breakpoints.down("md")); // Hide on md & below
-  const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program', "/ticket-management"];
+  const hiddenPaths = ['/ticket-validation-at-entry'];
+  const hiddenTicketManagement = ["/ticket-management"];
   const hiddenSearchSelect = ['/search-&-select-service-providers'];
+  const hiddenProfileService = ['/profile-&-services-management'];
+  const hiddenMarketting = ['/marketplace-&-service-provider-supervision'];
+  const hiddenTicketingAndTransection = ['/ticketing-&-transactions-supervision'];
+  const hiddenUsrMange = ['/user-management'];
+  const hiddenGlobalOverview = ['/global-overview-&-general-statistics'];
+  const hiddenTraackingBooked = ['/tracking-of-booked-services-&-providers'];
+  const hiddenServiceReq = ['/service-request-&-negotiation'];
+  const hiddenStatisticsPerform = ['/statistics-&-performance'];
+  const hiddenMessageClientRel = ['/messaging-&-client-relationship'];
+  const hiddenTransectionPayment = ['/transaction-&-payment-management'];
+  const hiddenServiceCal = ['/confirmed-service-calendar'];
+  const hiddenReserContracts = ['/reservations-and-contracts'];
+  const hiddenHomeGlobal = ['/home-and-global-view'];
+  const hiddenLoyaltyProgram = ['/loyalty-program'];
+  const hiddenTicketPurchasePro = ['/ticket-purchase-process'];
+  const hiddenEventSearchDetails = ['/event-search-and-details'];
+  const hiddenCustomPhotoVideo = ['/custom-photo-or-video-filters-for-events'];
+  const hiddenHomeRecommadation = ['/home-and-recommendations'];
+  const hiddenTranPaymet = ['/transection-and-payment'];
+  const hiddenDashboard = ['/'];
+
   const [navOpen, setNavOpen] = useState(false);
 
   const layoutQuery: Breakpoint = 'lg';
@@ -56,7 +80,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
           slotProps={{
             container: {
               maxWidth: false,
-              sx: { px: { [layoutQuery]: 5 } },
+              sx: { px: { [layoutQuery]: 3 } },
             },
           }}
           sx={header?.sx}
@@ -76,22 +100,103 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   }}
                 />
                 <NavMobile
-                  data={navData}
+                  data={filteredNavItems}
                   open={navOpen}
                   onClose={() => setNavOpen(false)}
                 />
                 {
-                  hiddenSearchSelect.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon title="Search & Select Service Providers" />
+                  hiddenSearchSelect.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Search & Select Service Providers" />
                 }
-                {hiddenPaths.some(path => pathname.includes(path)) &&
-                  <Typography fontWeight={600} fontSize={{ xs: "18px", sm: "24px", md: "30px" }} key={_id}>Hey Welcome, <span>{name}</span>!</Typography>
+                {
+                  (hiddenReserContracts.some(path => pathname.includes(path)) ||
+                    hiddenServiceCal.some(path => pathname.includes(path))) &&
+                  !isMobileOrTablet && (
+                    <HeadingCommon weight={600} baseSize="30px" title="Reservations & Contracts" />
+                  )
+                }
+                {
+                  hiddenHomeGlobal.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Home & Global View" />
+                }
+                {
+                  hiddenTransectionPayment.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Transaction & Payment Management" />
+                }
+                {
+                  hiddenLoyaltyProgram.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="My Loyalty Points" />
+                }
+                {
+                  hiddenMessageClientRel.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Messaging & Client Relationship" />
+                }
+                {
+                  hiddenStatisticsPerform.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title={name} />
+                }
+                {
+                  hiddenServiceReq.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Service Request & Negotiation" />
+                }
+
+                {
+                  hiddenCustomPhotoVideo.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Custom Photo or Video Filter" />
+                }
+                {
+                  hiddenGlobalOverview.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Global Overview & General Statistics" />
+                }
+                {
+                  hiddenTraackingBooked.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Tracking of Booked Services & Providers" />
+                }
+                {
+                  hiddenUsrMange.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Admin Panel" />
+                }
+                {
+                  hiddenProfileService.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Profile & Services Management" />
+                }
+                {
+                  hiddenMarketting.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="TICK-M EVENTS" />
+                }
+                {
+                  hiddenTicketingAndTransection.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Ticketing & Transactions Supervision" />
+                }
+                {
+                  (
+                    hiddenHomeRecommadation.some(path => pathname.includes(path)) ||
+                    hiddenEventSearchDetails.some(path => pathname.includes(path)) ||
+                    hiddenPaths.some(path => pathname.includes(path))) &&
+                  !hiddenProfileService.some(path => pathname.includes(path)) && (
+                    <Typography fontWeight={600} fontSize={{ xs: "18px", sm: "24px", md: "30px" }} key={_id}>
+                      Hey Welcome, <span>{name}</span>!
+                    </Typography>
+                  )
+                }
+                {
+                  hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
+                  <Typography fontWeight={600} fontSize={{ xs: "18px", sm: "24px", md: "30px" }} key={_id}>
+                    Event Name
+                  </Typography>
                 }
               </>
             ),
             rightArea: (
               <Box display="flex" alignItems="center" gap={2} >
+
                 {/* Search Bar */}
-                {!hiddenPaths.some(path => pathname.includes(path)) &&
+                {
+                  !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
+                  !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
+                  !hiddenTicketManagement.some(path => pathname.includes(path)) &&
+                  !hiddenTransectionPayment.some(path => pathname.includes(path)) && !hiddenMarketting.some(path => pathname.includes(path)) &&
+                  !hiddenServiceCal.some(path => pathname.includes(path)) &&
+                  !hiddenReserContracts.some(path => pathname.includes(path)) &&
+                  !hiddenHomeGlobal.some(path => pathname.includes(path)) &&
+                  !hiddenMarketting.some(path => pathname.includes(path)) &&
+                  !hiddenCustomPhotoVideo.some(path => pathname.includes(path)) &&
+
+                  !hiddenPaths.some(path => pathname.includes(path)) &&
+                  !hiddenLoyaltyProgram.some(path => pathname.includes(path)) &&
+                  !hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
+                  !hiddenServiceReq.some(path => pathname.includes(path)) &&
+                  !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
+                  !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
+                  !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
+                  !hiddenProfileService.some(path => pathname.includes(path)) &&
+                  !hiddenMessageClientRel.some(path => pathname.includes(path)) &&
                   <Box
                     sx={{
                       display: "flex",
@@ -128,15 +233,45 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 {/* Notifications & Popovers (Hidden on Mobile & Tablet) */}
                 {!isMobileOrTablet && (
                   <>
-                    {!hiddenPaths.some(path => pathname.includes(path)) &&
+                    {
+                      !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
+                      !hiddenServiceReq.some(path => pathname.includes(path)) &&
+                      !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
+                      !hiddenPaths.some(path => pathname.includes(path)) &&
+                      !hiddenLoyaltyProgram.some(path => pathname.includes(path)) &&
+                      !hiddenCustomPhotoVideo.some(path => pathname.includes(path)) &&
                       <Box display="flex" gap={1} alignItems="center">
 
                         <NotificationsPopover data={_notifications} />
                         {
-                          !hiddenSearchSelect.some(path => pathname.includes(path)) && <><MessagePopover totalUnRead="1" />
-                            <GiftPopover totalUnRead="5" />
+                          !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
+                          !hiddenTicketManagement.some(path => pathname.includes(path)) &&
+                          !hiddenHomeGlobal.some(path => pathname.includes(path)) &&
+                          !hiddenServiceCal.some(path => pathname.includes(path)) &&
+                          !hiddenTransectionPayment.some(path => pathname.includes(path)) &&
+                          !hiddenMarketting.some(path => pathname.includes(path)) &&
+                          !hiddenSearchSelect.some(path => pathname.includes(path)) &&
+                          !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
+                          !hiddenProfileService.some(path => pathname.includes(path)) &&
+                          !hiddenUsrMange.some(path => pathname.includes(path)) &&
+                          !hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
+                          !hiddenMessageClientRel.some(path => pathname.includes(path)) &&
+                          <>
+                            {
+                              !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
+                              !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
+                              <>
+                                <MessagePopover totalUnRead="1" />
+                                {
+                                  !hiddenReserContracts.some(path => pathname.includes(path)) && <GiftPopover totalUnRead="5" />
+                                }
 
-                            <EmailPopover totalUnRead="2" />
+                              </>
+                            }
+                            {
+                              !hiddenReserContracts.some(path => pathname.includes(path)) && <EmailPopover totalUnRead="2" />
+                            }
+
                           </>
                         }
 
@@ -145,12 +280,63 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                     }
                   </>
                 )}
+                {
+                  !isMobileOrTablet &&
+                  (
+                    hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
+                    <>
+                      <Iconify icon="typcn:filter" width={24} />
+                      <Iconify icon="mdi:heart" width={24} color="#e11e1e" />
+                    </>
+                  )
+                }
+                {
+                  hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
+                  <Typography fontWeight={600} fontSize={{ xs: 14, sm: 16, md: 18 }} color="#3CB1F1">
+                    Performance: <span style={{ color: "black" }}>Excellent</span>
+                  </Typography>
+                }
+                {
+                  hiddenLoyaltyProgram.some(path => pathname.includes(path)) &&
+                  <HeadingCommon title="500" weight={700} color="#0B2E4C" />
 
+                }
+                {
+                  (hiddenTransectionPayment.some(path => pathname.includes(path)) ||
+                    hiddenMessageClientRel.some(path => pathname.includes(path))) && (
+                    <Typography fontWeight={600} fontSize={{ xs: 14, sm: 16, md: 18 }} color="#3CB1F1">
+                      Balance: <span style={{ color: "#757575" }}>$2,500</span>
+                    </Typography>
+                  )
+                }
                 {/* Buttons (Hidden on Mobile & Tablet) */}
                 {!isMobileOrTablet && (
                   <>
-                    {!hiddenPaths.some(path => pathname.includes(path)) &&
+                    {
+                      !hiddenDashboard.some(path => pathname.includes(path)) &&
+                      !hiddenTranPaymet.some(path => pathname.includes(path)) &&
+                      !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
+                      !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
+                      !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
+                      !hiddenTicketManagement.some(path => pathname.includes(path)) &&
+                      !hiddenLoyaltyProgram.some(path => pathname.includes(path)) &&
+                      !hiddenCustomPhotoVideo.some(path => pathname.includes(path)) &&
+                      !hiddenHomeGlobal.some(path => pathname.includes(path)) &&
+                      !hiddenServiceCal.some(path => pathname.includes(path)) &&
+                      !hiddenReserContracts.some(path => pathname.includes(path)) &&
+                      !hiddenPaths.some(path => pathname.includes(path)) &&
+                      !hiddenTransectionPayment.some(path => pathname.includes(path)) &&
+                      !hiddenMessageClientRel.some(path => pathname.includes(path)) &&
+                      !hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
                       !hiddenSearchSelect.some(path => pathname.includes(path)) &&
+                      !hiddenProfileService.some(path => pathname.includes(path)) &&
+                      !hiddenMarketting.some(path => pathname.includes(path)) &&
+                      !hiddenUsrMange.some(path => pathname.includes(path)) &&
+                      !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
+                      !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
+                      !hiddenServiceReq.some(path => pathname.includes(path)) &&
+
+                      !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
                       <>
                         <Button
                           variant="contained"
@@ -164,7 +350,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                             fontWeight: 600
                           }}
                         >
-                          Save Changesss
+                          Save Changes
                         </Button>
                         <Button
                           variant="outlined"
@@ -172,13 +358,104 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                             borderRadius: "8px",
                             px: 1,
                             borderColor: "#C8C8C8",
-                            color: "#0C2340",
+                            color: "#2295D4",
                             fontSize: 16,
                             fontFamily: "Poppins, sans-serif",
                             fontWeight: 600
                           }}
                         >
                           Publish Event
+                        </Button>
+                      </>
+                    }
+                    {
+                      !isMobileOrTablet && (
+                        hiddenDashboard.some(path => pathname.includes(path)) &&
+                        !hiddenTranPaymet.some(path => pathname.includes(path)) &&
+                        !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
+                        !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
+                        !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
+                        !hiddenTicketManagement.some(path => pathname.includes(path)) &&
+                        !hiddenLoyaltyProgram.some(path => pathname.includes(path)) &&
+                        !hiddenCustomPhotoVideo.some(path => pathname.includes(path)) &&
+                        !hiddenHomeGlobal.some(path => pathname.includes(path)) &&
+                        !hiddenServiceCal.some(path => pathname.includes(path)) &&
+                        !hiddenReserContracts.some(path => pathname.includes(path)) &&
+                        !hiddenPaths.some(path => pathname.includes(path)) &&
+                        !hiddenTransectionPayment.some(path => pathname.includes(path)) &&
+                        !hiddenMessageClientRel.some(path => pathname.includes(path)) &&
+                        !hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
+                        !hiddenSearchSelect.some(path => pathname.includes(path)) &&
+                        !hiddenProfileService.some(path => pathname.includes(path)) &&
+                        !hiddenMarketting.some(path => pathname.includes(path)) &&
+                        !hiddenUsrMange.some(path => pathname.includes(path)) &&
+                        !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
+                        !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
+                        !hiddenServiceReq.some(path => pathname.includes(path)) &&
+
+                        !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
+                        <>
+                          <Button
+                            variant="contained"
+                            sx={{
+                              backgroundColor: "#0C2340",
+                              color: "white",
+                              borderRadius: "8px",
+                              px: 1,
+                              fontSize: 16,
+                              fontFamily: "Poppins, sans-serif",
+                              fontWeight: 600
+                            }}
+                          >
+                            Create an Event
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            sx={{
+                              borderRadius: "8px",
+                              px: 1,
+                              borderColor: "#C8C8C8",
+                              color: "#2295D4",
+                              fontSize: 16,
+                              fontFamily: "Poppins, sans-serif",
+                              fontWeight: 600
+                            }}
+                          >
+                            Setting
+                          </Button>
+                        </>
+                      )
+                    }
+                    {
+                      hiddenTranPaymet.some(path => pathname.includes(path)) &&
+                      <>
+                        <Button
+                          variant="contained"
+                          sx={{
+                            backgroundColor: "#0C2340",
+                            color: "white",
+                            borderRadius: "8px",
+                            px: 1,
+                            fontSize: 16,
+                            fontFamily: "Poppins, sans-serif",
+                            fontWeight: 600
+                          }}
+                        >
+                          Export
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          sx={{
+                            borderRadius: "8px",
+                            px: 1,
+                            borderColor: "#C8C8C8",
+                            color: "#2295D4",
+                            fontSize: 16,
+                            fontFamily: "Poppins, sans-serif",
+                            fontWeight: 600
+                          }}
+                        >
+                          Request Help
                         </Button>
                       </>
                     }
@@ -198,6 +475,38 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                         My Tickets
                       </Button>
                     )}
+                    {hiddenServiceReq.some(path => pathname.includes(path)) && (
+                      <Button
+                        variant="contained"
+                        size='small'
+                        sx={{
+                          backgroundColor: "#0C2340",
+                          color: "white",
+                          borderRadius: 1,
+                          p: 1,
+                          fontSize: 16,
+                          fontWeight: 500
+                        }}
+                      >
+                        Submission
+                      </Button>
+                    )}
+                    {hiddenCustomPhotoVideo.some(path => pathname.includes(path)) && (
+                      <Button
+                        variant="contained"
+                        size='small'
+                        sx={{
+                          backgroundColor: "#0C2340",
+                          color: "white",
+                          borderRadius: 1,
+                          p: 1,
+                          fontSize: 16,
+                          fontWeight: 500
+                        }}
+                      >
+                        Gallery
+                      </Button>
+                    )}
 
                   </>
                 )}
@@ -213,8 +522,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
        * Sidebar
        *************************************** */
       sidebarSection={
-        <NavDesktop data={navData} layoutQuery={layoutQuery}
-        />
+        <NavDesktop data={filteredNavItems} layoutQuery={layoutQuery} />
       }
       /** **************************************
        * Footer

@@ -15,6 +15,7 @@ export const RoleProtectedRoute = ({
   allowedRoles,
   currentRole
 }: ProtectedRouteProps) => {
+
   if (!currentRole || !allowedRoles.includes(currentRole)) {
     return <Navigate to="/404" replace />;
   }

@@ -15,13 +15,15 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { NavUpgrade } from '../components/nav-upgrade';
 
 // ----------------------------------------------------------------------
+export type UserRole = 'organizer' | 'admin' | 'provider' | 'participant';
 
 interface NavItem {
-  path: string;
   title: string;
-  icon: React.ReactNode;
+  path: string;
+  icon?: React.ReactNode;
   info?: React.ReactNode;
-  children?: NavItem[]; // ✅ Allow nested children
+  roles?: UserRole[]; // Add roles property
+  children?: NavItem[];
 }
 export type NavContentProps = {
   data: NavItem[]; // ✅ Use the updated NavItem type

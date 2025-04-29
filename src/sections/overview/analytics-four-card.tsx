@@ -30,7 +30,7 @@ export function AnalyticsFourCards({ up, chartOptions, percentage, donutChartOpt
                     title="Revenue Generated"
                     value="$536k"
                     iconSrc={up ? "./assets/icons/dashboard/ic_arrow_down.svg" : "./assets/icons/dashboard/ic_arrow_up.svg"}
-                    chartOptions={{ ...chartOptions, colors: [theme.palette.blue.dark] }}
+                    chartOptions={{ ...chartOptions, colors: ['#0B2E4E'] }}
                     chartSeries={[{ name: "Tickets", data: [10, 20, 15, 25, 20] }]}
                     chartType="line"
                     chartHeight={110}

@@ -119,7 +119,7 @@ export function TicketReservationManagementTable({
                                     type === "1" || type === "3" ? <Button
                                         variant="contained"
                                         sx={{
-                                            backgroundColor: type === "3" ? "#FF0000" : theme.palette.blue.dark,
+                                            backgroundColor: type === "3" ? "#FF0000" : '#0B2E4E',
                                             color: theme.palette.common.white,
                                             "&:hover": {
                                                 backgroundColor: type === "3" ? "darkred" : "#0b243d"

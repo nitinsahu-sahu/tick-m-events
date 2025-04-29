@@ -1,20 +1,45 @@
-import { Box, Button, Typography } from "@mui/material";
-import { Iconify } from "src/components/iconify";
+import { PageTitleSection } from "src/components/page-title-section";
 import { DashboardContent } from "src/layouts/dashboard";
+import { MetricCard } from "../metric-card";
+import { PaymentHistory } from "../payment-history";
+import { PaymentSettingAndPrefrenceHistory } from "../payment-settings-&-prefrences";
+import { InvoiceHistory } from "../invoices-&-reports";
+import { RefundManagementHistory } from "../refund-management";
+import { WithdrawalTableHistory } from "../withdrawal-table-history";
+import { WithdrawalRequest } from "../withdrawal-request";
+import { HelpCenterAndSecurity } from "../help-center-and-security";
 
 export function TransectionAndPaymentView() {
+  return (
     <DashboardContent>
-      <Box display="flex" alignItems="center" mb={5}>
-        <Typography variant="h4" flexGrow={1}>
-        Transection And Payment
-        </Typography>
-        <Button
-          variant="contained"
-          color="inherit"
-          startIcon={<Iconify icon="mingcute:add-line" />}
-        >
-          New post
-        </Button>
-      </Box>
-      </DashboardContent>
+      <PageTitleSection
+        title="Transaction And Payment"
+        rightCom="Available Funds: 1,500,000 XAF"
+      />
+
+      {/* Metric Cards */}
+      <MetricCard />
+
+      {/* Payment History */}
+      <PaymentHistory />
+
+      {/* Payment History */}
+      <WithdrawalRequest />
+
+      {/* Withdrawal Table History */}
+      <WithdrawalTableHistory />
+
+      {/* Refund Management History */}
+      <RefundManagementHistory />
+
+      {/* Invoice History */}
+      <InvoiceHistory />
+
+      {/* Payment Setting and Prefrence History */}
+      <PaymentSettingAndPrefrenceHistory />
+
+      {/* Help Center and security */}
+      <HelpCenterAndSecurity />
+    </DashboardContent>
+  );
 }

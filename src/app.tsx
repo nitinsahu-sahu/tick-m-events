@@ -1,6 +1,7 @@
-import 'src/global.css';
+import { ToastContainer } from 'react-toastify';
 
-import Fab from '@mui/material/Fab';
+
+import 'src/global.css';
 
 import { Router } from 'src/routes/sections';
 
@@ -8,7 +9,6 @@ import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
 
 import { ThemeProvider } from 'src/theme/theme-provider';
 
-import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -18,6 +18,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <Router />
+      <ToastContainer />
     </ThemeProvider>
   );
 }

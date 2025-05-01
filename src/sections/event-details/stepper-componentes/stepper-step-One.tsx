@@ -7,20 +7,21 @@ import {
     Grid, FormControl, InputLabel
 } from "@mui/material";
 import PublicIcon from '@mui/icons-material/Public';
-import { useDispatch, useSelector } from 'react-redux';
-import UploadIcon from '@mui/icons-material/CloudUpload';
+import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TikTokIcon from '@mui/icons-material/MusicNote';
 import { LoadingButton } from '@mui/lab';
+import { useNavigate } from 'react-router-dom';
+
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { eventCreate } from 'src/redux/actions/event.action';
 import { AppDispatch } from 'src/redux/store';
 
 export function StepperStepOne() {
+    const navigate = useNavigate();
     const quillRef = useRef<ReactQuill>(null);
     const dispatch = useDispatch<AppDispatch>();
     const [eventBanner, setEventBanner] = useState(null); // Correct initialization
@@ -82,12 +83,15 @@ export function StepperStepOne() {
         }
         try {
             const res = await dispatch(eventCreate(formEventData));
-            console.log(res, 'res');
+            const eventId = res?.eventId; // Adjust based on your response structure
+
+            // Add event ID to current URL as search param
+            navigate(`?eventId=${eventId}`, { replace: true });
 
         } catch (error) {
             toast.error("Event creation failed");
         }
-    }, [eventFormData, eventBanner, dispatch]);
+    }, [eventFormData, eventBanner, dispatch, navigate]);
 
     return (
         <
@@ -107,6 +111,11 @@ export function StepperStepOne() {
                             {/* Event Name - Full width on mobile */}
                             <Grid item xs={12} sm={6}>
                                 <TextField
+                                    inputProps={{
+                                        style: {
+                                            textTransform: "capitalize"
+                                        }
+                                    }}
                                     required
                                     name="eventName"
                                     type='text'
@@ -203,7 +212,7 @@ export function StepperStepOne() {
                                     <Select
                                         value={eventFormData.eventFormat}
                                         onChange={handleEventChange}
-                                        name="eventCategory"
+                                        name="eventFormat"
                                         label="eventFormat"
                                     >
                                         <MenuItem value="In-person">In-person (with a physical location)</MenuItem>
@@ -240,6 +249,11 @@ export function StepperStepOne() {
                                 <HeadingCommon width={400} baseSize="16px" title="Enter location" />
                                 <TextField
                                     required
+                                    inputProps={{
+                                        style: {
+                                            textTransform: "capitalize"
+                                        }
+                                    }}
                                     name="location"
                                     type='text'
                                     value={eventFormData.location}
@@ -281,6 +295,11 @@ export function StepperStepOne() {
                     <Grid item xs={12} sm={6} md={4}>
                         <TextField
                             required
+                            inputProps={{
+                                style: {
+                                    textTransform: "capitalize"
+                                }
+                            }}
                             name="name"
                             type='text'
                             value={eventFormData.name}

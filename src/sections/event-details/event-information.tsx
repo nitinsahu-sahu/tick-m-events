@@ -8,11 +8,11 @@ import { StepperStepFour } from "./stepper-componentes/stepper-step-four";
 import { StepperStepOne } from "./stepper-componentes/stepper-step-One";
 import { StepperStepTwo } from "./stepper-componentes/stepper-step-two";
 import { StepperStepThree } from "./stepper-componentes/stepper-step-three";
-import { StepperSucessful } from "./stepper-componentes/event-created-succesfull";
+import { StepperSuccessful } from "./stepper-componentes/event-created-succesfull";
 
 
 export function EventInformation() {
-  const stepComponents = [<StepperStepOne />, <StepperStepTwo />, <StepperStepThree />, <StepperStepFour />, <StepperSucessful />];
+  const stepComponents = [<StepperStepOne />, <StepperStepTwo />, <StepperStepThree />, <StepperStepFour />, <StepperSuccessful />];
   const steps = ['0', '1', '2', '3'];
   const { stepper } = useSelector((state: RootState) => state?.event);
   const [activeStep, setActiveStep] = useState(0);

@@ -94,8 +94,7 @@ export function StepperStepOne() {
     }, [eventFormData, eventBanner, dispatch, navigate]);
 
     return (
-        <
-            >
+        <>
             <HeadingCommon variant="h5" baseSize="33px" weight={600} title="Event Information" color="#0B2E4C" />
             <HeadingCommon
                 variant="body2"
@@ -144,11 +143,11 @@ export function StepperStepOne() {
                                 <TextField
                                     required
                                     name="time"
-                                    type='text'
+                                    type='time'
                                     value={eventFormData.time}
                                     onChange={handleEventChange}
-                                    fullWidth label="Select Time"
-                                    placeholder="12:00 am - 10:00am" />
+                                    fullWidth label="Start Time"
+                                />
                             </Grid>
                         </Grid>
 

@@ -21,7 +21,7 @@ export function SignInView() {
 
   const getWidth = (key) => (active === key ? "50%" : "10%");
   const auth = useSelector(state => state.auth);
-  const [formData, setFormData] = useState({ email: 'admin.rinku@gmail.com', password: 'admin@123' });
+  const [formData, setFormData] = useState({ email: 'organizer.William1@gmail.com', password: 'Manoj@123' });
   const [formRegisterData, setRegisterData] = useState({
     name: "",
     email: "",

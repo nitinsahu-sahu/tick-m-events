@@ -12,24 +12,24 @@ import { StepperSuccessful } from "./stepper-componentes/event-created-succesful
 
 
 export function EventInformation() {
-  const stepComponents = [<StepperStepOne />, <StepperStepTwo />, <StepperStepThree />, <StepperStepFour />, <StepperSuccessful />];
+  const stepComponents = [<StepperStepOne />, <StepperStepTwo />, <StepperStepThree />, <StepperStepFour />];
   const steps = ['0', '1', '2', '3'];
   const { stepper } = useSelector((state: RootState) => state?.event);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(3);
 
   useEffect(() => {
-    setActiveStep( stepper);
+    setActiveStep(stepper);
   }, [stepper]);
 
-  useEffect(() => {
-    if (activeStep === 4) {
-      const timer = setTimeout(() => {
-        setActiveStep(0);
-      }, 10000);
-      return () => clearTimeout(timer);
-    }
-    return undefined; // Explicit return for other cases
-  }, [activeStep]);
+  // useEffect(() => {
+  //   if (stepper === 3) {
+  //     const timer = setTimeout(() => {
+  //       setActiveStep(0);
+  //     }, 10000);
+  //     return () => clearTimeout(timer);
+  //   }
+  //   return undefined; // Explicit return for other cases
+  // }, [stepper]);
 
   return (
     <Box

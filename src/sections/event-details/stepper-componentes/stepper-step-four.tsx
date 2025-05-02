@@ -62,6 +62,8 @@ export function StepperStepFour() {
             const result = await dispatch(eventPublicationCreate({ formEventPublicatinData, eventId, ticketCustomId, eventCustomizationId }));
             if (result?.status === 201) {
                 toast.success(result?.message);
+            navigate(`/event-details`);
+
             } else {
                 toast.error(result?.message);
             }
@@ -70,7 +72,7 @@ export function StepperStepFour() {
             toast.error("Event creation failed");
         }
         // Here you would typically send the data to your backend
-    }, [publicationData, dispatch]);
+    }, [publicationData, dispatch,navigate]);
 
     return (
         <Card

@@ -28,6 +28,7 @@ interface UpdateEvent {
   date?: string;
   time?: string;
   eventName?: string;
+  isDelete?: boolean;
 }
 const style = {
   position: 'absolute',
@@ -53,7 +54,8 @@ export function SecurityAndConfirmation() {
     _id: '',
     date: '',
     time: '',
-    eventName: ''
+    eventName: '',
+    isDelete: false
   })
 
   const handleOpenReschedule = () => setOpenReschedule(true);
@@ -90,9 +92,7 @@ export function SecurityAndConfirmation() {
 
       // Close the modal
       const result = await dispatch(eventUpdate(updatedEvent));
-      console.log('====================================');
-      console.log(result);
-      console.log('====================================');
+
       if (result?.status === 200) {
         toast.success(result?.message);
         handleCloseReschedule();
@@ -100,7 +100,7 @@ export function SecurityAndConfirmation() {
       } else {
         toast.error(result?.message);
       }
-      
+
       // Optionally show a success message
       // enqueueSnackbar('Event rescheduled successfully', { variant: 'success' });
 
@@ -111,10 +111,37 @@ export function SecurityAndConfirmation() {
     }
   };
 
-  const handleDelete = () => {
-    // Add your delete logic here
-    handleCloseDelete();
+  const handleDelete = async () => {
+    if (!selectedEvent) return;
+
+    try {
+      // Prepare the delete event data
+      const deletedEvent = {
+        ...selectedEvent,
+        isDelete: true
+      };
+
+      // Dispatch the delete action
+      const result = await dispatch(eventUpdate(deletedEvent));
+
+      if (result?.status === 200) {
+        toast.success(result?.message);
+        // Reset the selected event if there are other events
+        if (events.length > 1) {
+          setSelectedEvent(events[0]);
+        } else {
+          setSelectedEvent(null);
+        }
+        handleCloseDelete();
+      } else {
+        toast.error(result?.message);
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      toast.error('Failed to delete event');
+    }
   };
+
 
   useEffect(() => {
     const fetchEvents = async () => {

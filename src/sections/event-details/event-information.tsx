@@ -11,8 +11,8 @@ import { StepperStepThree } from "./stepper-componentes/stepper-step-three";
 import { StepperSuccessful } from "./stepper-componentes/event-created-succesfull";
 
 
-export function EventInformation() {
-  const stepComponents = [<StepperStepOne />, <StepperStepTwo />, <StepperStepThree />, <StepperStepFour />];
+export function EventInformation({handleEventThemeLogo, fileInputRef}:any) {
+  const stepComponents = [<StepperStepOne fileInputRef={fileInputRef} handleEventThemeLogo={handleEventThemeLogo}/>, <StepperStepTwo />, <StepperStepThree />, <StepperStepFour />];
   const steps = ['0', '1', '2', '3'];
   const { stepper } = useSelector((state: RootState) => state?.event);
   const [activeStep, setActiveStep] = useState(3);

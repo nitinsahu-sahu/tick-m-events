@@ -2,15 +2,12 @@ import { eventConstants } from "./constants";
 import axios from "../helper/axios";
 
 export const eventUpdate = (updatedEvent) => async (dispatch) => {
+ 
     const eventId = updatedEvent?._id
     dispatch({ type: eventConstants.EVENT_UPDATE_REQUEST });
 
     try {
         const response = await axios.patch(`/event/${eventId}`, updatedEvent);
-console.log('====================================');
-console.log(response?.data?.message);
-console.log(response?.data);
-console.log('====================================');
         dispatch({
             type: eventConstants.EVENT_UPDATE_SUCCESS,
             payload: { message: response?.data?.message },

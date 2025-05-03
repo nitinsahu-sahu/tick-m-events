@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import {
@@ -20,12 +20,10 @@ import { HeadingCommon } from 'src/components/multiple-responsive-heading/headin
 import { eventCreate } from 'src/redux/actions/event.action';
 import { AppDispatch } from 'src/redux/store';
 
-export function StepperStepOne() {
+export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
     const navigate = useNavigate();
     const quillRef = useRef<ReactQuill>(null);
     const dispatch = useDispatch<AppDispatch>();
-    const [eventBanner, setEventBanner] = useState(null); // Correct initialization
-
     const [eventFormData, setEventFormData] = useState({
         eventName: "",
         date: "",
@@ -50,16 +48,10 @@ export function StepperStepOne() {
         setEventFormData((prevData) => ({ ...prevData, [name]: value }));
     };
 
-    const handleEventBanner = (e: any) => {
-        if (e.target.files?.[0]) { // Check if a file exists
-            setEventBanner(e.target.files[0]); // Store the File object directly
-        }
-    };
-
     const handleEventCreate = useCallback(async (event: any) => {
         event.preventDefault();
         const formEventData = new FormData();
-
+        const files = fileInputRef.current?.files;
         // Append all form data
         formEventData.append("name", eventFormData.name);
         formEventData.append("email", eventFormData.email);
@@ -78,8 +70,9 @@ export function StepperStepOne() {
         formEventData.append("tiktok", eventFormData.tiktok);
 
         formEventData.append("description", quillRef?.current?.value as string);        // Append avatar if it exists
-        if (eventBanner) {
-            formEventData.append("coverImage", eventBanner);
+        if (files && files.length > 0) {
+            const selectedFile = files[0];
+            formEventData.append("coverImage", selectedFile);
         }
         try {
             const res = await dispatch(eventCreate(formEventData));
@@ -91,7 +84,7 @@ export function StepperStepOne() {
         } catch (error) {
             toast.error("Event creation failed");
         }
-    }, [eventFormData, eventBanner, dispatch, navigate]);
+    }, [eventFormData, dispatch, navigate, fileInputRef]);
 
     return (
         <>
@@ -102,6 +95,7 @@ export function StepperStepOne() {
                 weight={400}
                 title="Select the ideal destination to begin your journey with ease"
             />
+
             <form encType='multipart/form-data' onSubmit={handleEventCreate}>
                 <Grid container spacing={2}>
                     {/* Event Details Section */}
@@ -160,7 +154,10 @@ export function StepperStepOne() {
                                     fullWidth
                                     required
                                     name='coverImage'
-                                    onChange={handleEventBanner}
+                                    inputRef={fileInputRef}
+                                    onChange={handleEventThemeLogo}
+
+                                    // onChange={handleEventBanner}
                                     InputProps={{
                                         sx: {
                                             borderRadius: '10px',

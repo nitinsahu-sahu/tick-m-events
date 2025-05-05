@@ -55,9 +55,9 @@ const FormTextField = ({ name, type = 'text', value, onChange, placeholder, tran
     />
 );
 
-export function UpdateProfile({ profileData, socialLinks, setProfileData, setSocialLinks }: any) {
+export function UpdateProfile({ setShowUpdateProfile,profileData, socialLinks, setProfileData, setSocialLinks }: any) {
     const dispatch = useDispatch<AppDispatch>();
-    const { _id, username } = useSelector((state: RootState) => state?.profile?.profile);
+    const { _id } = useSelector((state: RootState) => state?.auth?.user);
     const { profile } = useSelector((state: RootState) => state?.profile);
 
     const handleProfileUpdateChange = (event: any) => {
@@ -89,6 +89,7 @@ export function UpdateProfile({ profileData, socialLinks, setProfileData, setSoc
             const result = await dispatch(profileUpdate({ formProfileData, _id }));
             if ((result as ApiResult)?.status === 200) {
                 toast.success(result?.message);
+                setShowUpdateProfile(false)
                 setProfileData({
                     name: "",
                     email: "",
@@ -111,7 +112,7 @@ export function UpdateProfile({ profileData, socialLinks, setProfileData, setSoc
         } catch (error) {
             toast.error("Profile update failed");
         }
-    }, [profileData, setProfileData, setSocialLinks, _id, socialLinks, dispatch])
+    }, [profileData, setProfileData, setSocialLinks, _id, socialLinks,setShowUpdateProfile, dispatch])
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} bgcolor="#FFFFFF" p={3}>

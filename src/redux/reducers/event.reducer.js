@@ -3,6 +3,8 @@ import { eventConstants } from "../actions/constants";
 const initialState = {
     stepper: 0,
     message: '',
+    basicDetails: [],
+    fullData: []
 };
 
 const eventReducer = (state, action) => {
@@ -21,6 +23,23 @@ const eventReducer = (state, action) => {
             };
 
         case eventConstants.EVENT_CREATE_FAILURE:
+            return {
+                ...state,
+                message: action.payload.message,
+            };
+
+        // Get Events
+        case eventConstants.EVENT_GET_REQUEST:
+            return { ...state };
+
+        case eventConstants.EVENT_GET_SUCCESS:
+            return {
+                ...state,
+                basicDetails: action.payload.basicDetails,
+                fullData: action.payload.fullData,
+            };
+
+        case eventConstants.EVENT_GET_FAILURE:
             return {
                 ...state,
                 message: action.payload.message,

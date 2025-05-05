@@ -5,6 +5,7 @@ import { RootState } from "src/redux/store";
 
 export function MainProfile({ onModify }: any) {
     const { profile } = useSelector((state: RootState) => state?.profile);
+    
     const handleModifyClick = (rowData: any) => {
         onModify(rowData);  // Call the callback with row data
     };

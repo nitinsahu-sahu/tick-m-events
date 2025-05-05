@@ -1,12 +1,16 @@
-import { Checkbox, FormControlLabel, MenuItem, Select, Grid, FormControl, InputLabel,  IconButton, Box, TextField } from "@mui/material";
+import { Checkbox, FormControlLabel, MenuItem, Select, Grid, FormControl, InputLabel, IconButton, Box, TextField } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
-
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/store";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { eventsTickets } from "./utills";
 import { PopularEvent } from "./PopularEvent";
 
 export function FindYourEvent() {
+    const { fullData } = useSelector((state: RootState) => state?.event);
+    console.log('fullData', fullData);
+
     return (
         <Box boxShadow={3} borderRadius={3} mt={3}>
             {/* Top Bar with Search */}
@@ -261,8 +265,8 @@ export function FindYourEvent() {
                                 mt: 2,
                             }}
                         >
-                            <HeadingCommon variant="subtitle2" title="Available Tickets" weight={400} baseSize="16px"/>
-                           
+                            <HeadingCommon variant="subtitle2" title="Available Tickets" weight={400} baseSize="16px" />
+
                             <FormControlLabel control={<Checkbox />} label="Only show available tickets" />
                         </Box>
                     </Grid>
@@ -272,9 +276,9 @@ export function FindYourEvent() {
             <Box mt={2} p={{ xs: 1, md: 1, lg: 2 }}>
                 {/* Main Grid Layout */}
                 <Grid container spacing={3} >
-                    {eventsTickets.map((ticketc, index) => (
-                        <Grid item xs={12} sm={6} md={6} key={ticketc.id || index}>
-                            <PopularEvent ticket={ticketc} key={index} />
+                    {fullData.map((item: any, index: any) => (
+                        <Grid item xs={12} sm={6} md={6} key={item._id || index} >
+                            <PopularEvent event={item} key={index} />
                         </Grid>
                     ))}
                 </Grid>

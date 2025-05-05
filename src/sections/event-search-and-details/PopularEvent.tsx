@@ -1,7 +1,11 @@
 import { Box, Button, Card, CardContent, Grid, Typography, Avatar } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { formatTimeTo12Hour } from 'src/hooks/formate-time';
 
-export const PopularEvent = ({ ticket }: any) => (
+
+
+export const PopularEvent = ({ event }: any) => (
   <Card
     sx={{
       borderRadius: 3,
@@ -11,69 +15,49 @@ export const PopularEvent = ({ ticket }: any) => (
       backgroundPosition: 'center',
       overflow: 'visible',
       position: 'relative',
-      mt:4
+      my: 3
     }}
   >
-    {ticket.viewPromo && (
-    <Box
-      sx={{
-        position: 'absolute',
-        top: 46,
-        left: -12,
-        overflow: 'hidden',
-        backgroundColor: '#0B2E4C',
-        color: '#fff',
-        px: 2,
-        py: '2px',
-        fontSize: '10px',
-        fontWeight: 600,
-        transform: 'rotate(-45deg)',
-        width: '120px',
-        textAlign: 'center',
-        zIndex: 1,
-        boxShadow: 2,
-      }}
-    >
-      View Promo
-    </Box>
+    {event && (
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 46,
+          left: -12,
+          overflow: 'hidden',
+          backgroundColor: '#0B2E4C',
+          color: '#fff',
+          px: 2,
+          py: '2px',
+          fontSize: '10px',
+          fontWeight: 600,
+          transform: 'rotate(-45deg)',
+          width: '120px',
+          textAlign: 'center',
+          zIndex: 1,
+          boxShadow: 2,
+        }}
+      >
+        {event?.category}
+      </Box>
     )}
     <CardContent sx={{ textAlign: 'center', position: 'relative' }}>
       <Avatar
-        src={`/assets/images/home-and-recommendations/${ticket.image}`}
-        alt={ticket.title}
+        src={event?.customization?.eventLogo?.url}
+        alt={event.title}
         sx={{
-          width: { xs: '80px', sm: '90px', md: '97px' },
-          height: { xs: '80px', sm: '90px', md: '97px' },
+          border: "2px solid black",
+          width: { xs: '70px', sm: '80px', md: '90px' },
+          height: { xs: '70px', sm: '80px', md: '90px' },
           position: 'absolute',
           top: -40,
           left: '50%',
           transform: 'translateX(-50%)',
         }}
       />
-      <Typography
-        variant="h6"
-        fontWeight={600}
-        fontSize={{ xs: '15px', sm: '20px', md: '25px' }}
-        mt={5}
-        color="#0B2E4C"
-      >
-        {ticket.title}
-      </Typography>
-      <Typography
-        variant="body2"
-        color="black"
-        fontWeight={400}
-        fontSize={{ xs: '8px', sm: '12px', md: '16px' }}
-      >
-        {ticket.location} | {ticket.date} | {ticket.time}
-      </Typography>
-      <Typography
-        variant="body2"
-        fontSize={{ xs: '8px', sm: '12px', md: '16px' }}
-        sx={{ color: ticket.statusColor, fontWeight: 700, mt: 1 }}
-      >
-        {ticket.status}
-      </Typography>
+      <HeadingCommon variant="h6" mt={5} title={event.eventName} baseSize="25px" weight={600} color="#0B2E4C" />
+      <HeadingCommon variant="body2" title={`${event.location} | ${event.date} | ${formatTimeTo12Hour(event.time)}`} baseSize="16px" weight={400} />
+      <HeadingCommon variant="body2" title='paid' baseSize="16px" weight={700} color="#0B2E4C" />
       {/* Star Rating */}
       <Box
         sx={{
@@ -88,12 +72,12 @@ export const PopularEvent = ({ ticket }: any) => (
             key={i}
             fontSize="small"
             sx={{
-              color: i < Math.floor(ticket.rating) ? '#fbc02d' : '#ddd',
+              color: i < Math.floor(23) ? '#fbc02d' : '#ddd',
             }}
           />
         ))}
         <Typography fontWeight="bold" ml={0.5} fontSize={{ xs: '12px', sm: '14px' }}>
-          {ticket.rating}
+          3
         </Typography>
       </Box>
 

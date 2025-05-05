@@ -1,18 +1,20 @@
-import {
-    Box, CardContent, Button,
-    Card, Stack
-} from '@mui/material';
+import { Box, CardContent, Button, Card, Stack } from '@mui/material';
+import { useSelector } from 'react-redux';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import { MusicFestivalTable } from 'src/components/tables/music-festival-table';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { RootState } from 'src/redux/store';
 
 import { musicFestivalTableData, musicFestivalTableHeaders } from './utills';
 
 
+
 export function MusicFestival() {
+    const { fullData } = useSelector((state: RootState) => state?.event);
+
     return (
         <Box>
             <Card sx={{ borderRadius: 4, boxShadow: 3, p: 1, mt: 3 }}>

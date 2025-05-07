@@ -55,7 +55,7 @@ const FormTextField = ({ name, type = 'text', value, onChange, placeholder, tran
     />
 );
 
-export function UpdateProfile({ setShowUpdateProfile,profileData, socialLinks, setProfileData, setSocialLinks }: any) {
+export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, setProfileData, setSocialLinks }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const { _id } = useSelector((state: RootState) => state?.auth?.user);
     const { profile } = useSelector((state: RootState) => state?.profile);
@@ -112,7 +112,7 @@ export function UpdateProfile({ setShowUpdateProfile,profileData, socialLinks, s
         } catch (error) {
             toast.error("Profile update failed");
         }
-    }, [profileData, setProfileData, setSocialLinks, _id, socialLinks,setShowUpdateProfile, dispatch])
+    }, [profileData, setProfileData, setSocialLinks, _id, socialLinks, setShowUpdateProfile, dispatch])
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} bgcolor="#FFFFFF" p={3}>
@@ -166,8 +166,8 @@ export function UpdateProfile({ setShowUpdateProfile,profileData, socialLinks, s
                     {/* Social Media Fields */}
                     {socialMediaFields.map((field) => (
                         <FormTextField
-                            key={field.name}
-                            name={field.name}
+                            key={field.name || ''}
+                            name={field.name || ''}
                             type="text"
                             value={socialLinks[field.name]}
                             onChange={handleLinksChange}

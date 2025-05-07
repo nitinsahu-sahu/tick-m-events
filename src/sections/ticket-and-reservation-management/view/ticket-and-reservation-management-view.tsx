@@ -22,7 +22,7 @@ export function TicketAndReservationManagementView() {
         rightCom={<SearchBar />} // Passing SearchBar component as a prop
       />
       <TicketManagement />
-      <TicketCreationAndConfiguration />
+      {/* <TicketCreationAndConfiguration /> */}
       <SalesAndStockTracking />
       <ReservationManagement />
       <RefundAndCancellationManangement />

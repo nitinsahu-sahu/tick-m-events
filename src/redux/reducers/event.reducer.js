@@ -1,7 +1,7 @@
 import { eventConstants } from "../actions/constants";
 
 const initialState = {
-    stepper: 0,
+    stepper: 1,
     message: '',
     basicDetails: [],
     fullData: []

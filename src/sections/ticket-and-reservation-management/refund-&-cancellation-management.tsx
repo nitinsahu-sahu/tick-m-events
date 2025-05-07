@@ -38,7 +38,7 @@ export function RefundAndCancellationManangement() {
           <FormControlLabel control={<Checkbox />} label="No Refunds after a set date" />
           <TextField type="date" size="small" />
 
-          <Button variant="contained" sx={{ bgcolor: "#1E3A8A", color: "white", mt: 2, width: "200px" }}>
+          <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white", mt: 2, width: "200px" }}>
             Save Changes
           </Button>
         </Box>

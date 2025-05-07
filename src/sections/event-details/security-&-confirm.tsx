@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { AppDispatch, RootState } from 'src/redux/store';
-import { eventUpdate } from 'src/redux/actions/event.action';
+import { eventFetch, eventUpdate } from 'src/redux/actions/event.action';
 
 interface Event {
   _id: string;
@@ -87,6 +87,7 @@ export function SecurityAndConfirmation() {
       // await dispatch(updateEventAction(updatedEvent));
 
       // For now, we'll update the local state
+      
       setEvents(events.map(event =>
         event._id === selectedEvent._id ? updatedEvent : event
       ));
@@ -115,32 +116,41 @@ export function SecurityAndConfirmation() {
 
   const handleDelete = async () => {
     if (!selectedEvent) return;
-
+  
     try {
-      // Prepare the delete event data
-      const deletedEvent = {
+      // Optimistically update the UI first
+      const remainingEvents = events.filter(event => event._id !== selectedEvent._id);
+      setEvents(remainingEvents);
+      
+      if (remainingEvents.length > 0) {
+        setSelectedEvent(remainingEvents[0]);
+      } else {
+        setSelectedEvent(null);
+      }
+  
+      // Then make the API call
+      const updatedEvent = {
         ...selectedEvent,
         isDelete: true
       };
-
-      // Dispatch the delete action
-      const result = await dispatch(eventUpdate(deletedEvent));
-
-      if (result?.status === 200) {
-        toast.success(result?.message);
-        // Reset the selected event if there are other events
-        if (events.length > 1) {
-          setSelectedEvent(events[0]);
-        } else {
-          setSelectedEvent(null);
-        }
-        handleCloseDelete();
+  
+      const result = await dispatch(eventUpdate(updatedEvent));
+  
+      if (result?.status !== 200) {
+        // Revert if API call fails
+        setEvents([...remainingEvents, selectedEvent]);
+        setSelectedEvent(selectedEvent);
+        toast.error(result?.message || 'Failed to delete event');
       } else {
-        toast.error(result?.message);
+        toast.success(result?.message);
+        handleCloseDelete();
       }
     } catch (error) {
       console.error('Error deleting event:', error);
       toast.error('Failed to delete event');
+      // Revert on error
+      setEvents([...events]);
+      setSelectedEvent(selectedEvent);
     }
   };
 
@@ -153,6 +163,8 @@ export function SecurityAndConfirmation() {
       });
     }
   }, [openReschedule, selectedEvent]);
+
+
 
   return (
     <>

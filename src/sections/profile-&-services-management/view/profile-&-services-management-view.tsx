@@ -36,6 +36,7 @@ export function ProfileAndServicesManagementView() {
     linkedin: '',
     tiktok: '',
   });
+
   const [profileData, setProfileData] = useState({
     _id: '',
     name: '',
@@ -55,6 +56,7 @@ export function ProfileAndServicesManagementView() {
   const isMobile = useMediaQuery('(max-width:600px)');
 
   const handleModify = useCallback((rowData: any) => {
+    
     setShowUpdateProfile(true); // Show UpdateProfile when Modify is clicked
 
     setProfileData((prev) => {
@@ -85,7 +87,7 @@ export function ProfileAndServicesManagementView() {
     setSocialLinks((prev) => {
       // Only update if values actually changed
       if (
-        prev._id === rowData._id &&
+        prev._id === rowData.socialLinks._id &&
         prev.instagram === rowData.socialLinks.instagram &&
         prev.facebook === rowData.socialLinks.facebook &&
         prev.linkedin === rowData.socialLinks.linkedin &&
@@ -94,11 +96,11 @@ export function ProfileAndServicesManagementView() {
         return prev;
       }
       return {
-        _id: rowData._id,
-        instagram: rowData.socialLinks.instagram,
-        facebook: rowData.socialLinks.facebook,
-        linkedin: rowData.socialLinks.linkedin,
-        tiktok: rowData.socialLinks.tiktok,
+        _id: rowData.socialLinks._id,
+        instagram: rowData.socialLinks.instagram || '',
+        facebook: rowData.socialLinks.facebook || '',
+        linkedin: rowData.socialLinks.linkedin || '',
+        tiktok: rowData.socialLinks.tiktok || '',
       };
     });
   }, []);

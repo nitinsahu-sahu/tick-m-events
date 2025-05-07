@@ -109,7 +109,6 @@ export function EventDetailsView() {
             setImgSrc(newPreviewUrl);
             setShowCrop(false);
 
-            console.log('Cropped image URL:', newPreviewUrl);
           }
         }, 'image/png', 1);
       } catch (error) {

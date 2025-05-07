@@ -35,10 +35,10 @@ export function ReservationManagement() {
 
             {/* Export Buttons */}
             <Box mt={2} display="flex" gap={2}>
-                <Button variant="contained" sx={{ bgcolor: "#003B73", color: "white" }}>
+                <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
                     Export as CSV
                 </Button>
-                <Button variant="contained" sx={{ bgcolor: "#003B73", color: "white" }}>
+                <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
                     Export as Excel
                 </Button>
             </Box>
@@ -55,10 +55,10 @@ export function ReservationManagement() {
                     <FormControlLabel control={<Checkbox />} label="Validation via Name List & Account ID" />
 
                     <Box display="flex" gap={2} mt={2}>
-                        <Button variant="contained" sx={{ bgcolor: "#1E3A8A", color: "white" }}>
+                        <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
                             Save Changes
                         </Button>
-                        <Button variant="contained" sx={{ bgcolor: "#1E3A8A", color: "white" }}>
+                        <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
                             Go to Ticket Validation Page
                         </Button>
                     </Box>

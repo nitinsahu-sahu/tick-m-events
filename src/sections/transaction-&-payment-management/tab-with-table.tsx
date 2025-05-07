@@ -21,7 +21,6 @@ export function TabWithTableView() {
     );
     const handleSubmit = (e: any) => {
         e.preventDefault();
-        console.log("Submitted form values:", formValues);
     };
 
     const [statusFilter, setStatusFilter] = useState("All");

@@ -11,8 +11,10 @@ import { isUserLoggedIn } from 'src/redux/actions';
 import Protected from 'src/redux/helper/HOC';
 import { RoleProtectedRoute } from 'src/redux/helper/RoleWise';
 import { TrackingBookedServicesAndProvidersView } from 'src/sections/tracking-of-booked-services-&-providers/view';
+import { MultipleDashboard } from 'src/hooks/common-dashbord';
 
 // ----------------------------Organizer Routes------------------------------------------
+const SingleEvent = lazy(() => import('src/pages/Single-event'));
 export const MarketingEngagenmentPage = lazy(() => import('src/pages/marketing-engagenment'));
 export const EventDetailsPage = lazy(() => import('src/pages/event-details'));
 export const EntryValidationPage = lazy(() => import('src/pages/entry-validation'));
@@ -83,7 +85,7 @@ export function Router() {
   }, [dispatch, auth?.authenticate]); // ✅ Remove `auth` from dependencies
 
   // Get current user role from auth state
-  const currentRole = auth?.user?.role
+  const currentRole = auth?.user?.role || 'participant'
 
   return useRoutes([
     {
@@ -180,7 +182,7 @@ export function Router() {
         },
         {
           path: 'profile-&-services-management',
-          element: <RoleProtectedRoute allowedRoles={['provider','admin']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
+          element: <RoleProtectedRoute allowedRoles={['provider', 'admin', 'organizer']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
         },
         {
           path: 'confirmed-service-calendar',
@@ -207,20 +209,6 @@ export function Router() {
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><ServiceRequestAndNegotiationPage /></RoleProtectedRoute>
         },
         // -----------------------**************-------------------------
-
-        // Admin Route
-        // {
-        //   path: "/",  // Add this missing path property
-        //   index: true,
-        //   element: (
-        //     <RoleProtectedRoute 
-        //       allowedRoles={['admin']} 
-        //       currentRole={currentRole}
-        //     >
-        //       <HomePage />
-        //     </RoleProtectedRoute>
-        //   )
-        // },
         {
           path: 'global-overview-&-general-statistics',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><GlobalOverviewAndGeneralStatisticsPage /></RoleProtectedRoute>
@@ -236,7 +224,18 @@ export function Router() {
 
         // -----------------------**************-------------------------
 
-        { element: <HomePage />, index: true, },
+        {
+          index: true,
+          path: '/',
+          element: <RoleProtectedRoute
+            allowedRoles={['participant', 'admin', 'organizer', 'provider']}
+            currentRole={currentRole}
+          >
+            <MultipleDashboard />
+          </RoleProtectedRoute>
+        },
+
+        // { element: <HomePage />, index: true, },
 
         { path: 'password-recovery', element: <PasswordRecoveryPage /> },
       ],
@@ -255,6 +254,12 @@ export function Router() {
         <FrontHomePage />
       ),
     },
+    // {
+    //   path: '/event/:slug/:id',
+    //   element: (
+    //     <SingleEvent />
+    //   ),
+    // },
     {
       path: '404',
       element: <Page404 />,

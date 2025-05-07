@@ -12,9 +12,9 @@ import {
   MenuItem
 } from "@mui/material";
 import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { AppDispatch } from 'src/redux/store';
+import { AppDispatch, RootState } from 'src/redux/store';
 import { eventFetch, eventUpdate } from 'src/redux/actions/event.action';
 
 interface Event {
@@ -45,11 +45,13 @@ const style = {
 };
 
 export function SecurityAndConfirmation() {
+  const { basicDetails } = useSelector((state: RootState) => state?.event);
+
   const dispatch = useDispatch<AppDispatch>();
   const [openReschedule, setOpenReschedule] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
-  const [events, setEvents] = useState<Event[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [events, setEvents] = useState<Event[]>(basicDetails || []);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(basicDetails[0] || null);
   const [updateEvent, setUpdateEvent] = useState<UpdateEvent>({
     _id: '',
     date: '',
@@ -85,6 +87,7 @@ export function SecurityAndConfirmation() {
       // await dispatch(updateEventAction(updatedEvent));
 
       // For now, we'll update the local state
+      
       setEvents(events.map(event =>
         event._id === selectedEvent._id ? updatedEvent : event
       ));
@@ -113,50 +116,43 @@ export function SecurityAndConfirmation() {
 
   const handleDelete = async () => {
     if (!selectedEvent) return;
-
+  
     try {
-      // Prepare the delete event data
-      const deletedEvent = {
+      // Optimistically update the UI first
+      const remainingEvents = events.filter(event => event._id !== selectedEvent._id);
+      setEvents(remainingEvents);
+      
+      if (remainingEvents.length > 0) {
+        setSelectedEvent(remainingEvents[0]);
+      } else {
+        setSelectedEvent(null);
+      }
+  
+      // Then make the API call
+      const updatedEvent = {
         ...selectedEvent,
         isDelete: true
       };
-
-      // Dispatch the delete action
-      const result = await dispatch(eventUpdate(deletedEvent));
-
-      if (result?.status === 200) {
-        toast.success(result?.message);
-        // Reset the selected event if there are other events
-        if (events.length > 1) {
-          setSelectedEvent(events[0]);
-        } else {
-          setSelectedEvent(null);
-        }
-        handleCloseDelete();
+  
+      const result = await dispatch(eventUpdate(updatedEvent));
+  
+      if (result?.status !== 200) {
+        // Revert if API call fails
+        setEvents([...remainingEvents, selectedEvent]);
+        setSelectedEvent(selectedEvent);
+        toast.error(result?.message || 'Failed to delete event');
       } else {
-        toast.error(result?.message);
+        toast.success(result?.message);
+        handleCloseDelete();
       }
     } catch (error) {
       console.error('Error deleting event:', error);
       toast.error('Failed to delete event');
+      // Revert on error
+      setEvents([...events]);
+      setSelectedEvent(selectedEvent);
     }
   };
-
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const result = await dispatch(eventFetch());
-        setEvents(result?.basicDetails || []);
-        if (result?.basicDetails?.length > 0) {
-          setSelectedEvent(result.basicDetails[0]);
-        }
-      } catch (error) {
-        console.error("Error fetching events:", error);
-      }
-    };
-    fetchEvents();
-  }, [dispatch]);
 
   // Set modal values when opening reschedule
   useEffect(() => {
@@ -167,6 +163,8 @@ export function SecurityAndConfirmation() {
       });
     }
   }, [openReschedule, selectedEvent]);
+
+
 
   return (
     <>

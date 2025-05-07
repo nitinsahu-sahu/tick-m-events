@@ -48,8 +48,7 @@ export function PasswordRecoveryView() {
         } else {
             setError(false);
             setSubmitted(true);
-            console.log("Method:", method);
-            console.log("Input:", input);
+         
         }
     };
 
@@ -59,7 +58,6 @@ export function PasswordRecoveryView() {
             return;
         }
 
-        console.log("Resetting password to:", newPassword);
         alert("Password reset successfully (simulated)");
         setShowResetBox(false);
     };

@@ -60,7 +60,6 @@ export function StepperStepTwo() {
             isLimitedSeat: true
         }
     ]);
-    // console.log('ticket', ticketRows);
 
     const handleTickteConfigChange = (event: any) => {
         event.preventDefault(); // Prevent default form submission behavior

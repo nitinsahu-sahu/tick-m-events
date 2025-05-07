@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
+import { TicketCreationAndConfiguration } from "./ticket-creation-&-onfiguration";
 
 export function TicketManagement() {
     const theme = useTheme();
+    const [showTicketCreation, setShowTicketCreation] = useState(false);
 
     const ticketManagementTableHeaders = ["Ticket Name", "Price", "Quantity Available", "Ticket Description", "Remaining Stock", "Actions"];
     const ticketManagementTableData = [
@@ -18,18 +21,26 @@ export function TicketManagement() {
                 Ticket Management
             </Typography>
             <TicketReservationManagementTable headers={ticketManagementTableHeaders} data={ticketManagementTableData} type="1" />
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
                 <Button
                     variant="contained"
                     sx={{
-                        backgroundColor: "#0B2E4E",
+                        backgroundColor: theme.palette.blue.dark,
                         color: "#fff",
                         width: "90%",
+                        '&:hover': { backgroundColor: theme.palette.blue.main }
                     }}
+                    onClick={() => setShowTicketCreation((prev) => !prev)}
                 >
-                    Add a Ticket
+                    {showTicketCreation ? "Cancel Adding Ticket" : "Add a Ticket"}
                 </Button>
             </Box>
+
+            {showTicketCreation && (
+                <Box mt={4}>
+                    <TicketCreationAndConfiguration />
+                </Box>
+            )}
         </Box>
     )
 }

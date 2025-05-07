@@ -43,6 +43,7 @@ export function UserPopover() {
     const hiddenHomeRecommadation = ['/home-and-recommendations'];
     const hiddenTranPaymet = ['/transection-and-payment'];
     const hiddenDashboard = ['/'];
+    const hiddenEventDetails = ['/event-details'];
 
     const { _id, name, role, avatar } = useSelector((state: RootState) => state?.auth?.user);
 
@@ -231,6 +232,8 @@ export function UserPopover() {
                         <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
                             <Button
                                 variant="contained"
+                                disabled={hiddenEventDetails?.toString() === pathname?.toString()}
+                                onClick={() => navigate("/event-details")} // Redirect on click
                                 sx={{
                                     backgroundColor: "#0C2340",
                                     color: "white",

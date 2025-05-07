@@ -34,7 +34,6 @@ export const SearchAndAdvanceFilter = () => {
       certifiedOnly,
       location,
     };
-    console.log('Applied Filters:', filters);
   };
 
   const handleCategoryChange = (event: SelectChangeEvent) => {

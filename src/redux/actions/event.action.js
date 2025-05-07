@@ -2,7 +2,7 @@ import { eventConstants } from "./constants";
 import axios from "../helper/axios";
 
 export const eventUpdate = (updatedEvent) => async (dispatch) => {
- 
+
     const eventId = updatedEvent?._id
     dispatch({ type: eventConstants.EVENT_UPDATE_REQUEST });
 
@@ -43,25 +43,15 @@ export const eventFetch = () => async (dispatch) => {
             payload: {
                 message: response?.data?.message,
                 basicDetails: response?.data?.basicDetails,
+                fullData: response?.data?.fullData,
             },
 
         });
-        return {
-            type: eventConstants.EVENT_GET_SUCCESS,
-            basicDetails: response?.data?.basicDetails,
-            message: response?.data?.message,
-        };
     } catch (error) {
         dispatch({
             type: eventConstants.EVENT_GET_FAILURE,
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },
         });
-
-        return {
-            type: eventConstants.EVENT_GET_FAILURE,
-            message: error?.response?.data?.message || "Server error",
-            status: error.status
-        };
     }
 };
 

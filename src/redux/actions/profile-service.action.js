@@ -68,8 +68,6 @@ export const profileGet = (_id) => async (dispatch) => {
 
     try {
         const response = await axios.get(`/auth/profile/${_id}`);
-        console.log(response);
-
         dispatch({
             type: authConstants.GET_SUCCESS,
             payload: {

@@ -14,7 +14,6 @@ import { TrackingBookedServicesAndProvidersView } from 'src/sections/tracking-of
 import { MultipleDashboard } from 'src/hooks/common-dashbord';
 
 // ----------------------------Organizer Routes------------------------------------------
-const SingleEvent = lazy(() => import('src/pages/Single-event'));
 export const MarketingEngagenmentPage = lazy(() => import('src/pages/marketing-engagenment'));
 export const EventDetailsPage = lazy(() => import('src/pages/event-details'));
 export const EntryValidationPage = lazy(() => import('src/pages/entry-validation'));
@@ -30,7 +29,6 @@ export const EventSearchAndDetailsPage = lazy(() => import('src/pages/event-sear
 // ----------------------------Service Provider Routes------------------------------------------
 
 export const HomePage = lazy(() => import('src/pages/home'));
-export const BlogPage = lazy(() => import('src/pages/blog'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const FrontHomePage = lazy(() => import('src/pages/front-home'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
@@ -249,17 +247,12 @@ export function Router() {
       ),
     },
     {
-      path: 'home',
+      path: '/our-event/:eventId',
       element: (
         <FrontHomePage />
       ),
     },
-    // {
-    //   path: '/event/:slug/:id',
-    //   element: (
-    //     <SingleEvent />
-    //   ),
-    // },
+
     {
       path: '404',
       element: <Page404 />,

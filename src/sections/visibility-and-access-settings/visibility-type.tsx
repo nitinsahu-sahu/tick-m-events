@@ -1,15 +1,13 @@
-import React from 'react';
 import {
   Box,
-  Typography,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  TextField,
-  Checkbox,
   Button,
+  Checkbox,
+  FormControlLabel,
   FormGroup,
-  Container
+  Radio,
+  RadioGroup,
+  TextField,
+  Typography,
 } from '@mui/material';
 
 export function VisibilityType() {

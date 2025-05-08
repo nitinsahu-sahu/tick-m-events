@@ -17,13 +17,10 @@ export const formatTimeTo12Hour = (timeString: any) => {
     return `${hour12}:${minutes} ${period}`;
 };
 
-// export const formatEventDate = (dateString: any) => {
-//     const options = { year: 'numeric', month: 'long', day: 'numeric' };
-//     return new Date(dateString).toLocaleDateString('en-US', options);
-// };
 
 export const formatEventDate = (dateString: string | Date): string => {
     const options: Intl.DateTimeFormatOptions = { 
+        weekday: 'long',
         year: 'numeric', 
         month: 'long', 
         day: 'numeric' 

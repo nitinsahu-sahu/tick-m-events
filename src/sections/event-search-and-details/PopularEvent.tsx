@@ -1,16 +1,41 @@
 import { Box, Button, Card, CardContent, Grid, Typography, Avatar } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
-import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { formatTimeTo12Hour } from 'src/hooks/formate-time';
+import { AppDispatch } from 'src/redux/store';
+import { eventAddToWishlist } from 'src/redux/actions/event.action';
 
+interface ApiResult {
+  status: number;
+  type: string;
+  message: any;
+  // Add other properties if needed
+}
 
+export function PopularEvent({ event, handleEventDetails }: any) {
+  const dispatch = useDispatch<AppDispatch>();
 
-export function PopularEvent({ event,handleEventDetails }: any) {
   const handleViewEvent = (selectedViewEvent: any) => {
     handleEventDetails(selectedViewEvent)
   };
+
+  const handleAddEventWishlist = async (selectedViewEvent: any) => {
+    try {
+      const result = await dispatch(eventAddToWishlist(selectedViewEvent))
+      if ((result as ApiResult)?.status === 201) {
+        toast.success(result?.message);
+      } else {
+        toast.error(result?.message);
+      }
+    } catch (error) {
+      toast.error("Server maintenence");
+    }
+  };
+
+  // Simplified arrow function without block statement
 
   return (
     <Card
@@ -98,7 +123,10 @@ export function PopularEvent({ event,handleEventDetails }: any) {
                     fullWidth
                     onClick={() => {
                       if (text === "View Details") {
-                        handleViewEvent({selectedViewEvent:event})// Log when "Modify Profile" is clicked
+                        handleViewEvent({ selectedViewEvent: event })// Log when "Modify Profile" is clicked
+                      }
+                      if (text === "Wishlist") {
+                        handleAddEventWishlist({ selectedViewEvent: event })// Log when "Modify Profile" is clicked
                       }
                       // Add other conditions if needed
                     }}
@@ -115,7 +143,7 @@ export function PopularEvent({ event,handleEventDetails }: any) {
           </Grid>
         </Grid>
       </CardContent>
-    </Card>
+    </Card >
   )
 }
 

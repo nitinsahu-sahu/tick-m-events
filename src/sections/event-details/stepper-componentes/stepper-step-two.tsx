@@ -154,7 +154,7 @@ export function StepperStepTwo() {
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                 }}
-                                placeholder="0.00"
+                                placeholder="0 XAF"
                                 value={row.price}
                                 onChange={(e) => handleChange(row.id, 'price', e.target.value)}
                             />

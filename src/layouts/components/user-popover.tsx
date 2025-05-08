@@ -166,13 +166,6 @@ export function UserPopover() {
                     }
 
                     {
-                        hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
-                        <Box display="flex" gap={1} alignItems="center" justifyContent="center">
-                            <Iconify icon="typcn:filter" width={24} />
-                            <Iconify icon="mdi:heart" width={24} color="#e11e1e" />
-                        </Box>
-                    }
-                    {
                         !hiddenDashboard.some(path => pathname.includes(path)) &&
                         !hiddenTranPaymet.some(path => pathname.includes(path)) &&
                         !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&

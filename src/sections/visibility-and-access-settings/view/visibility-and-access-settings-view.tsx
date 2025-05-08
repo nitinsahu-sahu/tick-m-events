@@ -1,9 +1,10 @@
-import { PageTitleSection } from "src/components/page-title-section";
 import { DashboardContent } from "src/layouts/dashboard";
-import { CustomPhotoVideoFilter } from "../custom-photo-video-filter";
+import { PageTitleSection } from "src/components/page-title-section";
+
 import { EventCustomization } from "../event-page-customization";
-import { NotificationAutomaticReminders } from "../notifications-&-automatic-reminders";
+import { CustomPhotoVideoFilter } from "../custom-photo-video-filter";
 import { VisibilityType } from "../visibility-type";
+import { NotificationAutomaticReminders } from "../notifications-&-automatic-reminders";
 
 export function VisibilityAndAccessSettingsView() {
   return (

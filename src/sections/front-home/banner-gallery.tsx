@@ -1,18 +1,22 @@
-import { Card,Grid,Typography } from "@mui/material";
+import { Card, Grid } from "@mui/material";
+import ReactHtmlParser from 'react-html-parser';
+
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+import { formatEventDate, formatTimeTo12Hour } from "src/hooks/formate-time";
 
 
-export function BannerGallery() {
+export function BannerGallery({ coverImage, eventName, description, date, time }: any) {
     const images = [
-        './assets/images/cover/banner-2.png',
-        './assets/images/cover/banner-3.png',
-        './assets/images/cover/banner-4.png'
+        '../assets/images/cover/banner-2.png',
+        '../assets/images/cover/banner-3.png',
+        '../assets/images/cover/banner-4.png'
     ];
     return (
         <Grid container spacing={3}>
             <Grid item xs={12} md={8}>
                 <Card
                     sx={{
-                        backgroundImage: `url('./assets/images/cover/banner-1.png')`,
+                        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${coverImage?.url || "../assets/images/cover/banner-1.png"})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                         height: "330px",
@@ -26,12 +30,10 @@ export function BannerGallery() {
                         p: 3,
                     }}
                 >
-                    <Typography variant="h4" fontWeight="bold">
-                        Avignon Convention 2025
-                    </Typography>
-                    <Typography fontStyle="italic">&quot;Agile Internationally&quot;</Typography>
+                    <HeadingCommon title={eventName} variant="h4" color="white" baseSize="54px" mb={0}/>
+                    {ReactHtmlParser(description)}
+                    <HeadingCommon color="white" title={`${formatEventDate(date)} | ${formatTimeTo12Hour(time)}`} weight={400} baseSize="16px" />
 
-                    <Typography>Saturday, November 22, 2025 | 5:00 PM</Typography>
                 </Card>
             </Grid>
 

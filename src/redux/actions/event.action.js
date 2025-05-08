@@ -224,6 +224,7 @@ export const ticketConfigCreate = ({ formEventData, eventId }) => async (dispatc
 
     try {
         const response = await axios.post(`/event/tickets/${eventId}`, formEventData);
+        // const response = await axios.post(`/event/tickets/6815cf53789b3d38a21e1faf`, formEventData);
         dispatch({
             type: eventConstants.TICKET_CONFIG_CREATE_SUCCESS,
             payload: {
@@ -243,5 +244,29 @@ export const ticketConfigCreate = ({ formEventData, eventId }) => async (dispatc
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },
         });
         return null; // or return an error object if you prefer
+    }
+};
+
+export const eventByIdFetch = (eventId) => async (dispatch) => {
+    dispatch({ type: eventConstants.EVENT_BY_ID_REQUEST});
+
+    try {
+        const response = await axios.get(`/event/${eventId}`);
+        console.log('====================================');
+        console.log(response);
+        console.log('====================================');
+        dispatch({
+            type: eventConstants.EVENT_BY_ID_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                eventWithDetails: response?.data?.eventWithDetails,
+            },
+
+        });
+    } catch (error) {
+        dispatch({
+            type: eventConstants.EVENT_BY_ID_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
     }
 };

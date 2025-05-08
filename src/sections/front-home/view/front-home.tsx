@@ -1,29 +1,20 @@
-import {
-    AppBar,
-    Toolbar,
-    Box,
-    Button,
-    IconButton,
-    Drawer,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
-    Typography,
-    Divider,
-    useMediaQuery,
-    useTheme,
-    Card,
-} from "@mui/material";
+import { AppBar, Toolbar, IconButton, Drawer, List, ListItem, ListItemButton, ListItemText, Divider, Button, Box, Typography, Card, useMediaQuery, useTheme, } from "@mui/material";
+
 import MenuIcon from '@mui/icons-material/Menu';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share'; // Import the Share icon
-
 import { styled } from "@mui/material/styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import ReactHtmlParser from 'react-html-parser';
 
 // import { NavHomeTwo } from "../nav-two";
 import { Breadcrumb } from "src/components/breadcrumb/breadcrumb";
+import { AppDispatch, RootState } from "src/redux/store";
+import { eventByIdFetch } from "src/redux/actions/event.action";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+
 import { BannerGallery } from "../banner-gallery";
 import { TrackingSystem } from "../tracking-system";
 import { ContactAndSharing } from "../contact-and-sharing";
@@ -32,6 +23,7 @@ import { RateAndReview } from "../rate-and-review";
 import { CompanyMarquee } from "../company-marquee";
 import { FriendWhoBooked } from "../friend-who-booked";
 import { LiveChat } from "../live-chat";
+
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
     display: "flex",
@@ -163,29 +155,41 @@ export function NavHomeOne() {
 }
 
 export function FrontHome() {
+    const dispatch = useDispatch<AppDispatch>();
+    const { eventId } = useParams();
+    const { _id, eventName, date, time, category, eventType, coverImage, location, formate, description,
+        organizer, customization, tickets, visibility
+    } = useSelector((state: RootState) => state?.event?.eventWithDetails);
 
+    useEffect(() => {
+        const fetchEvent = async () => {
+            try {
+                await dispatch(eventByIdFetch(eventId));
+            } catch (error) {
+                console.error("Failed to fetch event:", error);
+            }
+        };
+
+        fetchEvent(); // Call the async function inside useEffect
+    }, [dispatch, eventId]); // Add dependencies
 
     return (
         <>
             {/* <NavHomeTwo />
             <NavHomeOne /> */}
-            <Box sx={{ p: 3 }}>
+            <Box sx={{ p: 3 }} key={_id}>
                 {/* Breadcrumb */}
-                <Breadcrumb />
+                <Breadcrumb eventName={eventName} />
 
                 {/* Main Event Banner */}
-                <BannerGallery />
+                <BannerGallery coverImage={coverImage} eventName={eventName} description={description} date={date} time={time} />
 
                 {/* Event Description */}
                 <Card sx={{ mt: 3, p: 3, borderRadius: "15px", backgroundColor: "#2296D4", color: "white" }}>
                     <Box maxWidth={900}>
-                        <Typography variant="h5" fontWeight="bold">
-                            Event Description
-                        </Typography>
-                        <Typography mt={1}>
-                            Welcome to the Avignon Convention 2025! Join us for an exciting day of innovation, networking, and learning.
-                            Our objective is to gather professionals worldwide to discuss agile methodologies and international collaboration.
-                        </Typography>
+                        <HeadingCommon title='Event Description' variant="h5" color="white" baseSize="40px" mb={0} weight={600} />
+                        {ReactHtmlParser(description)}
+
                         <Typography mt={2}>
                             Registration is required before November 10, 2025. Don’t miss out on this incredible event!
                         </Typography>
@@ -227,7 +231,7 @@ export function FrontHome() {
                 </Card>
 
                 {/* Tracking system */}
-                <TrackingSystem />
+                <TrackingSystem tickets={tickets} location={location}/>
 
                 {/* Contact and Sharing Section */}
                 <ContactAndSharing />
@@ -243,7 +247,7 @@ export function FrontHome() {
 
                 {/* Rate and Review */}
                 <FriendWhoBooked />
-                
+
                 {/* Rate and Review */}
                 <LiveChat />
             </Box>

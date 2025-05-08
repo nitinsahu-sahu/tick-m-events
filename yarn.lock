@@ -639,7 +639,7 @@
   resolved "https://registry.npmjs.org/@types/domhandler/-/domhandler-2.4.5.tgz"
   integrity sha512-lANhC2grmFG1gBac/8sDAKdIXx+TzAdkJIAjEOSMA+qW3297ybACEbacJnG15aNYfrzDO6fdcoouokqAKsy6aQ==
 
-"@types/domutils@*":
+"@types/domutils@*", "@types/domutils@^2.1.0":
   version "2.1.0"
   resolved "https://registry.npmjs.org/@types/domutils/-/domutils-2.1.0.tgz"
   integrity sha512-5oQOJFsEXmVRW2gcpNrBrv1bj+FVge2Zwd5iDqxan5tu9/EKxaufqpR8lIY5sGIZJRhD5jgTM0iBmzjdpeQutQ==

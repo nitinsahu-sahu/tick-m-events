@@ -8,6 +8,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { createTicketType } from "src/redux/actions/ticket-&-reservation-management.action";
 import { AppDispatch } from "src/redux/store";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 interface FormRefs {
     eventName: HTMLInputElement | null;
@@ -95,9 +96,8 @@ export function TicketCreationAndConfiguration() {
         <Box boxShadow={3} borderRadius={3} mt={3}>
             <Paper sx={{ width: "100%", p: 3, maxWidth: { xs: "800px", sm: "800px", md: "100%" } }}>
                 {/* Section Title */}
-                <Typography variant="h5" color={theme.palette.blue.contrastText} fontWeight="bold">
-                    Ticket Creation & Configuration
-                </Typography>
+                <HeadingCommon baseSize="33px" weight={600} variant="h5" color='#0B2E4C' title="Ticket Creation & Configuration"/>
+               
 
                 {/* Table Header */}
                 <Box
@@ -129,9 +129,7 @@ export function TicketCreationAndConfiguration() {
                 </Box>
 
                 {/* Form Section */}
-                <Typography variant="h6" color={theme.palette.blue.contrastText} fontWeight="bold" sx={{ mt: 3 }}>
-                    Create a Ticket Type
-                </Typography>
+                <HeadingCommon baseSize="33px" weight={600} variant="h5" color='#0B2E4C' title="Create a Ticket Type" mt={3}/>
 
                 {/* Inputs - Responsive Grid */}
                 <Box
@@ -244,7 +242,7 @@ export function TicketCreationAndConfiguration() {
                     <Button
                         fullWidth
                         variant="contained"
-                        sx={{ backgroundColor: theme.palette.blue.contrastText }}
+                        sx={{ backgroundColor: '#0B2E4C' }}
                         onClick={handleSubmit}
                     >
                         Save & Publish Tickets

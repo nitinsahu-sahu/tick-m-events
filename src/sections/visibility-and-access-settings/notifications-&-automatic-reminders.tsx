@@ -36,14 +36,12 @@ export function NotificationAutomaticReminders() {
   //     notificationMethod,
   //     notificationType: "reminder" // static field (if required)
   //   };
-  //   console.log(payload);
   //   dispatch(saveReminderSettings(payload));
   // };
 
   const handleSave = () => {
     const now = new Date();
     const eventDate = new Date(now.getTime() + 2 * 60 * 1000); 
-    console.log(eventDate);// 2 minutes from now
     const payload = {
       eventDate, // Current system date and time
       reminderTime: 1, // 1 hour before event

@@ -23,6 +23,7 @@ import { LoadingButton } from '@mui/lab';
 import { AppDispatch } from 'src/redux/store';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 import { Iconify } from 'src/components/iconify';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
@@ -30,6 +31,7 @@ import { ticketConfigCreate } from 'src/redux/actions/event.action';
 
 export function StepperStepTwo() {
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
 
     const [fullRefundCheck, setFullRefundCheck] = useState(false);
     const [noRefundAfterDateCheck, setNoRefundAfterDateCheck] = useState(false);
@@ -58,7 +60,6 @@ export function StepperStepTwo() {
             isLimitedSeat: true
         }
     ]);
-    // console.log('ticket', ticketRows);
 
     const handleTickteConfigChange = (event: any) => {
         event.preventDefault(); // Prevent default form submission behavior
@@ -92,7 +93,7 @@ export function StepperStepTwo() {
     const handleTicketConfig = useCallback(async (event: any) => {
         event.preventDefault();
         const formEventData = new FormData();
-        formEventData.append("eventId", "1");
+        formEventData.append("eventId", "681203aecab8ec40c8d55abe");
         formEventData.append("tickets", JSON.stringify(ticketRows));
         formEventData.append("purchaseDeadlineDate", ticketConfigData.purchaseDeadlineDate);
         formEventData.append("isPurchaseDeadlineEnabled", ticketConfigData.isPurchaseDeadlineEnabled);
@@ -107,11 +108,19 @@ export function StepperStepTwo() {
 
 
         try {
-            const res = await dispatch(ticketConfigCreate(formEventData));
+            // Get current search params
+            const searchParams = new URLSearchParams(window.location.search);
+            const eventId = searchParams.get('eventId'); // Get existing eventId
+            const res = await dispatch(ticketConfigCreate({ formEventData, eventId }));
+
+            const ticketConfigId = res?.ticketConfigId; // Adjust based on your response structure
+
+            // Add event ID to current URL as search param
+            navigate(`?eventId=${eventId}&ticketConfigId=${ticketConfigId}`, { replace: true });
         } catch (error) {
             toast.error("Server Error");
         }
-    }, [dispatch, ticketRows, ticketConfigData, fullRefundCheck, refundEnabled, partialRefundCheck, noRefundAfterDateCheck]);
+    }, [navigate, dispatch, ticketRows, ticketConfigData, fullRefundCheck, refundEnabled, partialRefundCheck, noRefundAfterDateCheck]);
 
 
     return (
@@ -125,6 +134,11 @@ export function StepperStepTwo() {
                         <Grid item xs={12} sm={5} md={3}>
                             <TextField
                                 fullWidth
+                                inputProps={{
+                                    style: {
+                                        textTransform: "capitalize"
+                                    }
+                                }}
                                 label="Ticket Types"
                                 placeholder="Standard, VIP, Premium"
                                 value={row.ticketType}
@@ -140,7 +154,7 @@ export function StepperStepTwo() {
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                 }}
-                                placeholder="0.00"
+                                placeholder="0 XAF"
                                 value={row.price}
                                 onChange={(e) => handleChange(row.id, 'price', e.target.value)}
                             />

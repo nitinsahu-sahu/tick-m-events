@@ -1,166 +1,211 @@
-import { Box, Typography, Card, CardContent, Grid } from "@mui/material";
-import { useState } from "react";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { TextField, Box, Typography, Card, CardContent, Grid } from "@mui/material";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { LoadingButton } from "@mui/lab";
+import { ColorResult, SketchPicker } from 'react-color';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+import { AppDispatch } from "src/redux/store";
+import { eventCustomizationCreate } from "src/redux/actions/event.action";
 
 export function StepperStepThree() {
-      const [selectedLogo, setSelectedLogo] = useState<string | null>(null);
-      const [selectedFrame, setSelectedFrame] = useState<string | null>(null);
-      const [selectedColor, setSelectedColor] = useState("#FF66A1");
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
+
+    const [eventLogo, setEventLogo] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [selectedFrame, setSelectedFrame] = useState('');
+    const [selectedColor, setSelectedColor] = useState("#F68CB9");
+    const [customColor, setCustomColor] = useState("#FF66A1");
+    const handleEventThemeLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files?.[0]) {
+            // Create object URL for preview
+            const previewUrl = URL.createObjectURL(e.target.files[0]);
+            setEventLogo(previewUrl);
+        }
+    };
+
+    // Clean up object URLs when component unmounts
+    useEffect(() => () => {
+        if (eventLogo) {
+            URL.revokeObjectURL(eventLogo);
+        }
+    }, [eventLogo]);
+
+
+    const handleColorChange = (color: ColorResult) => {
+        setCustomColor(color.hex); // Extract the hex value from ColorResult
+    };
+
+    const handleEventCustomize = useCallback(async (event: any) => {
+        event.preventDefault();
+        const formEventCustomizeData = new FormData();
+        const files = fileInputRef.current?.files;
+        // Append all form data
+        formEventCustomizeData.append("frame", selectedFrame);
+        formEventCustomizeData.append("themeColor", selectedColor);
+        formEventCustomizeData.append("customColor", customColor);
+
+        if (files && files.length > 0) {
+            const selectedFile = files[0];
+            formEventCustomizeData.append("eventLogo", selectedFile);
+        }
+        try {
+            // Get current search params
+            const searchParams = new URLSearchParams(window.location.search);
+            const eventId = searchParams.get('eventId'); // Get existing eventId
+            const ticketConfigId = searchParams.get('ticketConfigId'); // Get existing eventId
+            const res = await dispatch(eventCustomizationCreate({formEventCustomizeData,eventId,ticketConfigId}));
+            const eventCustomizationId = res?.eventCustomizationId;
+
+            // Add event ID to current URL as search param
+            navigate(`?eventId=${eventId}&ticketConfigId=${ticketConfigId}&eventCustomiztionId=${eventCustomizationId}`, { replace: true });
+
+        } catch (error) {
+            toast.error("Event creation failed");
+        }
+    }, [dispatch, navigate, customColor, selectedColor, selectedFrame]);
 
     return (
         <Card
             sx={{
-                borderRadius: 4,
+                borderRadius: 3,
                 padding: 3,
                 boxShadow: 3,
-                margin: "auto",
                 border: "2px solid #E0E0E0",
-                marginTop: 4,
+                marginTop: 3,
             }}
         >
             <CardContent>
-                <Grid container spacing={4}>
-                    {/* Left Section: Theme Selection */}
-                    <Grid item xs={12} md={6}>
-                        <Typography variant="h5" fontWeight="bold">
-                            Event Customization
-                        </Typography>
+                <form encType='multipart/form-data' onSubmit={handleEventCustomize}>
+                    <Grid container spacing={4}>
+                        {/* Left Section: Theme Selection */}
+                        <Grid item xs={12} md={6}>
+                            <HeadingCommon variant="h5" weight={600} baseSize="33px" title="Event Customization" />
+                            <Box>
+                                <HeadingCommon variant="h5" weight={800} mb="0px" baseSize="33px" title="Choose Event Theme" color="#0B2E4C" />
+                                <HeadingCommon variant="body2" weight={500} mt="-10px" baseSize="17px" title="Choose main colors" color="#0B2E4C" />
+                            </Box>
+                            <Box sx={{ display: "flex", gap: 2, mt: 3, flexWrap: "wrap" }}>
+                                {["#F68CB9", "#FF592F", "#FEEE4A", "#67A5E1", "#FE5C9D"].map((color) => (
+                                    <Box
+                                        key={color}
+                                        sx={{
+                                            width: 45,
+                                            height: 45,
+                                            backgroundColor: color,
+                                            borderRadius: "50%",
+                                            cursor: "pointer",
+                                            border: selectedColor === color ? "2px solid black" : "none",
+                                        }}
+                                        onClick={() => setSelectedColor(color)}
+                                    />
+                                ))}
+                            </Box>
+                            <HeadingCommon variant="body2" mt={2} weight={500} baseSize="17px" title="Choose Custom Colors" color="#0B2E4C" />
 
-                        <Typography variant="h6" fontWeight="bold" sx={{ mt: 2, color: "#1E1E1E" }}>
-                            Choose Event Theme
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: "#666" }}>
-                            Choose main colors
-                        </Typography>
+                            <SketchPicker color={customColor} onChangeComplete={handleColorChange} />
+                        </Grid>
 
-                        <Box sx={{ display: "flex", gap: 2, mt: 1, flexWrap: "wrap" }}>
-                            {["#FF66A1", "#E63946", "#FFD700", "#4A90E2", "#E91E63"].map((color) => (
-                                <Box
-                                    key={color}
-                                    sx={{
-                                        width: 32,
-                                        height: 32,
-                                        backgroundColor: color,
-                                        borderRadius: "50%",
-                                        cursor: "pointer",
-                                        border: selectedColor === color ? "2px solid black" : "none",
-                                    }}
-                                    onClick={() => setSelectedColor(color)}
-                                />
-                            ))}
-                        </Box>
+                        {/* Right Section: Logo Upload & Frame Selection */}
+                        <Grid item xs={12} md={6}>
+                            <Typography variant="h6" fontWeight="bold">
+                                Theme Logo Preview
+                            </Typography>
 
-                        <Typography variant="body2" sx={{ color: "#666", mt: 2 }}>
-                            Choose Custom Colors
-                        </Typography>
-                        <Box
-                            sx={{
-                                width: "100%",
-                                maxWidth: "200px",
-                                height: "32px",
-                                background: "linear-gradient(to right, yellow, orange)",
-                                borderRadius: "8px",
-                                mt: 1,
-                                border: "1px solid #ccc",
-                            }}
-                        />
-                    </Grid>
+                            <Box
+                                sx={{
+                                    width: "90px",
+                                    height: "90px",
+                                    borderRadius: "12px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    backgroundColor: "#FFF",
+                                    boxShadow: 2,
+                                    border: "1px solid #D3D3D3",
+                                    overflow: "hidden",
+                                    marginBottom: 4,
+                                }}
+                            >
+                                {eventLogo ? (
+                                    <img src={eventLogo} alt="Uploaded" width="60px" />
+                                ) : (
+                                    <Typography variant="body2" color="textSecondary">
+                                        No Logo
+                                    </Typography>
+                                )}
+                            </Box>
 
-                    {/* Right Section: Logo Upload & Frame Selection */}
-                    <Grid item xs={12} md={6}>
-                        <Typography variant="h6" fontWeight="bold">
-                            Add logo
-                        </Typography>
-
-                        <Box
-                            sx={{
-                                width: "90px",
-                                height: "90px",
-                                borderRadius: "12px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                backgroundColor: "#FFF",
-                                boxShadow: 2,
-                                border: "1px solid #D3D3D3",
-                                overflow: "hidden",
-                                marginBottom: 4,
-                            }}
-                        >
-                            {selectedLogo ? (
-                                <img src={selectedLogo} alt="Uploaded" width="60px" />
-                            ) : (
-                                <Typography variant="body2" color="textSecondary">
-                                    No Logo
-                                </Typography>
-                            )}
-                        </Box>
-
-                        <Grid container spacing={3}>
-                            {/* Logo Upload Section */}
-                            <Grid item xs={12} sm={6}>
-                                <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
-                                    Choose logo
-                                </Typography>
-                                <label
-                                    htmlFor="logo-upload"
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: 8,
-                                        backgroundColor: "#F1F1F1",
-                                        padding: "10px 16px",
-                                        borderRadius: "8px",
-                                        cursor: "pointer",
-                                        border: "1px solid #ccc",
-                                        fontSize: "14px",
-                                        fontWeight: "500",
-                                    }}
-                                >
-                                    Upload Image <CloudUploadIcon fontSize="small" />
-                                    <input
+                            <Grid container spacing={3}>
+                                {/* Logo Upload Section */}
+                                <Grid item xs={12} sm={12}>
+                                    <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
+                                        Choose logo
+                                    </Typography>
+                                    <TextField
                                         type="file"
-                                        id="logo-upload"
-                                        hidden
-                                        onChange={(e) => {
-                                            const files = e.target.files;
-                                            if (!files || files.length === 0) return;
-                                            const file = files[0];
-                                            setSelectedLogo(URL.createObjectURL(file));
+                                        fullWidth
+                                        required
+                                        name="eventLogo"
+                                        onChange={handleEventThemeLogo}
+                                        inputRef={fileInputRef}
+                                        InputProps={{
+                                            sx: {
+                                                borderRadius: '10px',
+                                                border: '1px solid #ccc',
+                                                backgroundColor: '#F9F9F9',
+                                            },
+                                            inputProps: {
+                                                accept: "image/*",
+                                            },
                                         }}
                                     />
-                                </label>
-                            </Grid>
+                                </Grid>
 
-                            {/* Frame Selection Section */}
-                            <Grid item xs={12} sm={6}>
-                                <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
-                                    Choose Frames
-                                </Typography>
-                                <Box sx={{ display: "flex", gap: 2 }}>
-                                    {["circle", "triangle", "square"].map((frame) => (
-                                        <Box
-                                            key={frame}
-                                            sx={{
-                                                width: 40,
-                                                height: 40,
-                                                borderRadius: frame === "circle" ? "50%" : "4px",
-                                                border: "2px solid",
-                                                borderColor: selectedFrame === frame ? "#007BFF" : "#D3D3D3",
-                                                backgroundColor: "#E0E0E0",
-                                                cursor: "pointer",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                            }}
-                                            onClick={() => setSelectedFrame(frame)}
-                                        />
-                                    ))}
-                                </Box>
+                                {/* Frame Selection Section */}
+                                <Grid item xs={12} sm={12}>
+                                    <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
+                                        Choose Frames
+                                    </Typography>
+                                    <Box sx={{ display: "flex", gap: 2 }}>
+                                        {["circle", "triangle", "square"].map((frame) => (
+                                            <Box
+                                                key={frame}
+                                                sx={{
+                                                    width: 40,
+                                                    height: 40,
+                                                    borderRadius: frame === "circle" ? "50%" : "4px",
+                                                    border: "2px solid",
+                                                    borderColor: selectedFrame === frame ? "#007BFF" : "#D3D3D3",
+                                                    backgroundColor: "#E0E0E0",
+                                                    cursor: "pointer",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                }}
+                                                onClick={() => setSelectedFrame(frame)}
+                                            />
+                                        ))}
+                                    </Box>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </Grid>
-                </Grid>
+                    {/* Submit Button - Always full width */}
+                    <LoadingButton
+                        fullWidth
+                        size="large"
+                        type="submit"
+                        color="inherit"
+                        variant="contained"
+                        sx={{ mt: 3, backgroundColor: "#0B2E4C" }}
+                    >
+                        Save Customization
+                    </LoadingButton>
+                </form>
             </CardContent>
         </Card>
     )

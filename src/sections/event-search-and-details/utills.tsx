@@ -118,8 +118,4 @@ export const tabs = ['Recent', 'Best', 'Latest'];
 export const typeMap = ['recent', 'best', 'latest'];
 
 export const musicFestivalTableHeaders = ["Ticket", "Price", "Benefits", "Availability"];
-export const musicFestivalTableData = [
-    { ticket: "Standard", price: "10,000 XAF", benefits: "General Access", availability: "Available" },
-    { ticket: "Standard", price: "10,000 XAF", benefits: "General Access", availability: "Available" },
-    { ticket: "Standard", price: "10,000 XAF", benefits: "General Access", availability: "Available" },
-];
+

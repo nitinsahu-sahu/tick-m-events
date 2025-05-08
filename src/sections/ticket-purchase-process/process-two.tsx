@@ -21,8 +21,7 @@ export function ProcessTwo() {
         formFields.forEach(field => {
             formData[field.id] = formRefs.current[field.id]?.value || '';
         });
-        console.log('Form data:', formData);
-        // Use formData for submission
+       
     };
 
     const setRef = (id: string) => (el: HTMLInputElement | null) => {

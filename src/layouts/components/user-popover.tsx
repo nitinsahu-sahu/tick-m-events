@@ -43,6 +43,7 @@ export function UserPopover() {
     const hiddenHomeRecommadation = ['/home-and-recommendations'];
     const hiddenTranPaymet = ['/transection-and-payment'];
     const hiddenDashboard = ['/'];
+    const hiddenEventDetails = ['/event-details'];
 
     const { _id, name, role, avatar } = useSelector((state: RootState) => state?.auth?.user);
 
@@ -165,13 +166,6 @@ export function UserPopover() {
                     }
 
                     {
-                        hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
-                        <Box display="flex" gap={1} alignItems="center" justifyContent="center">
-                            <Iconify icon="typcn:filter" width={24} />
-                            <Iconify icon="mdi:heart" width={24} color="#e11e1e" />
-                        </Box>
-                    }
-                    {
                         !hiddenDashboard.some(path => pathname.includes(path)) &&
                         !hiddenTranPaymet.some(path => pathname.includes(path)) &&
                         !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
@@ -231,6 +225,8 @@ export function UserPopover() {
                         <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
                             <Button
                                 variant="contained"
+                                disabled={hiddenEventDetails?.toString() === pathname?.toString()}
+                                onClick={() => navigate("/event-details")} // Redirect on click
                                 sx={{
                                     backgroundColor: "#0C2340",
                                     color: "white",

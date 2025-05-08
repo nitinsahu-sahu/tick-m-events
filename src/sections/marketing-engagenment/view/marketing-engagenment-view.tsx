@@ -46,6 +46,7 @@ export function MarketingEngagenmentView() {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
     dispatch(promotionGet())
@@ -76,12 +77,15 @@ export function MarketingEngagenmentView() {
             borderRadius: "10px",
             "&:hover": { bgcolor: "#083048" },
           }}
+          onClick={() => setShowCreateForm(true)} 
         >
           Create a New Notification
         </Button>
 
         {/* Select Notification Type */}
-        <Typography variant="body2" fontWeight="bold" mt={3} mb={1}>
+        {showCreateForm && (
+          <Paper  sx={{ p: 3, borderRadius: '10px', background: '#f5f5f5', mt:3 }}>
+        <Typography variant="body2" fontWeight="bold"  mb={1}>
           Select Notification Type
         </Typography>
         <Select fullWidth defaultValue="Web Push" sx={{ mb: 3 }}>
@@ -198,6 +202,8 @@ export function MarketingEngagenmentView() {
         >
           Send Notifications
         </Button>
+        </Paper>
+        )}
       </Box>
 
       {/* Media sharing  section */}

@@ -10,6 +10,7 @@ import { RootState } from 'src/redux/store';
 import { usePathname } from 'src/routes/hooks';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { getFilteredNavItems } from 'src/routes/hooks/getFilterNavItesm';
+import { useNavigate } from 'react-router-dom';
 
 import { Main } from './main';
 import { layoutClasses } from '../classes';
@@ -23,6 +24,7 @@ import { MessagePopover } from '../components/message-popover';
 import { GiftPopover } from '../components/gift-popover';
 import { EmailPopover } from '../components/email-popover';
 import { UserPopover } from '../components/user-popover';
+import { WishlistPopover } from '../components/wishlist-popover';
 
 // ----------------------------------------------------------------------
 
@@ -39,7 +41,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
   const { _id, name, role } = useSelector((state: RootState) => state?.auth?.user);
   const filteredNavItems = getFilteredNavItems(navData, role);
   const pathname = usePathname()
-
+  const navigate = useNavigate();
   const isMobileOrTablet = useMediaQuery(theme.breakpoints.down("md")); // Hide on md & below
   const hiddenPaths = ['/ticket-validation-at-entry'];
   const hiddenTicketManagement = ["/ticket-management"];
@@ -60,6 +62,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
   const hiddenLoyaltyProgram = ['/loyalty-program'];
   const hiddenTicketPurchasePro = ['/ticket-purchase-process'];
   const hiddenEventSearchDetails = ['/event-search-and-details'];
+  const hiddenEventDetails = ['/event-details'];
   const hiddenCustomPhotoVideo = ['/custom-photo-or-video-filters-for-events'];
   const hiddenHomeRecommadation = ['/home-and-recommendations'];
   const hiddenTranPaymet = ['/transection-and-payment'];
@@ -178,6 +181,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
 
                 {/* Search Bar */}
                 {
+                  !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
                   !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
                   !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
                   !hiddenTicketManagement.some(path => pathname.includes(path)) &&
@@ -281,12 +285,11 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   </>
                 )}
                 {
-                  !isMobileOrTablet &&
                   (
                     hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
                     <>
                       <Iconify icon="typcn:filter" width={24} />
-                      <Iconify icon="mdi:heart" width={24} color="#e11e1e" />
+                      <WishlistPopover />
                     </>
                   )
                 }
@@ -397,6 +400,8 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                         <>
                           <Button
                             variant="contained"
+                            disabled={hiddenEventDetails?.toString() === pathname?.toString()}
+                            onClick={() => navigate("/event-details")} // Redirect on click
                             sx={{
                               backgroundColor: "#0C2340",
                               color: "white",

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import {
@@ -7,24 +7,23 @@ import {
     Grid, FormControl, InputLabel
 } from "@mui/material";
 import PublicIcon from '@mui/icons-material/Public';
-import { useDispatch, useSelector } from 'react-redux';
-import UploadIcon from '@mui/icons-material/CloudUpload';
+import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TikTokIcon from '@mui/icons-material/MusicNote';
 import { LoadingButton } from '@mui/lab';
+import { useNavigate } from 'react-router-dom';
+
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { eventCreate } from 'src/redux/actions/event.action';
 import { AppDispatch } from 'src/redux/store';
 
-export function StepperStepOne() {
+export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
+    const navigate = useNavigate();
     const quillRef = useRef<ReactQuill>(null);
     const dispatch = useDispatch<AppDispatch>();
-    const [eventBanner, setEventBanner] = useState(null); // Correct initialization
-
     const [eventFormData, setEventFormData] = useState({
         eventName: "",
         date: "",
@@ -49,16 +48,10 @@ export function StepperStepOne() {
         setEventFormData((prevData) => ({ ...prevData, [name]: value }));
     };
 
-    const handleEventBanner = (e: any) => {
-        if (e.target.files?.[0]) { // Check if a file exists
-            setEventBanner(e.target.files[0]); // Store the File object directly
-        }
-    };
-
     const handleEventCreate = useCallback(async (event: any) => {
         event.preventDefault();
         const formEventData = new FormData();
-
+        const files = fileInputRef.current?.files;
         // Append all form data
         formEventData.append("name", eventFormData.name);
         formEventData.append("email", eventFormData.email);
@@ -77,21 +70,24 @@ export function StepperStepOne() {
         formEventData.append("tiktok", eventFormData.tiktok);
 
         formEventData.append("description", quillRef?.current?.value as string);        // Append avatar if it exists
-        if (eventBanner) {
-            formEventData.append("coverImage", eventBanner);
+        if (files && files.length > 0) {
+            const selectedFile = files[0];
+            formEventData.append("coverImage", selectedFile);
         }
         try {
             const res = await dispatch(eventCreate(formEventData));
-            console.log(res, 'res');
+            const eventId = res?.eventId; // Adjust based on your response structure
+
+            // Add event ID to current URL as search param
+            navigate(`?eventId=${eventId}`, { replace: true });
 
         } catch (error) {
             toast.error("Event creation failed");
         }
-    }, [eventFormData, eventBanner, dispatch]);
+    }, [eventFormData, dispatch, navigate, fileInputRef]);
 
     return (
-        <
-            >
+        <>
             <HeadingCommon variant="h5" baseSize="33px" weight={600} title="Event Information" color="#0B2E4C" />
             <HeadingCommon
                 variant="body2"
@@ -99,6 +95,7 @@ export function StepperStepOne() {
                 weight={400}
                 title="Select the ideal destination to begin your journey with ease"
             />
+
             <form encType='multipart/form-data' onSubmit={handleEventCreate}>
                 <Grid container spacing={2}>
                     {/* Event Details Section */}
@@ -107,6 +104,11 @@ export function StepperStepOne() {
                             {/* Event Name - Full width on mobile */}
                             <Grid item xs={12} sm={6}>
                                 <TextField
+                                    inputProps={{
+                                        style: {
+                                            textTransform: "capitalize"
+                                        }
+                                    }}
                                     required
                                     name="eventName"
                                     type='text'
@@ -135,11 +137,11 @@ export function StepperStepOne() {
                                 <TextField
                                     required
                                     name="time"
-                                    type='text'
+                                    type='time'
                                     value={eventFormData.time}
                                     onChange={handleEventChange}
-                                    fullWidth label="Select Time"
-                                    placeholder="12:00 am - 10:00am" />
+                                    fullWidth label="Start Time"
+                                />
                             </Grid>
                         </Grid>
 
@@ -152,7 +154,10 @@ export function StepperStepOne() {
                                     fullWidth
                                     required
                                     name='coverImage'
-                                    onChange={handleEventBanner}
+                                    inputRef={fileInputRef}
+                                    onChange={handleEventThemeLogo}
+
+                                    // onChange={handleEventBanner}
                                     InputProps={{
                                         sx: {
                                             borderRadius: '10px',
@@ -203,7 +208,7 @@ export function StepperStepOne() {
                                     <Select
                                         value={eventFormData.eventFormat}
                                         onChange={handleEventChange}
-                                        name="eventCategory"
+                                        name="eventFormat"
                                         label="eventFormat"
                                     >
                                         <MenuItem value="In-person">In-person (with a physical location)</MenuItem>
@@ -240,6 +245,11 @@ export function StepperStepOne() {
                                 <HeadingCommon width={400} baseSize="16px" title="Enter location" />
                                 <TextField
                                     required
+                                    inputProps={{
+                                        style: {
+                                            textTransform: "capitalize"
+                                        }
+                                    }}
                                     name="location"
                                     type='text'
                                     value={eventFormData.location}
@@ -281,6 +291,11 @@ export function StepperStepOne() {
                     <Grid item xs={12} sm={6} md={4}>
                         <TextField
                             required
+                            inputProps={{
+                                style: {
+                                    textTransform: "capitalize"
+                                }
+                            }}
                             name="name"
                             type='text'
                             value={eventFormData.name}

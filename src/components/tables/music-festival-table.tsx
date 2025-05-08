@@ -19,6 +19,7 @@ export function MusicFestivalTable({
     data: any[];
 }) {
     const theme = useTheme();
+    console.log('table', data);
 
     return (
         <TableContainer component={Paper}>
@@ -44,25 +45,38 @@ export function MusicFestivalTable({
 
                 <TableBody>
                     {data.map((row, index) => (
-                        <TableRow
-                            key={index}
-                            sx={{
-                                backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#e0e0e0",
-                            }}
-                        >
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                {row.ticket}
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                {row.price}
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                {row.benefits}
-                            </TableCell>
-                            <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                {row.availability}
-                            </TableCell>
-                        </TableRow>
+                        // First check if tickets exist, otherwise show "No tickets" row
+                        row.tickets?.length > 0 ? (
+                            // Map through each ticket in the tickets array
+                            row.tickets.map((ticket: any, ticketIndex: any) => (
+                                <TableRow
+                                    key={ticket._id || `${index}-${ticketIndex}`}
+                                    sx={{
+                                        backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#e0e0e0",
+                                    }}
+                                >
+                                    <TableCell align="center" sx={{ textTransform: "uppercase", fontWeight: "bold" }}>
+                                        {ticket.ticketType || "N/A"}
+                                    </TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                                        {ticket.price || "N/A"}
+                                    </TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                                        {ticket.description || "N/A"}
+                                    </TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                                        Available
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        ) : (
+                            // Show this if no tickets exist for this event
+                            <TableRow key={`no-tickets-${index}`}>
+                                <TableCell colSpan={4} align="center">
+                                    No tickets available
+                                </TableCell>
+                            </TableRow>
+                        )
                     ))}
                 </TableBody>
             </Table>

@@ -1,26 +1,28 @@
+import { useCallback, useState } from 'react';
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { ticketst } from '../utills';
-import { DiscoverEvent } from '../discover-event';
 import { FindYourEvent } from '../find-your-event';
 import { MusicFestival } from '../music-festival';
 import { EventShare } from '../event-share';
-import { MusicFestivalTwo } from '../music-festival-two';
 
 export function EventSearchAndDetailsView() {
+  const [selectedEvent, setSelectedEvent] = useState({}); // Toggle for edit mode
+  const handleEventDetails = useCallback((selectedViewEvent: any) => {
+    setSelectedEvent(selectedViewEvent?.selectedViewEvent)
+  }, [])
+
   return (
     <DashboardContent>
       <PageTitleSection title="Discover Events" />
 
-      <DiscoverEvent list={ticketst} />
+      {/* <DiscoverEvent list={ticketst} /> */}
 
-      <FindYourEvent />
-
-      {/* urban festival 2025 */}
-      <MusicFestival />
+      <FindYourEvent handleEventDetails={handleEventDetails} />
 
       {/* urban festival 2025 */}
-      <MusicFestivalTwo />
+      {
+        Object.keys(selectedEvent).length === 0 ? null : <MusicFestival selectedEvent={selectedEvent} />
+      }
 
       {/* share this event */}
       <EventShare />

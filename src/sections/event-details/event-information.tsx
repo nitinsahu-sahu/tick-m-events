@@ -8,28 +8,28 @@ import { StepperStepFour } from "./stepper-componentes/stepper-step-four";
 import { StepperStepOne } from "./stepper-componentes/stepper-step-One";
 import { StepperStepTwo } from "./stepper-componentes/stepper-step-two";
 import { StepperStepThree } from "./stepper-componentes/stepper-step-three";
-import { StepperSucessful } from "./stepper-componentes/event-created-succesfull";
+import { StepperSuccessful } from "./stepper-componentes/event-created-succesfull";
 
 
-export function EventInformation() {
-  const stepComponents = [<StepperStepOne />, <StepperStepTwo />, <StepperStepThree />, <StepperStepFour />, <StepperSucessful />];
+export function EventInformation({handleEventThemeLogo, fileInputRef}:any) {
+  const stepComponents = [<StepperStepOne fileInputRef={fileInputRef} handleEventThemeLogo={handleEventThemeLogo}/>, <StepperStepTwo />, <StepperStepThree />, <StepperStepFour />];
   const steps = ['0', '1', '2', '3'];
   const { stepper } = useSelector((state: RootState) => state?.event);
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(3);
 
   useEffect(() => {
-    setActiveStep( stepper);
+    setActiveStep(stepper);
   }, [stepper]);
 
-  useEffect(() => {
-    if (activeStep === 4) {
-      const timer = setTimeout(() => {
-        setActiveStep(0);
-      }, 10000);
-      return () => clearTimeout(timer);
-    }
-    return undefined; // Explicit return for other cases
-  }, [activeStep]);
+  // useEffect(() => {
+  //   if (stepper === 3) {
+  //     const timer = setTimeout(() => {
+  //       setActiveStep(0);
+  //     }, 10000);
+  //     return () => clearTimeout(timer);
+  //   }
+  //   return undefined; // Explicit return for other cases
+  // }, [stepper]);
 
   return (
     <Box

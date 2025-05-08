@@ -89,7 +89,7 @@ export function PopularEvent({ event, handleEventDetails }: any) {
         />
         <HeadingCommon variant="h6" mt={5} title={event.eventName} baseSize="25px" weight={600} color="#0B2E4C" />
         <HeadingCommon variant="body2" title={`${event.location} | ${event.date} | ${formatTimeTo12Hour(event.time)}`} baseSize="16px" weight={400} />
-        <HeadingCommon variant="body2" title='paid' baseSize="16px" weight={700} color="#0B2E4C" />
+        <HeadingCommon variant="body2" title={event.payStatus} baseSize="16px" weight={700} color="#0B2E4C" />
         {/* Star Rating */}
         <Box
           sx={{

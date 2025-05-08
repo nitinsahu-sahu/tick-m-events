@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
+
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
 import { TicketCreationAndConfiguration } from "./ticket-creation-&-onfiguration";
-import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 export function TicketManagement() {
     const theme = useTheme();

@@ -11,20 +11,21 @@ import {
     Checkbox,
     InputAdornment,
     IconButton,
-    FormControl
+    FormControl,
+    ToggleButtonGroup,
+    ToggleButton
 } from '@mui/material';
-//   import { DatePicker } from '@mui/x-date-pickers';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import PaymentIcon from '@mui/icons-material/Payment';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import MoneyIcon from '@mui/icons-material/AttachMoney';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { LoadingButton } from '@mui/lab';
-import { AppDispatch } from 'src/redux/store';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
+import { AppDispatch } from 'src/redux/store';
 import { Iconify } from 'src/components/iconify';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { ticketConfigCreate } from 'src/redux/actions/event.action';
@@ -36,7 +37,8 @@ export function StepperStepTwo() {
     const [fullRefundCheck, setFullRefundCheck] = useState(false);
     const [noRefundAfterDateCheck, setNoRefundAfterDateCheck] = useState(false);
     const [refundEnabled, setRefundEnabled] = useState(false);
-    const [partialRefundCheck, setPartialRefundCheck] = useState(true);
+    const [partialRefundCheck, setPartialRefundCheck] = useState(false);
+    const [payStatus, setPayStatus] = useState('paid');
     const [ticketConfigData, setTicketConfigData] = useState({
         purchaseDeadlineDate: "",
         isPurchaseDeadlineEnabled: "true",
@@ -52,15 +54,13 @@ export function StepperStepTwo() {
         {
             id: 1,
             ticketType: '',
-            price: '0',
+            price: '0 XAF',
             isLinkPramotion: false,
             totalTickets: '0',
             description: '',
-            isUnlimitedSeat: false,
             isLimitedSeat: true
         }
     ]);
-
     const handleTickteConfigChange = (event: any) => {
         event.preventDefault(); // Prevent default form submission behavior
         const { name, value } = event.target;
@@ -70,7 +70,7 @@ export function StepperStepTwo() {
     const addRow = () => {
         setTicketRows([
             ...ticketRows,
-            { id: Date.now(), isLimitedSeat: true, ticketType: '', price: '', isLinkPramotion: false, totalTickets: '', description: '', isUnlimitedSeat: false }
+            { id: Date.now(), isLimitedSeat: true, ticketType: '', price: '', isLinkPramotion: false, totalTickets: '', description: '' }
         ]);
     };
 
@@ -93,7 +93,7 @@ export function StepperStepTwo() {
     const handleTicketConfig = useCallback(async (event: any) => {
         event.preventDefault();
         const formEventData = new FormData();
-        formEventData.append("eventId", "681203aecab8ec40c8d55abe");
+
         formEventData.append("tickets", JSON.stringify(ticketRows));
         formEventData.append("purchaseDeadlineDate", ticketConfigData.purchaseDeadlineDate);
         formEventData.append("isPurchaseDeadlineEnabled", ticketConfigData.isPurchaseDeadlineEnabled);
@@ -104,6 +104,7 @@ export function StepperStepTwo() {
         formEventData.append("partialRefundPercent", ticketConfigData.partialRefundPercent);
         formEventData.append("partialRefundCheck", partialRefundCheck.toString());
         formEventData.append("noRefundDate", ticketConfigData.noRefundDate);
+        formEventData.append("payStatus", payStatus);
         formEventData.append("noRefundAfterDateCheck", noRefundAfterDateCheck.toString());
 
 
@@ -120,12 +121,57 @@ export function StepperStepTwo() {
         } catch (error) {
             toast.error("Server Error");
         }
-    }, [navigate, dispatch, ticketRows, ticketConfigData, fullRefundCheck, refundEnabled, partialRefundCheck, noRefundAfterDateCheck]);
+    }, [navigate, payStatus, dispatch, ticketRows, ticketConfigData, fullRefundCheck, refundEnabled, partialRefundCheck, noRefundAfterDateCheck]);
 
-
+    const handlePayStatus = (newValue: any) => {
+        setPayStatus(newValue)
+        setTicketRows([
+            {
+                id: 1,
+                ticketType: '',
+                price: '0 XAF',
+                isLinkPramotion: false,
+                totalTickets: '0',
+                description: '',
+                isLimitedSeat: true
+            }
+        ])
+        setTicketConfigData({
+            purchaseDeadlineDate: "",
+            isPurchaseDeadlineEnabled: "true",
+            paymentMethods: newValue === 'free' ? '' : "Cash",
+            fullRefundDaysBefore: "",
+            partialRefundPercent: "",
+            noRefundDate: '',
+            isRefundPolicyEnabled: false,
+        })
+    }
     return (
         <Box sx={{ p: 1, maxWidth: '100%', width: '100%' }}>
             <HeadingCommon variant="h6" title="Ticket Configuration" weight={600} baseSize="33px" />
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+                <Typography variant="body1" sx={{ mr: 2 }}>Ticket Type:</Typography>
+                <ToggleButtonGroup
+                    color="primary"
+                    value={payStatus}
+                    exclusive
+                    onChange={(event: any, newValue: any) => {
+                        if (newValue !== null) {
+
+                            handlePayStatus(newValue);
+                        }
+                    }}
+                    aria-label="Payment Status"
+                >
+                    <ToggleButton value="paid" aria-label="paid">
+                        Paid Event
+                    </ToggleButton>
+                    <ToggleButton value="free" aria-label="free">
+                        Free Event
+                    </ToggleButton>
+
+                </ToggleButtonGroup>
+            </Box>
             <form encType='multipart/form-data' onSubmit={handleTicketConfig}>
 
                 {ticketRows.map((row, index) => (
@@ -134,6 +180,7 @@ export function StepperStepTwo() {
                         <Grid item xs={12} sm={5} md={3}>
                             <TextField
                                 fullWidth
+                                required
                                 inputProps={{
                                     style: {
                                         textTransform: "capitalize"
@@ -147,41 +194,45 @@ export function StepperStepTwo() {
                         </Grid>
 
                         {/* Price per Ticket */}
-                        <Grid item xs={12} sm={5} md={3}>
-                            <TextField
-                                fullWidth
-                                label="Price for each ticket"
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                                }}
-                                placeholder="0 XAF"
-                                value={row.price}
-                                onChange={(e) => handleChange(row.id, 'price', e.target.value)}
-                            />
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            size="small"
-                                            checked={row.isLinkPramotion}
-                                            onChange={(e) =>
-                                                handleChange(1, "isLinkPramotion", e.target.checked)
-                                            }
-                                        />
-                                    }
-                                    label="Link to an existing promotion"
-                                    sx={{
-                                        '& .MuiFormControlLabel-label': {
-                                            fontSize: '11px',
-                                        },
-                                        mr: 1,
+                        {
+                            payStatus === 'free' ? null : <Grid item xs={12} sm={5} md={3}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    label="Price for each ticket"
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
                                     }}
+                                    placeholder="0 XAF"
+                                    value={row.price}
+                                    onChange={(e) => handleChange(row.id, 'price', e.target.value)}
                                 />
-                            </Box>
-                        </Grid>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                size="small"
+                                                checked={row.isLinkPramotion}
+                                                onChange={(e) =>
+                                                    handleChange(row.id, "isLinkPramotion", e.target.checked)
+                                                }
+                                            />
+                                        }
+                                        label="Link to an existing promotion"
+                                        sx={{
+                                            '& .MuiFormControlLabel-label': {
+                                                fontSize: '11px',
+                                            },
+                                            mr: 1,
+                                        }}
+                                    />
+                                </Box>
+                            </Grid>
+                        }
+
 
                         {/* Total Tickets */}
-                        <Grid item xs={12} sm={5} md={3}>
+                        <Grid item xs={12} sm={5} md={payStatus === 'free' ? 4 : 3}>
                             <TextField
                                 fullWidth
                                 label="Total Tickets"
@@ -189,48 +240,49 @@ export function StepperStepTwo() {
                                 value={row.totalTickets}
                                 onChange={(e) => handleChange(row.id, 'totalTickets', e.target.value)}
                             />
-                            <Box key={row.id} sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-                                            size="small"
-                                            checked={row.isLimitedSeat}
-                                            onChange={(e) =>
-                                                handleChange(row.id, 'isLimitedSeat', true) // Limited selected
-                                            }
-                                        />
-                                    }
-                                    label="Limited"
+                            <Box key={row.id} sx={{ width: "100%" }}>
+                                <RadioGroup
+                                    name="isLimitedSeat"
+                                    value={row.isLimitedSeat.toString()}
+                                    onChange={(event) => handleChange(row.id, 'isLimitedSeat', event.target.value === 'true')}
                                     sx={{
-                                        '& .MuiFormControlLabel-label': {
-                                            fontSize: '11px',
-                                        },
-                                        mr: 1,
+                                        mt: 1,
+                                        display: 'flex',
+                                        flexDirection: 'row', // Explicitly set to row (default)
+                                        alignItems: 'center' // Vertical alignment
                                     }}
-                                />
-                                <FormControlLabel
-                                    control={
-                                        <Radio
-                                            size="small"
-                                            checked={row.isUnlimitedSeat}
-                                            onChange={() =>
-                                                handleChange(row.id, 'isUnlimitedSeat', false) // Unlimited selected
+                                >
+                                    <FormControlLabel
+                                        value="true"
+                                        control={<Radio size="small" />} // Smaller radio button
+                                        label="Limited"
+                                        sx={{
+                                            marginRight: 2, // Additional right margin
+                                            '& .MuiFormControlLabel-label': {
+                                                fontSize: '11px',
+                                                fontWeight: 500,
+                                                color: 'text.primary'
                                             }
-                                        />
-                                    }
-                                    label="Unlimited seats"
-                                    sx={{
-                                        '& .MuiFormControlLabel-label': {
-                                            fontSize: '11px',
-                                        },
-                                        mr: 1,
-                                    }}
-                                />
+                                        }}
+                                    />
+                                    <FormControlLabel
+                                        value="false"
+                                        control={<Radio size="small" />}
+                                        label="Unlimited Seats"
+                                        sx={{
+                                            '& .MuiFormControlLabel-label': {
+                                                fontSize: '11px',
+                                                fontWeight: 500,
+                                                color: 'text.primary'
+                                            }
+                                        }}
+                                    />
+                                </RadioGroup>
                             </Box>
                         </Grid>
 
                         {/* Ticket Description */}
-                        <Grid item xs={12} sm={5} md={2}>
+                        <Grid item xs={12} sm={5} md={payStatus === 'free' ? 4 : 2}>
                             <TextField
                                 fullWidth
                                 label="Description"
@@ -265,13 +317,14 @@ export function StepperStepTwo() {
                 <Box mt={2}>
                     <Grid container spacing={3}>
                         {/* Purchase Deadline */}
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={12} md={payStatus === 'free' ? 12 : 3}>
                             <Typography fontWeight="bold">Purchase deadline</Typography>
                             <Box display="flex" flexDirection="column" mt={1}>
                                 <TextField
                                     value={ticketConfigData.purchaseDeadlineDate}
                                     onChange={handleTickteConfigChange}
                                     fullWidth
+                                    required
                                     name="purchaseDeadlineDate"
                                     type="date"
                                     label="Select Date"
@@ -281,196 +334,222 @@ export function StepperStepTwo() {
                                     name="isPurchaseDeadlineEnabled" // Make sure the name matches your state field
                                     value={ticketConfigData.isPurchaseDeadlineEnabled.toString()}
                                     onChange={handleTickteConfigChange}
-                                    sx={{ mt: 1 }}
+                                    sx={{
+                                        mt: 1,
+                                        display: 'flex',
+                                        flexDirection: 'row', // Explicitly set to row (default)
+                                        alignItems: 'center' // Vertical alignment
+                                    }}
                                 >
-                                    <FormControlLabel value="true" control={<Radio />} label="Enabled" />
-                                    <FormControlLabel value="false" control={<Radio />} label="Disabled" />
+                                    <FormControlLabel
+                                        sx={{
+                                            '& .MuiFormControlLabel-label': {
+                                                fontSize: '11px',
+                                                fontWeight: 500,
+                                                color: 'text.primary'
+                                            }
+                                        }} value="true" control={<Radio />} label="Enabled" />
+                                    <FormControlLabel
+                                        sx={{
+                                            '& .MuiFormControlLabel-label': {
+                                                fontSize: '11px',
+                                                fontWeight: 500,
+                                                color: 'text.primary'
+                                            }
+                                        }}
+                                        value="false" control={<Radio />} label="Disabled" />
                                 </RadioGroup>
                             </Box>
                         </Grid>
 
                         {/* Accepted Payment Methods */}
-                        <Grid item xs={12} md={3}>
-                            <Typography fontWeight="bold">Accepted payment methods</Typography>
-                            <Box
-                                border={1}
-                                borderRadius={2}
-                                p={2}
-                                mt={1}
-                                sx={{ borderColor: '#ccc', minHeight: '150px' }}
-                            >
-                                <FormControl component="fieldset">
-                                    <RadioGroup
-                                        aria-label="payment-methods"
-                                        name="paymentMethods" // Make sure the name matches your state field
-                                        value={ticketConfigData.paymentMethods}
-                                        onChange={handleTickteConfigChange}
-                                    >
-                                        <FormControlLabel
-                                            value="Mobile Money"
-                                            control={<Radio size="small" />}
-                                            label={
-                                                <Box display="flex" alignItems="center">
-                                                    <PaymentIcon sx={{ mr: 1 }} />
-                                                    <HeadingCommon baseSize="14px" title="Mobile Money" />
-                                                </Box>
-                                            }
-                                            sx={{ margin: 0 }} // Remove default margin
-                                        />
+                        {
+                            payStatus === 'free' ? null : <Grid item xs={12} md={3}>
+                                <Typography fontWeight="bold">Accepted payment methods</Typography>
+                                <Box
+                                    border={1}
+                                    borderRadius={2}
+                                    p={2}
+                                    mt={1}
+                                    sx={{ borderColor: '#ccc', minHeight: '150px' }}
+                                >
+                                    <FormControl component="fieldset">
+                                        <RadioGroup
+                                            aria-label="payment-methods"
+                                            name="paymentMethods" // Make sure the name matches your state field
+                                            value={ticketConfigData.paymentMethods}
+                                            onChange={handleTickteConfigChange}
+                                        >
+                                            <FormControlLabel
+                                                value="Mobile Money"
+                                                control={<Radio size="small" />}
+                                                label={
+                                                    <Box display="flex" alignItems="center">
+                                                        <PaymentIcon sx={{ mr: 1 }} />
+                                                        <HeadingCommon baseSize="14px" title="Mobile Money" />
+                                                    </Box>
+                                                }
+                                                sx={{ margin: 0 }} // Remove default margin
+                                            />
 
-                                        <FormControlLabel
-                                            value="Credit Card"
-                                            control={<Radio size="small" />}
-                                            label={
-                                                <Box display="flex" alignItems="center">
-                                                    <CreditCardIcon sx={{ mr: 1 }} />
-                                                    <HeadingCommon baseSize="14px" title="Credit Card" />
-                                                </Box>
-                                            }
-                                            sx={{ margin: 0 }}
-                                        />
+                                            <FormControlLabel
+                                                value="Credit Card"
+                                                control={<Radio size="small" />}
+                                                label={
+                                                    <Box display="flex" alignItems="center">
+                                                        <CreditCardIcon sx={{ mr: 1 }} />
+                                                        <HeadingCommon baseSize="14px" title="Credit Card" />
+                                                    </Box>
+                                                }
+                                                sx={{ margin: 0 }}
+                                            />
 
-                                        <FormControlLabel
-                                            value="Cash"
-                                            control={<Radio size="small" />}
-                                            label={
-                                                <Box display="flex" alignItems="center">
-                                                    <MoneyIcon sx={{ mr: 1 }} />
-                                                    <HeadingCommon baseSize="14px" title="Cash" />
-                                                </Box>
-                                            }
-                                            sx={{ margin: 0 }}
-                                        />
+                                            <FormControlLabel
+                                                value="Cash"
+                                                control={<Radio size="small" />}
+                                                label={
+                                                    <Box display="flex" alignItems="center">
+                                                        <MoneyIcon sx={{ mr: 1 }} />
+                                                        <HeadingCommon baseSize="14px" title="Cash" />
+                                                    </Box>
+                                                }
+                                                sx={{ margin: 0 }}
+                                            />
 
-                                        <FormControlLabel
-                                            value="Bank Transfer"
-                                            control={<Radio size="small" />}
-                                            label={
-                                                <Box display="flex" alignItems="center">
-                                                    <AccountBalanceIcon sx={{ mr: 1 }} />
-                                                    <HeadingCommon baseSize="14px" title="Bank Transfer" />
-                                                </Box>
-                                            }
-                                            sx={{ margin: 0 }}
-                                        />
-                                    </RadioGroup>
-                                </FormControl>
-                            </Box>
-                        </Grid>
+                                            <FormControlLabel
+                                                value="Bank Transfer"
+                                                control={<Radio size="small" />}
+                                                label={
+                                                    <Box display="flex" alignItems="center">
+                                                        <AccountBalanceIcon sx={{ mr: 1 }} />
+                                                        <HeadingCommon baseSize="14px" title="Bank Transfer" />
+                                                    </Box>
+                                                }
+                                                sx={{ margin: 0 }}
+                                            />
+                                        </RadioGroup>
+                                    </FormControl>
+                                </Box>
+                            </Grid>
+                        }
 
                         {/* Refund Policy */}
-                        <Grid item xs={12} md={4}>
-                            <Box display="flex" justifyContent="space-between" alignItems="center">
-                                <Typography fontWeight="bold" mb={1}>
-                                    Refund policy
-                                </Typography>
-                                <Switch
-                                    name="isRefundPolicyEnabled"
-                                    checked={refundEnabled}
-                                    onChange={(e) => setRefundEnabled(e.target.checked)}
-                                />
-                            </Box>
-
-
-                            {refundEnabled && (
-                                <Box display="flex" flexDirection="column" gap={2} mt={2}>
-                                    <Box>
-                                        <FormControlLabel
-                                            control={
-                                                <Checkbox
-                                                    checked={fullRefundCheck}
-                                                    onChange={(e) => setFullRefundCheck(e.target.checked)}
-                                                    name="fullRefundCheck"
-                                                />
-                                            }
-                                            label="Full Refund Available up to X days before the event:"
-                                            sx={{
-                                                '& .MuiFormControlLabel-label': {
-                                                    fontSize: '11px',
-                                                    fontWeight: 'bold',
-                                                }
-                                            }}
-                                        />
-                                        <TextField
-                                            name="fullRefundDaysBefore"
-                                            type="text"
-                                            value={ticketConfigData.fullRefundDaysBefore}
-                                            onChange={handleTickteConfigChange}
-                                            fullWidth
-                                            size="small"
-                                            placeholder="Enter number of days"
-                                            sx={{ mt: 1 }}
-                                        />
-                                    </Box>
-
-                                    <Box>
-                                        <FormControlLabel
-                                            control={
-                                                <Checkbox
-                                                    checked={partialRefundCheck}
-                                                    onChange={(e) => setPartialRefundCheck(e.target.checked)}
-                                                    name="partialRefundC"
-
-                                                />
-                                            }
-                                            sx={{
-                                                '& .MuiFormControlLabel-label': {
-                                                    fontSize: '11px',  // Set font size to 20px
-                                                    // You can add other typography styles here if needed
-                                                    fontWeight: 'bold',
-                                                    // color: 'text.primary',
-                                                }
-                                            }}
-                                            label="Partial Refund with Fee (% of ticket price retained):"
-                                        />
-                                        <TextField
-                                            name="partialRefundPercent"
-                                            value={ticketConfigData.partialRefundPercent}
-                                            onChange={handleTickteConfigChange}
-                                            fullWidth
-                                            size="small"
-                                            placeholder="Enter percentage"
-                                            sx={{ mt: 1 }}
-                                        />
-                                    </Box>
-
-                                    <Box>
-                                        <FormControlLabel
-                                            control={
-                                                <Checkbox
-                                                    checked={noRefundAfterDateCheck}
-                                                    onChange={(e) => setNoRefundAfterDateCheck(e.target.checked)}
-                                                    name="partialRefundC"
-
-                                                />
-                                            }
-                                            sx={{
-                                                '& .MuiFormControlLabel-label': {
-                                                    fontSize: '11px',  // Set font size to 20px
-                                                    // You can add other typography styles here if needed
-                                                    fontWeight: 'bold',
-                                                    // color: 'text.primary',
-                                                }
-                                            }}
-                                            label="Partial Refund with Fee (% of ticket price retained):"
-                                        />
-                                        <TextField
-                                            name="noRefundDate"
-                                            value={ticketConfigData.noRefundDate}
-                                            onChange={handleTickteConfigChange}
-                                            fullWidth
-                                            type="date"
-                                            size="small"
-                                            sx={{ mt: 1 }}
-                                            InputLabelProps={{ shrink: true }}
-                                        />
-                                    </Box>
+                        {
+                            payStatus === 'free' ? null : <Grid item xs={12} md={4}>
+                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                    <Typography fontWeight="bold" mb={1}>
+                                        Refund policy
+                                    </Typography>
+                                    <Switch
+                                        name="isRefundPolicyEnabled"
+                                        checked={refundEnabled}
+                                        onChange={(e) => setRefundEnabled(e.target.checked)}
+                                    />
                                 </Box>
-                            )}
-                        </Grid>
+
+
+                                {refundEnabled && (
+                                    <Box display="flex" flexDirection="column" gap={2} mt={2}>
+                                        <Box>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={fullRefundCheck}
+                                                        onChange={(e) => setFullRefundCheck(e.target.checked)}
+                                                        name="fullRefundCheck"
+                                                    />
+                                                }
+                                                label="Full Refund Available up to X days before the event:"
+                                                sx={{
+                                                    '& .MuiFormControlLabel-label': {
+                                                        fontSize: '11px',
+                                                        fontWeight: 'bold',
+                                                    }
+                                                }}
+                                            />
+                                            <TextField
+                                                name="fullRefundDaysBefore"
+                                                type="text"
+                                                value={ticketConfigData.fullRefundDaysBefore}
+                                                onChange={handleTickteConfigChange}
+                                                fullWidth
+                                                size="small"
+                                                placeholder="Enter number of days"
+                                                sx={{ mt: 1 }}
+                                            />
+                                        </Box>
+
+                                        <Box>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={partialRefundCheck}
+                                                        onChange={(e) => setPartialRefundCheck(e.target.checked)}
+                                                        name="partialRefundC"
+
+                                                    />
+                                                }
+                                                sx={{
+                                                    '& .MuiFormControlLabel-label': {
+                                                        fontSize: '11px',  // Set font size to 20px
+                                                        // You can add other typography styles here if needed
+                                                        fontWeight: 'bold',
+                                                        // color: 'text.primary',
+                                                    }
+                                                }}
+                                                label="Partial Refund with Fee (% of ticket price retained):"
+                                            />
+                                            <TextField
+                                                name="partialRefundPercent"
+                                                value={ticketConfigData.partialRefundPercent}
+                                                onChange={handleTickteConfigChange}
+                                                fullWidth
+                                                size="small"
+                                                placeholder="Enter percentage"
+                                                sx={{ mt: 1 }}
+                                            />
+                                        </Box>
+
+                                        <Box>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={noRefundAfterDateCheck}
+                                                        onChange={(e) => setNoRefundAfterDateCheck(e.target.checked)}
+                                                        name="partialRefundC"
+
+                                                    />
+                                                }
+                                                sx={{
+                                                    '& .MuiFormControlLabel-label': {
+                                                        fontSize: '11px',  // Set font size to 20px
+                                                        // You can add other typography styles here if needed
+                                                        fontWeight: 'bold',
+                                                        // color: 'text.primary',
+                                                    }
+                                                }}
+                                                label="Partial Refund with Fee (% of ticket price retained):"
+                                            />
+                                            <TextField
+                                                name="noRefundDate"
+                                                value={ticketConfigData.noRefundDate}
+                                                onChange={handleTickteConfigChange}
+                                                fullWidth
+                                                type="date"
+                                                size="small"
+                                                sx={{ mt: 1 }}
+                                                InputLabelProps={{ shrink: true }}
+                                            />
+                                        </Box>
+                                    </Box>
+                                )}
+                            </Grid>
+                        }
+
 
                         {/* Save Tickets Button */}
-                        <Grid item xs={12} md={2} >
+
+                        <Grid item xs={12} md={payStatus === 'free' ? 12 : 2} >
                             <LoadingButton
                                 fullWidth
                                 size="large"
@@ -478,7 +557,10 @@ export function StepperStepTwo() {
                                 variant="contained"
                                 sx={{ color: "black", backgroundColor: "#2295D4" }}
                             >
-                                Save Tickets
+                                {
+                                    payStatus === 'free' ? 'Activate Free Entry' : 'Save Tickets'
+                                }
+
                             </LoadingButton>
                         </Grid>
                     </Grid>

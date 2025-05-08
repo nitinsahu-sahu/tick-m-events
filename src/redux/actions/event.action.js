@@ -1,6 +1,60 @@
 import { eventConstants } from "./constants";
 import axios from "../helper/axios";
 
+export const removeFromWishlist = ({eventId}) => async (dispatch) => {
+    dispatch({ type: eventConstants.WISHLIST_ADD_REQUEST });
+
+    try {
+        const response = await axios.delete(`event-wishlist/${eventId}`);
+        console.log('res',response);
+        
+        dispatch({
+            type: eventConstants.WISHLIST_ADD_SUCCESS,
+            payload: {
+                message: response?.data?.message
+            },
+        });
+        dispatch(wishlistEventFetch())
+    } catch (error) {
+        dispatch({
+            type: eventConstants.WISHLIST_ADD_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+
+    }
+};
+
+
+export const eventAddToWishlist = (selectedViewEvent) => async (dispatch) => {
+    const { _id } = selectedViewEvent.selectedViewEvent
+    dispatch({ type: eventConstants.WISHLIST_ADD_REQUEST });
+
+    try {
+        const response = await axios.post("event-wishlist", { eventId: _id });
+        
+        dispatch({
+            type: eventConstants.WISHLIST_ADD_SUCCESS,
+            payload: {
+                message: response?.data?.message
+            },
+        });
+        return {
+            type: eventConstants.WISHLIST_ADD_SUCCESS,
+            message: response?.data?.message,
+        };
+    } catch (error) {
+        dispatch({
+            type: eventConstants.WISHLIST_ADD_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+        return {
+            type: eventConstants.WISHLIST_ADD_FAILURE,
+            message: error?.response?.data?.message
+        };
+    }
+};
+
+// Event Updation
 export const eventUpdate = (updatedEvent) => async (dispatch) => {
 
     const eventId = updatedEvent?._id
@@ -30,6 +84,25 @@ export const eventUpdate = (updatedEvent) => async (dispatch) => {
             message: error?.response?.data?.message || "Server error",
             status: error.status
         };
+    }
+};
+
+export const wishlistEventFetch = () => async (dispatch) => {
+    dispatch({ type: eventConstants.WISHLIST_GET_REQUEST });
+
+    try {
+        const response = await axios.get(`/event-wishlist`);
+        dispatch({
+            type: eventConstants.WISHLIST_GET_SUCCESS,
+            payload: {
+                wishlist: response?.data?.wishlist,
+            },
+        });
+    } catch (error) {
+        dispatch({
+            type: eventConstants.WISHLIST_GET_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
     }
 };
 

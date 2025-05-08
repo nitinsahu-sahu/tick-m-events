@@ -24,6 +24,7 @@ import { MessagePopover } from '../components/message-popover';
 import { GiftPopover } from '../components/gift-popover';
 import { EmailPopover } from '../components/email-popover';
 import { UserPopover } from '../components/user-popover';
+import { WishlistPopover } from '../components/wishlist-popover';
 
 // ----------------------------------------------------------------------
 
@@ -180,6 +181,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
 
                 {/* Search Bar */}
                 {
+                  !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
                   !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
                   !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
                   !hiddenTicketManagement.some(path => pathname.includes(path)) &&
@@ -283,12 +285,11 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   </>
                 )}
                 {
-                  !isMobileOrTablet &&
                   (
                     hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
                     <>
                       <Iconify icon="typcn:filter" width={24} />
-                      <Iconify icon="mdi:heart" width={24} color="#e11e1e" />
+                      <WishlistPopover />
                     </>
                   )
                 }

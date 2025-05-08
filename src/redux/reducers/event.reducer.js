@@ -4,7 +4,8 @@ const initialState = {
     stepper: 1,
     message: '',
     basicDetails: [],
-    fullData: []
+    fullData: [],
+    wishlist: []
 };
 
 const eventReducer = (state, action) => {
@@ -12,6 +13,22 @@ const eventReducer = (state, action) => {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
+        // Event Wishlist fetch
+        case eventConstants.WISHLIST_GET_REQUEST:
+            return { ...state };
+
+        case eventConstants.WISHLIST_GET_SUCCESS:
+            return {
+                ...state,
+                wishlist: action.payload.wishlist,
+            };
+
+        case eventConstants.WISHLIST_GET_FAILURE:
+            return {
+                ...state,
+                message: action.payload.message,
+            };
+
         // Event Create
         case eventConstants.EVENT_CREATE_REQUEST:
             return { ...state };

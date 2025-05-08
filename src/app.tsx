@@ -7,7 +7,7 @@ import 'src/global.css';
 import { Router } from 'src/routes/sections';
 import { useScrollToTop } from 'src/hooks/use-scroll-to-top';
 import { ThemeProvider } from 'src/theme/theme-provider';
-import { eventFetch } from './redux/actions/event.action';
+import { eventFetch, wishlistEventFetch } from './redux/actions/event.action';
 import { AppDispatch } from './redux/store';
 
 
@@ -18,7 +18,8 @@ export default function App() {
 
   useScrollToTop();
   useEffect(() => {
-     dispatch(eventFetch());
+    dispatch(wishlistEventFetch())
+    dispatch(eventFetch());
   }, [dispatch]);
   return (
     <ThemeProvider>

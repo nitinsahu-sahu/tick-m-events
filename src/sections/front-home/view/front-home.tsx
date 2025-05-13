@@ -103,12 +103,14 @@ export function NavHomeOne() {
             <AppBar position="static" elevation={0} sx={{ bgcolor: "background.paper" }}>
                 <StyledToolbar>
                     <LogoSection>
-                        <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-                            Tick-m
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ ml: 1 }}>
-                            CYCLING
-                        </Typography>
+                        <Box
+                            alt="Tick-M Events"
+                            component="img"
+                            src="../assets/logo/full-logo.png"
+                            width="200px"
+                            height="90px"
+                            style={{ objectFit: "cover" }}
+                        />
                     </LogoSection>
 
                     <NavItems>
@@ -158,7 +160,7 @@ export function FrontHome() {
     const dispatch = useDispatch<AppDispatch>();
     const { eventId } = useParams();
     const { _id, eventName, date, time, category, eventType, coverImage, location, formate, description,
-        organizer, customization, tickets, visibility
+        organizer, customization, tickets, visibility, review
     } = useSelector((state: RootState) => state?.event?.eventWithDetails);
 
     useEffect(() => {
@@ -175,8 +177,8 @@ export function FrontHome() {
 
     return (
         <>
-            {/* <NavHomeTwo />
-            <NavHomeOne /> */}
+            {/* <NavHomeTwo /> */}
+            <NavHomeOne />
             <Box sx={{ p: 3 }} key={_id}>
                 {/* Breadcrumb */}
                 <Breadcrumb eventName={eventName} />
@@ -231,16 +233,23 @@ export function FrontHome() {
                 </Card>
 
                 {/* Tracking system */}
-                <TrackingSystem tickets={tickets} location={location}/>
+                <TrackingSystem
+                    eventName={eventName}
+                    eventId={_id}
+                    tickets={tickets}
+                    location={location}
+                    date={date}
+                    time={time}
+                />
 
                 {/* Contact and Sharing Section */}
-                <ContactAndSharing />
+                <ContactAndSharing organizer={organizer} />
 
                 {/* Count Down System */}
-                <CountDownCounter />
+                <CountDownCounter date={date} time={time}/>
 
                 {/* Rate and Review */}
-                <RateAndReview />
+                <RateAndReview reviews={review} />
 
                 {/* Rate and Review */}
                 <CompanyMarquee />

@@ -53,14 +53,14 @@ export function EventShare({ selectedEvent }: any) {
 
       <Stack direction="row" spacing={2} alignItems="center">
         {/* Facebook */}
-        <Tooltip title="Share on Facebook">
+        {/* <Tooltip title="Share on Facebook">
           <FacebookShareButton
             url={shareUrl}
             hashtag="#Event"
           >
             <FacebookIcon size={40} round />
           </FacebookShareButton>
-        </Tooltip>
+        </Tooltip> */}
 
         {/* Twitter */}
         <Tooltip title="Share on Twitter">

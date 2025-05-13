@@ -147,14 +147,14 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
         return Math.max(0, subtotal - discount); // Ensure total doesn't go below 0
     };
 
-     // Get selected tickets data
+    // Get selected tickets data
     const getSelectedTickets = () => {
         const selected: Array<{
             ticketName: string;
             quantity: number;
             price: number;
         }> = [];
-        
+
         tickets?.forEach((ticket: any) => {
             ticket.tickets.forEach((item: any) => {
                 const quantity = ticketQuantities[item._id] || 0;
@@ -167,7 +167,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                 }
             });
         });
-        
+
         return selected;
     };
 
@@ -175,7 +175,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
         if (calculateSubtotal() <= 0) return;
         setModalOpen(true);
     };
-    
+
     return (
         <Box mt={3}>
             {/* Ticketing Section */}

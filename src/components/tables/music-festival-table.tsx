@@ -19,7 +19,6 @@ export function MusicFestivalTable({
     data: any[];
 }) {
     const theme = useTheme();
-    console.log('table', data);
 
     return (
         <TableContainer component={Paper}>

@@ -30,6 +30,12 @@ export const ticketTypeConstants = {
     CREATE_TICKET_TYPE_SUCCESS: 'CREATE_TICKET_TYPE_SUCCESS',
 }
 
+export const eventReviewConstants = {
+    CREATE_REQUEST: 'CREATE_REQUEST',
+    CREATE_FAILURE: 'CREATE_FAILURE',
+    CREATE_SUCCESS: 'CREATE_SUCCESS',
+}
+
 export const promotionConstants = {
     CREATE_REQUEST: 'CREATE_REQUEST',
     CREATE_FAILURE: 'CREATE_FAILURE',

@@ -4,28 +4,8 @@ import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 
-export function ParticipantTable({ headers, data }: any) {
+export function ParticipantTable({ headers, data, ticketQuantities, handleDecrement, handleIncrement }: any) {
     const theme = useTheme();
-    const [quantities, setQuantities] = useState<Record<string, number>>(
-        data.reduce((acc: Record<string, number>, item: any) => {
-            acc[item.id] = parseInt(item.selection, 10) || 1; // Added radix 10
-            return acc;
-        }, {})
-    );
-
-    const handleIncrement = (id: string) => {
-        setQuantities(prev => ({
-            ...prev,
-            [id]: (prev[id] || 0) + 1
-        }));
-    };
-
-    const handleDecrement = (id: string) => {
-        setQuantities(prev => ({
-            ...prev,
-            [id]: Math.max((prev[id] || 0) - 1, 0) // Prevent negative values
-        }));
-    };
 
     return (
         <TableContainer component={Paper}>
@@ -50,56 +30,95 @@ export function ParticipantTable({ headers, data }: any) {
                 </TableHead>
 
                 <TableBody>
-                    {data.map((row: any) => (
-                        <TableRow key={row.id} sx={{ backgroundColor: "#f5f5f5", borderBottom: "2px solid #E1E1E1" }}>
-                            {Object.keys(row).map((key) => (
-                                <TableCell
-                                    key={key}
-                                    align="center"
-                                    sx={{
-                                        fontSize: { xs: "0.8rem", sm: "1rem" },
-                                        fontWeight: "normal",
-                                    }}
-                                >
-                                    {key === "selection" ? (
-                                        row[key] === "Insufficient Points" ? (
-                                            <Typography sx={{ color: "#ff9800", fontWeight: 600 }}>
-                                                {row[key]}
-                                            </Typography>
-                                        ) : (
+                    {data?.length === 0 || data?.every((ticket: any) => ticket?.tickets?.length === 0) ? (
+                        <TableRow>
+                            <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                                <Typography variant="body1" color="textSecondary">
+                                    No ticket available
+                                </Typography>
+                            </TableCell>
+                        </TableRow>
+                    ) : (
+                        data?.map((ticket: any) => (
+                            ticket?.tickets?.length > 0 ? (
+                                ticket?.tickets?.map((row: any, index: any) => (
+                                    <TableRow key={row._id} sx={{ backgroundColor: "#f5f5f5", borderBottom: "2px solid #E1E1E1" }}>
+                                        {/* Your existing table cells */}
+                                        <TableCell align="center" sx={{ fontSize: { xs: "0.8rem", sm: "1rem" }, fontWeight: "normal" }}>
+                                            {index + 1}
+                                        </TableCell>
+                                        <TableCell
+                                            align="center"
+                                            sx={{
+                                                fontSize: { xs: "0.8rem", sm: "1rem" },
+                                                fontWeight: "normal",
+                                                textTransform: 'capitalize'
+                                            }}
+                                        >
+                                            {row.ticketType} Ticket
+                                            {row.isLimitedSeat && row.totalTickets === "0" && (
+                                                <span style={{ color: "#3CB1F1" }}> (Sold Out)</span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell
+                                            align="center"
+                                            sx={{
+                                                fontSize: { xs: "0.8rem", sm: "1rem" },
+                                                fontWeight: "normal",
+                                            }}
+                                        >
+                                            {row?.price}
+                                        </TableCell>
+                                        <TableCell
+                                            align="center"
+                                            sx={{
+                                                fontSize: { xs: "0.8rem", sm: "1rem" },
+                                                fontWeight: "normal",
+                                            }}
+                                        >
+                                            {row?.description}
+                                        </TableCell>
+                                        <TableCell
+                                            align="center"
+                                            sx={{
+                                                fontSize: { xs: "0.8rem", sm: "1rem" },
+                                                fontWeight: "normal",
+                                            }}
+                                        >
                                             <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
-                                                <IconButton 
-                                                    size="small" 
-                                                    onClick={() => handleDecrement(row.id)}
-                                                    sx={{ 
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{
                                                         backgroundColor: theme.palette.grey[300],
                                                         '&:hover': { backgroundColor: theme.palette.grey[400] },
                                                         '&:disabled': { opacity: 0.5 }
                                                     }}
-                                                    disabled={quantities[row.id] <= 0}
+                                                    onClick={() => handleDecrement(row?._id)}
+                                                    disabled={ticketQuantities[row?._id] <= 0}
                                                 >
                                                     <RemoveIcon fontSize="small" />
                                                 </IconButton>
-                                                <Typography>{quantities[row.id]}</Typography>
-                                                <IconButton 
-                                                    size="small" 
-                                                    onClick={() => handleIncrement(row.id)}
-                                                    sx={{ 
+                                                <Typography mx={1}>{ticketQuantities[row?._id] || 0}</Typography>
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{
                                                         backgroundColor: theme.palette.grey[300],
                                                         '&:hover': { backgroundColor: theme.palette.grey[400] }
                                                     }}
+                                                    onClick={() => handleIncrement(row?._id, row?.totalTickets)}
+                                                    disabled={row?.isLimitedSeat && row?.totalTickets !== "0" &&
+                                                        ticketQuantities[row?._id] >= parseInt(row?.totalTickets, 10)}
                                                 >
                                                     <AddIcon fontSize="small" />
                                                 </IconButton>
                                             </Box>
-                                        )
-                                    ) : (
-                                        row[key]
-                                    )}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    ))}
+                                        </TableCell>
+                                        {/* Rest of your table cells */}
+                                    </TableRow>
+                                ))
+                            ) : null
+                        ))
+                    )}
                 </TableBody>
             </Table>
         </TableContainer>

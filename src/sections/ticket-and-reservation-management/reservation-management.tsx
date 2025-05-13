@@ -1,11 +1,12 @@
 import { Box, Button, Checkbox, FormControlLabel, Typography } from "@mui/material";
 import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
+import { Link } from "react-router-dom";
 
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
 
 export function ReservationManagement() {
-      const chartRealTimeOptions: ApexOptions = {
+    const chartRealTimeOptions: ApexOptions = {
         series: [45, 30, 25], // Ticket Sold, Validation, Remaining
         labels: ["Ticket Sold", "Ticket Validation", "Remaining Tickets"],
         chart: { type: "donut" },
@@ -13,14 +14,14 @@ export function ReservationManagement() {
         legend: { position: "bottom", markers: { strokeWidth: 8 } },
         dataLabels: { enabled: true },
         responsive: [{ breakpoint: 768, options: { legend: { position: "bottom" } } }],
-      };
+    };
 
-      const reservationManagementTableHeaders = ["Name", "Email", "Ticket Type", "Purchase Date", "Status", "Actions"];
-      const reservationManagementTableData = [
+    const reservationManagementTableHeaders = ["Name", "Email", "Ticket Type", "Purchase Date", "Status", "Actions"];
+    const reservationManagementTableData = [
         { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/02/2025", reservationStatus: "Pending", action: ["Cancel"] },
         { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/03/2025", reservationStatus: "Pending", action: ["Cancel"] },
         { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/04/2025", reservationStatus: "Pending", action: ["Cancel"] },
-      ];
+    ];
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
@@ -58,9 +59,11 @@ export function ReservationManagement() {
                         <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
                             Save Changes
                         </Button>
-                        <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
-                            Go to Ticket Validation Page
-                        </Button>
+                        <Link to='/entry-validation'>
+                            <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
+                                Go to Ticket Validation Page
+                            </Button>
+                        </Link>
                     </Box>
                 </Box>
             </Box>

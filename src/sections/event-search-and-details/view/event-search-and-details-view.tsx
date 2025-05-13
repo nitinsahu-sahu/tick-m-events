@@ -25,7 +25,9 @@ export function EventSearchAndDetailsView() {
       }
 
       {/* share this event */}
-      <EventShare />
+      {
+        Object.keys(selectedEvent).length === 0 ? null : <EventShare selectedEvent={selectedEvent} />
+      }
     </DashboardContent>
   );
 }

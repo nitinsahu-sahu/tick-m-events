@@ -1,13 +1,11 @@
 import { eventConstants } from "./constants";
 import axios from "../helper/axios";
 
-export const removeFromWishlist = ({eventId}) => async (dispatch) => {
+export const removeFromWishlist = ({ eventId }) => async (dispatch) => {
     dispatch({ type: eventConstants.WISHLIST_ADD_REQUEST });
 
     try {
         const response = await axios.delete(`event-wishlist/${eventId}`);
-        console.log('res',response);
-        
         dispatch({
             type: eventConstants.WISHLIST_ADD_SUCCESS,
             payload: {
@@ -31,7 +29,7 @@ export const eventAddToWishlist = (selectedViewEvent) => async (dispatch) => {
 
     try {
         const response = await axios.post("event-wishlist", { eventId: _id });
-        
+
         dispatch({
             type: eventConstants.WISHLIST_ADD_SUCCESS,
             payload: {
@@ -166,8 +164,6 @@ export const eventCustomizationCreate = ({ formEventCustomizeData, eventId, tick
 
     try {
         const response = await axios.post(`/event/tickets/ec/${eventId}/${ticketConfigId}`, formEventCustomizeData);
-        console.log(response);
-
         dispatch({
             type: eventConstants.EVENT_CUSTOMIZTION_CREATE_SUCCESS,
             payload: {
@@ -248,13 +244,10 @@ export const ticketConfigCreate = ({ formEventData, eventId }) => async (dispatc
 };
 
 export const eventByIdFetch = (eventId) => async (dispatch) => {
-    dispatch({ type: eventConstants.EVENT_BY_ID_REQUEST});
+    dispatch({ type: eventConstants.EVENT_BY_ID_REQUEST });
 
     try {
         const response = await axios.get(`/event/${eventId}`);
-        console.log('====================================');
-        console.log(response);
-        console.log('====================================');
         dispatch({
             type: eventConstants.EVENT_BY_ID_SUCCESS,
             payload: {

@@ -1,5 +1,5 @@
-import { Badge, Popover, Typography, Box, IconButton } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { Badge, Popover, Box, IconButton } from "@mui/material";
+import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ReactHtmlParser from 'react-html-parser';
 import { toast } from 'react-toastify';
@@ -10,12 +10,6 @@ import { AppDispatch, RootState } from "src/redux/store";
 import { truncateText } from "src/hooks/description-cutting";
 import { removeFromWishlist } from "src/redux/actions/event.action";
 
-interface ApiResult {
-    status: number;
-    type: string;
-    message: any;
-    // Add other properties if needed
-}
 
 
 export function WishlistPopover({ sx, ...other }: any) {

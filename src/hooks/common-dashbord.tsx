@@ -25,10 +25,8 @@ const renderFallback = (
 );
 
 export function MultipleDashboard() {
-    const { role, isLoading } = useSelector((state: RootState) => ({
-        role: state?.auth?.user?.role,
-        isLoading: state?.auth?.loading
-    }));
+     const role = useSelector((state: RootState) => state.auth.user?.role);
+    const isLoading = useSelector((state: RootState) => state.auth.loading);
 
     if (isLoading) {
         return renderFallback;

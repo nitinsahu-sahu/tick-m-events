@@ -1,9 +1,22 @@
-import { Box, Button, Divider, Grid, Typography, LinearProgress, TextField, Select, MenuItem, Card, CardContent, Avatar } from "@mui/material";
+import { Box, Button, Divider, Grid, Typography, LinearProgress, TextField, Select, MenuItem, Card, CardContent, Avatar,Collapse } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 import StarHalfIcon from "@mui/icons-material/StarHalf";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { useDispatch } from "react-redux";
+import { toast } from 'react-toastify';
+import SendIcon from '@mui/icons-material/Send';
+import { eventAddReview } from "src/redux/actions/reviewOnEvent.action";
+import { AppDispatch } from "src/redux/store";
+import { useParams } from "react-router-dom";
+
+interface ApiResult {
+    status: number;
+    type: string;
+    message: any;
+    // Add other properties if needed
+}
 
 function renderStars(rating: any) {
     const fullStars = Math.floor(rating);
@@ -21,44 +34,129 @@ function renderStars(rating: any) {
     );
 };
 
-const reviews = [
-    { id: 1, name: "Jean M.", rating: 5, comment: "Great atmosphere, very professional DJ!", date: "12/02/2024" },
-    { id: 2, name: "Jean M.", rating: 5, comment: "Great atmosphere, very professional DJ!", date: "12/02/2024" },
-];
 
-const ReviewCard = ({ name, rating, comment, date }: any) => (
+const ReviewCard = ({ name, rating, comment, createdAt }: any) => {
+  const [isReplying, setIsReplying] = useState(false);
+  const [replyText, setReplyText] = useState('');
+
+  const handleReplySubmit = () => {
+    console.log('Reply submitted:', replyText);
+    // Here you would typically send the reply to your API
+    setReplyText('');
+    setIsReplying(false);
+  };
+
+  return (
     <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid #ddd", mb: 2 }}>
-        <CardContent>
-            <Grid container alignItems="center" justifyContent="space-between">
-                <Grid item>
-                    <Box display="flex" alignItems="center">
-                        <Avatar sx={{ bgcolor: "black", color: "white", mr: 1 }}>{name[0]}</Avatar>
-                        <Box>
-                            <Typography fontWeight="bold">{name}</Typography>
-                            <Box display="flex" alignItems="center">
-                                {[...Array(rating)].map((_, i) => (
-                                    <StarIcon key={i} sx={{ color: "gold", fontSize: 18 }} />
-                                ))}
-                            </Box>
-                        </Box>
-                    </Box>
-                </Grid>
-                <Grid item>
-                    <Typography fontSize="14px" color="gray">{date}</Typography>
-                </Grid>
-            </Grid>
-            <Typography mt={1}>{comment}</Typography>
-            <Box mt={2} textAlign="right">
-                <Button variant="outlined" startIcon={<ChatBubbleOutlineIcon />} sx={{ textTransform: "none" }}>
-                    Reply to a Review
-                </Button>
+      <CardContent>
+        {/* Review Header */}
+        <Grid container alignItems="center" justifyContent="space-between">
+          <Grid item>
+            <Box display="flex" alignItems="center">
+              <Avatar sx={{ bgcolor: "black", color: "white", mr: 1 }}>{name[0]}</Avatar>
+              <Box>
+                <Typography fontWeight="bold">{name}</Typography>
+                <Box display="flex" alignItems="center">
+                  {[...Array(rating)].map((_, i) => (
+                    <StarIcon key={i} sx={{ color: "gold", fontSize: 18 }} />
+                  ))}
+                </Box>
+              </Box>
             </Box>
-        </CardContent>
-    </Card>
-);
+          </Grid>
+          <Grid item>
+            <Typography fontSize="14px" color="gray">
+              {new Date(createdAt).toLocaleDateString()}
+            </Typography>
+          </Grid>
+        </Grid>
 
-export function RateAndReview() {
+        {/* Review Comment */}
+        <Typography mt={1}>{comment}</Typography>
+
+        {/* Reply Section */}
+        <Box mt={2} textAlign="right">
+          <Button
+            variant="outlined"
+            startIcon={<ChatBubbleOutlineIcon />}
+            sx={{ textTransform: "none" }}
+            onClick={() => setIsReplying(!isReplying)}
+          >
+            {isReplying ? 'Cancel Reply' : 'Reply to Review'}
+          </Button>
+
+          <Collapse in={isReplying}>
+            <Box mt={2} display="flex" alignItems="flex-end">
+              <TextField
+                fullWidth
+                multiline
+                rows={2}
+                variant="outlined"
+                placeholder="Write your reply..."
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                sx={{ mr: 1 }}
+              />
+              <Button
+                variant="contained"
+                endIcon={<SendIcon />}
+                onClick={handleReplySubmit}
+                disabled={!replyText.trim()}
+              >
+                Send
+              </Button>
+            </Box>
+          </Collapse>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+};
+
+export function RateAndReview({ reviews }: any) {
+    console.log('review', reviews);
+
     const [filter, setFilter] = useState("date");
+    const dispatch = useDispatch<AppDispatch>()
+    const { eventId } = useParams();
+
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        comment: ''
+    });
+
+    // Handle form submission
+    const handleSubmit = useCallback(async (e: React.FormEvent) => {
+        e.preventDefault();
+        const reviewFormData = new FormData();
+        reviewFormData.append("name", formData.name);
+        reviewFormData.append("eventId", eventId!);
+        reviewFormData.append("email", formData.email);
+        reviewFormData.append("comment", formData.comment);
+
+        const result = await dispatch(eventAddReview(reviewFormData));
+        if ((result as ApiResult)?.status === 201) {
+            toast.success(result?.message);
+            setFormData({
+                name: '',
+                email: '',
+                comment: ''
+            })
+        } else {
+            toast.error(result?.message);
+        }
+        // Here you would typically send the data to an API
+    }, [formData, dispatch, eventId]);
+
+    // Handle input changes
+    const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    }, []);
     return (
         <>
             <Box p={3} m={3} alignItems="center">
@@ -127,12 +225,12 @@ export function RateAndReview() {
                                 { label: "Service", value: 4.7 },
                                 { label: "Safety", value: 4.8 },
                                 { label: "Guide", value: 4.9 },
-                            ].map((review) => (
-                                <Box key={review.label} display="flex" alignItems="center" mt={1} width="100%">
-                                    <Typography sx={{ width: "80px", textAlign: "left" }}>{review.label}</Typography>
+                            ].map((item) => (
+                                <Box key={item.label} display="flex" alignItems="center" mt={1} width="100%">
+                                    <Typography sx={{ width: "80px", textAlign: "left" }}>{item.label}</Typography>
                                     <LinearProgress
                                         variant="determinate"
-                                        value={(review.value / 5) * 100}
+                                        value={(item.value / 5) * 100}
                                         sx={{
                                             width: "100%",
                                             mx: 1,
@@ -141,7 +239,7 @@ export function RateAndReview() {
                                             backgroundColor: "#ddd",
                                         }}
                                     />
-                                    <Typography>{review.value}/5</Typography>
+                                    <Typography>{item.value}/5</Typography>
                                 </Box>
                             ))}
                         </Box>
@@ -150,47 +248,103 @@ export function RateAndReview() {
             </Box>
 
             <Box p={3}>
-                {/* Header & Filter */}
-                <Grid container justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6" fontWeight="bold">Reviews</Typography>
-                    <Select
-                        value={filter}
-                        onChange={(e) => setFilter(e.target.value)}
-                        size="small"
-                        sx={{ minWidth: 150, borderRadius: 3 }}
-                    >
-                        <MenuItem value="date">Filter by Date</MenuItem>
-                        <MenuItem value="rating">Filter by Rating</MenuItem>
-                    </Select>
-                </Grid>
+                {
+                    reviews?.length ?
+                        <Box>
+                            {/* Header & Filter */}
+                            <Grid container justifyContent="space-between" alignItems="center">
+                                <Typography variant="h6" fontWeight="bold">Reviews</Typography>
+                                <Select
+                                    value={filter}
+                                    onChange={(e) => setFilter(e.target.value)}
+                                    size="small"
+                                    sx={{ minWidth: 150, borderRadius: 3 }}
+                                >
+                                    <MenuItem value="date">Filter by Date</MenuItem>
+                                    <MenuItem value="rating">Filter by Rating</MenuItem>
+                                </Select>
 
-                {/* Reviews List */}
-                <Box mt={2}>
-                    {reviews.map((review) => (
-                        <ReviewCard key={review.id} {...review} />
-                    ))}
-                </Box>
+                            </Grid>
+
+                            {/* Reviews List */}
+                            <Box mt={2}>
+                                {reviews.map((item: any, index: any) => (
+                                    <ReviewCard key={item._id || index} {...item} />
+                                ))}
+                            </Box>
+                        </Box>
+                        : <Box
+                            sx={{
+                                p: 3,
+                                border: '1px dashed #ddd',
+                                borderRadius: 2,
+                                textAlign: 'center',
+                                backgroundColor: 'background.paper'
+                            }}
+                        >
+                            <Typography variant="body1" color="text.secondary" gutterBottom>
+                                No reviews yet
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                Be the first to share your experience!
+                            </Typography>
+                        </Box>
+                }
 
                 {/* Add Review */}
                 <Box mt={4} p={3} sx={{ border: "1px solid #ddd", borderRadius: 3 }}>
                     <Typography variant="h6" fontWeight="bold">Add a review</Typography>
                     <Typography color="gray" mb={2}>Leave a review</Typography>
 
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                            <TextField fullWidth placeholder="Your name" variant="outlined" />
+                    <form onSubmit={handleSubmit}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    placeholder="Your name"
+                                    variant="outlined"
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    placeholder="Email Address"
+                                    variant="outlined"
+                                    type="email"
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    name="comment"
+                                    value={formData.comment}
+                                    onChange={handleInputChange}
+                                    placeholder="Your comment"
+                                    variant="outlined"
+                                    multiline
+                                    rows={3}
+                                />
+                            </Grid>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField fullWidth placeholder="Email Address" variant="outlined" />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField fullWidth placeholder="Your comment" variant="outlined" multiline rows={3} />
-                        </Grid>
-                    </Grid>
 
-                    <Button fullWidth variant="contained" sx={{ mt: 2, bgcolor: "#0C2E4E", "&:hover": { bgcolor: "#011627d9" } }}>
-                        Submit review
-                    </Button>
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            sx={{ mt: 2, bgcolor: "#0C2E4E", "&:hover": { bgcolor: "#011627d9" } }}
+                        >
+                            Submit review
+                        </Button>
+                    </form>
                 </Box>
             </Box>
         </>

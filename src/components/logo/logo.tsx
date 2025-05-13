@@ -1,30 +1,43 @@
 import type { BoxProps } from '@mui/material/Box';
 import { forwardRef } from 'react';
 import Box from '@mui/material/Box';
+import { useTheme, useMediaQuery } from '@mui/material';
 
 import { RouterLink } from 'src/routes/components';
-
 import { logoClasses } from './classes';
 
 // ----------------------------------------------------------------------
 
 export type LogoProps = BoxProps & {
   href?: string;
-  isSingle?: boolean;
   disableLink?: boolean;
+  singleLogoPath?: string;
+  fullLogoPath?: string;
 };
 
 export const Logo = forwardRef<HTMLDivElement, LogoProps>(
   (
-    { width, href = '/', height, isSingle = true, disableLink = false, className, sx, ...other },
+    { 
+      width, 
+      href = '/', 
+      height, 
+      disableLink = false, 
+      className, 
+      sx, 
+      singleLogoPath = "./assets/logo/logo-mobile.png",
+      fullLogoPath = "./assets/logo/full-logo.png",
+      ...other 
+    },
     ref
   ) => {
+    const theme = useTheme();
+    const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
     const singleLogo = (
       <Box
         alt="Single logo"
         component="img"
-        src="./assets/logo/full-logo.svg"
+        src={singleLogoPath}
         width="100%"
         height="100%"
         style={{ objectFit: "cover" }}
@@ -35,26 +48,22 @@ export const Logo = forwardRef<HTMLDivElement, LogoProps>(
       <Box
         alt="Full logo"
         component="img"
-        src="./assets/logo/single-logo.svg"
-        width="100%"
-        height="100%"
-        style={{ objectFit: "cover" }}
+        src={fullLogoPath}
+        width="200px"
+        height="90px"
+        style={{ objectFit: "scale-down" }}
       />
     );
 
     const baseSize = {
-      width: width ?? 122,
-      height: height ?? 81,
-      ...(!isSingle && {
-        width: width ?? 102,
-        height: height ?? 36,
-      }),
+      width: width ?? (isMdUp ? 122 : 102),
+      height: height ?? (isMdUp ? 81 : 36),
     };
 
     return (
       <Box
         ref={ref}
-        component={RouterLink}
+        component={disableLink ? 'div' : RouterLink}
         href={href}
         className={logoClasses.root.concat(className ? ` ${className}` : '')}
         aria-label="Logo"
@@ -68,8 +77,8 @@ export const Logo = forwardRef<HTMLDivElement, LogoProps>(
         }}
         {...other}
       >
-        {isSingle ? singleLogo : fullLogo}
-      </Box>   
+        {isMdUp ? fullLogo : singleLogo}
+      </Box>
     );
   }
 );

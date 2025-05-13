@@ -20,7 +20,7 @@ export function NavHomeOne() {
                 <Box
                     alt="Single logo"
                     component="img"
-                    src="./assets/logo/full-logo.svg"
+                    src="../assets/logo/logo-mobile.png"
                     width="150px"
                     height="70px"
                     style={{ objectFit: "cover" }}

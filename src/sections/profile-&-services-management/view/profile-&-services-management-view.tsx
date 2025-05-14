@@ -56,9 +56,10 @@ export function ProfileAndServicesManagementView() {
   const isMobile = useMediaQuery('(max-width:600px)');
 
   const handleModify = useCallback((rowData: any) => {
-    
-    setShowUpdateProfile(true); // Show UpdateProfile when Modify is clicked
 
+    setShowUpdateProfile(true); // Show UpdateProfile when Modify is clicked
+// Safely handle socialLinks (fallback to empty object if null/undefined)
+  const userSocialLinks = rowData.socialLinks || {};
     setProfileData((prev) => {
       // Only update if values actually changed
       if (
@@ -87,20 +88,20 @@ export function ProfileAndServicesManagementView() {
     setSocialLinks((prev) => {
       // Only update if values actually changed
       if (
-        prev._id === rowData.socialLinks._id &&
-        prev.instagram === rowData.socialLinks.instagram &&
-        prev.facebook === rowData.socialLinks.facebook &&
-        prev.linkedin === rowData.socialLinks.linkedin &&
-        prev.tiktok === rowData.socialLinks.tiktok
+        prev._id === userSocialLinks._id  &&
+        prev.instagram === userSocialLinks.instagram &&
+        prev.facebook === userSocialLinks.facebook &&
+        prev.linkedin === userSocialLinks.linkedin &&
+        prev.tiktok === userSocialLinks.tiktok
       ) {
         return prev;
       }
       return {
-        _id: rowData.socialLinks._id,
-        instagram: rowData.socialLinks.instagram || '',
-        facebook: rowData.socialLinks.facebook || '',
-        linkedin: rowData.socialLinks.linkedin || '',
-        tiktok: rowData.socialLinks.tiktok || '',
+        _id: userSocialLinks._id,
+        instagram: userSocialLinks.instagram || '',
+        facebook: userSocialLinks.facebook || '',
+        linkedin: userSocialLinks.linkedin || '',
+        tiktok: userSocialLinks.tiktok || '',
       };
     });
   }, []);

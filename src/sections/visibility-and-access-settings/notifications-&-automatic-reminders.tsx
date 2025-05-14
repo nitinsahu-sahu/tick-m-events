@@ -1,18 +1,9 @@
 import { useState } from 'react';
-
-import {
-  Box,
-  Typography,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  TextField,
-  MenuItem,
-  Button
-} from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { saveReminderSettings } from 'src/redux/actions/reminderActions';
+import { Box, Button, FormControlLabel, MenuItem, Radio, RadioGroup, TextField, Typography } from '@mui/material';
+
 import { AppDispatch } from 'src/redux/store';
+import { saveReminderSettings } from 'src/redux/actions/reminderActions';
 
 export function NotificationAutomaticReminders() {
   const dispatch = useDispatch<AppDispatch>();

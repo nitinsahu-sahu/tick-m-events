@@ -1,121 +1,113 @@
-import { Box, Button, Grid, MenuItem, Paper, Select, Typography } from "@mui/material";
+import { Box, Button, Grid, SelectChangeEvent, MenuItem, Paper, Select, Typography } from "@mui/material";
 import { useState } from "react";
+import { toast } from 'react-toastify';
+import { useDispatch } from "react-redux";
+
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+import { AppDispatch } from "src/redux/store";
+import { eventOrderCreate } from "src/redux/actions/eventOrder";
+
 import { HeadProcess } from "./head-process";
+import { PaymentOption, paymentOptions } from "./utils";
 
-export function ProcessThree() {
-    const paymentOptions = [
-        {
-            src: "./assets/images/payment-gateway-logo/mtn-mobile-money.png",
-            name: "MTN Mobile Money"
-        },
-        {
-            src: "./assets/images/payment-gateway-logo/orange-money.png",
-            name: "Orange Money"
-        },
-        {
-            src: "./assets/images/payment-gateway-logo/bank-card.jpg",
-            name: "Bank Card"
-        },
-        {
-            src: "./assets/images/payment-gateway-logo/bank-transfer.png",
-            name: "Bank Transfer"
-        },
-    ];
+export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
+    const dispatch = useDispatch<AppDispatch>();
 
-    const [selectedPayment, setSelectedPayment] = useState(paymentOptions[0]);
+    const [selectedPayment, setSelectedPayment] = useState<PaymentOption>(paymentOptions[0]);
+    const handlePaymentChange = (event: SelectChangeEvent<string>) => {
+        const selectedValue = event.target.value;
+        const selectedOption = paymentOptions.find(option => option.value === selectedValue);
 
+        if (selectedOption) {
+            setSelectedPayment(selectedOption);
+        }
+    };
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        const orderFormEntry = new FormData();
+        orderFormEntry.append("eventId", tickets.eventId);
+        orderFormEntry.append("orderAddress", JSON.stringify(orderDetails));
+        orderFormEntry.append("tickets", JSON.stringify(tickets));
+        orderFormEntry.append("totalAmount", tickets?.totalAmount);
+        orderFormEntry.append("paymentMethod", selectedPayment?.value);
+        try {
+
+            const result = await dispatch(eventOrderCreate(orderFormEntry));
+            if (result?.status === 201) {
+                toast.success(result?.message);
+            } else {
+                toast.error(result?.message);
+            }
+
+        } catch (error) {
+            toast.error("Event creation failed");
+        }
+    };
     return (
-        <Box mt={6}>
-            <Paper sx={{ width: "100%", p: 4, boxShadow: 3, borderRadius: 2, position: "relative" }}>
+        <Box mt={3}>
+            <Paper sx={{ width: "100%", p: 4, boxShadow: 3, borderRadius: 3, position: "relative" }}>
                 <HeadProcess title="Secure Payment" step="3" />
-                <Typography variant="h6" fontWeight={600} fontSize={{ xs: "14px", sm: "16px", md: "20px" }}>
-                    Select Payment Method
-                </Typography>
+                <HeadingCommon weight={600} baseSize="20px" title='Select Payment Method' variant="h6" />
+                <form onSubmit={handleSubmit}>
+                    <Select
+                        fullWidth
+                        name="paymentMethod"
+                        value={selectedPayment.value}
+                        onChange={handlePaymentChange}
+                        sx={{
+                            borderRadius: "12px",
+                            backgroundColor: "#fff",
+                            boxShadow: 1,
+                            mb: 2,
+                        }}
+                    >
+                        {paymentOptions.map((option, index) => (
+                            <MenuItem key={index} value={option.value}>
+                                <Box display="flex" alignItems="center">
+                                    <img
+                                        src={option.src}
+                                        alt={option.name}
+                                        style={{ width: 30, height: 30, marginRight: 10 }}
+                                    />
+                                    {option.name}
+                                </Box>
+                            </MenuItem>
+                        ))}
+                    </Select>
 
-                <Select
-                    fullWidth
-                    value={selectedPayment.name}
-                    onChange={(e) => {
-                        const selected = paymentOptions.find(opt => opt.name === e.target.value);
-                        if (selected) setSelectedPayment(selected);
-                    }}
-                    sx={{
-                        borderRadius: "12px",
-                        backgroundColor: "#fff",
-                        boxShadow: 1,
-                        mb: 2,
-                    }}
-                >
-                    {paymentOptions.map((option, index) => (
-                        <MenuItem key={index} value={option.name}>
-                            <Box display="flex" alignItems="center">
-                                <img
-                                    src={option.src}
-                                    alt={option.name}
-                                    style={{ width: 30, height: 30, marginRight: 10 }}
-                                />
-                                {option.name}
-                            </Box>
-                        </MenuItem>
-                    ))}
-                </Select>
-
-                {/* Payment Details Box */}
-                <Box
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        backgroundColor: "#F8F9FA",
-                        p: 2,
-                        borderRadius: "12px",
-                        mb: 2,
-                    }}
-                >
-                    <Box display="flex" alignItems="center">
-                        <img
-                            src={selectedPayment.src}
-                            alt={selectedPayment.name}
-                            style={{ width: 50, height: 50, marginRight: 2 }}
-                        />
-                        <Typography fontWeight="bold">
-                            {selectedPayment.name === "MTN Mobile Money"
-                                ? "Payment Number: 987621"
-                                : selectedPayment.name === "Orange Money"
-                                    ? "Payment Number: 654321"
-                                    : "Payment Details"}
-                        </Typography>
+                    {/* Payment Details Box */}
+                    <Box p={3} borderRadius={3} bgcolor="#F8F9FA" display="flex" alignItems="center" justifyContent="space-between">
+                        <Box display="flex" alignItems="center">
+                            <img
+                                src={selectedPayment.src}
+                                alt={selectedPayment.name}
+                                style={{ width: 50, height: 50, marginRight: 2 }}
+                            />
+                            <Typography fontWeight="bold">
+                                {selectedPayment.name === "MTN Mobile Money"
+                                    ? "Payment Number: 987621"
+                                    : selectedPayment.name === "Orange Money"
+                                        ? "Payment Number: 654321"
+                                        : "Payment Details"}
+                            </Typography>
+                        </Box>
+                        <HeadingCommon title={`Total: ${tickets?.totalAmount || 0.00} XAF`} baseSize="15px" />
                     </Box>
-                    <Typography fontWeight="bold">
-                        Total: 30,000 XAF
-                    </Typography>
-                </Box>
 
-                <Grid container spacing={2} mt={2}>
-                    <Grid item xs={12}>
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            sx={{ bgcolor: "#0B3558" }}
-                        >
-                            Confirm & Pay
-                        </Button>
+                    <Grid container spacing={2} mt={3}>
+                        <Grid item xs={12}>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                sx={{ bgcolor: "#0B3558" }}
+                            >
+                                Confirm & Pay
+                            </Button>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={4}>
-                        <Button
-                            variant="contained"
-                            sx={{
-                                bgcolor: "#B0B0B0",
-                                borderRadius: "12px",
-                                "&:hover": { bgcolor: "#A0A0A0" },
-                                p: "8px",
-                                fontSize: "14px",
-                            }}
-                        >
-                            &lt; Back
-                        </Button>
-                    </Grid>
-                </Grid>
+                </form>
             </Paper>
         </Box>
     )

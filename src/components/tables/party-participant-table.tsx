@@ -6,6 +6,8 @@ import RemoveIcon from '@mui/icons-material/Remove';
 
 export function ParticipantTable({ headers, data, ticketQuantities, handleDecrement, handleIncrement }: any) {
     const theme = useTheme();
+   
+ 
 
     return (
         <TableContainer component={Paper}>
@@ -68,6 +70,11 @@ export function ParticipantTable({ headers, data, ticketQuantities, handleDecrem
                                             }}
                                         >
                                             {row?.price}
+                                            {row.isLimitedSeat && row.totalTickets !== "0" && (
+                                                <span style={{ fontSize: "0.8rem", color: "#666" }}>
+                                                    ({row.totalTickets} available)
+                                                </span>
+                                            )}
                                         </TableCell>
                                         <TableCell
                                             align="center"

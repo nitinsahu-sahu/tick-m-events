@@ -1,14 +1,6 @@
-import React, { useState } from "react";
-import {
-    Box,
-    Grid,
-    Typography,
-    TextField,
-    Select,
-    MenuItem,
-    Button,
-    Paper,
-} from "@mui/material";
+import { useState } from "react";
+
+import { Box, Button, MenuItem, Paper, Select, TextField, Typography } from "@mui/material";
 
 export function WithdrawalRequest() {
     const [amount, setAmount] = useState("");

@@ -1,5 +1,7 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Paper, Typography } from "@mui/material";
+
 import { TransactionAndPaymentTable } from "src/components/tables/transaction-&-payment-table";
+
 import { WithdrawalTableData, WithdrawalTableHeaders } from "./utils";
 
 export function WithdrawalTableHistory() {

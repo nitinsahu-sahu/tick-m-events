@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Box, Button, Checkbox, FormControlLabel, Grid, Paper, TextField, Typography } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, Grid, TextField, Typography } from "@mui/material";
+
 import { TransactionAndPaymentTable } from "src/components/tables/transaction-&-payment-table";
+
 import { RefundTableData, RefundTableHeaders } from "./utils";
 
 export function RefundManagementHistory() {

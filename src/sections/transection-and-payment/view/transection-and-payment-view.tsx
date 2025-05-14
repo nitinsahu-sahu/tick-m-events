@@ -1,13 +1,14 @@
-import { PageTitleSection } from "src/components/page-title-section";
 import { DashboardContent } from "src/layouts/dashboard";
+import { PageTitleSection } from "src/components/page-title-section";
+
+import { HelpCenterAndSecurity } from "../help-center-and-security";
+import { InvoiceHistory } from "../invoices-&-reports";
 import { MetricCard } from "../metric-card";
 import { PaymentHistory } from "../payment-history";
 import { PaymentSettingAndPrefrenceHistory } from "../payment-settings-&-prefrences";
-import { InvoiceHistory } from "../invoices-&-reports";
 import { RefundManagementHistory } from "../refund-management";
-import { WithdrawalTableHistory } from "../withdrawal-table-history";
 import { WithdrawalRequest } from "../withdrawal-request";
-import { HelpCenterAndSecurity } from "../help-center-and-security";
+import { WithdrawalTableHistory } from "../withdrawal-table-history";
 
 export function TransectionAndPaymentView() {
   return (

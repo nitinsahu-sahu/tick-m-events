@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { usePathname } from 'src/routes/hooks';
-import { _notifications } from 'src/_mock';
+import { _giftboxdata, _messages, _notifications } from 'src/_mock';
 import { RootState } from 'src/redux/store';
 import { logout } from 'src/redux/actions';
 import { Iconify } from 'src/components/iconify';
@@ -43,7 +43,7 @@ export function UserPopover() {
     const hiddenHomeRecommadation = ['/home-and-recommendations'];
     const hiddenTranPaymet = ['/transection-and-payment'];
     const hiddenDashboard = ['/'];
-    const hiddenEventDetails = ['/event-details'];
+    const hiddenEventDetails = ['/events/add-new'];
 
     const { _id, name, role, avatar } = useSelector((state: RootState) => state?.auth?.user);
 
@@ -149,15 +149,15 @@ export function UserPopover() {
                                         !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
                                         !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
                                         <>
-                                            <MessagePopover totalUnRead="1" />
+                                            <MessagePopover  data={_messages}  />
                                             {
-                                                !hiddenReserContracts.some(path => pathname.includes(path)) && <GiftPopover totalUnRead="5" />
+                                                !hiddenReserContracts.some(path => pathname.includes(path)) && <GiftPopover data={_giftboxdata} />
                                             }
                                         </>
                                     }
-                                    {
+                                    {/* {
                                         !hiddenReserContracts.some(path => pathname.includes(path)) && <EmailPopover totalUnRead="2" />
-                                    }
+                                    } */}
                                 </>
                             }
 
@@ -219,41 +219,41 @@ export function UserPopover() {
                         </Box>
                     }
                     {
-                        hiddenDashboard.some(path => pathname.includes(path)) &&
-                        !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
-                        !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
-                            <Button
-                                variant="contained"
-                                disabled={hiddenEventDetails?.toString() === pathname?.toString()}
-                                onClick={() => navigate("/event-details")} // Redirect on click
-                                sx={{
-                                    backgroundColor: "#0C2340",
-                                    color: "white",
-                                    borderRadius: "8px",
-                                    px: 1,
-                                    fontSize: 14,
-                                    fontFamily: "Poppins, sans-serif",
-                                    fontWeight: 600
-                                }}
-                            >
-                                Create an Events
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                sx={{
-                                    borderRadius: "8px",
-                                    px: 1,
-                                    borderColor: "#C8C8C8",
-                                    color: "#2295D4",
-                                    fontSize: 14,
-                                    fontFamily: "Poppins, sans-serif",
-                                    fontWeight: 600
-                                }}
-                            >
-                                Setting
-                            </Button>
-                        </Box>
+                        role === 'organizer' && (
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
+                                <Button
+                                    variant="contained"
+                                    disabled={hiddenEventDetails?.toString() === pathname?.toString()}
+                                    onClick={() => navigate("/events/add-new")} // Redirect on click
+                                    sx={{
+                                        backgroundColor: "#0C2340",
+                                        color: "white",
+                                        borderRadius: "8px",
+                                        px: 1,
+                                        fontSize: 14,
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontWeight: 600
+                                    }}
+                                >
+                                    Create an Events
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    sx={{
+                                        borderRadius: "8px",
+                                        px: 1,
+                                        borderColor: "#C8C8C8",
+                                        color: "#2295D4",
+                                        fontSize: 14,
+                                        fontFamily: "Poppins, sans-serif",
+                                        fontWeight: 600
+                                    }}
+                                >
+                                    Settings
+                                </Button>
+                            </Box>
+                        )
+
                     }
                     {
                         hiddenTranPaymet.some(path => pathname.includes(path)) &&

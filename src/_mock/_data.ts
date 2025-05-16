@@ -87,11 +87,33 @@ export const _tasks = [...Array(5)].map((_, index) => ({
 
 // ----------------------------------------------------------------------
 
+export const _messages = [
+  {
+    id: _id(1),
+    title: 'Jhon',
+    description: 'Please Explain this event',
+    avatarUrl: '/assets/images/avatar/avatar-2.webp',
+    type: 'friend-interactive',
+    postedAt: _times(1),
+    isUnRead: true,
+  },
+  {
+    id: _id(2),
+    title: 'Jannifer',
+    description: 'Where is the loaction?',
+    avatarUrl: '/assets/images/avatar/avatar-2.webp',
+    type: 'friend-interactive',
+    postedAt: _times(2),
+    isUnRead: true,
+  }
+];
+
+
 export const _notifications = [
   {
     id: _id(1),
-    title: 'Your order is placed',
-    description: 'waiting for shipping',
+    title: 'Ticket Selection Information',
+    description: '',
     avatarUrl: null,
     type: 'order-placed',
     postedAt: _times(1),
@@ -99,38 +121,41 @@ export const _notifications = [
   },
   {
     id: _id(2),
-    title: _fullName(2),
-    description: 'answered to your comment on the Minimal',
+    title: "B2B Marketplace information",
+    description: '',
     avatarUrl: '/assets/images/avatar/avatar-2.webp',
     type: 'friend-interactive',
     postedAt: _times(2),
     isUnRead: true,
   },
+];
+
+export const _giftboxdata = [
   {
-    id: _id(3),
-    title: 'You have new message',
-    description: '5 unread messages',
+    id: _id(1),
+    title: 'Marketing informaitons',
+    description: '',
     avatarUrl: null,
-    type: 'chat-message',
-    postedAt: _times(3),
-    isUnRead: false,
+    type: 'order-placed',
+    postedAt: _times(1),
+    isUnRead: true,
   },
   {
-    id: _id(4),
-    title: 'You have new mail',
-    description: 'sent from Guido Padberg',
-    avatarUrl: null,
-    type: 'mail',
-    postedAt: _times(4),
-    isUnRead: false,
+    id: _id(2),
+    title: "Pramotion notifications",
+    description: '',
+    avatarUrl: '/assets/images/avatar/avatar-2.webp',
+    type: 'order-placed',
+    postedAt: _times(2),
+    isUnRead: true,
   },
   {
-    id: _id(5),
-    title: 'Delivery processing',
-    description: 'Your order is being shipped',
-    avatarUrl: null,
-    type: 'order-shipped',
-    postedAt: _times(5),
-    isUnRead: false,
+    id: _id(2),
+    title: "Special Offers Organizer enable/Disable",
+    description: 'The Marketing and Engagement Page sell their tickets',
+    avatarUrl: '/assets/images/avatar/avatar-2.webp',
+    type: 'order-placed',
+    postedAt: _times(2),
+    isUnRead: true,
   },
 ];

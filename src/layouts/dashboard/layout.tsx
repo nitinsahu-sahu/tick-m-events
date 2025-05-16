@@ -4,7 +4,7 @@ import { InputBase, Button, Box, Alert, useMediaQuery, IconButton, Typography } 
 import { useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 
-import { _langs, _notifications } from 'src/_mock';
+import { _giftboxdata, _langs, _messages, _notifications } from 'src/_mock';
 import { Iconify } from 'src/components/iconify';
 import { RootState } from 'src/redux/store';
 import { usePathname } from 'src/routes/hooks';
@@ -62,7 +62,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
   const hiddenLoyaltyProgram = ['/loyalty-program'];
   const hiddenTicketPurchasePro = ['/ticket-purchase-process'];
   const hiddenEventSearchDetails = ['/event-search-and-details'];
-  const hiddenEventDetails = ['/event-details'];
+  const hiddenEventDetails = ['/events/add-new'];
   const hiddenCustomPhotoVideo = ['/custom-photo-or-video-filters-for-events'];
   const hiddenHomeRecommadation = ['/home-and-recommendations'];
   const hiddenTranPaymet = ['/transection-and-payment'];
@@ -265,16 +265,16 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                               !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
                               !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
                               <>
-                                <MessagePopover totalUnRead="1" />
+                                <MessagePopover  data={_messages} />
                                 {
-                                  !hiddenReserContracts.some(path => pathname.includes(path)) && <GiftPopover totalUnRead="5" />
+                                  !hiddenReserContracts.some(path => pathname.includes(path)) && <GiftPopover data={_giftboxdata} />
                                 }
 
                               </>
                             }
-                            {
+                            {/* {
                               !hiddenReserContracts.some(path => pathname.includes(path)) && <EmailPopover totalUnRead="2" />
-                            }
+                            } */}
 
                           </>
                         }
@@ -373,62 +373,41 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                     }
                     {
                       !isMobileOrTablet && (
-                        hiddenDashboard.some(path => pathname.includes(path)) &&
-                        !hiddenTranPaymet.some(path => pathname.includes(path)) &&
-                        !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
-                        !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
-                        !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
-                        !hiddenTicketManagement.some(path => pathname.includes(path)) &&
-                        !hiddenLoyaltyProgram.some(path => pathname.includes(path)) &&
-                        !hiddenCustomPhotoVideo.some(path => pathname.includes(path)) &&
-                        !hiddenHomeGlobal.some(path => pathname.includes(path)) &&
-                        !hiddenServiceCal.some(path => pathname.includes(path)) &&
-                        !hiddenReserContracts.some(path => pathname.includes(path)) &&
-                        !hiddenPaths.some(path => pathname.includes(path)) &&
-                        !hiddenTransectionPayment.some(path => pathname.includes(path)) &&
-                        !hiddenMessageClientRel.some(path => pathname.includes(path)) &&
-                        !hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
-                        !hiddenSearchSelect.some(path => pathname.includes(path)) &&
-                        !hiddenProfileService.some(path => pathname.includes(path)) &&
-                        !hiddenMarketting.some(path => pathname.includes(path)) &&
-                        !hiddenUsrMange.some(path => pathname.includes(path)) &&
-                        !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
-                        !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
-                        !hiddenServiceReq.some(path => pathname.includes(path)) &&
-
-                        !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
-                        <>
-                          <Button
-                            variant="contained"
-                            disabled={hiddenEventDetails?.toString() === pathname?.toString()}
-                            onClick={() => navigate("/event-details")} // Redirect on click
-                            sx={{
-                              backgroundColor: "#0C2340",
-                              color: "white",
-                              borderRadius: "8px",
-                              px: 1,
-                              fontSize: 16,
-                              fontFamily: "Poppins, sans-serif",
-                              fontWeight: 600
-                            }}
-                          >
-                            Create an Event
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            sx={{
-                              borderRadius: "8px",
-                              px: 1,
-                              borderColor: "#C8C8C8",
-                              color: "#2295D4",
-                              fontSize: 16,
-                              fontFamily: "Poppins, sans-serif",
-                              fontWeight: 600
-                            }}
-                          >
-                            Setting
-                          </Button>
-                        </>
+                        role === 'organizer' && (
+                          <>
+                            <Button
+                              variant="contained"
+                              disabled={hiddenEventDetails?.toString() === pathname?.toString()}
+                              onClick={() => navigate("/events/add-new")} // Redirect on click
+                              sx={{
+                                backgroundColor: "#0C2340",
+                                color: "white",
+                                borderRadius: "8px",
+                                px: 1,
+                                fontSize: 16,
+                                fontFamily: "Poppins, sans-serif",
+                                fontWeight: 600
+                              }}
+                            >
+                              Create an Event
+                            </Button>
+                            <Button
+                              variant="contained"
+                              
+                              sx={{
+                                backgroundColor: "#0C2340",
+                                color: "white",
+                                borderRadius: "8px",
+                                px: 1,
+                                fontSize: 16,
+                                fontFamily: "Poppins, sans-serif",
+                                fontWeight: 600
+                              }}
+                            >
+                              Settings
+                            </Button>
+                          </>
+                        )
                       )
                     }
                     {

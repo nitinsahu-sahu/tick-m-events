@@ -7,25 +7,25 @@ import { Outlet } from 'react-router-dom';
 
 // Lazy load dashboard components
 const HomePage = lazy(() => import('../pages/home'));
-const HomeAndGlobalPage = lazy(() => import('../pages/home-and-global-view'));
+const StatisticsAndPerformancePage = lazy(() => import('../pages/statistics-&-performance'));
 const HomeAndRecommendationsPage = lazy(() => import('../pages/home-and-recommendations'));
-const StatisticsAndReportsPage = lazy(() => import('../pages/statistics-&-performance'));
+const StatisticsAndReportsPage = lazy(() => import('../pages/statistics-and-reports'));
 
 const renderFallback = (
-  <Box display="flex" alignItems="center" justifyContent="center" flex="1 1 auto">
-    <LinearProgress
-      sx={{
-        width: 1,
-        maxWidth: 320,
-        bgcolor: (theme) => varAlpha(theme.vars.palette.text.primaryChannel, 0.16),
-        [`& .${linearProgressClasses.bar}`]: { bgcolor: 'text.primary' },
-      }}
-    />
-  </Box>
+    <Box display="flex" alignItems="center" justifyContent="center" flex="1 1 auto">
+        <LinearProgress
+            sx={{
+                width: 1,
+                maxWidth: 320,
+                bgcolor: (theme) => varAlpha(theme.vars.palette.text.primaryChannel, 0.16),
+                [`& .${linearProgressClasses.bar}`]: { bgcolor: 'text.primary' },
+            }}
+        />
+    </Box>
 );
 
 export function MultipleDashboard() {
-     const role = useSelector((state: RootState) => state.auth.user?.role);
+    const role = useSelector((state: RootState) => state.auth.user?.role);
     const isLoading = useSelector((state: RootState) => state.auth.loading);
 
     if (isLoading) {
@@ -44,7 +44,7 @@ export function MultipleDashboard() {
                         case 'organizer':
                             return <StatisticsAndReportsPage />;
                         case 'provider':
-                            return <HomeAndGlobalPage />;
+                            return <StatisticsAndPerformancePage />;
                         default:
                             return <HomePage />;
                     }

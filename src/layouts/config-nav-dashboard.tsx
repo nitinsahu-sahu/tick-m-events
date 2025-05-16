@@ -19,6 +19,13 @@ const EventsInfo = () => <Label color="success" variant="inverted">3</Label>
 
 
 export const navData: NavItem[] = [
+  // All Users Dashboard
+  {
+    title: 'Statistics & Performance',
+    path: '/',
+    icon: icon('ic-analytics'),
+    roles: ['provider'],
+  },
   {
     title: 'Dashboard',
     path: '/',
@@ -26,35 +33,32 @@ export const navData: NavItem[] = [
     roles: ['admin'],
   },
   {
+    title: 'Home',
+    path: '/',
+    icon: icon('ic-dashboard'),
+    roles: ['organizer'],
+  },
+
+  // Organizer Sidebar
+  {
     title: 'Events',
     path: '#',
     icon: icon('ic_events'),
     info: <EventsInfo />,
+    roles: ['organizer'],
     children: [ // Submenu items
-      {
-        title: 'Order List',
-        path: '/events/order-list',
-        icon: icon('ic_order_list'),
-      },
-      {
-        title: 'Check Schedule',
-        path: '/events/check-schedule',
-        icon: icon('ic_check_schedule'),
-      },
       {
         title: 'Add New',
         path: '/events/add-new',
-        icon: icon('ic_add_new'),
+        icon: icon('ic_event_create'),
+      },
+      {
+        title: 'Edit an Event',
+        path: '/events/check-schedule',
+        icon: icon('ic_event_edit'),
       },
     ],
   },
-  {
-    title: 'Event Details',
-    path: '/event-details',
-    icon: icon('ic-analytics'),
-    roles: ['organizer'],
-  },
-
   {
     title: 'Ticket & Reservation Management',
     path: '/ticket-and-reservation-management',
@@ -62,14 +66,14 @@ export const navData: NavItem[] = [
     roles: ['organizer'],
   },
   {
-    title: 'Entry Validation',
-    path: '/entry-validation',
+    title: 'Marketing Engagenment',
+    path: '/marketing-engagenment',
     icon: icon('ic-marketing-ngagenment'),
     roles: ['organizer'],
   },
   {
-    title: 'Marketing Engagenment',
-    path: '/marketing-engagenment',
+    title: 'Entry Validation',
+    path: '/entry-validation',
     icon: icon('ic-marketing-ngagenment'),
     roles: ['organizer'],
   },
@@ -80,16 +84,24 @@ export const navData: NavItem[] = [
     roles: ['organizer'],
   },
   {
-    title: 'Statistics & Reports',
-    path: '/statistics-and-reports',
-    icon: icon('ic-statistics'),
+    title: 'Event Settings',
+    path: '/transection-and-payment',
+    icon: icon('ic-transaction-&-payment'),
     roles: ['organizer'],
   },
+  {
+    title: 'Find a Service Provider',
+    path: '/search-&-select-service-providers',
+    icon: icon('ic-analytics'),
+    roles: ['organizer', 'provider'],
+  },
+
+  // Provider Sidebar
   {
     title: 'Visibility & Access Settings',
     path: '/visibility-and-access-settings',
     icon: icon('ic-analytics'),
-    roles: ['organizer'],
+    roles: ['provider'],
   },
   {
     title: 'Home & Recommendations',
@@ -164,18 +176,6 @@ export const navData: NavItem[] = [
     roles: ['provider'],
   },
   {
-    title: 'Statistics & Performance',
-    path: '/statistics-&-performance',
-    icon: icon('ic-analytics'),
-    roles: ['provider'],
-  },
-  {
-    title: 'Search & Select Service Providers',
-    path: '/search-&-select-service-providers',
-    icon: icon('ic-analytics'),
-    roles: ['organizer'],
-  },
-  {
     title: 'Service Request & Negotiation',
     path: '/service-request-&-negotiation',
     icon: icon('ic-analytics'),
@@ -185,7 +185,7 @@ export const navData: NavItem[] = [
     title: 'Tracking of Booked Services & Providers',
     path: '/tracking-of-booked-services-&-providers',
     icon: icon('ic-analytics'),
-    roles: ['organizer'],
+    roles: ['provider'],
   },
   {
     title: 'Global Overview & General Statistics',
@@ -211,13 +211,13 @@ export const navData: NavItem[] = [
     title: 'Marketplace & Service Provider Supervision',
     path: '/marketplace-&-service-provider-supervision',
     icon: icon('ic-analytics'),
-    roles: ['organizer','admin'],
+    roles: ['admin'],
   },
   {
     title: 'Profile & Services Management',
     path: '/profile-&-services-management',
     icon: icon('ic-analytics'),
-    roles: ['provider','admin','organizer'],
+    roles: ['provider', 'admin'],
   },
 
 ];

@@ -132,8 +132,7 @@ export function EventDetailsView() {
       {/* Title & Search Bar */}
       <PageTitleSection
         title="Create and Manage My Events"
-        desc="Lorem ipsum dolor sit amet"
-        rightCom={<SearchBar />}
+        desc=""
       />
 
       {/* Event Banner Preview */}

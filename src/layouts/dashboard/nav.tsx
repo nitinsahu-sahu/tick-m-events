@@ -1,16 +1,15 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
-
 import { useEffect, useState } from 'react';
-import { Collapse, Box, ListItem, ListItemButton, Typography } from '@mui/material';
-
-import { useTheme } from '@mui/material/styles';
-import Drawer, { drawerClasses } from '@mui/material/Drawer';
+import { Collapse, Box, ListItem, ListItemButton, useTheme, Drawer, drawerClasses } from '@mui/material';
+import { useSelector } from 'react-redux';
 
 import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 import { varAlpha } from 'src/theme/styles';
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { RootState } from 'src/redux/store';
 
 import { NavUpgrade } from '../components/nav-upgrade';
 
@@ -110,40 +109,46 @@ export function NavMobile({
 
 export function DashboardHF({ title }: any) {
   return (
-    <Typography variant="h6" sx={{
-      color: "#C8C8C8",
-      fontFamily: "Poppins, sans-serif",
-      fontWeight: 600,
-      fontSize: { xs: 14, sm: 16 },
-      marginBottom: 1,
-      marginTop: 1,
-      marginLeft: 2
-    }}>
-      {title}
-
-    </Typography>
+    <HeadingCommon title={title} color="#C8C8C8" variant="h6" weight={600} baseSize="16px" mb={1} mt={1} />
   )
 }
+// Add this custom hook to filter nav items by role
+const useFilteredNavData = (data: any) => {
+  const currentRole = useSelector((state: RootState) => state.auth?.user?.role || 'participant');
+
+
+  return data.filter((item: any) => {
+    // If no roles specified, show to all
+    if (!item.roles) return true;
+    // Check if current role is in allowed roles
+    return item.roles.includes(currentRole);
+  });
+};
+
+
 export function NavContent({ data, slots, sx }: NavContentProps) {
+  const filteredData = useFilteredNavData(data); // Use the filtered data
+
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
 
   const handleToggle = (title: string) => {
     setOpenMenus((prev) => ({ ...prev, [title]: !prev[title] }));
   };
+
   return (
     <>
       <Logo />
 
       {slots?.topArea}
       <DashboardHF title="MAIN MENU" />
-
       <Scrollbar fillContent>
         <Box component="nav" display="flex" flex="1 1 auto" flexDirection="column" sx={sx}>
           <Box component="ul" gap={0.5} display="flex" flexDirection="column">
-            {data.map((item) => {
-              const isActive = item.path === pathname;
+            {filteredData.map((item: any) => {
               const hasChildren = item.children && item.children.length > 0;
+              const isActive = pathname === item.path ||
+                (hasChildren && item.children.some((child: any) => child.path === pathname));
 
               return (
                 <Box key={item.title}>
@@ -202,31 +207,41 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                   {/* Submenu Items (Dropdown) */}
                   {hasChildren && (
                     <Collapse in={openMenus[item.title]} timeout="auto" unmountOnExit>
-                      <Box component="ul" sx={{ pl: 0 }}>
-                        {item?.children?.map((child: any) => (
-                          <ListItem key={child.title} disableGutters disablePadding>
-                            <ListItemButton
-                              component={RouterLink}
-                              href={child.path}
-                              sx={{
-                                pl: 2,
-                                gap: 2,
-                                pr: 1.5,
-                                borderRadius: 0.75,
-                                typography: 'body2',
-                                fontWeight: 'fontWeightMedium',
-                                color: 'var(--layout-nav-item-color)',
-                                minHeight: 'var(--layout-nav-item-height)',
-                                '&:hover': {
-                                  bgcolor: 'var(--layout-nav-item-hover-bg)',
-                                },
-                              }}
-                            >
-                              <Box component="span" sx={{ width: 24, height: 24 }}>{child.icon}</Box>
-                              <Box component="span" flexGrow={1}>{child.title}</Box>
-                            </ListItemButton>
-                          </ListItem>
-                        ))}
+                      <Box component="ul" sx={{ pl: 0, my: 1 }}>
+                        {item?.children?.map((child: any) => {
+                          const isChildActive = child.path === pathname;
+                          return (
+                            <ListItem key={child.title} disableGutters disablePadding>
+                              <ListItemButton
+                                component={RouterLink}
+                                href={child.path}
+                                sx={{
+                                  pl: 6,
+                                  gap: 2,
+                                  pr: 1.5,
+                                  borderRadius: 0.75,
+                                  typography: 'body2',
+                                  fontWeight: isChildActive ? 'fontWeightSemiBold' : 'fontWeightMedium',
+                                  color: isChildActive
+                                    ? 'var(--layout-nav-item-active-color)'
+                                    : 'var(--layout-nav-item-color)',
+                                  minHeight: 'var(--layout-nav-item-height)',
+                                  bgcolor: isChildActive
+                                    ? 'var(--layout-nav-item-active-bg)'
+                                    : 'transparent',
+                                  '&:hover': {
+                                    bgcolor: isChildActive
+                                      ? 'var(--layout-nav-item-active-hover-bg)'
+                                      : 'var(--layout-nav-item-hover-bg)',
+                                  },
+                                }}
+                              >
+                                <Box component="span" sx={{ width: 24, height: 24 }}>{child.icon}</Box>
+                                <Box component="span" flexGrow={1}>{child.title}</Box>
+                              </ListItemButton>
+                            </ListItem>
+                          );
+                        })}
                       </Box>
                     </Collapse>
                   )}

@@ -36,6 +36,7 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
             const result = await dispatch(eventOrderCreate(orderFormEntry));
             if (result?.status === 201) {
                 toast.success(result?.message);
+                onNext()
             } else {
                 toast.error(result?.message);
             }

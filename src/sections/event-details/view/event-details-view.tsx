@@ -3,6 +3,7 @@ import { Box, Button, IconButton } from "@mui/material";
 import DownloadIcon from '@mui/icons-material/Download';
 import CropIcon from '@mui/icons-material/Crop';
 import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from "react-image-crop";
+import { toast } from 'react-toastify';
 
 import "react-image-crop/dist/ReactCrop.css";
 
@@ -86,13 +87,24 @@ export function EventDetailsView() {
       try {
         // Create a new canvas for the cropped image
         const canvas = document.createElement('canvas');
-        canvas.width = completedCrop.width;
-        canvas.height = completedCrop.height;
+        canvas.width = 1500; // Set to your desired dimensions
+        canvas.height = 536;
 
-        await canvasPreview(
+        // Get the context
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Draw the cropped image
+        ctx.drawImage(
           imgRef.current,
-          canvas,
-          completedCrop,
+          completedCrop.x,
+          completedCrop.y,
+          completedCrop.width,
+          completedCrop.height,
+          0,
+          0,
+          1500,
+          536
         );
 
         // Convert canvas to blob
@@ -109,10 +121,18 @@ export function EventDetailsView() {
             setImgSrc(newPreviewUrl);
             setShowCrop(false);
 
+            // Update the file input with the cropped image
+            if (fileInputRef.current) {
+              const croppedFile = new File([blob], 'cropped-image.png', { type: 'image/png' });
+              const dataTransfer = new DataTransfer();
+              dataTransfer.items.add(croppedFile);
+              fileInputRef.current.files = dataTransfer.files;
+            }
           }
         }, 'image/png', 1);
       } catch (error) {
         console.error('Cropping error:', error);
+        toast.error('Failed to apply crop');
       }
     }
   };
@@ -184,13 +204,16 @@ export function EventDetailsView() {
               />
             )}
 
+            <Box sx={{ position: 'absolute', bottom: 10, left: 10, display: 'flex', gap: 1 }}>
+              <HeadingCommon title="Minimum dimensions: 1500×536 pixels" baseSize="12px" color="red" />
+            </Box>
             <Box sx={{ position: 'absolute', top: 10, right: 10, display: 'flex', gap: 1 }}>
               <IconButton onClick={handleDownload} sx={{ backgroundColor: 'rgba(255,255,255,0.7)' }}>
                 <DownloadIcon />
               </IconButton>
-              {/* <IconButton onClick={handleToggleCrop} sx={{ backgroundColor: 'rgba(255,255,255,0.7)' }}>
+              <IconButton onClick={handleToggleCrop} sx={{ backgroundColor: 'rgba(255,255,255,0.7)' }}>
                 <CropIcon />
-              </IconButton> */}
+              </IconButton>
             </Box>
           </>
         ) : (

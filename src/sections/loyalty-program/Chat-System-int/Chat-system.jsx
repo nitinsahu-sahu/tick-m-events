@@ -1,6 +1,5 @@
 import { Box, Divider, Grid, List, ListItem, ListItemButton, ListItemText, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
-import { useChat } from 'src/redux/context/ChatContext';
 
 import ChatMessages from './ChatMessages';
 import SendMessageForm from './SendMessageForm';

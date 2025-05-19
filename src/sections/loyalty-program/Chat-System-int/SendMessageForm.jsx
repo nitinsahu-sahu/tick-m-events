@@ -1,7 +1,6 @@
 import { Box, IconButton, TextField } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { useState } from 'react';
-import { useChat } from 'src/redux/context/ChatContext';
 
 const SendMessageForm = () => {
   const [message, setMessage] = useState('');

@@ -8,7 +8,7 @@ import { TicketReservationManagementTable } from "src/components/tables/ticket-r
 export function ReservationManagement() {
     const chartRealTimeOptions: ApexOptions = {
         series: [45, 30, 25], // Ticket Sold, Validation, Remaining
-        labels: ["Ticket Sold", "Ticket Validation", "Remaining Tickets"],
+        labels: ["Ticket Sold", "Ticket validated", "Remaining Tickets"],
         chart: { type: "donut" },
         colors: ["#2395D4", "#002E4E", "#29A71A"], // Match colors from screenshot
         legend: { position: "bottom", markers: { strokeWidth: 8 } },

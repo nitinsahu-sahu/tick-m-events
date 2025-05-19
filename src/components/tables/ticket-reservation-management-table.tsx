@@ -64,17 +64,7 @@ export function TicketReservationManagementTable({
                                     <>
                                         {[row.price, row.total, row.remaining].map((value, i) => (
                                             <TableCell key={i} align="center">
-                                                <TextField
-                                                    fullWidth
-                                                    variant="outlined"
-                                                    size="small"
-                                                    value={value}
-                                                    sx={{
-                                                        minWidth: "80px",
-                                                        "& .MuiInputBase-input": { textAlign: "center" },
-                                                    }}
-                                                    inputProps={{ style: { textAlign: "center" } }}
-                                                />
+                                               {value}
                                             </TableCell>
                                         ))}
                                     </>

@@ -2,17 +2,15 @@ import { useTheme } from '@mui/material/styles';
 import { Avatar, Box, Button, Popover, Typography, useMediaQuery } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { usePathname } from 'src/routes/hooks';
 import { _giftboxdata, _messages, _notifications } from 'src/_mock';
 import { RootState } from 'src/redux/store';
 import { logout } from 'src/redux/actions';
-import { Iconify } from 'src/components/iconify';
 
 import { NotificationsPopover } from './notifications-popover';
 import { MessagePopover } from './message-popover';
-import { EmailPopover } from './email-popover';
 import { GiftPopover } from './gift-popover';
 
 export function UserPopover() {
@@ -120,8 +118,6 @@ export function UserPopover() {
                         <Typography textTransform="capitalize" fontSize={12} color="gray" fontFamily="Poppins, sans-serif">
                             {role}
                         </Typography>
-
-
                     </Box>
                     {
                         !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
@@ -149,7 +145,7 @@ export function UserPopover() {
                                         !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
                                         !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
                                         <>
-                                            <MessagePopover  data={_messages}  />
+                                            <MessagePopover data={_messages} />
                                             {
                                                 !hiddenReserContracts.some(path => pathname.includes(path)) && <GiftPopover data={_giftboxdata} />
                                             }
@@ -249,7 +245,18 @@ export function UserPopover() {
                                         fontWeight: 600
                                     }}
                                 >
-                                    Settings
+                                    <Link
+                                        to="/visibility-and-access-settings"
+                                        style={{
+                                            textDecoration: 'none', // Removes underline
+                                            color: 'inherit', // Inherits parent color
+                                            // Or set specific color:
+                                            // color: '#yourColor',
+                                        }}
+                                    >
+                                        Settings
+                                    </Link>
+
                                 </Button>
                             </Box>
                         )

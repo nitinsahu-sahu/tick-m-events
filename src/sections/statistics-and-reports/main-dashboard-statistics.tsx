@@ -1,6 +1,7 @@
 import { Box, Grid, Typography, Card, CardContent, CircularProgress } from "@mui/material";
 import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 
 export function CommonBarHead({ totalCount, leftHead, head }: any) {
@@ -50,11 +51,9 @@ export function MainDashboardStatistics() {
     const barChartSeries = [{ data: [10, 40, 30, 70, 50, 90] }];
     return (
         <Box mt={3}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-                Main Dashboard Statistics
-            </Typography>
+            <HeadingCommon title="Main Dashboard Statistics" mb={0}/>
 
-            <Grid container spacing={2} mt={2}>
+            <Grid container spacing={2} mt={1}>
                 {[
                     {
                         totalCount: "215",
@@ -171,7 +170,6 @@ export function MainDashboardStatistics() {
                     </Grid>
                 ))}
             </Grid>
-
         </Box>
     )
 }

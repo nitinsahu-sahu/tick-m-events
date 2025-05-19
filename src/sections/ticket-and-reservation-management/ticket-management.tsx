@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Box, Button } from "@mui/material";
-import { useTheme } from '@mui/material/styles';
 
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
@@ -8,7 +7,6 @@ import { TicketReservationManagementTable } from "src/components/tables/ticket-r
 import { TicketCreationAndConfiguration } from "./ticket-creation-&-onfiguration";
 
 export function TicketManagement() {
-    const theme = useTheme();
     const [showTicketCreation, setShowTicketCreation] = useState(false);
 
     const ticketManagementTableHeaders = ["Ticket Name", "Price", "Quantity Available", "Ticket Description", "Remaining Stock", "Actions"];

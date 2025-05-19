@@ -1,8 +1,9 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
 import { useState } from 'react';
-import { InputBase, Button, Box, Alert, useMediaQuery, IconButton, Typography } from '@mui/material';
+import { InputBase, Button, Box, Alert, useMediaQuery, IconButton, Typography, ListItemText, ListItem, List, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { _giftboxdata, _langs, _messages, _notifications } from 'src/_mock';
 import { Iconify } from 'src/components/iconify';
@@ -10,7 +11,6 @@ import { RootState } from 'src/redux/store';
 import { usePathname } from 'src/routes/hooks';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { getFilteredNavItems } from 'src/routes/hooks/getFilterNavItesm';
-import { useNavigate } from 'react-router-dom';
 
 import { Main } from './main';
 import { layoutClasses } from '../classes';
@@ -22,9 +22,10 @@ import { HeaderSection } from '../core/header-section';
 import { NotificationsPopover } from '../components/notifications-popover';
 import { MessagePopover } from '../components/message-popover';
 import { GiftPopover } from '../components/gift-popover';
-import { EmailPopover } from '../components/email-popover';
 import { UserPopover } from '../components/user-popover';
 import { WishlistPopover } from '../components/wishlist-popover';
+import { SearchEvent } from './search-box';
+
 
 // ----------------------------------------------------------------------
 
@@ -39,6 +40,8 @@ export type DashboardLayoutProps = {
 export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) {
   const theme = useTheme();
   const { _id, name, role } = useSelector((state: RootState) => state?.auth?.user);
+
+
   const filteredNavItems = getFilteredNavItems(navData, role);
   const pathname = usePathname()
   const navigate = useNavigate();
@@ -178,60 +181,11 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
             ),
             rightArea: (
               <Box display="flex" alignItems="center" gap={2} >
-
-                {/* Search Bar */}
                 {
-                  !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
-                  !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
-                  !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
-                  !hiddenTicketManagement.some(path => pathname.includes(path)) &&
-                  !hiddenTransectionPayment.some(path => pathname.includes(path)) && !hiddenMarketting.some(path => pathname.includes(path)) &&
-                  !hiddenServiceCal.some(path => pathname.includes(path)) &&
-                  !hiddenReserContracts.some(path => pathname.includes(path)) &&
-                  !hiddenHomeGlobal.some(path => pathname.includes(path)) &&
-                  !hiddenMarketting.some(path => pathname.includes(path)) &&
-                  !hiddenCustomPhotoVideo.some(path => pathname.includes(path)) &&
-
-                  !hiddenPaths.some(path => pathname.includes(path)) &&
-                  !hiddenLoyaltyProgram.some(path => pathname.includes(path)) &&
-                  !hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
-                  !hiddenServiceReq.some(path => pathname.includes(path)) &&
-                  !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
-                  !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
-                  !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
-                  !hiddenProfileService.some(path => pathname.includes(path)) &&
-                  !hiddenMessageClientRel.some(path => pathname.includes(path)) &&
-                  <Box
-                    sx={{
-                      display: "flex",
-                      height: "40px",
-                      alignItems: "center",
-                      width: "200px",
-                      maxWidth: "300px",
-                      border: "1px solid #ddd",
-                      borderRadius: "8px",
-                      padding: "8px 12px",
-                      backgroundColor: "#fff",
-                      boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    {/* Search Icon */}
-                    <IconButton >
-                      <Iconify icon="eva:search-fill" />
-                    </IconButton>
-
-                    {/* Search Input */}
-                    <InputBase
-                      placeholder="Search here"
-                      sx={{
-                        flex: 1,
-                        fontSize: "14px",
-                        color: "#666",
-                        "&::placeholder": { color: "#bbb" },
-                      }}
-                    />
-                  </Box>
+                  role === 'organizer' && (<SearchEvent />)
                 }
+                {/* Search Bar */}
+
 
 
                 {/* Notifications & Popovers (Hidden on Mobile & Tablet) */}
@@ -265,7 +219,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                               !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
                               !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
                               <>
-                                <MessagePopover  data={_messages} />
+                                <MessagePopover data={_messages} />
                                 {
                                   !hiddenReserContracts.some(path => pathname.includes(path)) && <GiftPopover data={_giftboxdata} />
                                 }
@@ -391,21 +345,23 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                             >
                               Create an Event
                             </Button>
-                            <Button
-                              variant="contained"
-                              
-                              sx={{
-                                backgroundColor: "#0C2340",
-                                color: "white",
-                                borderRadius: "8px",
-                                px: 1,
-                                fontSize: 16,
-                                fontFamily: "Poppins, sans-serif",
-                                fontWeight: 600
-                              }}
-                            >
-                              Settings
-                            </Button>
+                            <Link to='/visibility-and-access-settings'>
+                              <Button
+                                variant="contained"
+
+                                sx={{
+                                  backgroundColor: "#0C2340",
+                                  color: "white",
+                                  borderRadius: "8px",
+                                  px: 1,
+                                  fontSize: 16,
+                                  fontFamily: "Poppins, sans-serif",
+                                  fontWeight: 600
+                                }}
+                              >
+                                Settings
+                              </Button>
+                            </Link>
                           </>
                         )
                       )

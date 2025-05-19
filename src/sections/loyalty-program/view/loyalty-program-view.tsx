@@ -5,6 +5,7 @@ import { HeroSection } from "../hero-section";
 import { AccountPoints } from "../account-points";
 import { AvailableRewards } from "../avalable-rewards";
 import { RewardsHistory } from "../reward-history";
+import { ChatSystem } from "../Chat-System-int/Chat-system";
 
 
 export function LoyaltyProgramView  ()  {
@@ -17,6 +18,8 @@ export function LoyaltyProgramView  ()  {
             <AvailableRewards />
 
             <RewardsHistory />
+
+            <ChatSystem />
         </DashboardContent>
     );
 };

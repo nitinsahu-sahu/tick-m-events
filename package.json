@@ -61,7 +61,8 @@
     "recharts": "^2.15.1",
     "redux": "^5.0.1",
     "redux-thunk": "^3.1.0",
-    "simplebar-react": "^3.2.6"
+    "simplebar-react": "^3.2.6",
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
     "@types/domutils": "^2.1.0",

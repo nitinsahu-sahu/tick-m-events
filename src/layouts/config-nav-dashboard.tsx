@@ -84,12 +84,6 @@ export const navData: NavItem[] = [
     roles: ['organizer'],
   },
   {
-    title: 'Event Settings',
-    path: '/transection-and-payment',
-    icon: icon('ic-transaction-&-payment'),
-    roles: ['organizer'],
-  },
-  {
     title: 'Find a Service Provider',
     path: '/search-&-select-service-providers',
     icon: icon('ic-analytics'),
@@ -98,10 +92,10 @@ export const navData: NavItem[] = [
 
   // Provider Sidebar
   {
-    title: 'Visibility & Access Settings',
+    title: 'Event Settings',
     path: '/visibility-and-access-settings',
     icon: icon('ic-analytics'),
-    roles: ['provider'],
+    roles: ['organizer'],
   },
   {
     title: 'Home & Recommendations',

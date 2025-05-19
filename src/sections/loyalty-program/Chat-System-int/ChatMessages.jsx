@@ -1,8 +1,6 @@
 import { Box, List, ListItem, ListItemText, Typography } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { useChat } from 'src/redux/context/ChatContext';
-// import { useChat } from '../../context/ChatContext';
-// import { useAuth } from '../../context/AuthContext';
+
 
 const ChatMessages = () => {
     const { messages } = useChat();

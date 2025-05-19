@@ -80,14 +80,6 @@ function ColorlibStepIcon(props: ColorlibStepIconProps) {
   );
 }
 
-
-ColorlibStepIcon.propTypes = {
-  active: PropTypes.bool,
-  className: PropTypes.string,
-  completed: PropTypes.bool,
-  icon: PropTypes.node,
-};
-
 interface CustomizedSteppersProps {
   steps: string[];
   activeStep?: number;

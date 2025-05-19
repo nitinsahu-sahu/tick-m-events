@@ -19,7 +19,7 @@ export function LoyaltyProgramView  ()  {
 
             <RewardsHistory />
 
-            <ChatSystem />
+            {/* <ChatSystem /> */}
         </DashboardContent>
     );
 };

@@ -159,7 +159,10 @@ export function Router() {
           path: 'search-&-select-service-providers',
           element: <RoleProtectedRoute allowedRoles={['organizer', 'provider']} currentRole={currentRole}><SearchAndSelectServiceProvidersPage /></RoleProtectedRoute>
         },
-
+{
+          path: 'visibility-and-access-settings',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><VisibilityAndAccessSettingsPage /></RoleProtectedRoute>
+        },
 
         // -----------------------**************-------------------------
 
@@ -172,10 +175,7 @@ export function Router() {
           path: '/',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><StatisticsAndPerformancePage /> </RoleProtectedRoute>
         },
-  {
-          path: 'visibility-and-access-settings',
-          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><VisibilityAndAccessSettingsPage /></RoleProtectedRoute>
-        },
+        
         {
           path: 'home-and-global-view',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><HomeAndGlobalPage /></RoleProtectedRoute>
@@ -218,7 +218,7 @@ export function Router() {
           path: 'ticketing-&-transactions-supervision',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><TicketingAndTransactionsSupervisionPage /></RoleProtectedRoute>
         },
-{
+        {
           path: 'marketplace-&-service-provider-supervision',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><MarketplaceAndServiceProviderSupervisionPage /></RoleProtectedRoute>
         },

@@ -10,7 +10,7 @@ import { RootState } from 'src/redux/store';
 import { usePathname } from 'src/routes/hooks';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { getFilteredNavItems } from 'src/routes/hooks/getFilterNavItesm';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { Main } from './main';
 import { layoutClasses } from '../classes';
@@ -265,7 +265,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                               !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
                               !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
                               <>
-                                <MessagePopover  data={_messages} />
+                                <MessagePopover data={_messages} />
                                 {
                                   !hiddenReserContracts.some(path => pathname.includes(path)) && <GiftPopover data={_giftboxdata} />
                                 }
@@ -391,21 +391,23 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                             >
                               Create an Event
                             </Button>
-                            <Button
-                              variant="contained"
-                              
-                              sx={{
-                                backgroundColor: "#0C2340",
-                                color: "white",
-                                borderRadius: "8px",
-                                px: 1,
-                                fontSize: 16,
-                                fontFamily: "Poppins, sans-serif",
-                                fontWeight: 600
-                              }}
-                            >
-                              Settings
-                            </Button>
+                            <Link to='/visibility-and-access-settings'>
+                              <Button
+                                variant="contained"
+
+                                sx={{
+                                  backgroundColor: "#0C2340",
+                                  color: "white",
+                                  borderRadius: "8px",
+                                  px: 1,
+                                  fontSize: 16,
+                                  fontFamily: "Poppins, sans-serif",
+                                  fontWeight: 600
+                                }}
+                              >
+                                Settings
+                              </Button>
+                            </Link>
                           </>
                         )
                       )

@@ -96,8 +96,3 @@ export const entries = [
 
 
 export const entryValidationHeaders = ["Name", "Ticket Type", "Entry Time", "Status"]
-
-export const entryValidationData = [
-    { name: "Jean M.", ticketType: "VIP", entryTime: "18:30 PM", status: "Validated" },
-    { name: "Jean M.", ticketType: "VIP", entryTime: "18:30 PM", status: "Validated" },
-];

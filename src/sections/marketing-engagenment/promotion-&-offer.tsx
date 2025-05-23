@@ -4,16 +4,17 @@ import {
   Typography,
   Paper,
   TextField,
-  Checkbox,
   FormControlLabel,
   Select,
   MenuItem,
   Box,
   Grid,
+  Radio, RadioGroup
 } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
+
 import { promotionCreate } from 'src/redux/actions/promotionAndOffer';
 import { AppDispatch } from 'src/redux/store';
 
@@ -26,23 +27,18 @@ interface ApiResult {
 
 export function PromotionsAndOffers() {
   const dispatch = useDispatch<AppDispatch>();
+  const [selectedDiscounts, setSelectedDiscounts] = useState('');
+  const handleDiscountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedDiscounts(event.target.value);
+  };
 
-  const [selectedDiscounts, setSelectedDiscounts] = useState({
-    percentageDiscount: false,
-    fixedValueDiscount: false,
-    groupOffer: false,
-    earlyBuyerDiscount: false,
-  });
   const [promotionFormData, setPromotionFormData] = useState({
     discountValue: '',
     ticketSelection: 'vip',
     validityPeriodStart: '',
     validityPeriodEnd: '',
-    promoCode: '',
-    advantageType: 'discount',
-    usageLimit: '',
   });
-
+  const [promoCode, setPromoCode] = useState('')
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   const handlePromotionChange = (event: any) => {
@@ -50,27 +46,24 @@ export function PromotionsAndOffers() {
     const { name, value } = event.target;
     setPromotionFormData((prevData) => ({ ...prevData, [name]: value }));
   };
-  const handleCheckboxChange = (event: any) => {
-    const { name, checked } = event.target;
-    setSelectedDiscounts((prevState) => ({
-      ...prevState,
-      [name]: checked,
-    }));
+
+  const handlePromoCodeChange = (e: any) => {
+    const value = e.target.value.toUpperCase(); // Convert to uppercase
+    setPromoCode(value); // Store in state
   };
+
   const handlePomotionsCreate = useCallback(
     async (event: any) => {
       event.preventDefault();
       const formEventData = new FormData();
-
       // Append all form data
       formEventData.append('discountValue', promotionFormData.discountValue);
       formEventData.append('ticketSelection', promotionFormData.ticketSelection);
       formEventData.append('validityPeriodEnd', promotionFormData.validityPeriodEnd);
       formEventData.append('validityPeriodStart', promotionFormData.validityPeriodStart);
-      formEventData.append('promoCode', promotionFormData.promoCode);
-      formEventData.append('advantageType', promotionFormData.advantageType);
-      formEventData.append('usageLimit', promotionFormData.usageLimit);
-      formEventData.append('promotionType', JSON.stringify(selectedDiscounts));
+      formEventData.append('promoCode', promoCode);
+      formEventData.append('promotionType', selectedDiscounts);
+
       try {
         const result = await dispatch(promotionCreate(formEventData));
         if ((result as ApiResult)?.status === 201) {
@@ -80,16 +73,9 @@ export function PromotionsAndOffers() {
             ticketSelection: 'vip',
             validityPeriodStart: '',
             validityPeriodEnd: '',
-            promoCode: '',
-            advantageType: 'discount',
-            usageLimit: '',
           });
-          setSelectedDiscounts({
-            percentageDiscount: false,
-            fixedValueDiscount: false,
-            groupOffer: false,
-            earlyBuyerDiscount: false,
-          });
+          setPromoCode('')
+          setSelectedDiscounts('');
         } else {
           toast.error(result?.message);
         }
@@ -97,7 +83,7 @@ export function PromotionsAndOffers() {
         toast.error('Promotion creation failed');
       }
     },
-    [promotionFormData, selectedDiscounts, dispatch]
+    [promotionFormData, selectedDiscounts,promoCode, dispatch]
   );
 
   return (
@@ -122,37 +108,93 @@ export function PromotionsAndOffers() {
       </Button>
 
       {showCreateForm && (
-        <Paper sx={{ p: 3, borderRadius: '10px', background: '#f5f5f5', mt:3 }}>
+        <Paper sx={{ p: 3, borderRadius: '10px', background: '#f5f5f5', mt: 3 }}>
           <Typography variant="subtitle1" fontWeight="bold" mb={2}>
             Create a Promotion
           </Typography>
           <form onSubmit={handlePomotionsCreate}>
-            {/* Discount Type Checkboxes */}
-            <Grid container spacing={2} mb={3}>
+            <Typography variant="body2" fontWeight="bold" mb={1}>
+              Select Discount Type
+            </Typography>
+            <RadioGroup
+              name="promotionType"
+              value={selectedDiscounts}
+              onChange={handleDiscountChange}
+              row
+              
+            >
               {[
-                { label: 'Percentage Discount', name: 'percentageDiscount' },
-                { label: 'Fixed Value Discount', name: 'fixedValueDiscount' },
-                { label: 'Group Offer', name: 'groupOffer' },
-                { label: 'Early Buyer Discount', name: 'earlyBuyerDiscount' },
+                { label: 'Percentage Discount', value: 'percentageDiscount' },
+                { label: 'Fixed Value Discount', value: 'fixedValueDiscount' },
+                { label: 'Group Offer', value: 'groupOffer' },
+                { label: 'Early Buyer Discount', value: 'earlyBuyerDiscount' },
               ].map((option) => (
-                <Grid item xs={12} sm={6} md={3} key={option.name}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        name={option.name}
-                        checked={selectedDiscounts[option.name as keyof typeof selectedDiscounts]}
-                        onChange={handleCheckboxChange}
-                      />
-                    }
-                    label={option.label}
-                    sx={{ fontSize: '14px' }}
-                  />
-                </Grid>
+                <FormControlLabel
+                  key={option.value}
+                  value={option.value}
+                  control={<Radio required/>}
+                  label={option.label}
+                />
               ))}
-            </Grid>
+            </RadioGroup>
+
+            <Typography variant="body2" fontWeight="bold" mb={1}>
+              {(() => {
+                switch (selectedDiscounts) {
+                  case 'percentageDiscount':
+                    return 'Discount Percentage (%)';
+                  case 'fixedValueDiscount':
+                    return 'Discount Amount (XAF)';
+                  case 'groupOffer':
+                    return 'Group Size Required';
+                  case 'earlyBuyerDiscount':
+                    return 'Days Before Event for Discount';
+                  default:
+                    return 'Discount Value';
+                }
+              })()}
+            </Typography>
+
+            <TextField
+              fullWidth
+              required
+              name="discountValue"
+              type="number"
+              placeholder={
+                selectedDiscounts === 'percentageDiscount'
+                  ? 'Enter % (e.g., 10)'
+                  : selectedDiscounts === 'fixedValueDiscount'
+                    ? 'Enter amount (e.g., 2000)'
+                    : selectedDiscounts === 'groupOffer'
+                      ? 'Enter group size (e.g., 5)'
+                      : selectedDiscounts === 'earlyBuyerDiscount'
+                        ? 'Enter days before event (e.g., 7)'
+                        : 'Enter discount value'
+              }
+              InputProps={{
+                endAdornment:
+                  selectedDiscounts === 'percentageDiscount'
+                    ? <span style={{ marginLeft: 8 }}>%</span>
+                    : selectedDiscounts === 'fixedValueDiscount'
+                      ? <span style={{ marginLeft: 8 }}>XAF</span>
+                      : null,
+              }}
+              value={promotionFormData.discountValue}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (selectedDiscounts === 'percentageDiscount' && Number(val) > 100) {
+                  toast.error('Percentage cannot exceed 100%');
+                  return;
+                }
+                setPromotionFormData((prevData) => ({ ...prevData, discountValue: val }));
+              }}
+              sx={{ mb: 2 }}
+            />
+
+
 
             {/* Discount Value */}
-            <Typography variant="body2" fontWeight="bold" mb={1}>
+            {/* <Typography variant="body2" fontWeight="bold" mb={1}>
               Discount value
             </Typography>
             <TextField
@@ -164,7 +206,7 @@ export function PromotionsAndOffers() {
               value={promotionFormData.discountValue}
               onChange={handlePromotionChange}
               sx={{ mb: 2 }}
-            />
+            /> */}
 
             {/* Ticket Selection */}
             <Typography variant="body2" fontWeight="bold" mb={1}>
@@ -213,7 +255,7 @@ export function PromotionsAndOffers() {
 
             {/* Promo Code */}
             <Typography variant="body2" fontWeight="bold" mb={1}>
-              Promo Code (Optional)
+              Promo Code
             </Typography>
             <TextField
               fullWidth
@@ -228,39 +270,8 @@ export function PromotionsAndOffers() {
                   textTransform: 'uppercase',
                 },
               }}
-              value={promotionFormData.promoCode}
-              onChange={handlePromotionChange}
-            />
-
-            {/* Advantage Type */}
-            <Typography variant="body2" fontWeight="bold" mb={1}>
-              Advantage Type
-            </Typography>
-            <Select
-              fullWidth
-              name="advantageType"
-              value={promotionFormData.advantageType}
-              onChange={handlePromotionChange}
-              sx={{ mb: 2 }}
-            >
-              <MenuItem value="discount">Discount</MenuItem>
-              <MenuItem value="spring discount">Spring Discount</MenuItem>
-              <MenuItem value="vip sale">VIP Sale</MenuItem>
-              <MenuItem value="flash deal">Flash Deal</MenuItem>
-            </Select>
-
-            {/* Usage Limit */}
-            <Typography variant="body2" fontWeight="bold" mb={1}>
-              Usage Limit
-            </Typography>
-            <TextField
-              fullWidth
-              placeholder="Usage Limit"
-              name="usageLimit"
-              type="number"
-              value={promotionFormData.usageLimit}
-              onChange={handlePromotionChange}
-              sx={{ mb: 2 }}
+              value={promoCode}
+              onChange={handlePromoCodeChange}
             />
 
             {/* Submit Button */}

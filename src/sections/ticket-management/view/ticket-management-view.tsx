@@ -1,48 +1,46 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Button, Card, CardContent, Grid, Typography } from '@mui/material';
 import QrCodeIcon from '@mui/icons-material/QrCode';
- 
+import { useSelector } from 'react-redux';
+
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { MatrixThreeCard } from 'src/components/matrix-three-cards/matrix-three-cards';
+import { RootState } from 'src/redux/store';
+
 import { TicketHistoryCancelRefundCard } from '../t-h-c-r';
 import { TicketCard } from '../ticket-card';
- 
+import axios from "../../../redux/helper/axios";
+
 export function TicketManagementView() {
   const [activeTab, setActiveTab] = useState('Active Tickets');
- 
+  const [tickets, setTickets] = useState([]);
+  const { _id } = useSelector((state: RootState) => state?.auth?.user);
+
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
   };
- 
-  const ticketst = [
-    {
-      id: 1,
-      title: 'Tech Expo 2025',
-      location: 'Douala',
-      date: '10/02/2025',
-      time: '5:00 PM',
-      status: 'Valid',
-      statusColor: 'green',
-    },
-    {
-      id: 2,
-      title: 'Startup Summit 2025',
-      location: 'Yaoundé',
-      date: '10/02/2025',
-      time: '5:00 PM',
-      status: 'Pending Validation',
-      statusColor: '#d4af37',
-    },
-  ];
- 
+
+  useEffect(() => {
+    async function fetchTickets() {
+      try {
+        const response = await axios.get(`/event-order/user/${_id}`);
+        setTickets(response?.data);
+      } catch (error) {
+        console.error("Error fetching tickets:", error);
+      }
+    }
+
+    fetchTickets();
+  }, [_id]);
+
   const metrics = [
     { title: 'Total', value: '10' },
     { title: 'Active', value: '6' },
     { title: 'Refunded', value: '2' },
     { title: 'Expired', value: '2' },
   ];
- 
+
   const ticketHistory = [
     {
       title: 'Urban Music Festival',
@@ -61,7 +59,7 @@ export function TicketManagementView() {
       button: ['Download Invoice', 'Leave a Review'],
     },
   ];
- 
+
   const cancelAndRefund = [
     {
       title: 'Urban Music Festival',
@@ -82,13 +80,13 @@ export function TicketManagementView() {
       statusColor: 'red',
     },
   ];
- 
+
   const tabNames = ['Active Tickets', 'History', 'Cancellations & Refunds'];
- 
+
   return (
     <DashboardContent>
       <PageTitleSection title="Ticket Management" />
- 
+
       {/* Tabs */}
       <Grid container spacing={2} justifyContent="center">
         <Grid item xs={12}>
@@ -124,9 +122,9 @@ export function TicketManagementView() {
           </Box>
         </Grid>
       </Grid>
- 
+
       <MatrixThreeCard metrics={metrics} sm={3} md={3} />
- 
+
       {/* Conditionally Render Each Tab Section */}
       {activeTab === 'Active Tickets' && (
         <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
@@ -139,15 +137,15 @@ export function TicketManagementView() {
             My Active Tickets
           </Typography>
           <Grid container spacing={3} mt={3}>
-            {ticketst.map((ticketc) => (
-              <Grid item xs={12} sm={6} md={6} key={ticketc.id}>
+            {tickets.map((ticketc, index) => (
+              <Grid item xs={12} sm={6} md={6} key={index} mb={6}>
                 <TicketCard ticket={ticketc} />
               </Grid>
             ))}
           </Grid>
         </Box>
       )}
- 
+
       {activeTab === 'History' && (
         <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
           <Typography
@@ -170,7 +168,7 @@ export function TicketManagementView() {
           </Grid>
         </Box>
       )}
- 
+
       {activeTab === 'Cancellations & Refunds' && (
         <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
           <Typography
@@ -191,7 +189,7 @@ export function TicketManagementView() {
               />
             ))}
           </Grid>
- 
+
           <Grid container mt={3}>
             <Grid item xs={12}>
               <Card sx={{ borderRadius: 3, boxShadow: 3, p: 2 }}>
@@ -215,7 +213,7 @@ export function TicketManagementView() {
           </Grid>
         </Box>
       )}
- 
+
       {/* QR Code Section (Shown regardless of tab) */}
       <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
         <Typography

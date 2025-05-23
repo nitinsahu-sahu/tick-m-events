@@ -1,15 +1,25 @@
-import React from "react";
 import { Box, Button, Card, Divider, Grid, MenuItem, Select, Typography } from "@mui/material";
 import QrCodeIcon from "@mui/icons-material/QrCode";
+import { useSelector } from "react-redux";
+
 import { PageTitleSection } from "src/components/page-title-section";
+import { RootState } from "src/redux/store";
+import { ChatProvider } from "src/redux/contaxt/ChatContext";
+import ChatPage from "../ChatPage";
+
 
 export function TicketValidationAtEntryView() {
+    const currentUser = useSelector((state: RootState) => state?.auth?.user);
     return (
         <Box p={3}>
             <PageTitleSection
                 title="Loyalty Program"
 
             />
+            <ChatProvider>
+                <ChatPage currentUser={currentUser} />
+            </ChatProvider>
+
             <Grid container spacing={2} sx={{ alignItems: "stretch" }}>  {/* Add alignItems: "stretch" */}
                 {/* Select Event */}
                 <Grid item xs={12} md={6} sx={{ display: "flex" }} >  {/* Add display: "flex" */}

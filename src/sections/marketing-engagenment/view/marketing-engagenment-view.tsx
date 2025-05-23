@@ -7,11 +7,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
+  Paper,Card, CardContent, IconButton,
   TextField, FormControlLabel, Select, MenuItem,
-  Radio, RadioGroup, useMediaQuery,
-  useTheme, Box
+  Radio, RadioGroup,  Box
 } from '@mui/material';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -24,6 +24,12 @@ import { BookingTrends } from "../graph";
 import { PromotionsAndOffers } from '../promotion-&-offer';
 import { ActivePromotion } from '../active-promotion';
 
+interface PostData {
+  description: string;
+  reservationLink: string;
+  hashtag: string;
+  eventImage: string | null;
+}
 
 const promotionsData = [
   { id: 1, type: 'Spring Discount', date: '2025-03-10', discount: '20%', status: 'Active' },
@@ -33,8 +39,8 @@ const promotionsData = [
 
 export function MarketingEngagenmentView() {
   const [selectedPromo, setSelectedPromo] = useState(promotionsData[0]);
-  const [onSave, setOnSave] = useState();
-  const [onCancel, setOnCancel] = useState();
+  // const [onSave, setOnSave] = useState();
+  // const [onCancel, setOnCancel] = useState();
   const dispatch = useDispatch<AppDispatch>();
 
   const [description, setDescription] = useState(
@@ -42,11 +48,56 @@ export function MarketingEngagenmentView() {
   );
   const [reservationLink, setReservationLink] = useState('https://eventbooking.com/my-event');
   const [hashtag, setHashtag] = useState('#AmazingEvent2025');
-
-
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [savedData, setSavedData] = useState<PostData | null>(null);
+  const [eventImage, setEventImage] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+
+  useEffect(() => {
+    const data = localStorage.getItem('postData');
+    if (data) {
+      setSavedData(JSON.parse(data));
+    }
+  }, []);
+
+  // Handle file input change
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      // For preview, create URL
+      const imageUrl = URL.createObjectURL(file);
+      setEventImage(imageUrl);
+    }
+  };
+
+  useEffect(() => {
+    const data = localStorage.getItem('postData');
+    if (data) {
+      try {
+        const parsedData = JSON.parse(data) as PostData;
+        setSavedData(parsedData);
+        // Optionally, you could also update the individual states:
+        setDescription(parsedData.description);
+        setReservationLink(parsedData.reservationLink);
+        setHashtag(parsedData.hashtag);
+        setEventImage(parsedData.eventImage);
+      } catch (error) {
+        console.error('Failed to parse saved post data', error);
+      }
+    }
+  }, []);
+
+  const handlePost = () => {
+    const postData: PostData = {
+      description,
+      reservationLink,
+      hashtag,
+      eventImage, // this is the URL for preview (not the actual file)
+    };
+    // Save to localStorage
+    localStorage.setItem('postData', JSON.stringify(postData));
+    // Update state to show the card
+    setSavedData(postData);
+  };
 
   useEffect(() => {
     dispatch(promotionGet())
@@ -77,132 +128,134 @@ export function MarketingEngagenmentView() {
             borderRadius: "10px",
             "&:hover": { bgcolor: "#083048" },
           }}
-          onClick={() => setShowCreateForm(true)} 
+          onClick={() => setShowCreateForm(true)}
         >
           Create a New Notification
         </Button>
 
         {/* Select Notification Type */}
         {showCreateForm && (
-          <Paper  sx={{ p: 3, borderRadius: '10px', background: '#f5f5f5', mt:3 }}>
-        <Typography variant="body2" fontWeight="bold"  mb={1}>
-          Select Notification Type
-        </Typography>
-        <Select fullWidth defaultValue="Web Push" sx={{ mb: 3 }}>
-          <MenuItem value="Web Push">Web Push</MenuItem>
-        </Select>
+          <Paper sx={{ p: 3, borderRadius: '10px', background: '#f5f5f5', mt: 3 }}>
+            <Typography variant="body2" fontWeight="bold" mb={1}>
+              Select Notification Type
+            </Typography>
+            <Select fullWidth defaultValue="Web Push" sx={{ mb: 3 }}>
+              <MenuItem value="Web Push">Web Push</MenuItem>
+              <MenuItem value="sms">SMS</MenuItem>
+              <MenuItem value="email">Email</MenuItem>
+            </Select>
 
-        {/* Recipient Selection */}
-        <Typography variant="body1" fontWeight="bold" mb={1}>
-          Recipient Selection
-        </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
+            {/* Recipient Selection */}
+            <Typography variant="body1" fontWeight="bold" mb={1}>
+              Recipient Selection
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
 
-            padding: "12px",
+                padding: "12px",
 
-            mb: 3,
-          }}
-        >
-          {[
-            "All registered participants (Ticket holders)",
-            "Interested participants (Waitlist but no purchase yet)",
-            "Pending payment participants (Unfinished reservations)",
-          ].map((label) => (
-            <label
-              key={label}
-              htmlFor={`checkbox-${label}`}
-              className="flex items-center gap-2"
+                mb: 3,
+              }}
             >
-              <input
-                id={`checkbox-${label}`}
-                type="checkbox"
-                className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-              />
-              <span className="text-gray-700 text-sm">{label}</span>
-            </label>
-          ))}
-        </Box>
-
-        {/* Enter Message */}
-        <Typography fontWeight="bold" mb={1}>
-          Enter Message
-        </Typography>
-        <TextField
-          fullWidth
-          placeholder="Example: 'Don’t miss the festival! Only 100 tickets left!'"
-          sx={{ mb: 3 }}
-        />
-
-        {/* Add CTA Button */}
-        <Typography fontWeight="bold" mb={1}>
-          Add CTA Button
-        </Typography>
-        <TextField
-          fullWidth
-          placeholder="CTA Button (e.g., 'Buy Now', 'Reserve', 'Share')"
-          sx={{ mb: 3 }}
-        />
-
-        {/* Schedule Options */}
-        <Typography fontWeight="bold" mb={1}>
-          Schedule Options
-        </Typography>
-        <RadioGroup defaultValue="send-now">
-          <FormControlLabel value="send-now" control={<Radio />} label="Send now" />
-          <FormControlLabel
-            value="schedule"
-            control={<Radio />}
-            label="Schedule for a specific date/time"
-          />
-        </RadioGroup>
-
-        {/* Date and Time Selection */}
-        <Box sx={{ display: "flex", gap: "16px", mt: 2, mb: 3 }}>
-          <Box sx={{ position: "relative", flex: 1 }}>select date
-            <TextField fullWidth placeholder="mm/dd/yyyy" type='date' />
-          </Box>
-          <Box sx={{ flex: 1 }}>select time
-            <TextField fullWidth placeholder="00:00" type='time' />
-          </Box>
-        </Box>
-
-        {/* Real-Time Campaign Statistics */}
-        <Typography fontWeight="bold" mb={1}>
-          Real-Time Campaign Statistics
-        </Typography>
-
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 4 }}>
-          {[
-            { label: "Open Rate: 0%" },
-            { label: "Link Clicks: 0" },
-            { label: "Conversions: 0" },
-          ].map((item, index) => (
-            <Box key={index}>
-              <Typography variant="body2" mb={0.5}>{item.label}</Typography>
-              <Box sx={{ height: "8px", background: "#E5E7EB", borderRadius: "5px" }} />
+              {[
+                "All registered participants (Ticket holders)",
+                "Interested participants (Waitlist but no purchase yet)",
+                "Pending payment participants (Unfinished reservations)",
+              ].map((label) => (
+                <label
+                  key={label}
+                  htmlFor={`checkbox-${label}`}
+                  className="flex items-center gap-2"
+                >
+                  <input
+                    id={`checkbox-${label}`}
+                    type="checkbox"
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                  <span className="text-gray-700 text-sm">{label}</span>
+                </label>
+              ))}
             </Box>
-          ))}
-        </Box>
+
+            {/* Enter Message */}
+            <Typography fontWeight="bold" mb={1}>
+              Enter Message
+            </Typography>
+            <TextField
+              fullWidth
+              placeholder="Example: 'Don’t miss the festival! Only 100 tickets left!'"
+              sx={{ mb: 3 }}
+            />
+
+            {/* Add CTA Button */}
+            <Typography fontWeight="bold" mb={1}>
+              Add CTA Button
+            </Typography>
+            <TextField
+              fullWidth
+              placeholder="CTA Button (e.g., 'Buy Now', 'Reserve', 'Share')"
+              sx={{ mb: 3 }}
+            />
+
+            {/* Schedule Options */}
+            <Typography fontWeight="bold" mb={1}>
+              Schedule Options
+            </Typography>
+            <RadioGroup defaultValue="send-now">
+              <FormControlLabel value="send-now" control={<Radio />} label="Send now" />
+              <FormControlLabel
+                value="schedule"
+                control={<Radio />}
+                label="Schedule for a specific date/time"
+              />
+            </RadioGroup>
+
+            {/* Date and Time Selection */}
+            <Box sx={{ display: "flex", gap: "16px", mt: 2, mb: 3 }}>
+              <Box sx={{ position: "relative", flex: 1 }}>select date
+                <TextField fullWidth placeholder="mm/dd/yyyy" type='date' />
+              </Box>
+              <Box sx={{ flex: 1 }}>select time
+                <TextField fullWidth placeholder="00:00" type='time' />
+              </Box>
+            </Box>
+
+            {/* Real-Time Campaign Statistics */}
+            <Typography fontWeight="bold" mb={1}>
+              Real-Time Campaign Statistics
+            </Typography>
+
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 4 }}>
+              {[
+                { label: "Open Rate: 0%" },
+                { label: "Link Clicks: 0" },
+                { label: "Conversions: 0" },
+              ].map((item, index) => (
+                <Box key={index}>
+                  <Typography variant="body2" mb={0.5}>{item.label}</Typography>
+                  <Box sx={{ height: "8px", background: "#E5E7EB", borderRadius: "5px" }} />
+                </Box>
+              ))}
+            </Box>
 
 
-        {/* Send Notifications Button */}
-        <Button
-          fullWidth
-          sx={{
-            bgcolor: "#0B2E4C",
-            color: "white",
-            padding: "10px",
-            borderRadius: "10px",
-            "&:hover": { bgcolor: "#083048" },
-          }}
-        >
-          Send Notifications
-        </Button>
-        </Paper>
+            {/* Send Notifications Button */}
+            <Button
+              fullWidth
+              sx={{
+                bgcolor: "#0B2E4C",
+                color: "white",
+                padding: "10px",
+                borderRadius: "10px",
+                "&:hover": { bgcolor: "#083048" },
+              }}
+            >
+              Send Notifications
+            </Button>
+          </Paper>
         )}
       </Box>
 
@@ -230,6 +283,36 @@ export function MarketingEngagenmentView() {
             Share on LinkedIn
           </Button>
         </Box>
+        {savedData && (
+          <Card sx={{ mb: 3, p: 2, borderRadius: '10px', backgroundColor: '#e0f7fa', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <CardContent sx={{ flex: 1 }}>
+              {savedData.eventImage && (
+                <img src={savedData.eventImage} alt="Event" style={{ maxWidth: '100px', borderRadius: '10px', marginBottom: '8px' }} />
+              )}
+              <Typography variant="subtitle1" fontWeight="bold">
+                {savedData.description}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                Reservation: <a href={savedData.reservationLink} target="_blank" rel="noreferrer">{savedData.reservationLink}</a>
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                Hashtag: {savedData.hashtag}
+              </Typography>
+            </CardContent>
+
+            <IconButton
+              color="success"
+              sx={{ fontSize: 40 }}
+              onClick={() => {
+                // Open WhatsApp with the description or reservation link or both
+                const message = encodeURIComponent(`${savedData.description}\nReservation: ${savedData.reservationLink}\nHashtag: ${savedData.hashtag}`);
+                window.open(`https://wa.me/?text=${message}`, '_blank');
+              }}
+            >
+              <WhatsAppIcon sx={{ fontSize: 40 }} />
+            </IconButton>
+          </Card>
+        )}
 
         {/* Edit Your Post */}
         <Paper sx={{ p: 2, borderRadius: '10px', background: '#f5f5f5' }}>
@@ -243,6 +326,7 @@ export function MarketingEngagenmentView() {
           <TextField
             type="file"
             fullWidth
+            onChange={handleImageChange}
             InputProps={{
               sx: {
                 borderRadius: '10px',
@@ -290,6 +374,7 @@ export function MarketingEngagenmentView() {
         {/* Post Button */}
         <Button
           fullWidth
+          onClick={handlePost}
           sx={{
             bgcolor: '#0B2E4C',
             color: 'white',
@@ -392,38 +477,7 @@ export function MarketingEngagenmentView() {
         <BookingTrends />
 
         {/* Follow-up Section */}
-        <Box
-          sx={{
-            background: "#F1F1F1",
-            p: { xs: 2, sm: 3 },
-            borderLeft: "4px solid #3AACE7",
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            alignItems: { xs: "center", sm: "flex-start" },
-            textAlign: { xs: "center", sm: "left" },
-          }}
-        >
-          <Typography variant="body1" fontWeight="bold">
-            Follow up with participants who viewed the event but didn’t buy. Consider sending a special
-            offer to encourage them to complete their purchase.
-          </Typography>
-        </Box>
 
-        <Button
-          fullWidth
-          variant="contained"
-          sx={{
-            backgroundColor: "#0B2A4A",
-            color: "white",
-            borderRadius: "8px",
-            mt: 2,
-            fontWeight: "bold",
-            py: 1.5,
-            "&:hover": { backgroundColor: "#09324A" },
-          }}
-        >
-          Send Follow-up
-        </Button>
       </Box>
     </DashboardContent>
   );

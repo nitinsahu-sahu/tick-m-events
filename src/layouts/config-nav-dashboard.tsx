@@ -40,6 +40,12 @@ export const navData: NavItem[] = [
   },
 
   // Organizer Sidebar
+   {
+    title: 'Statistics And Reports',
+    path: '/statistics-&-reports',
+    icon: icon('ic-dashboard'),
+    roles: ['organizer'],
+  },
   {
     title: 'Events',
     path: '#',

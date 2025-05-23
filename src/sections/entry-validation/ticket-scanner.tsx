@@ -1,11 +1,15 @@
-import { Typography,IconButton,Box, Button, Card, CardContent, Grid, TextField, useTheme } from "@mui/material";
+import { Typography, IconButton, Box, Button, Card, CardContent, Grid, TextField } from "@mui/material";
 import { useState } from "react";
-
+import QrReader from 'react-qr-scanner'
 import { Iconify } from "src/components/iconify";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 import { TICKET_STATUS, tickets } from "./utills";
 
+interface QRScanResult {
+  text: string;
+  // Add other properties if the QR scanner returns more data
+}
 
 const renderTicketDetails = (ticket: typeof tickets[0]) => {
     const details = [
@@ -29,10 +33,23 @@ const renderTicketDetails = (ticket: typeof tickets[0]) => {
     );
 };
 export function TicketScanner() {
-    const [search, setSearch] = useState("");
+    const [delay] = useState<number>(100);
+    const [result, setResult] = useState<string>('No result');
 
-    const theme = useTheme();
+    const handleScan = (data: QRScanResult | null) => {
+        if (data) {
+            setResult(data.text);
+        }
+    };
 
+    const handleError = (err: Error) => {
+        console.error(err);
+    };
+
+    const previewStyle: React.CSSProperties = {
+        height: 240,
+        width: 320,
+    };
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
             <HeadingCommon title="Ticket Scanner" color="#0B2E4C" weight={600} baseSize="33px" />
@@ -51,14 +68,14 @@ export function TicketScanner() {
             </Box>
 
             <Box display="flex" mt={2} gap={1}>
-                <TextField
-                    fullWidth
-                    variant="outlined"
-                    placeholder="Scan a Ticket"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    sx={{ borderRadius: "8px" }}
+            
+                <QrReader
+                    delay={delay}
+                    style={previewStyle}
+                    onError={handleError}
+                    onScan={handleScan}
                 />
+                <p>{result}</p>
                 <Button
                     variant="contained"
                     sx={{

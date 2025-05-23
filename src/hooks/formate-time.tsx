@@ -41,3 +41,26 @@ export const formatEventDate = (dateString: string | Date): string => {
         return 'Invalid date';
     }
 };
+
+export function formatTimeToAMPM(dateString: string): string {
+    const date = new Date(dateString);
+
+    // Check if the date is valid using Number.isNaN
+    if (Number.isNaN(date.getTime())) {
+        return 'Invalid Time';
+    }
+
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    // Convert to 12-hour format using operator assignment
+    hours %= 12;
+    // Use logical OR for default assignment
+    hours = hours || 12; // the hour '0' should be '12'
+
+    // Add leading zero to minutes if needed
+    const minutesStr = minutes.toString().padStart(2, '0');
+
+    return `${hours}:${minutesStr} ${ampm}`;
+}

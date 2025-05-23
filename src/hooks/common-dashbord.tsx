@@ -9,7 +9,7 @@ import { Outlet } from 'react-router-dom';
 const HomePage = lazy(() => import('../pages/home'));
 const StatisticsAndPerformancePage = lazy(() => import('../pages/statistics-&-performance'));
 const HomeAndRecommendationsPage = lazy(() => import('../pages/home-and-recommendations'));
-const StatisticsAndReportsPage = lazy(() => import('../pages/statistics-and-reports'));
+const MarketplaceAndServiceProviderSupervisionPage = lazy(() => import('../pages/marketplace-&-service-provider-supervision'));
 
 const renderFallback = (
     <Box display="flex" alignItems="center" justifyContent="center" flex="1 1 auto">
@@ -40,9 +40,9 @@ export function MultipleDashboard() {
                         case 'participant':
                             return <HomeAndRecommendationsPage />;
                         case 'admin':
-                            return <HomePage />;
+                            return <MarketplaceAndServiceProviderSupervisionPage />;
                         case 'organizer':
-                            return <StatisticsAndReportsPage />;
+                            return <HomePage />;
                         case 'provider':
                             return <StatisticsAndPerformancePage />;
                         default:

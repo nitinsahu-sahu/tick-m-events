@@ -188,18 +188,18 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
                             </Grid>
 
                             <Grid item xs={12} sm={6} md={3}>
-                                <TextField
-                                    required
-                                    name="eventType"
-                                    type='text'
-                                    fullWidth
-                                    label="Event Type"
-                                    value={eventFormData.eventType}
-                                    onChange={handleEventChange}
-                                    InputProps={{
-                                        startAdornment: <PublicIcon sx={{ mr: 1 }} />,
-                                    }}
-                                />
+                                <FormControl fullWidth>
+                                    <InputLabel>Event Category</InputLabel>
+                                    <Select
+                                        name="eventType"
+                                        value={eventFormData.eventType}
+                                        onChange={handleEventChange}
+                                        label="Event Category"
+                                    >
+                                        <MenuItem value="Public">Public</MenuItem>
+                                        <MenuItem value="Private">Private</MenuItem>
+                                    </Select>
+                                </FormControl>
                             </Grid>
 
                             <Grid item xs={12} sm={6} md={3}>

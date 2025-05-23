@@ -89,18 +89,15 @@ export function TicketReservationManagementTable({
 
 
                             {
-                                row.status ? <TableCell align="center">
-                                    <Select
-                                        size="small"
-                                        value="Pending"
-                                    >
-                                        {row.status.map((statusOption: any) => (
-                                            <MenuItem key={statusOption} value={statusOption}>
-                                                {statusOption}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </TableCell> : <TableCell align="center">{row.sold || row.ticketSold || row.reservationStatus}</TableCell>
+                                row.status ? (
+                                    <TableCell align="center">
+                                            {row.status}
+                                    </TableCell>
+                                ) : (
+                                    <TableCell align="center">
+                                        {row.sold || row.ticketSold || row.reservationStatus}
+                                    </TableCell>
+                                )
                             }
 
 

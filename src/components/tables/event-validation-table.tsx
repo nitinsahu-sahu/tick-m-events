@@ -7,58 +7,67 @@ import {
     TableHead,
     TableCell,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { formatTimeToAMPM } from "src/hooks/formate-time";
 
-export function EventValidationTable({
-    headers,
-    data,
-}: any) {
-    const theme = useTheme();
+import { headerStyle, cellStyle } from "./utils";
 
+interface TableData {
+    _id: string,
+    name: string;
+    ticketType: string;
+    entryTime: string;
+    status: string;
+    // Assuming your data might also have these fields based on your example
+    userId: {
+        name: string;
+    };
+    verifyEntry: boolean;
+    tickets?: Array<{
+        ticketType: string;
+        // other ticket properties...
+    }>;
+}
+
+interface EventValidationTableProps {
+    headers: string[];
+    data: TableData[];
+}
+
+
+
+export function EventValidationTable({ headers, data }: EventValidationTableProps) {
     return (
         <TableContainer component={Paper}>
             <Table>
                 <TableHead>
                     <TableRow>
-                        {headers.map((header: any) => (
-                            <TableCell
-                                key={header}
-                                align="center"
-                                sx={{
-                                    bgcolor: "#1F8FCD",
-                                    fontWeight: "bold",
-                                    fontSize: { xs: "0.8rem", sm: "1rem" },
-                                    color: theme.palette.common.white,
-                                }}
-                            >
+                        {headers.map((header) => (
+                            <TableCell key={header} align="center" sx={headerStyle}>
                                 {header}
                             </TableCell>
                         ))}
                     </TableRow>
                 </TableHead>
 
-                <TableBody>
-                    {data.map((row: any, index: any) => {
-                        const backgroundColor = index % 2 === 0 ? "#f5f5f5" : "#e0e0e0";
-
-                        return (
-                            <TableRow key={index} sx={{ backgroundColor }}>
-                                <TableCell sx={{ fontWeight: 600, align: "center" }}>
-                                    {row.name}
+                {
+                    data?.length ? <TableBody>
+                        {data.map((row, index) => (
+                            <TableRow key={index} sx={{
+                                backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#e0e0e0",
+                            }}>
+                                <TableCell align="center">{row.name}</TableCell>
+                                <TableCell align="center">
+                                    {row.ticketType || 'N/A'}
                                 </TableCell>
-                                <TableCell sx={{ fontWeight: 600, align: "center" }}>
-                                    {row.ticketType}
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 600, align: "center" }}>
-                                    {row.entryTime}
-                                </TableCell>
-                                <TableCell sx={{ fontWeight: 600, align: "center" }}>
-                                    {row.status}
+                                <TableCell align="center">{formatTimeToAMPM(row.entryTime || 'N/A')}</TableCell>
+                                <TableCell align="center">
+                                    {row.verifyEntry ? 'Verified' : 'Unverified'}
                                 </TableCell>
                             </TableRow>
-                        );
-                    })}
-                </TableBody>
+                        ))}
+                    </TableBody> : 'No entry yet'
+                }
+
             </Table>
         </TableContainer>
     );

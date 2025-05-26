@@ -61,7 +61,7 @@ export function EventValidationTable({ headers, data }: EventValidationTableProp
                                 </TableCell>
                                 <TableCell align="center">{formatTimeToAMPM(row.entryTime || 'N/A')}</TableCell>
                                 <TableCell align="center">
-                                    {row.verifyEntry ? 'Verified' : 'Unverified'}
+                                    {row.verifyEntry ? 'Validated' : 'Invalid'}
                                 </TableCell>
                             </TableRow>
                         ))}

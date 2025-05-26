@@ -7,13 +7,11 @@ import {
   Button,
   FormControlLabel,
   MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
   SelectChangeEvent,
   Grid,
 } from '@mui/material';
 import { useState } from 'react';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
 const categories = ['Web Development', 'Graphic Design', 'Marketing', 'Consulting'];
 
@@ -48,15 +46,19 @@ export const SearchAndAdvanceFilter = () => {
         p: { xs: 2, sm: 3, md: 4 },
         boxShadow: 4,
         maxWidth: '100%',
-        
+
         mx: 'auto',
-        my: { xs: 3, md: 5 },
+        mt: { xs: 3, md: 5 },
       }}
     >
-      <Typography variant="h3" gutterBottom textAlign="center">
-        Search & Advanced Filters
-      </Typography>
-
+      <Box textAlign="center">
+        <HeadingCommon
+          variant="h3"
+          title="Search & Advanced Filters"
+          weight={700}
+          baseSize="30px"
+        />
+      </Box>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <TextField
@@ -65,7 +67,7 @@ export const SearchAndAdvanceFilter = () => {
             placeholder="Search by Name, Service, City..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            
+
             sx={{
 
               // Wrap all outline states under .MuiOutlinedInput-root
@@ -107,7 +109,7 @@ export const SearchAndAdvanceFilter = () => {
             onChange={(e) => setCategory(e.target.value)}
             InputLabelProps={{
               sx: {
-                
+
                 color: 'black',
                 '&.Mui-focused': { color: 'black' },
               },

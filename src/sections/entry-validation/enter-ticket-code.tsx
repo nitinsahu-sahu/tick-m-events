@@ -1,4 +1,4 @@
-import { Box, Button, Card, Grid, TextField, IconButton, Typography,Tooltip } from "@mui/material";
+import { Box, Button, Card, Grid, TextField, IconButton, Typography, Tooltip } from "@mui/material";
 import { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from 'react-toastify';
@@ -40,7 +40,7 @@ interface ApiResult {
     ticket: Ticket;
 }
 
-export function EnterTicketCode() {
+export function EnterTicketCode({setEventInformation}:any) {
     const dispatch = useDispatch<AppDispatch>();
     const [verifyData, setVerifyData] = useState({
         ticketCode: "",
@@ -74,6 +74,11 @@ export function EnterTicketCode() {
                     message: result?.message,
                     ticket: result?.ticket,
                 });
+                 setEventInformation({
+                    eventName: result.eventName.eventName,
+                    _id: result.eventName._id,
+                    // include other relevant data
+                });
             } else {
                 setFlag({
                     counter: result?.flag,
@@ -82,9 +87,9 @@ export function EnterTicketCode() {
                 });
             }
         } catch (error) {
-            console.error('Verification error:', error);
+            toast.error(error.message);
         }
-    }, [verifyData, dispatch]);
+    }, [verifyData, dispatch,setEventInformation]);
 
     const handleCancelState = () => {
         setFlag({

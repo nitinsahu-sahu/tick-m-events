@@ -4,11 +4,11 @@ const ServiceNegotiationCard = () =>(
     <Box
       sx={{
         backgroundColor: "#fff",
-        borderRadius: "16px",
+        borderRadius: 3,
         p: 3,
         mt:3,
         border: '1px solid #E0E0E0',
-        boxShadow: '0 0 10px rgba(0, 0, 0, 0.4)',
+        boxShadow: 3,
       }}
     >
       <Typography fontWeight={600} fontSize={18} mb={2}>

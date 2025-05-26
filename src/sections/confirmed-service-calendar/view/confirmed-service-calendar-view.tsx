@@ -14,9 +14,6 @@ export function ConfirmedServiceCalendarView() {
 
     return (
         <DashboardContent>
-            <PageTitleSection
-                title="Reservations & Contracts"
-            />
 
             <MatrixThreeCard metrics={stats} />
             

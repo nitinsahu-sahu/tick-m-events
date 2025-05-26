@@ -131,7 +131,7 @@ export function Router() {
         // -----------------------**************-------------------------
 
         // Organizer Route
-        
+
         {
           path: 'statistics-&-reports',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><StatisticsAndReportsPage /></RoleProtectedRoute>
@@ -183,7 +183,7 @@ export function Router() {
         },
         {
           path: 'profile-&-services-management',
-          element: <RoleProtectedRoute allowedRoles={['provider', 'admin', 'organizer']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
+          element: <RoleProtectedRoute allowedRoles={['provider', 'admin', 'organizer', 'participant']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
         },
         {
           path: 'confirmed-service-calendar',

@@ -18,7 +18,7 @@ export function RefundAndCancellationManangement() {
     { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/04/2025", status: "Pending", refundAction: ["Approve", "Deny"] },
   ];
  
-  const [selectedPolicy, setSelectedPolicy] = useState("");
+  const [selectedPolicy, setSelectedPolicy] = useState("fullRefund");
   const [daysBeforeEvent, setDaysBeforeEvent] = useState("");
   const [partialRefundPercent, setPartialRefundPercent] = useState("");
   const [cutoffDate, setCutoffDate] = useState("");

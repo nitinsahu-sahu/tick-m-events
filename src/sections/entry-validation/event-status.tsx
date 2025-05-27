@@ -11,7 +11,7 @@ function StatusChip({ label, color }: { label: string; color: string }) {
     );
 }
 
-export function EventBreadCrum({ view, setView,eventName}: any) {
+export function EventBreadCrum({ view, setView,eventInformation}: any) {
 
     return (
         <Box
@@ -20,12 +20,13 @@ export function EventBreadCrum({ view, setView,eventName}: any) {
             alignItems="center"
             flexWrap="wrap"
             gap={2}
+            key={eventInformation?._id}
         >
             {/* Left Section: Event & Status */}
             <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
                 <Typography fontWeight={600} fontSize={13}>Event</Typography>
                 <Typography color="text.secondary" fontSize={13}>/</Typography>
-                <Typography color="text.secondary" fontSize={13}>{eventName|| "select code"}</Typography>
+                <Typography color="text.secondary" fontSize={13}>{eventInformation?.eventName|| "select code"}</Typography>
 
                 {/* Status Chips */}
                 <Stack direction="row" spacing={1} alignItems="center" ml={4}>

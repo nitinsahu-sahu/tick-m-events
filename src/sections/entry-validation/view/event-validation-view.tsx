@@ -10,47 +10,26 @@ import { EntryListView } from "../entry-list-view";
 import { RealTimeStatistics } from "../real-time-statistics";
 import { EventBreadCrum } from "../event-status";
 
-interface Ticket {
-  _id: string;
-  eventId: string;
-  tickets: Array<{
-    ticketType: string;
-    // add other ticket properties as needed
-  }>;
-  eventName: Array<{
-    _id: string;
-    eventName: string;
-    // add other ticket properties as needed
-  }>;
-  verifyEntry: boolean;
-  entryTime?: string;
-  userId?: {
-    name: string;
-    email: string;
-    _id: string;
-  };
-}
-
-interface FlagState {
-  counter: string;
-  message: string;
-  eventName: Partial<Ticket>;
-  ticket: Partial<Ticket>; // Partial makes all properties optional
+interface EventInformation {
+    eventName?: any;
+    _id?: any;
+    // Add other expected fields
 }
 
 
 export function EventValidationView() {
 
   const [view, setView] = useState('scan');
-  
+ const [eventInformation, setEventInformation] = useState<EventInformation>({});
+    
   return (
     <DashboardContent>
       <PageTitleSection
         title="Entry Validation (QR Code Scan)"
       />
-      <EventBreadCrum setView={setView} view={view} />
+      <EventBreadCrum setView={setView} view={view} eventInformation={eventInformation}/>
       {
-        view === 'scan' ? <TicketScanner /> : <EnterTicketCode  />
+        view === 'scan' ? <TicketScanner /> : <EnterTicketCode  setEventInformation={setEventInformation}/>
       }
 
       {/* Entry List Section */}

@@ -1,3 +1,4 @@
+
 export const profileFields = [
   {
     name: 'name',
@@ -16,7 +17,14 @@ export const profileFields = [
     type: 'text',
     placeholder: 'Professional DJ with 10+ years of experience in events and parties.',
     multiline: true,
-    minRows: 3
+    minRows: 3,
+    
+  },
+  {
+    name: 'serviceCategory',
+    type: 'text',
+    placeholder: 'Which type of provide service',
+    multiline: true,
   },
   {
     name: 'address',
@@ -77,10 +85,10 @@ export const days = [
   "Sunday",
 ];
 
-export const offterTableHeaders = ["Service", "Indicative Price", "Location",  "Actions"];
+export const offterTableHeaders = ["Service", "Indicative Price", "Location", "Actions"];
 export const offterTableData = [
-    { service: "DJ & Entertainment", indicativePrice: "20000 XAF", location: "America" },
-    { service: "DJ & Entertainment", indicativePrice: "20000 XAF", location: "America" },
+  { service: "DJ & Entertainment", indicativePrice: "20000 XAF", location: "America" },
+  { service: "DJ & Entertainment", indicativePrice: "20000 XAF", location: "America" },
 ];
 
 type AddServiceForm = {

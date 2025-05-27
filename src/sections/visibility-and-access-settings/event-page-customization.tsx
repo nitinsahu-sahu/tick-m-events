@@ -179,7 +179,7 @@ export const EventCustomization = () => {
       </Box>
 
       {/* Content Layout */}
-      <Box mt={4}>
+      {/* <Box mt={4}>
         <Typography variant="subtitle1" fontSize={{ xs: 12, sm: 16, md: 20 }} fontWeight={500} gutterBottom>
           Content Layout Customization
         </Typography>
@@ -253,7 +253,7 @@ export const EventCustomization = () => {
           </Button>
         </Box>
 
-      </Box>
+      </Box> */}
 
       {/* Save Button */}
       <Box mt={4}>

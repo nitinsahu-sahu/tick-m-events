@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import {
   Box,
   Button,
@@ -10,6 +10,8 @@ import {
   Stack,
   Grid,
 } from '@mui/material';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 
@@ -26,14 +28,14 @@ interface ApiResult {
 const ServiceRequestForm = () => {
   const dispatch = useDispatch<AppDispatch>()
   const [eventBanner, setEventBanner] = useState(null); // Correct initialization
+  const fullDesRef = useRef<ReactQuill>(null);
+  const addOptionRef = useRef<ReactQuill>(null);
 
   const [formData, setFormData] = useState({
     serviceType: '',
     location: '',
     dateTime: '',
     budget: '',
-    requirements: '',
-    additionalOptions: '',
     status: ''
   });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -57,8 +59,8 @@ const ServiceRequestForm = () => {
     formServiceData.append("eventLocation", formData.location);
     formServiceData.append("dateAndTime", formData.dateTime);
     formServiceData.append("budget", formData.budget);
-    formServiceData.append("description", formData.requirements);
-    formServiceData.append("additionalOptions", formData.additionalOptions);
+    formServiceData.append("description", fullDesRef?.current?.value as string);
+    formServiceData.append("additionalOptions", addOptionRef?.current?.value as string);
     formServiceData.append("status", formData.status);
     if (eventBanner) {
       formServiceData.append("coverImage", eventBanner);
@@ -72,10 +74,15 @@ const ServiceRequestForm = () => {
           location: '',
           dateTime: '',
           budget: '',
-          requirements: '',
-          additionalOptions: '',
           status: ''
         })
+        // Replace the empty array with a valid Delta object
+        if (fullDesRef.current) {
+          fullDesRef.current.getEditor().setText('');
+        }
+        if (addOptionRef.current) {
+          addOptionRef.current.getEditor().setText('');
+        }
         setEventBanner(null)
       } else {
         toast.error(result?.message);
@@ -90,13 +97,11 @@ const ServiceRequestForm = () => {
     <Box
       sx={{
         backgroundColor: '#fff',
-        borderRadius: 2.5,
-        p: 4,
-
-        fontFamily: 'Inter, sans-serif',
-        mt: 3,
+        borderRadius: 3,
+        p: 3,
+        my: 3,
         border: '1px solid #E0E0E0',
-        boxShadow: '0 0 10px rgba(0, 0, 0, 0.4)',
+        boxShadow: 3,
       }}
     >
       <Typography variant="h5" fontWeight={700}>
@@ -199,25 +204,15 @@ const ServiceRequestForm = () => {
           </Box>
 
           {/* Requirements */}
-          <Box mt={2}>
+          <Box my={2}>
             <Typography fontWeight={600} color="text.primary" mb={1}>
               Full Description of Requirements
             </Typography>
-            <TextField
-              name="requirements"
-              required
-              value={formData.requirements}
-              onChange={handleChange}
-              multiline
-              rows={4}
-              fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'black' },
-                  '&:hover fieldset': { borderColor: 'black' },
-                  '&.Mui-focused fieldset': { borderColor: 'black' }
-                }
-              }}
+            <ReactQuill
+              placeholder='Description...'
+              theme="snow"
+              className="custom-quill" // Add a custom class
+              ref={fullDesRef}
             />
           </Box>
 
@@ -251,20 +246,11 @@ const ServiceRequestForm = () => {
             <Typography fontWeight={600} color="text.primary" mb={1}>
               Additional Options
             </Typography>
-            <TextField
-              name="additionalOptions"
-              value={formData.additionalOptions}
-              onChange={handleChange}
-              multiline
-              rows={3}
-              fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'black' },
-                  '&:hover fieldset': { borderColor: 'black' },
-                  '&.Mui-focused fieldset': { borderColor: 'black' }
-                }
-              }}
+            <ReactQuill
+              placeholder='Add Additional...'
+              theme="snow"
+              className="custom-quill" // Add a custom class
+              ref={addOptionRef}
             />
           </Box>
 
@@ -275,7 +261,7 @@ const ServiceRequestForm = () => {
             flexDirection={{ xs: 'column', md: 'row' }} // Only stack on mobile
             justifyContent="space-between"
             gap={2}
-            mt={3}
+            mt={4}
           >
             <Button
               variant="contained"

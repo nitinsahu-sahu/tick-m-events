@@ -18,6 +18,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { profileGet } from 'src/redux/actions';
 import { AppDispatch, RootState } from 'src/redux/store';
+import { PageTitleSection } from 'src/components/page-title-section';
+
 import { MainProfile } from '../main-profile';
 import { UpdateProfile } from '../update-profile';
 import { OfferAndService } from '../offer-and-service';
@@ -46,7 +48,9 @@ export function ProfileAndServicesManagementView() {
     experience: '',
     website: '',
     number: '',
+    serviceCategory:''
   });
+ 
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     dispatch(profileGet(user?._id));
@@ -58,8 +62,8 @@ export function ProfileAndServicesManagementView() {
   const handleModify = useCallback((rowData: any) => {
 
     setShowUpdateProfile(true); // Show UpdateProfile when Modify is clicked
-// Safely handle socialLinks (fallback to empty object if null/undefined)
-  const userSocialLinks = rowData.socialLinks || {};
+    // Safely handle socialLinks (fallback to empty object if null/undefined)
+    const userSocialLinks = rowData.socialLinks || {};
     setProfileData((prev) => {
       // Only update if values actually changed
       if (
@@ -68,8 +72,9 @@ export function ProfileAndServicesManagementView() {
         prev.email === rowData.email &&
         prev.username === rowData.username &&
         prev.address === rowData.address &&
-        prev.number === rowData.website &&
-        prev.website === rowData.number &&
+        prev.number === rowData.number &&
+        prev.website === rowData.website &&
+        prev.serviceCategory === rowData.serviceCategory &&
         prev.experience === rowData.experience
       ) {
         return prev;
@@ -83,12 +88,13 @@ export function ProfileAndServicesManagementView() {
         number: rowData.number,
         website: rowData.website,
         experience: rowData.experience,
+        serviceCategory: rowData.serviceCategory,
       };
     });
     setSocialLinks((prev) => {
       // Only update if values actually changed
       if (
-        prev._id === userSocialLinks._id  &&
+        prev._id === userSocialLinks._id &&
         prev.instagram === userSocialLinks.instagram &&
         prev.facebook === userSocialLinks.facebook &&
         prev.linkedin === userSocialLinks.linkedin &&
@@ -108,6 +114,8 @@ export function ProfileAndServicesManagementView() {
 
   return (
     <DashboardContent>
+      <PageTitleSection title="Profile & Service Manangement" />
+
       <MainProfile onModify={handleModify} />
       {/* DJ light setion */}
 

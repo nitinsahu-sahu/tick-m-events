@@ -6,7 +6,12 @@ const initialState = {
     basicDetails: [],
     fullData: [],
     wishlist: [],
-    eventWithDetails: {}
+    eventWithDetails: {},
+    categories: [],
+    loadingCategories: false,
+    childCategories: [],
+    loadingChildCategories: false,
+    error: null,
 };
 
 const eventReducer = (state, action) => {
@@ -14,6 +19,47 @@ const eventReducer = (state, action) => {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
+        case eventConstants.EVENT_CATEGORY_FETCH_REQUEST:
+            return {
+                ...state,
+                loadingCategories: true,
+                error: null,
+            };
+
+        case eventConstants.EVENT_CATEGORY_FETCH_SUCCESS:
+            return {
+                ...state,
+                loadingCategories: false,
+                categories: action.payload.categories,
+            };
+
+        case eventConstants.EVENT_CATEGORY_FETCH_FAILURE:
+            return {
+                ...state,
+                loadingCategories: false,
+                error: action.payload.message,
+            };
+        case eventConstants.CHILD_CATEGORY_FETCH_REQUEST:
+            return {
+                ...state,
+                loadingChildCategories: true,
+                error: null,
+            };
+
+        case eventConstants.CHILD_CATEGORY_FETCH_SUCCESS:
+            return {
+                ...state,
+                loadingChildCategories: false,
+                childCategories: action.payload.childCategories,
+            };
+
+        case eventConstants.CHILD_CATEGORY_FETCH_FAILURE:
+            return {
+                ...state,
+                loadingChildCategories: false,
+                error: action.payload.message,
+            };
+
         // Event bY ID FETCH
         case eventConstants.EVENT_BY_ID_REQUEST:
             return { ...state };

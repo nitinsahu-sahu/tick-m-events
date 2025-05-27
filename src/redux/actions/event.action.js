@@ -263,3 +263,47 @@ export const eventByIdFetch = (eventId) => async (dispatch) => {
         });
     }
 };
+
+export const fetchAllCategories = () => async (dispatch) => {
+    dispatch({ type: eventConstants.EVENT_CATEGORY_FETCH_REQUEST });
+ 
+    try {
+        const response = await axios.get("/event/allCategory");
+        dispatch({
+            type: eventConstants.EVENT_CATEGORY_FETCH_SUCCESS,
+            payload: {
+                categories: response?.data?.categories
+            },
+        });
+    } catch (error) {
+        dispatch({
+            type: eventConstants.EVENT_CATEGORY_FETCH_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Failed to fetch categories",
+                error: error.status
+            },
+        });
+    }
+};
+ 
+export const fetchChildCategories = (parentId) => async (dispatch) => {
+  dispatch({ type: eventConstants.CHILD_CATEGORY_FETCH_REQUEST });
+ 
+  try {
+    const response = await axios.get(`/event/children/${parentId}`);
+    dispatch({
+      type: eventConstants.CHILD_CATEGORY_FETCH_SUCCESS,
+      payload: {
+        childCategories: response?.data,
+      },
+    });
+  } catch (error) {
+    dispatch({
+      type: eventConstants.CHILD_CATEGORY_FETCH_FAILURE,
+      payload: {
+        message: error?.response?.data?.message || "Failed to fetch child categories",
+        error: error.status,
+      },
+    });
+  }
+};

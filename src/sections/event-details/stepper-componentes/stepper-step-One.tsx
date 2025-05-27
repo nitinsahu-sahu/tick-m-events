@@ -4,10 +4,9 @@ import 'react-quill/dist/quill.snow.css';
 import {
     Box, Typography, TextField, Select,
     MenuItem, IconButton,
-    Grid, FormControl, InputLabel
+    Grid, FormControl, InputLabel, ListSubheader
 } from "@mui/material";
-import PublicIcon from '@mui/icons-material/Public';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import FacebookIcon from '@mui/icons-material/Facebook';
@@ -17,13 +16,19 @@ import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { eventCreate } from 'src/redux/actions/event.action';
-import { AppDispatch } from 'src/redux/store';
+import { eventCreate, fetchAllCategories } from 'src/redux/actions/event.action';
+import { AppDispatch, RootState } from 'src/redux/store';
 
 export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
     const navigate = useNavigate();
     const quillRef = useRef<ReactQuill>(null);
     const dispatch = useDispatch<AppDispatch>();
+    // ye dala hai
+    const { categories } = useSelector((state: RootState) => state.event);
+    useEffect(() => {
+        dispatch(fetchAllCategories());
+    }, [dispatch]);
+
     const [eventFormData, setEventFormData] = useState({
         eventName: "",
         date: "",
@@ -40,12 +45,16 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
         facebook: "",
         linkedIn: "",
         tiktok: "",
+        childCategory: "",
     });
 
     const handleEventChange = (event: any) => {
-        event.preventDefault(); // Prevent default form submission behavior
+        // event.preventDefault();
         const { name, value } = event.target;
-        setEventFormData((prevData) => ({ ...prevData, [name]: value }));
+        setEventFormData(prev => ({
+            ...prev,
+            [name]: String(value), // force string
+        }));
     };
 
     const handleEventCreate = useCallback(async (event: any) => {
@@ -59,7 +68,7 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
         formEventData.append("date", eventFormData.date);
         formEventData.append("time", eventFormData.time);
         formEventData.append("location", eventFormData.location);
-        formEventData.append("category", eventFormData.eventCategory);
+        formEventData.append("category", eventFormData.childCategory || eventFormData.eventCategory);
         formEventData.append("eventType", eventFormData.eventType);
         formEventData.append("format", eventFormData.eventFormat);
         formEventData.append("website", eventFormData.website);
@@ -170,33 +179,44 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
                                     }}
                                 />
                             </Grid>
-
                             <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Event Category</InputLabel>
+                                    <InputLabel id="event-category-label">Event Category</InputLabel>
                                     <Select
-                                        name="eventCategory"
-                                        value={eventFormData.eventCategory}
+                                        labelId="event-category-label"
+                                        name="childCategory"
+                                        value={eventFormData.childCategory}
                                         onChange={handleEventChange}
                                         label="Event Category"
+                                        renderValue={(selected) => {
+                                            const selectedItem = categories
+                                                .flatMap((cat: any) => cat.subcategories || [])
+                                                .find((child: any) => child._id === selected);
+                                            return selectedItem ? selectedItem.name : 'Select Subcategory';
+                                        }}
                                     >
-                                        <MenuItem value="concert">Concert</MenuItem>
-                                        <MenuItem value="conference">Conference</MenuItem>
-                                        <MenuItem value="festival">Festival</MenuItem>
+                                        {categories.map((parent: any) => (
+                                            parent.subcategories?.length > 0 && [
+                                                <ListSubheader key={`header-${parent._id}`}>{parent.name}</ListSubheader>,
+                                                ...parent.subcategories.map((child: any) => (
+                                                    <MenuItem key={child._id} value={child._id}>
+                                                        {child.name}
+                                                    </MenuItem>
+                                                ))
+                                            ]
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
-
                             <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Event Category</InputLabel>
                                     <Select
+                                        labelId="event-type-label"
                                         name="eventType"
                                         value={eventFormData.eventType}
                                         onChange={handleEventChange}
-                                        label="Event Category"
                                     >
-                                        <MenuItem value="Public">Public</MenuItem>
+                                        <MenuItem value="Public">Public</MenuItem>   {/* Default selected */}
                                         <MenuItem value="Private">Private</MenuItem>
                                     </Select>
                                 </FormControl>

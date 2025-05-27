@@ -2,8 +2,7 @@ import {
     Avatar,
     Box,
     Button,
-    Typography,
-    TextField
+    TextField,
 } from "@mui/material";
 import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +13,7 @@ import { AppDispatch, RootState } from "src/redux/store";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 import { profileFields, socialMediaFields } from "./utills";
+
 
 
 interface ApiResult {
@@ -57,7 +57,7 @@ const FormTextField = ({ name, type = 'text', value, onChange, placeholder, tran
 
 export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, setProfileData, setSocialLinks }: any) {
     const dispatch = useDispatch<AppDispatch>();
-    const { _id } = useSelector((state: RootState) => state?.auth?.user);
+    const { _id,role } = useSelector((state: RootState) => state?.auth?.user);
     const { profile } = useSelector((state: RootState) => state?.profile);
 
     const handleProfileUpdateChange = (event: any) => {
@@ -83,6 +83,7 @@ export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, 
         formProfileData.append("experience", profileData.experience);
         formProfileData.append("address", profileData.address);
         formProfileData.append("number", profileData.number);
+        formProfileData.append("serviceCategory", profileData.serviceCategory);
         formProfileData.append("website", profileData.website);
         formProfileData.append("socialLinks", JSON.stringify(socialLinks))
         try {
@@ -149,7 +150,7 @@ export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, 
 
                 <Box component="form" display="flex" flexDirection="column" gap={2}>
                     {/* Profile Fields */}
-                    {profileFields.map((field) => (
+                    {profileFields.filter(field => !(field.name === 'serviceCategory' && role === 'organizer')).map((field) => (
                         <FormTextField
                             key={field.name}
                             name={field.name}
@@ -162,7 +163,6 @@ export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, 
                             minRows={field.minRows}
                         />
                     ))}
-
                     {/* Social Media Fields */}
                     {socialMediaFields.map((field) => (
                         <FormTextField

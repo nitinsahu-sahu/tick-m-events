@@ -127,26 +127,6 @@ export const CustomPhotoVideoFilter = () => {
       </Box>
 
       {/* Automatic Social Sharing */}
-      <Box mb={3}>
-        <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
-          Automatic Social Sharing
-        </Typography>
-        <FormGroup row sx={{ flexWrap: 'wrap' }}>
-          {['Facebook', 'Instagram', 'TikTok', 'WhatsApp'].map((platform) => (
-            <FormControlLabel
-              key={platform}
-              control={
-                <Checkbox
-                  checked={selectedSocial[platform.toLowerCase() as keyof SocialPlatforms]}
-                  onChange={handleSocialChange}
-                  name={platform.toLowerCase()}
-                />
-              }
-              label={platform}
-            />
-          ))}
-        </FormGroup>
-      </Box>
 
       {/* Apply Filters Button */}
       <Button

@@ -1,5 +1,5 @@
-import React from 'react';
 import { Box, Typography, Grid, Button, Paper } from '@mui/material';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
 const providers = [
   {
@@ -23,16 +23,16 @@ export function CompareProviders () {
     <Box
       sx={{
         p: 3,
-        mb:3,
-        borderRadius: '20px',
+        my:3,
+        borderRadius: 3,
         backgroundColor: '#fff',
         border: '1px solid #E0E0E0',
-        boxShadow: '0 0 10px rgba(0,0,0,0.15)',
+        boxShadow: 3,
       }}
     >
-      <Typography variant="h6" sx={{ mb: 3 }} fontWeight="bold">
-        Compare Providers
-      </Typography>
+              <HeadingCommon title="Compare Providers" variant="h6" weight={600} />
+      
+      
 
       <Grid container spacing={3} justifyContent="center">
         {providers.map((provider, index) => (

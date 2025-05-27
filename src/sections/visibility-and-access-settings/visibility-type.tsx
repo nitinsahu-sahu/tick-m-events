@@ -25,11 +25,6 @@ export function VisibilityType() {
           control={<Radio />}
           label="Private - Only via direct link"
         />
-        <FormControlLabel
-          value="invitation"
-          control={<Radio />}
-          label="Invitation-Only - Only added guests"
-        />
       </RadioGroup>
 
       {/* Custom Event URL */}
@@ -46,7 +41,7 @@ export function VisibilityType() {
       </Box>
 
       {/* Secure Access */}
-      <Box mt={3}>
+      {/* <Box mt={3}>
         <Typography variant="subtitle2" mb={1}>
           Secure Access
         </Typography>
@@ -56,18 +51,12 @@ export function VisibilityType() {
           variant="outlined"
           size="medium"
         />
-      </Box>
+      </Box> */}
 
-      {/* Two-Factor Checkbox */}
-      <FormGroup sx={{ mt: 2 }}>
-        <FormControlLabel
-          control={<Checkbox />}
-          label="Enable Two-Factor Authentication (Email/SMS OTP)"
-        />
-      </FormGroup>
+     
 
       {/* Participant Limit */}
-      <Box mt={3}>
+      {/* <Box mt={3}>
         <Typography variant="subtitle2" mb={1}>
           Participant Limit
         </Typography>
@@ -78,15 +67,15 @@ export function VisibilityType() {
           variant="outlined"
           size="medium"
         />
-      </Box>
+      </Box> */}
 
       {/* Enable Waitlist */}
-      <FormGroup sx={{ mt: 2 }}>
+      {/* <FormGroup sx={{ mt: 2 }}>
         <FormControlLabel
           control={<Checkbox />}
           label="Enable Waitlist"
         />
-      </FormGroup>
+      </FormGroup> */}
 
       {/* Save Button */}
       <Box mt={4}>

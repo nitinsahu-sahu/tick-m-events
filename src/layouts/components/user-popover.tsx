@@ -42,6 +42,7 @@ export function UserPopover() {
     const hiddenTranPaymet = ['/transection-and-payment'];
     const hiddenDashboard = ['/'];
     const hiddenEventDetails = ['/events/add-new'];
+    const hiddenVisibilityAccess = ['/visibility-and-access-settings'];
 
     const { _id, name, role, avatar } = useSelector((state: RootState) => state?.auth?.user);
 
@@ -215,7 +216,9 @@ export function UserPopover() {
                         </Box>
                     }
                     {
-                        role === 'organizer' && (
+                        role === 'organizer' &&
+                        !hiddenTranPaymet.some(path => pathname.includes(path)) &&
+                        (
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
                                 <Button
                                     variant="contained"
@@ -244,6 +247,8 @@ export function UserPopover() {
                                         fontFamily: "Poppins, sans-serif",
                                         fontWeight: 600
                                     }}
+                                    disabled={hiddenVisibilityAccess?.toString() === pathname?.toString()}
+
                                 >
                                     <Link
                                         to="/visibility-and-access-settings"

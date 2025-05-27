@@ -4,7 +4,7 @@ import 'react-quill/dist/quill.snow.css';
 import {
     Box, Typography, TextField, Select,
     MenuItem, IconButton,
-    Grid, FormControl, InputLabel
+    Grid, FormControl, InputLabel, ListSubheader
 } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -16,7 +16,7 @@ import { LoadingButton } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { eventCreate, fetchAllCategories, fetchChildCategories } from 'src/redux/actions/event.action';
+import { eventCreate, fetchAllCategories } from 'src/redux/actions/event.action';
 import { AppDispatch, RootState } from 'src/redux/store';
 
 export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
@@ -24,7 +24,7 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
     const quillRef = useRef<ReactQuill>(null);
     const dispatch = useDispatch<AppDispatch>();
     // ye dala hai
-    const { categories, loadingCategories, childCategories } = useSelector((state: RootState) => state.event);
+    const { categories } = useSelector((state: RootState) => state.event);
     useEffect(() => {
         dispatch(fetchAllCategories());
     }, [dispatch]);
@@ -49,14 +49,12 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
     });
 
     const handleEventChange = (event: any) => {
-        event.preventDefault(); // Prevent default form submission behavior
+        // event.preventDefault();
         const { name, value } = event.target;
-        setEventFormData((prevData) => ({ ...prevData, [name]: value }));
-
-        if (name === 'eventCategory') {
-            setEventFormData(prevData => ({ ...prevData, childCategory: "" }));
-            dispatch(fetchChildCategories(value));
-        }
+        setEventFormData(prev => ({
+            ...prev,
+            [name]: String(value), // force string
+        }));
     };
 
     const handleEventCreate = useCallback(async (event: any) => {
@@ -181,65 +179,47 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
                                     }}
                                 />
                             </Grid>
-
                             <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Event Category</InputLabel>
-                                    {/* ye dla hai */}
+                                    <InputLabel id="event-category-label">Event Category</InputLabel>
                                     <Select
-                                        name="eventCategory"
-                                        value={eventFormData.eventCategory}
+                                        labelId="event-category-label"
+                                        name="childCategory"
+                                        value={eventFormData.childCategory}
                                         onChange={handleEventChange}
                                         label="Event Category"
+                                        renderValue={(selected) => {
+                                            const selectedItem = categories
+                                                .flatMap((cat: any) => cat.subcategories || [])
+                                                .find((child: any) => child._id === selected);
+                                            return selectedItem ? selectedItem.name : 'Select Subcategory';
+                                        }}
                                     >
-
-                                        {categories.map((cat:any) => (
-                                            <MenuItem key={cat._id} value={cat._id}>
-                                                {cat.name}
-                                            </MenuItem>
+                                        {categories.map((parent: any) => (
+                                            parent.subcategories?.length > 0 && [
+                                                <ListSubheader key={`header-${parent._id}`}>{parent.name}</ListSubheader>,
+                                                ...parent.subcategories.map((child: any) => (
+                                                    <MenuItem key={child._id} value={child._id}>
+                                                        {child.name}
+                                                    </MenuItem>
+                                                ))
+                                            ]
                                         ))}
                                     </Select>
-
                                 </FormControl>
-
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Child Category</InputLabel>
                                     <Select
-                                        name="childCategory"
-                                        value={eventFormData.childCategory || ""}
+                                        labelId="event-type-label"
+                                        name="eventType"
+                                        value={eventFormData.eventType}
                                         onChange={handleEventChange}
-                                        label="Child Category"
                                     >
-                                        {childCategories?.length > 0 ? (
-                                            childCategories.map((child:any) => (
-                                                <MenuItem key={child._id} value={child._id}>
-                                                    {child.name}
-                                                </MenuItem>
-                                            ))
-                                        ) : (
-                                            <MenuItem disabled>No child categories</MenuItem>
-                                        )}
+                                        <MenuItem value="Public">Public</MenuItem>   {/* Default selected */}
+                                        <MenuItem value="Private">Private</MenuItem>
                                     </Select>
                                 </FormControl>
-                            </Grid>
-
-
-                            <Grid item xs={12} sm={6} md={3}>
-                                <FormControl fullWidth>
-
-                                <Select
-                                    labelId="event-type-label"
-                                    name="eventType"
-                                    value={eventFormData.eventType}
-                                    onChange={handleEventChange}
-                                >
-                                    <MenuItem value="Public">Public</MenuItem>   {/* Default selected */}
-                                    <MenuItem value="Private">Private</MenuItem>
-                                </Select>
-                                </FormControl>
-
                             </Grid>
 
                             <Grid item xs={12} sm={6} md={3}>
@@ -262,7 +242,6 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
                         {/* Description - Full width always */}
                         <Grid item xs={12} sx={{ mt: 2 }}>
                             <ReactQuill
-                            className="custom-quill"
                                 placeholder='Enter your event description'
                                 theme="snow"
                                 style={{ height: '90px', margin: "20px 0px 40px 0px" }}

@@ -4,8 +4,11 @@ import Chart from "react-apexcharts";
 import { Link } from "react-router-dom";
 
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
+import { useCSVExport, useExcelExport } from "src/hooks/downloadable";
 
 export function ReservationManagement() {
+    const exportToExcel = useExcelExport();
+    const exportToCSV = useCSVExport();
     const chartRealTimeOptions: ApexOptions = {
         series: [45, 30, 25], // Ticket Sold, Validation, Remaining
         labels: ["Ticket Sold", "Ticket validated", "Remaining Tickets"],
@@ -16,12 +19,27 @@ export function ReservationManagement() {
         responsive: [{ breakpoint: 768, options: { legend: { position: "bottom" } } }],
     };
 
-    const reservationManagementTableHeaders = ["Name", "Email", "Ticket Type", "Purchase Date", "Status", "Actions"];
+    const reservationManagementTableHeaders = ["Name", "Email", "Ticket Type", "Purchase Date", "Status"];
     const reservationManagementTableData = [
-        { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/02/2025", reservationStatus: "Pending", action: ["Cancel"] },
-        { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/03/2025", reservationStatus: "Pending", action: ["Cancel"] },
-        { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/04/2025", reservationStatus: "Pending", action: ["Cancel"] },
+        { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/02/2025", reservationStatus: "Pending" },
+        { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/03/2025", reservationStatus: "Pending" },
+        { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/04/2025", reservationStatus: "Pending" },
     ];
+
+    const handleExcelExport = () => {
+        exportToExcel(reservationManagementTableData, {
+            fileName: 'transaction_list',
+            sheetName: 'Reservalation Entry List'
+        });
+    };
+
+    const handleCSVExport = () => {
+        exportToCSV(reservationManagementTableData, {
+            fileName: 'transaction_list',
+            headers: reservationManagementTableHeaders,
+            fieldNames: ['name', 'email', 'resrvationTicketType', 'purchaseDate', 'reservationStatus'] // Map to your actual data properties
+        });
+    };
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
@@ -36,10 +54,11 @@ export function ReservationManagement() {
 
             {/* Export Buttons */}
             <Box mt={2} display="flex" gap={2}>
-                <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
+                <Button onClick={handleCSVExport}
+                    variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
                     Export as CSV
                 </Button>
-                <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
+                <Button onClick={handleExcelExport} variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
                     Export as Excel
                 </Button>
             </Box>

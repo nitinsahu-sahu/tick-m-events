@@ -3,14 +3,7 @@ import {
   Typography,
   Select,
   MenuItem,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
   Button,
-  Paper,
   Stack,
 } from '@mui/material';
 
@@ -83,7 +76,7 @@ export default function BookedServicesTable() {
         {/* Add more filter items here */}
       </Select>
 
-      <Box sx={{ overflowX: 'auto', borderRadius: 2 }}>
+      <Box sx={{ overflowX: 'auto', verticalAlign:'middle',textAlign:'center', borderRadius: 2 }}>
         <Box sx={{ minWidth: 800 }}>
           {/* Table Header */}
           <Box

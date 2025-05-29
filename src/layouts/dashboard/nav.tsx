@@ -128,6 +128,7 @@ const useFilteredNavData = (data: any) => {
 
 export function NavContent({ data, slots, sx }: NavContentProps) {
   const filteredData = useFilteredNavData(data); // Use the filtered data
+  const {user} = useSelector((state:RootState) => state?.auth);
 
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
@@ -139,7 +140,8 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
   return (
     <>
       <Logo />
-
+      <HeadingCommon baseSize="13px" title={`Account ID: ${user._id}`}/>
+      {/* Account ID: TM-{user._id} */}
       {slots?.topArea}
       <DashboardHF title="MAIN MENU" />
       <Scrollbar fillContent>

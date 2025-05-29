@@ -8,7 +8,6 @@ import {PhotoFilterSection} from '../PhotoFilterSection';
 export function CustomPhotoAndVideoFiltersforEventsView() {
   return (
     <DashboardContent>
-      <PageTitleSection title="Custom Photo or Video Filter" />
       <PhotoFilterSection />
       <Box mt={4}>
         <FilterGrid />

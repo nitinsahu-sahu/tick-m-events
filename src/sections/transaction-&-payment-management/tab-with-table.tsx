@@ -254,7 +254,7 @@ export function TabWithTableView() {
                                     {paymentSettings.buttons.map((label, index) => (
                                         <Button
                                             type={index === 0 ? "submit" : "button"} // Only first button submits
-                                            onClick={index !== 0 ? () => console.log(`${label} clicked`) : undefined}
+                                            // onClick={index !== 0 ? () => console.log(`${label} clicked`) : undefined}
                                             key={index}
                                             variant="contained"
                                             sx={{

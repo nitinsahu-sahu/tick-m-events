@@ -33,6 +33,7 @@ export function LiveSalesRevenueData() {
       labels: { style: { fontSize: "12px", fontWeight: 500 } }
     }
   }), []);
+
   const salesComparisonOptions = useMemo<ApexOptions>(() => ({
     ...commonChartOptions,
     chart: { type: "bar" },
@@ -43,7 +44,9 @@ export function LiveSalesRevenueData() {
     yaxis: { show: false },
     colors: ["#FFFFFF", "#0B2E4C"],
     legend: { show: false }
+    
   }), []);
+
   const lineChartOptions = useMemo<ApexOptions>(() => ({
     ...commonChartOptions,
     chart: { type: "line", height: 250 },

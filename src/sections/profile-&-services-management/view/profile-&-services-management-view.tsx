@@ -30,6 +30,8 @@ export function ProfileAndServicesManagementView() {
   const { user } = useSelector((state: RootState) => state?.auth);
 
   const [showUpdateProfile, setShowUpdateProfile] = useState(false); // Toggle for edit mode
+  const [showService, setShowService] = useState(false); // Toggle for edit mode
+  const [updateAval, setUpdateAval] = useState(false); // Toggle for edit mode
 
   const [socialLinks, setSocialLinks] = useState({
     _id: '',
@@ -48,9 +50,9 @@ export function ProfileAndServicesManagementView() {
     experience: '',
     website: '',
     number: '',
-    serviceCategory:''
+    serviceCategory: ''
   });
- 
+
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     dispatch(profileGet(user?._id));
@@ -58,8 +60,19 @@ export function ProfileAndServicesManagementView() {
 
   // const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isMobile = useMediaQuery('(max-width:600px)');
+  const handleServiece=()=> {
+    setShowService(!showService)
+    setShowUpdateProfile(false);
+  }
+  const handleAvalibility=()=> {
+    setUpdateAval(!updateAval)
+    setShowService(false)
+    setShowUpdateProfile(false);
+  }
 
   const handleModify = useCallback((rowData: any) => {
+    setShowService(false)
+    setUpdateAval(false)
 
     setShowUpdateProfile(true); // Show UpdateProfile when Modify is clicked
     // Safely handle socialLinks (fallback to empty object if null/undefined)
@@ -116,7 +129,7 @@ export function ProfileAndServicesManagementView() {
     <DashboardContent>
       <PageTitleSection title="Profile & Service Manangement" />
 
-      <MainProfile onModify={handleModify} />
+      <MainProfile onModify={handleModify} handleAvalibility={handleAvalibility} setShowService={handleServiece} />
       {/* DJ light setion */}
 
       {showUpdateProfile && (
@@ -130,217 +143,223 @@ export function ProfileAndServicesManagementView() {
       )}
 
       {/* offerd services section */}
-      <OfferAndService />
+      {showService === true && (<OfferAndService />)}
+      {updateAval === true && (
+        <>
+          {/* Client review section */}
+          <ClientReview />
 
-      {/* Client review section */}
-      <ClientReview />
+          {/* Avability section */}
+          <Box
+            mt={3}
+            sx={{
+              borderRadius: '20px',
+              border: '1px solid #00000066',
+              background: '#FFFFFF',
+              p: 3,
+            }}
+          >
+            {/* Availability Settings Header */}
+            <Box
+              sx={{
+                borderRadius: '20px',
+                border: '1px solid #00000066',
+                backgroundColor: '#FFFFFF',
+                p: 2,
+                mb: 3,
+              }}
+            >
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ mb: 0 }}>
+                    Availability Settings
+                  </Typography>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: '50%',
+                        backgroundColor: 'green',
+                      }}
+                    />
+                    <Typography variant="body2">Available</Typography>
+                  </Stack>
+                </Box>
 
-      {/* Avability section */}
-      <Box
-        mt={3}
-        sx={{
-          borderRadius: '20px',
-          border: '1px solid #00000066',
-          background: '#FFFFFF',
-          p: 3,
-        }}
-      >
-        {/* Availability Settings Header */}
-        <Box
-          sx={{
-            borderRadius: '20px',
-            border: '1px solid #00000066',
-            backgroundColor: '#FFFFFF',
-            p: 2,
-            mb: 3,
-          }}
-        >
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Box>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ mb: 0 }}>
-                Availability Settings
-              </Typography>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Box
+                <Switch
+                  defaultChecked
                   sx={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: '50%',
-                    backgroundColor: 'green',
+                    '& .MuiSwitch-switchBase.Mui-checked': {
+                      color: '#0B2E4C',
+                    },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                      backgroundColor: '#0B2E4C',
+                    },
                   }}
                 />
-                <Typography variant="body2">Available</Typography>
               </Stack>
             </Box>
 
-            <Switch
-              defaultChecked
+            {/* Manage Availability */}
+            <Box
               sx={{
-                '& .MuiSwitch-switchBase.Mui-checked': {
-                  color: '#0B2E4C',
-                },
-                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                  backgroundColor: '#0B2E4C',
-                },
-              }}
-            />
-          </Stack>
-        </Box>
-
-        {/* Manage Availability */}
-        <Box
-          sx={{
-            borderRadius: '20px',
-            border: '1px solid #00000066',
-            backgroundColor: '#FFFFFF',
-            p: { xs: 2, sm: 3 },
-            mb: 3,
-          }}
-        >
-          <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-            Manage Your Availability
-          </Typography>
-
-          <Typography variant="body2" color="#D9D9D9" sx={{ mb: 3 }}>
-            Click on dates to mark as unavailable.
-          </Typography>
-
-          <Grid container spacing={0}>
-            {days.map((day, index) => (
-              <Grid item xs={12} key={index}>
-                <Box
-                  sx={{
-                    backgroundColor: '#EEEEEE',
-                    borderRadius: 1.5,
-                    px: 2,
-                    py: 1,
-                    mb: 2,
-                    width: '100%',
-                    maxWidth: { xs: '100%', md: '50%' },
-                    ml: { xs: 0, md: 0 }, // left-aligned on all devices
-                  }}
-                >
-                  <Grid
-                    container
-                    alignItems="center"
-                    spacing={1}
-                    sx={{
-                      flexWrap: { xs: 'wrap', md: 'nowrap' },
-                    }}
-                  >
-                    <Grid item xs={12} sm={3} md={2}>
-                      <Typography sx={{ fontSize: 14 }}>{day}</Typography>
-                    </Grid>
-
-                    <Grid item>
-                      <Checkbox
-                        sx={{
-                          mx: 1,
-                          color: 'black',
-                          '&.Mui-checked': {
-                            color: 'black',
-                          },
-                        }}
-                      />
-                    </Grid>
-
-                    <Grid item>
-                      <Typography sx={{ fontSize: 14, minWidth: 30 }}>24H</Typography>
-                    </Grid>
-
-                    <Grid item xs={12} sm={5} md={3}>
-                      <TextField
-                        type="time"
-                        size="small"
-                        fullWidth
-                        sx={{
-                          '& input[type="time"]::-webkit-calendar-picker-indicator': {
-                            display: 'none',
-                            WebkitAppearance: 'none',
-                          },
-                          '& input[type="time"]': {
-                            appearance: 'textfield',
-                            MozAppearance: 'textfield',
-                          },
-                          '& .MuiInputBase-root': {
-                            height: 30,
-                            backgroundColor: '#fff',
-                            borderRadius: '6px',
-                            border: '1px solid #C4C4C4',
-                            px: 1,
-                          },
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            border: 'none',
-                          },
-                        }}
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{
-                          style: { padding: '8px 0' },
-                        }}
-                      />
-                    </Grid>
-
-                    <Grid item>
-                      <Typography sx={{ mx: 1, fontSize: 14 }}>to</Typography>
-                    </Grid>
-
-                    <Grid item xs={12} sm={5} md={3}>
-                      <TextField
-                        type="time"
-                        size="small"
-                        fullWidth
-                        sx={{
-                          '& input[type="time"]::-webkit-calendar-picker-indicator': {
-                            display: 'none',
-                            WebkitAppearance: 'none',
-                          },
-                          '& input[type="time"]': {
-                            appearance: 'textfield',
-                            MozAppearance: 'textfield',
-                          },
-                          '& .MuiInputBase-root': {
-                            height: 30,
-                            backgroundColor: '#fff',
-                            borderRadius: '6px',
-                            border: '1px solid #C4C4C4',
-                            px: 1,
-                          },
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            border: 'none',
-                          },
-                        }}
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{
-                          style: { padding: '8px 0' },
-                        }}
-                      />
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-
-          <Box textAlign="center" mt={3}>
-            <Button
-              fullWidth
-              variant="contained"
-              sx={{
-                backgroundColor: '#0B2E4C',
-                textTransform: 'none',
-                fontWeight: 'bold',
-                borderRadius: '14px',
-                py: 1.5,
-                '&:hover': {
-                  backgroundColor: '#0B2E4C',
-                },
+                borderRadius: '20px',
+                border: '1px solid #00000066',
+                backgroundColor: '#FFFFFF',
+                p: { xs: 2, sm: 3 },
+                mb: 3,
               }}
             >
-              Add a Service
-            </Button>
+              <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+                Manage Your Availability
+              </Typography>
+
+              <Typography variant="body2" color="#D9D9D9" sx={{ mb: 3 }}>
+                Click on dates to mark as unavailable.
+              </Typography>
+
+              <Grid container spacing={0}>
+                {days.map((day, index) => (
+                  <Grid item xs={12} key={index}>
+                    <Box
+                      sx={{
+                        backgroundColor: '#EEEEEE',
+                        borderRadius: 1.5,
+                        px: 2,
+                        py: 1,
+                        mb: 2,
+                        width: '100%',
+                        maxWidth: { xs: '100%', md: '50%' },
+                        ml: { xs: 0, md: 0 }, // left-aligned on all devices
+                      }}
+                    >
+                      <Grid
+                        container
+                        alignItems="center"
+                        spacing={1}
+                        sx={{
+                          flexWrap: { xs: 'wrap', md: 'nowrap' },
+                        }}
+                      >
+                        <Grid item xs={12} sm={3} md={2}>
+                          <Typography sx={{ fontSize: 14 }}>{day}</Typography>
+                        </Grid>
+
+                        <Grid item>
+                          <Checkbox
+                            sx={{
+                              mx: 1,
+                              color: 'black',
+                              '&.Mui-checked': {
+                                color: 'black',
+                              },
+                            }}
+                          />
+                        </Grid>
+
+                        <Grid item>
+                          <Typography sx={{ fontSize: 14, minWidth: 30 }}>24H</Typography>
+                        </Grid>
+
+                        <Grid item xs={12} sm={5} md={3}>
+                          <TextField
+                            type="time"
+                            size="small"
+                            fullWidth
+                            sx={{
+                              '& input[type="time"]::-webkit-calendar-picker-indicator': {
+                                display: 'none',
+                                WebkitAppearance: 'none',
+                              },
+                              '& input[type="time"]': {
+                                appearance: 'textfield',
+                                MozAppearance: 'textfield',
+                              },
+                              '& .MuiInputBase-root': {
+                                height: 30,
+                                backgroundColor: '#fff',
+                                borderRadius: '6px',
+                                border: '1px solid #C4C4C4',
+                                px: 1,
+                              },
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                border: 'none',
+                              },
+                            }}
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{
+                              style: { padding: '8px 0' },
+                            }}
+                          />
+                        </Grid>
+
+                        <Grid item>
+                          <Typography sx={{ mx: 1, fontSize: 14 }}>to</Typography>
+                        </Grid>
+
+                        <Grid item xs={12} sm={5} md={3}>
+                          <TextField
+                            type="time"
+                            size="small"
+                            fullWidth
+                            sx={{
+                              '& input[type="time"]::-webkit-calendar-picker-indicator': {
+                                display: 'none',
+                                WebkitAppearance: 'none',
+                              },
+                              '& input[type="time"]': {
+                                appearance: 'textfield',
+                                MozAppearance: 'textfield',
+                              },
+                              '& .MuiInputBase-root': {
+                                height: 30,
+                                backgroundColor: '#fff',
+                                borderRadius: '6px',
+                                border: '1px solid #C4C4C4',
+                                px: 1,
+                              },
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                border: 'none',
+                              },
+                            }}
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{
+                              style: { padding: '8px 0' },
+                            }}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+
+              <Box textAlign="center" mt={3}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  sx={{
+                    backgroundColor: '#0B2E4C',
+                    textTransform: 'none',
+                    fontWeight: 'bold',
+                    borderRadius: '14px',
+                    py: 1.5,
+                    '&:hover': {
+                      backgroundColor: '#0B2E4C',
+                    },
+                  }}
+                >
+                  Add a Service
+                </Button>
+              </Box>
+            </Box>
           </Box>
-        </Box>
-      </Box>
+        </>
+      )}
+
+
+
 
       {/* Profile verification section */}
 

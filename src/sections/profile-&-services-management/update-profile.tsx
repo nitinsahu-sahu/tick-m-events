@@ -25,6 +25,7 @@ interface ApiResult {
 
 const FormTextField = ({ name, type = 'text', value, onChange, placeholder, transform, multiline, minRows }: any) => (
     <TextField
+        label={name}
         name={name}
         type={type}
         value={value}
@@ -55,9 +56,9 @@ const FormTextField = ({ name, type = 'text', value, onChange, placeholder, tran
     />
 );
 
-export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, setProfileData, setSocialLinks }: any) {
+export function UpdateProfile({ profileData, socialLinks, setProfileData, setSocialLinks }: any) {
     const dispatch = useDispatch<AppDispatch>();
-    const { _id,role } = useSelector((state: RootState) => state?.auth?.user);
+    const { _id, role } = useSelector((state: RootState) => state?.auth?.user);
     const { profile } = useSelector((state: RootState) => state?.profile);
 
     const handleProfileUpdateChange = (event: any) => {
@@ -90,7 +91,6 @@ export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, 
             const result = await dispatch(profileUpdate({ formProfileData, _id }));
             if ((result as ApiResult)?.status === 200) {
                 toast.success(result?.message);
-                setShowUpdateProfile(false)
                 setProfileData({
                     name: "",
                     email: "",
@@ -113,7 +113,7 @@ export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, 
         } catch (error) {
             toast.error("Profile update failed");
         }
-    }, [profileData, setProfileData, setSocialLinks, _id, socialLinks, setShowUpdateProfile, dispatch])
+    }, [profileData, setProfileData, setSocialLinks, _id, socialLinks,  dispatch])
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} bgcolor="#FFFFFF" p={3}>
@@ -152,6 +152,7 @@ export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, 
                     {/* Profile Fields */}
                     {profileFields.filter(field => !(field.name === 'serviceCategory' && role === 'organizer')).map((field) => (
                         <FormTextField
+
                             key={field.name}
                             name={field.name}
                             type={field.type}

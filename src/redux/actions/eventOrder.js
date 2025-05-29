@@ -8,7 +8,6 @@ export const eventOrderCreate = (orderFormEntry) => async (dispatch) => {
 
   try {
     const response = await axios.post(`/event-order/order`, orderFormEntry);
-    console.log('response ordear>>',response);
 
     dispatch({
       type: eventOrderConstants.CREATE_SUCCESS,
@@ -24,8 +23,6 @@ export const eventOrderCreate = (orderFormEntry) => async (dispatch) => {
       status: response.status,
     };
   } catch (error) {
-    console.log('response  error>>',error);
-
     dispatch({
       type: eventOrderConstants.CREATE_FAILURE,
       payload: { message: error?.response?.data?.message || "Server error", error: error.status },

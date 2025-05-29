@@ -1,22 +1,26 @@
 import { Box, Button, TextField } from "@mui/material";
-import { useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import { useCSVExport, useExcelExport } from "src/hooks/downloadable";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { EventValidationTable } from "src/components/tables/event-validation-table";
-import { RootState } from "src/redux/store";
+import { AppDispatch, RootState } from "src/redux/store";
+import { eventOrderFetch } from "src/redux/actions/eventOrder";
 
 import { entryValidationHeaders } from "./utills";
 
 
 export function EntryListView() {
+  const dispatch = useDispatch<AppDispatch>();
 
     const { verifiedOrders } = useSelector((state: RootState) => state?.order);
     const [searchTerm, setSearchTerm] = useState('');
     const exportToExcel = useExcelExport();
     const exportToCSV = useCSVExport();
-
+    useEffect(() => {
+        dispatch(eventOrderFetch())
+    }, [dispatch]);
     // Filter data based on search term
     const filteredData = useMemo(() =>
         verifiedOrders?.filter((item: any) =>

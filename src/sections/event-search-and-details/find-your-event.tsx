@@ -22,6 +22,7 @@ import { PopularEvent } from './PopularEvent';
  
 export function FindYourEvent({ handleEventDetails }: any) {
   const { fullData } = useSelector((state: RootState) => state?.event);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     category: '',

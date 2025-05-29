@@ -31,10 +31,8 @@ const ChatList: React.FC<ChatListProps> = ({ currentUser, onSelectUser }) => {
     }, [currentUser, getConversations]);
     const fetchOrganizers = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/v1/auth/users/organizer`);
-            console.log('====================================');
-            console.log(response);
-            console.log('====================================');
+            const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/users/organizer`);
+    
             const data = await response.json();
             setOrganizers(data);
         } catch (err) {

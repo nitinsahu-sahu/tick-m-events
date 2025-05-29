@@ -7,8 +7,21 @@ import { TicketCard } from 'src/components/event-card/event-card';
 import { UpComingCard } from '../UpComingCard';
 import { PopularEvent } from '../PopularEvent';
 import { ExploreMoreSection } from '../ExploreMore';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { AppDispatch, RootState } from 'src/redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
 
 export function HomeAndRecommendationsView() {
+  const { upcomingEvents, popularEvents, recommendedEvents } = useSelector((state: RootState) => state?.homeRecom);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(recommTrandingPopularEventFetch())
+  }, [dispatch]);
+
   const events = [
     { title: 'Tech Conference 2025', location: 'New York, USA', date: 'April 15, 2025' },
     { title: 'Music Festival', location: 'New York, USA', date: 'April 15, 2025' },
@@ -73,24 +86,19 @@ export function HomeAndRecommendationsView() {
     <DashboardContent>
       <PageTitleSection title="Home & Recommendations" />
       {/* UpComingCard component */}
-      <Grid container spacing={3}>
-        {events.map((event, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <UpComingCard {...event} />
-          </Grid>
-        ))}
-      </Grid>
-
+      <Box >
+        <HeadingCommon title="My Active Tickets" weight={600} baseSize="34px" variant="h5" />
+        <Grid container spacing={3}>
+          {events.map((event, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <UpComingCard {...event} />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
       {/* EventCard component */}
       <Box mt={3}>
-        <Typography
-          variant="h5"
-          fontWeight={600}
-          mb={3}
-          fontSize={{ xs: '20px', sm: '26px', md: '34px' }}
-        >
-          My Active Tickets
-        </Typography>
+        <HeadingCommon title="Recommended Events for You" weight={600} baseSize="34px" variant="h5" />
         {/* Main Grid Layout */}
         <Grid container spacing={3} mt={3}>
           {ticketst.map((ticketc, index) => (
@@ -103,14 +111,8 @@ export function HomeAndRecommendationsView() {
 
       {/* PopularEvent component */}
       <Box mt={3}>
-        <Typography
-          variant="h5"
-          fontWeight={600}
-          mb={3}
-          fontSize={{ xs: '20px', sm: '26px', md: '34px' }}
-        >
-          Popular & Trending Events
-        </Typography>
+
+        <HeadingCommon title="Popular & Trending Events" weight={600} baseSize="34px" variant="h5" />
         {/* Main Grid Layout */}
         <Grid container spacing={3} mt={3}>
           {eventsTickets.map((ticketc, index) => (
@@ -139,9 +141,7 @@ export function HomeAndRecommendationsView() {
               mb: 2,
             }}
           >
-            <Typography variant="h6" fontWeight="bold" mb={1}>
-              Notifications & Personalized Alerts
-            </Typography>
+            <HeadingCommon title="Notifications & Personalized Alerts" weight={600} baseSize="34px" variant="h5" />
             <IconButton
               sx={{
                 backgroundColor: '#2196f3',
@@ -203,16 +203,22 @@ export function HomeAndRecommendationsView() {
                 {/* Message */}
                 <Typography sx={{ fontWeight: 500, mb: { xs: 1, sm: 0 } }}>{item.text}</Typography>
 
-               
-                {/* Grid Buttons */}
-                {/* <Box mt={2} width="100%">
-                  <Grid container spacing={1}>
+
+                <Box
+                  mt={{ xs: 1, sm: 0 }}
+                  sx={{
+                    width: { xs: '100%', sm: 'auto' },
+                    display: 'flex',
+                    justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+                    flexGrow: 1,
+                  }}
+                >
+                  <Grid container spacing={1} sx={{ maxWidth: { sm: 360, md: 400 } }}>
                     {[
                       { text: 'View Event', color: 'primary' as const },
-                      { text: 'Enable Reminders', custom: true },
                       { text: 'Mark as Read', custom: true },
                     ].map(({ text, color, custom }) => (
-                      <Grid item xs={12} sm={4} md={2} key={text}>
+                      <Grid item xs={12} sm={4} key={text}>
                         <Button
                           fullWidth
                           size="small"
@@ -234,45 +240,7 @@ export function HomeAndRecommendationsView() {
                       </Grid>
                     ))}
                   </Grid>
-                </Box> */}
-                <Box
-  mt={{ xs: 1, sm: 0 }}
-  sx={{
-    width: { xs: '100%', sm: 'auto' },
-    display: 'flex',
-    justifyContent: { xs: 'flex-start', sm: 'flex-end' },
-    flexGrow: 1,
-  }}
->
-  <Grid container spacing={1} sx={{ maxWidth: { sm: 360, md: 400 } }}>
-    {[
-      { text: 'View Event', color: 'primary' as const },
-      { text: 'Enable Reminders', custom: true },
-      { text: 'Mark as Read', custom: true },
-    ].map(({ text, color, custom }) => (
-      <Grid item xs={12} sm={4} key={text}>
-        <Button
-          fullWidth
-          size="small"
-          variant="contained"
-          color={color || undefined}
-          disabled={item.disabled}
-          sx={{
-            fontSize: { xs: '10px', sm: '12px' },
-            fontWeight: 500,
-            textTransform: 'none',
-            backgroundColor: custom ? '#0b2e4c' : undefined,
-            '&:hover': {
-              backgroundColor: custom ? '#093047' : undefined,
-            },
-          }}
-        >
-          {text}
-        </Button>
-      </Grid>
-    ))}
-  </Grid>
-</Box>
+                </Box>
 
               </Box>
             ))}
@@ -281,10 +249,8 @@ export function HomeAndRecommendationsView() {
       </Box>
 
 
-      <Box>
-        {/* ExploreMore component */}
-        <ExploreMoreSection />
-      </Box>
+      <ExploreMoreSection />
+
     </DashboardContent>
   );
 }

@@ -81,7 +81,6 @@ export function UserPopover() {
                                 onClick={() => handleLogout()}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' || e.key === ' ') {
-                                        console.log('logout');
                                     }
                                 }}
                             >

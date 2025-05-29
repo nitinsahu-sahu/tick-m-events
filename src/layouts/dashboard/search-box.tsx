@@ -93,7 +93,6 @@ const SearchEventComponent = () => {
   }, []);
 
   const handleResultClick = useCallback((event: Event) => {
-    console.log('Selected event:', event);
     setSearchTerm('');
     setSearchResults([]);
     setIsSearchFocused(false);

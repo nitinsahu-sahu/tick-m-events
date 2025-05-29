@@ -4,6 +4,8 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { FindYourEvent } from '../find-your-event';
 import { MusicFestival } from '../music-festival';
 import { EventShare } from '../event-share';
+import { ticketst } from '../utills';
+import { DiscoverEvent } from '../discover-event';
 
 export function EventSearchAndDetailsView() {
   const [selectedEvent, setSelectedEvent] = useState({}); // Toggle for edit mode
@@ -15,7 +17,7 @@ export function EventSearchAndDetailsView() {
     <DashboardContent>
       <PageTitleSection title="Discover Events" />
 
-      {/* <DiscoverEvent list={ticketst} /> */}
+      <DiscoverEvent list={ticketst} />
 
       <FindYourEvent handleEventDetails={handleEventDetails} />
 

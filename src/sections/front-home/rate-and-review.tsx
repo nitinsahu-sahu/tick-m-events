@@ -40,7 +40,6 @@ const ReviewCard = ({ name, rating, comment, createdAt }: any) => {
   const [replyText, setReplyText] = useState('');
 
   const handleReplySubmit = () => {
-    console.log('Reply submitted:', replyText);
     // Here you would typically send the reply to your API
     setReplyText('');
     setIsReplying(false);
@@ -114,8 +113,6 @@ const ReviewCard = ({ name, rating, comment, createdAt }: any) => {
 };
 
 export function RateAndReview({ reviews }: any) {
-    console.log('review', reviews);
-
     const [filter, setFilter] = useState("date");
     const dispatch = useDispatch<AppDispatch>()
     const { eventId } = useParams();

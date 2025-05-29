@@ -38,7 +38,7 @@ export function MultipleDashboard() {
                 {(() => {
                     switch (role) {
                         case 'participant':
-                            return <HomeAndRecommendationsPage />;
+                            return <HomeAndRecommendationsPage />
                         case 'admin':
                             return <MarketplaceAndServiceProviderSupervisionPage />;
                         case 'organizer':

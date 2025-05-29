@@ -1,40 +1,59 @@
-import { Tab, Tabs } from "@mui/material";
+import { Box,Tab, Tabs, Typography } from "@mui/material";
 
-export function TabButton({  tabValue, onChange, tabLabels }: any) {
+export function TabButton({ providersList, tabValue, onChange, tabLabels }: any) {
 
     return (
-        <Tabs
-            value={tabValue}
-            onChange={onChange}
-            variant="scrollable"
-            scrollButtons="auto"
-            allowScrollButtonsMobile
-            TabIndicatorProps={{ style: { display: "none" } }}
-            textColor="inherit"
-            sx={{
-                "& .MuiTabs-scroller": {
-                    overflow: "auto !important",
-                }
-            }}
-        >
-            {tabLabels.map((label: any, index: any) => (
-                <Tab
-                    key={index}
-                    label={label}
-                    sx={{
-                        px: { xs: 1, sm: 3 },
-                        margin: "0px 5px ",
-                        minWidth: "unset",
-                        textTransform: "none",
-                        borderRadius: 2,
-                        border: "1px solid #0B2E4C",
-                        backgroundColor: tabValue === index ? "#0B2E4C" : "white",
-                        fontWeight: tabValue === index ? "bold" : "normal",
-                        color: tabValue === index ? "white" : "black",
-                        fontSize: { xs: "0.75rem", sm: "0.875rem" }
+           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Tabs
+        value={tabValue}
+        onChange={onChange}
+        variant="scrollable"
+        scrollButtons="auto"
+        allowScrollButtonsMobile
+        TabIndicatorProps={{ style: { display: "none" } }}
+        textColor="inherit"
+        sx={{
+          "& .MuiTabs-scroller": {
+            overflow: "auto !important",
+            display: 'flex',
+            alignItems: 'center'
+          },
+          flex: 1
+        }}
+      >
+        {tabLabels.map((label: any, index: any) => (
+          <Tab
+            key={index}
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                {label}
+                {index === Math.floor(tabLabels.length / 2) && (
+                  <Typography 
+                    sx={{ 
+                      ml: 1,
+                      color: tabValue === index ? 'white' : 'black'
                     }}
-                />
-            ))}
-        </Tabs>
+                  >
+                    ({providersList?.length || 0})
+                  </Typography>
+                )}
+              </Box>
+            }
+            sx={{
+              px: { xs: 1, sm: 3 },
+              margin: "0px 5px",
+              minWidth: "unset",
+              textTransform: "none",
+              borderRadius: 2,
+              border: "1px solid #0B2E4C",
+              backgroundColor: tabValue === index ? "#0B2E4C" : "white",
+              fontWeight: tabValue === index ? "bold" : "normal",
+              color: tabValue === index ? "white" : "black",
+              fontSize: { xs: "0.75rem", sm: "0.875rem" }
+            }}
+          />
+        ))}
+      </Tabs>
+    </Box>
     )
 }

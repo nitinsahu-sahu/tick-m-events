@@ -3,19 +3,13 @@ import { useState } from 'react';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
-import { PopularEvent } from './PopularEvent';
+import { ProviderListView } from './PopularEvent';
 import { eventTickets } from './Utills';
 
 
-export default function ProviderCardList() {
+export default function ProviderCardList({ handleSelct,providersList }: any) {
   const [view, setView] = useState('card');
-
-  const handleViewChange = (_event: React.MouseEvent<HTMLElement>, newView: string | null) => {
-    if (newView !== null) {
-      setView(newView);
-    }
-  };
-
+  
   return (
     <Paper
       sx={{
@@ -35,8 +29,6 @@ export default function ProviderCardList() {
         gap={2}
       >
         <HeadingCommon title="List of Providers" variant="h6" weight={600} />
-
-
         <Box
           sx={{
             display: 'flex',
@@ -55,11 +47,21 @@ export default function ProviderCardList() {
 
       {/* Cards Grid */}
       <Grid container spacing={3} mt={3}>
-        {eventTickets.map((ticketc, index) => (
-          <Grid item xs={12} sm={6} md={6} key={ticketc.id || index}>
-            <PopularEvent ticket={ticketc} key={index} />
+        {providersList?.length > 0 ? (
+          providersList?.map((ticketc: any, index: any) => (
+            <Grid item xs={12} sm={6} md={6} key={ticketc.id || index}>
+              <ProviderListView providers={ticketc} key={index} handleSelct={handleSelct}/>
+            </Grid>
+          ))
+        ) : (
+          <Grid item xs={12} sx={{ textAlign: 'center', py: 8 }}>
+            <Typography variant="h6" color="textSecondary">
+              {providersList === null
+                ? "Please apply filters to see service providers"
+                : "No providers match your current filters"}
+            </Typography>
           </Grid>
-        ))}
+        )}
       </Grid>
 
     </Paper>

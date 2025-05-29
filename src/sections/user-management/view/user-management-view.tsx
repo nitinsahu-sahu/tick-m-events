@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { TopNavButtons } from '../TopNavButtons';
@@ -8,27 +8,33 @@ import { OverviewTableCard } from '../OverviewTableCard';
 import { KycDocumentTableCard } from '../KycDocumentTableCard';
 import { ActionAndSectionTable } from '../ActionAndSectionTable';
 import UserActivityCard from '../UserActivityCard';
-
+ 
 export function UserManagementView() {
   const [activeTab, setActiveTab] = useState('User List');
+ 
   return (
     <DashboardContent>
-      <PageTitleSection title="user-management" />
+      <PageTitleSection />
       <TopNavButtons active={activeTab} onChange={setActiveTab} />
-      <SearchCard />
-      <Box mt={3}>
-        <OverviewTableCard />
-      </Box>
-      <Box mt={4}>
-        <KycDocumentTableCard />
-      </Box>
-      <Box mt={4}>
-        <ActionAndSectionTable />
-      </Box>
-      <Box mt={4}>
-        <UserActivityCard/>
-      </Box>
-
+ 
+      {activeTab === 'User List' && (
+        <>
+          <SearchCard />
+            <OverviewTableCard />
+        </>
+      )}
+ 
+      {activeTab === 'KYC Verification' && (
+          <KycDocumentTableCard />
+      )}
+ 
+      {activeTab === 'Actions & Sanctions' && (
+          <ActionAndSectionTable />
+      )}
+ 
+      {activeTab === 'Activity History' && (
+          <UserActivityCard />
+      )}
     </DashboardContent>
   );
 }

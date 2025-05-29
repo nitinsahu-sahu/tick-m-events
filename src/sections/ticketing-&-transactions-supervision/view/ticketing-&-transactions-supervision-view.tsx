@@ -1,5 +1,4 @@
-import { Box, Typography } from '@mui/material';
-import { PageTitleSection } from 'src/components/page-title-section';
+import { Box } from '@mui/material';
 import { DashboardContent } from 'src/layouts/dashboard';
 import EventManagementTable from '../EventManagementTable';
 import { PaymentMonitoringTable } from '../PaymentMonitoringTable';
@@ -10,7 +9,6 @@ import { InfoCard } from '../InfoCard';
 export function TicketingAndTransactionsSupervisionView() {
   return (
     <DashboardContent>
-      <PageTitleSection title="Ticketing & Transactions Supervision" />
 
       <InfoCard />
       <Box mt={3}>

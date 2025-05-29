@@ -210,6 +210,8 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth>
+                                    <InputLabel id="event-type-label">Event Type</InputLabel>
+
                                     <Select
                                         labelId="event-type-label"
                                         name="eventType"

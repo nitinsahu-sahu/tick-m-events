@@ -37,8 +37,8 @@ export function OverviewAnalyticsView() {
   return (
     <DashboardContent>
       <PageTitleSection
-        title="Ticket & Reservation Management"
-        desc="Lorem ipsum dolor sit amet"
+        title="Dashboard"
+        desc=""
         rightCom={<CountDownView />} // Passing SearchBar component as a prop
       />
 

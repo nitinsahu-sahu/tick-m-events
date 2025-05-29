@@ -1,4 +1,4 @@
-import { Box, CardMedia, Typography } from "@mui/material";
+import { Box, CardMedia } from "@mui/material";
 import Marquee from "react-fast-marquee";
 
 const companies = [

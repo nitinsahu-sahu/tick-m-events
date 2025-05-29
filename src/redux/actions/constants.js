@@ -36,6 +36,24 @@ export const eventReviewConstants = {
     CREATE_SUCCESS: 'CREATE_SUCCESS',
 }
 
+export const searchSelectProviderConstants = {
+    GET_REQUEST: 'GET_REQUEST',
+    GET_FAILURE: 'GET_FAILURE',
+    GET_SUCCESS: 'GET_SUCCESS',
+}
+
+export const eventCategoryConstants = {
+    GET_REQUEST: 'GET_REQUEST',
+    GET_FAILURE: 'GET_FAILURE',
+    GET_SUCCESS: 'GET_SUCCESS',
+}
+
+export const homeAndRecomConstants = {
+    GET_REQUEST: 'GET_REQUEST',
+    GET_FAILURE: 'GET_FAILURE',
+    GET_SUCCESS: 'GET_SUCCESS',
+}
+
 export const promotionConstants = {
     CREATE_REQUEST: 'CREATE_REQUEST',
     CREATE_FAILURE: 'CREATE_FAILURE',

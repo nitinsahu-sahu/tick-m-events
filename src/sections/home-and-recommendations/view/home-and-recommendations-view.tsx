@@ -1,17 +1,19 @@
-import { Typography, Grid, Box, Paper, Card, CardContent, Button, IconButton } from '@mui/material';
+import { Typography, Grid, Box, Paper,  Button, IconButton } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { TicketCard } from 'src/components/event-card/event-card';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { AppDispatch, RootState } from 'src/redux/store';
+import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
 
 import { UpComingCard } from '../UpComingCard';
 import { PopularEvent } from '../PopularEvent';
 import { ExploreMoreSection } from '../ExploreMore';
-import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { AppDispatch, RootState } from 'src/redux/store';
-import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
-import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
+
 
 export function HomeAndRecommendationsView() {
   const { upcomingEvents, popularEvents, recommendedEvents } = useSelector((state: RootState) => state?.homeRecom);

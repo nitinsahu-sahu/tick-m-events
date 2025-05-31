@@ -52,7 +52,7 @@ export const InvoiceTableData = [
 export const PaymentSettingTableHeaders = ["Type", "Number/IBAN","Status", "Action"];
 
 export const PaymentSettingTableData = [
-    { type: "Mobile Money", numberAndIban: "+123 4xxxx xxxx", status: "Approved", details: "Edit" },
-    { type: "Mobile Money", numberAndIban: "+123 4xxxx xxxx", status: "Pending", details: "Edit" },
-    { type: "Mobile Money", numberAndIban: "+123 4xxxx xxxx", status: "Approved", details: "Edit" },
+    { type: "Mobile Money", numberAndIban: "+237 6xxxx xxxx", status: "Approved", details: "Edit" },
+    { type: "Mobile Money", numberAndIban: "+237 6xxxx xxxx", status: "Pending", details: "Edit" },
+    { type: "Mobile Money", numberAndIban: "+237 6xxxx xxxx", status: "Approved", details: "Edit" },
 ];

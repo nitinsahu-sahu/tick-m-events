@@ -1,66 +1,99 @@
-import { useState, useRef, ChangeEvent } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  Box,
+  Box, Grid, FormControl, InputLabel, Select, MenuItem,
   Button,
   Typography,
   TextField,
-  IconButton,
   Input,
-  List,
-  ListItem,
-  ListItemText,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Close';
+import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { AppDispatch, RootState } from 'src/redux/store';
+import { eventCustomizationPageUpdate, eventUpdate } from 'src/redux/actions/event.action';
+import { SelectChangeEvent } from '@mui/material';
 
 export const EventCustomization = () => {
-  const [sections, setSections] = useState([
-    'Header',
-    'Event Description',
-    'Ticketing System',
-    'Location',
-    'Contact & Sharing',
-  ]);
-  const [newSection, setNewSection] = useState('');
-  const [primaryColor, setPrimaryColor] = useState('#003366');
-  const [secondaryColor, setSecondaryColor] = useState('#007bff');
-  const [previewImage, setPreviewImage] = useState<string>('./assets/images/cover/6.png');
-  const [eventLogoPreview, setEventLogoPreview] = useState<string>('./assets/images/cover/5.png');
+  const dispatch = useDispatch<AppDispatch>();
+  const { fullData } = useSelector((state: RootState) => state?.event);
+  const [selectedEventId, setSelectedEventId] = useState<string>('');
+
+  const [primaryColor, setPrimaryColor] = useState('#072F4A');
+  const [secondaryColor, setSecondaryColor] = useState('#3F51B5');
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [eventLogoPreview, setEventLogoPreview] = useState<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const logoFileInputRef = useRef<HTMLInputElement>(null);
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const eventBannerRef = useRef<HTMLInputElement>(null);
+
+  const handleEventChange = (event: SelectChangeEvent<string>) => {
+    setSelectedEventId(event.target.value);
+  };
+
+  const handleEventThemeLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      // Create object URL for preview
+      const previewUrl = URL.createObjectURL(e.target.files[0]);
+      setEventLogoPreview(previewUrl);
     }
   };
 
-  const handleLogoFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setEventLogoPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  // Clean up object URLs when component unmounts
+  useEffect(() => () => {
+    if (eventLogoPreview) {
+      URL.revokeObjectURL(eventLogoPreview);
+    }
+  }, [eventLogoPreview]);
+
+  const handleEventBanner = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      // Create object URL for preview
+      const previewUrl = URL.createObjectURL(e.target.files[0]);
+      setPreviewImage(previewUrl);
     }
   };
 
-  const handleAddSection = () => {
-    if (newSection.trim() !== '') {
-      setSections([...sections, newSection]);
-      setNewSection('');
+  // Clean up object URLs when component unmounts
+  useEffect(() => () => {
+    if (previewImage) {
+      URL.revokeObjectURL(previewImage);
     }
-  };
+  }, [previewImage]);
 
-  const handleDeleteSection = (index: any) => {
-    const updated = [...sections];
-    updated.splice(index, 1);
-    setSections(updated);
-  };
+  const handleSubmit = useCallback(async (event: any) => {
+    event.preventDefault();
+
+    const formData = new FormData();
+    const eventLogo = fileInputRef.current?.files;
+    const eventBanner = eventBannerRef.current?.files;
+
+    formData.append('themeColor', primaryColor);
+    formData.append('customColor', secondaryColor);
+    if (eventLogo && eventLogo.length > 0) {
+      const selectedFile = eventLogo[0];
+      formData.append("eventLogo", selectedFile);
+    }
+    if (eventBanner && eventBanner.length > 0) {
+      const selectedFile = eventBanner[0];
+      formData.append("coverImage", selectedFile);
+    }
+    const updatedEvent = {
+      _id: selectedEventId,
+      formData
+    }
+    const result = await dispatch(eventCustomizationPageUpdate(updatedEvent));
+
+    if (result?.status === 200) {
+      toast.success("Chaanges applied Successfully...");
+      // setTimeout(() => setSelectedEventId('')
+      //   , 2000);
+
+    } else {
+      toast.error(result?.message);
+    }
+  }, []);
+
 
   return (
     <Box
@@ -70,208 +103,179 @@ export const EventCustomization = () => {
       bgcolor="white"
       mt={3}
     >
-      <Typography variant="h6" fontSize={{ xs: 15, sm: 20, md: 26 }} fontWeight={500} gutterBottom>
-        Event Page Customization
-      </Typography>
+      <form onSubmit={handleSubmit} encType='multipart/form-data'>
+        <Box display="flex" justifyContent="space-between">
+          <HeadingCommon title="Event Page Customization" />
 
-      {/* Theme Color Selection */}
-      <Box mt={3}>
-        <Typography variant="subtitle1" fontSize={{ xs: 12, sm: 16, md: 20 }} fontWeight={500}>
-          Theme Color Selection
-        </Typography>
-        <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={4} mt={2}>
-          <Box flex={1}>
-            <Typography fontSize={{ xs: 12, sm: 14, md: 16 }} fontWeight={500}>Primary Color:</Typography>
-            <input
-              type="color"
-              value={primaryColor}
-              onChange={(e) => setPrimaryColor(e.target.value)}
-              style={{ width: '100%', height: '40px', border: 'none' }}
-            />
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Select Event</InputLabel>
+              <Select
+                value={selectedEventId}
+                onChange={handleEventChange}
+                label="Select Event"
+                sx={{ minWidth: 200 }}
+              >
+                {fullData.map((event: any) => (
+                  <MenuItem key={event._id} value={event._id}>
+                    {event.eventName} ({event.date})
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Box>
+
+        {/* Theme Color Selection */}
+        <Box mt={3}>
+          <HeadingCommon title="Theme Color Selection" baseSize="20px" />
+          <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={4} mt={2}>
+            <Box flex={1}>
+              <HeadingCommon title="Primary Color:" baseSize="16px" />
+              <Input
+                type="color"
+                name="primaryColor"
+                value={primaryColor}
+                onChange={(e) => setPrimaryColor(e.target.value)}
+                sx={{ width: '100%', height: '40px', border: 'none' }}
+              />
+            </Box>
+            <Box flex={1}>
+              <HeadingCommon title="Secondary Color:" baseSize="16px" />
+              <Input
+                type="color"
+                name="secondaryColor"
+                value={secondaryColor}
+                onChange={(e) => setSecondaryColor(e.target.value)}
+                style={{ width: '100%', height: '40px', border: 'none' }}
+              />
+            </Box>
           </Box>
-          <Box flex={1}>
-            <Typography fontSize={{ xs: 12, sm: 14, md: 16 }} fontWeight={500}>Secondary Color:</Typography>
-            <input
-              type="color"
-              value={secondaryColor}
-              onChange={(e) => setSecondaryColor(e.target.value)}
-              style={{ width: '100%', height: '40px', border: 'none' }}
-            />
-          </Box>
         </Box>
-      </Box>
 
-      {/* Background Image Upload */}
-      <Box mt={4}>
-        <Typography variant="subtitle1" fontSize={{ xs: 12, sm: 16, md: 20 }} fontWeight={500} gutterBottom>
-          Background Image Upload
-        </Typography>
-
-        <Input
-          type="file"
-          fullWidth
-          disableUnderline
-          inputRef={fileInputRef}
-          onChange={handleFileChange}
-          inputProps={{ accept: 'image/*' }} // Only accept image files
-          sx={{
-            border: '1px solid #ccc',
-            borderRadius: 1,
-            padding: '8px',
-            marginBottom: 2
-          }}
-        />
-
-        <Box mt={2}>
-          <img
-            src={previewImage}
-            alt="Background Preview"
-            style={{
-              width: '100%',
-              borderRadius: 8,
-              maxHeight: '300px',
-              objectFit: 'cover'
-            }}
-          />
-        </Box>
-      </Box>
-
-      {/* Event Logo Upload */}
-      <Box mt={4}>
-        <Typography variant="subtitle1" fontSize={{ xs: 12, sm: 16, md: 20 }} fontWeight={500} gutterBottom>
-          Event Logo Upload
-        </Typography>
-
-        <Input
-          type="file"
-          fullWidth
-          disableUnderline
-          inputRef={logoFileInputRef}
-          onChange={handleLogoFileChange}
-          inputProps={{
-            accept: 'image/*' // Only accept image files
-          }}
-          sx={{
-            border: '1px solid #ccc',
-            borderRadius: 1,
-            padding: '8px',
-            marginBottom: 2,
-            '&:hover': {
-              borderColor: '#000'
-            }
-          }}
-        />
-
-        <Box mt={2} maxWidth="200px">
-          <img
-            src={eventLogoPreview}
-            alt="Logo Preview"
-            style={{
-              width: '100%',
-              borderRadius: 8,
-              aspectRatio: '1/1', // Ensures square shape
-              objectFit: 'contain', // Keeps logo fully visible
-              backgroundColor: '#f5f5f5', // Light background for visibility
-              border: '1px solid #eee' // Subtle border
-            }}
-          />
-        </Box>
-      </Box>
-
-      {/* Content Layout */}
-      {/* <Box mt={4}>
-        <Typography variant="subtitle1" fontSize={{ xs: 12, sm: 16, md: 20 }} fontWeight={500} gutterBottom>
-          Content Layout Customization
-        </Typography>
-        <Typography variant="body2" color="text.secondary" fontSize={{ xs: 12, sm: 14, md: 16 }} fontWeight={500}>
-          Drag & Drop to rearrange sections:
-        </Typography>
-        <List>
-          {sections.map((section, index) => (
-            <ListItem
-              key={index}
-              sx={{
-                border: '1px solid #ccc',
-                borderRadius: 2,
-                my: 1,
-                px: 2,
-                py: 1
-              }}
-              secondaryAction={
-                <IconButton edge="end" onClick={() => handleDeleteSection(index)}>
-                  <DeleteIcon color="error" />
-                </IconButton>
-              }
-            >
-              <ListItemText primary={section} />
-            </ListItem>
-          ))}
-        </List>
-
-        <Box
-          mt={2}
-          borderRadius={2}
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            border: '1px solid #ccc',
-            overflow: 'hidden',
-            width: '100%',
-          }}
-        >
-          <TextField
+        {/* Background Image Upload */}
+        <Box mt={4}>
+          <HeadingCommon title="Background Image Upload" baseSize="20px" />
+          <Input
+            type="file"
             fullWidth
-            placeholder="New Section Name"
-            value={newSection}
-            onChange={(e) => setNewSection(e.target.value)}
-            variant="outlined"
-            size="small"
+            disableUnderline
+            name="eventBanner"
+            onChange={handleEventBanner}
+            inputRef={eventBannerRef}
+            inputProps={{ accept: 'image/*' }}
+            sx={{
+              border: '1px solid #ccc',
+              borderRadius: 1,
+              padding: '8px',
+              marginBottom: 2
+            }}
+          />
+          <Box
+            sx={{
+              width: "100%",
+              height: "250px",
+              borderRadius: "12px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#FFF",
+              boxShadow: 2,
+              border: "1px solid #D3D3D3",
+              overflow: "hidden",
+              marginBottom: 4,
+            }}
+          >
+            {previewImage ? (
+              <img src={previewImage}
+                alt="Logo Preview"
+                style={{
+                  width: '100%',
+                  borderRadius: 8,
+                  maxHeight: '300px',
+                  objectFit: 'cover'
+                }} />
+            ) : (
+              <Typography variant="body2" color="textSecondary">
+                No Event Banner
+              </Typography>
+            )}
+          </Box>
+        </Box>
+
+        {/* Event Logo Upload */}
+        <Box mt={3}>
+          <HeadingCommon title="Event Logo Upload" baseSize="20px" />
+          <TextField
+            type="file"
+            fullWidth
+            required
+            name="eventLogo"
+            onChange={handleEventThemeLogo}
+            inputRef={fileInputRef}
             InputProps={{
               sx: {
-                border: 'none',
-                '& fieldset': { border: 'none' },
-                borderRadius: 0,
-                pl: 2,
+                borderRadius: '10px',
+                border: '1px solid #ccc',
+                backgroundColor: '#F9F9F9',
+              },
+              inputProps: {
+                accept: "image/*",
               },
             }}
           />
+          <Box
+            sx={{
+              width: "120px",
+              height: "120px",
+              borderRadius: "12px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#FFF",
+              boxShadow: 2,
+              border: "1px solid #D3D3D3",
+              overflow: "hidden",
+              marginBottom: 4,
+            }}
+          >
+            {eventLogoPreview ? (
+              <img src={eventLogoPreview}
+                alt="Logo Preview"
+                style={{
+                  width: '100%',
+                  borderRadius: 8,
+                  aspectRatio: '1/1',
+                  objectFit: 'contain',
+                  backgroundColor: '#f5f5f5',
+                  border: '1px solid #eee'
+                }} />
+            ) : (
+              <Typography variant="body2" color="textSecondary">
+                No Logo
+              </Typography>
+            )}
+          </Box>
+        </Box>
 
+        {/* Save Button */}
+        <Box mt={3}>
           <Button
-            onClick={handleAddSection}
+            type="submit"
+            fullWidth
+            variant="contained"
             sx={{
               backgroundColor: '#072F4A',
               color: 'white',
-              px: 3,
-              borderRadius: 0,
-              whiteSpace: 'nowrap',
-              '&:hover': {
-                backgroundColor: '#051F33',
-              },
+              py: 1.5,
+              textTransform: 'none',
+              fontWeight: 'bold',
             }}
           >
-            Add Section
+            Apply Changes
           </Button>
         </Box>
-
-      </Box> */}
-
-      {/* Save Button */}
-      <Box mt={4}>
-        <Button
-          fullWidth
-          variant="contained"
-          sx={{
-            backgroundColor: '#072F4A',
-            color: 'white',
-            py: 1.5,
-            borderRadius: 2,
-            textTransform: 'none',
-            fontWeight: 'bold',
-          }}
-        >
-          Apply Changes
-        </Button>
-      </Box>
+      </form>
     </Box>
   );
 };

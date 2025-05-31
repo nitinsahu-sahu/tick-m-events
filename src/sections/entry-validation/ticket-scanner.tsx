@@ -1,12 +1,12 @@
-import { Typography, IconButton, Box, Button, Card, CardContent, Grid, TextField, Tooltip } from "@mui/material";
+import { Typography, IconButton, Box, Button, Card, Grid, Tooltip } from "@mui/material";
 import { useState } from "react";
 import QrReader from 'react-qr-scanner'
+import { useDispatch } from "react-redux";
+
 import { Iconify } from "src/components/iconify";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
-import { useDispatch } from "react-redux";
 import { verifyTicketCode, confirmTicketEntry } from "src/redux/actions/eventOrder";
 import { AppDispatch } from "src/redux/store";
-import { TICKET_STATUS, tickets } from "./utills";
 import { formatTimeToAMPM } from "src/hooks/formate-time";
 
 interface QRScanResult {
@@ -27,54 +27,40 @@ interface Ticket {
         email: string;
         _id: string;
     };
+    ticket: null
 
 }
-interface FlagState {
-    counter: string;
-    message: string;
-    ticket: Partial<Ticket>; // Partial makes all properties optional
-}
-const renderTicketDetails = (ticket: typeof tickets[0]) => {
-    const details = [
-        { label: "Entry Time", value: ticket.time },
-        { label: "Name", value: ticket.name },
-        { label: "Email", value: ticket.email },
-        { label: "Ticket Type", value: ticket.ticketType },
-        { label: "Status", value: ticket.status }
-    ];
-
-    return (
-        <>
-            {details.map((detail) => (
-                detail.value && (
-                    <Typography key={detail.label} variant="body2">
-                        <strong>{detail.label}:</strong> {detail.value}
-                    </Typography>
-                )
-            ))}
-        </>
-    );
-};
 
 export function TicketScanner() {
+
     const dispatch = useDispatch<AppDispatch>();
     const [delay] = useState<number>(100);
     const [result, setResult] = useState<string>('No result');
-    const [ticketInfo, setTicketInfo] = useState<any>(null);
     const [showScanner, setShowScanner] = useState<boolean>(false);
-    const [flag, setFlag] = useState<{ status: string; message: string; ticket?: Partial<Ticket> }>({ status: '', message: '' });
+    const [flag, setFlag] = useState<{
+        status: string;
+        message: string;
+        ticket?: Partial<Ticket> | null
+    }>({ status: '', message: '' });
+    const [isScanning, setIsScanning] = useState(false);
+    const [scanMessage, setScanMessage] = useState<string | null>(null);
 
     const handleScan = (data: QRScanResult | null) => {
         if (data) {
             setResult(data.text);
             setShowScanner(false);
+            setIsScanning(false);
+            setScanMessage("✅ QR Code scanned successfully!");
+            setTimeout(() => setScanMessage(null), 3000); // auto-clear message
         }
     };
 
     const handleError = (err: Error) => {
-        console.error(err);
+        setIsScanning(false);
+        setScanMessage("❌ QR Scanner encountered an error.");
+        setTimeout(() => setScanMessage(null), 3000);
     };
-    const [isVerifying, setIsVerifying] = useState(false);
+
     const handleVerifyClick = async () => {
         if (!result || result === 'No result') return;
         // Extract ticket code from the result (full URL or path)
@@ -89,29 +75,23 @@ export function TicketScanner() {
             ticketCode = parts[parts.length - 1];
         }
         try {
-            const res = await dispatch(verifyTicketCode({ ticketCode:"412340"}));
+            const res = await dispatch(verifyTicketCode({ ticketCode }));
             console.log("Action Result:", res);
 
             if (res.type === "VERIFY_TICKET_SUCCESS") {
                 // Use flag to determine ticket state
                 if (res.flag === "granted") {
-                    setTicketInfo(res.ticket);
                     setFlag({ status: "granted", message: res.message, ticket: res.ticket });
-                    console.log("ticket", res.ticket);
                 } else if (res.flag === "already") {
-                    setTicketInfo(res.ticket);
                     setFlag({ status: "already", message: "Ticket already used.", ticket: res.ticket });
                 } else {
-                    setTicketInfo(null);
                     setFlag({ status: "invalid", message: "Invalid or expired ticket.", ticket: null });
                 }
             } else {
                 // Failure case
-                setTicketInfo(null);
                 setFlag({ status: res.flag || "invalid", message: res.message, ticket: null });
             }
         } catch (error) {
-            setTicketInfo(null);
             setFlag({ status: "error", message: "Verification failed. Try again." });
         }
     };
@@ -155,7 +135,8 @@ export function TicketScanner() {
         height: 240,
         width: 320,
     };
-console.log("Debug: flag.ticket", flag.ticket);
+
+
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
             <HeadingCommon title="Ticket Scanner" color="#0B2E4C" weight={600} baseSize="33px" />
@@ -192,19 +173,25 @@ console.log("Debug: flag.ticket", flag.ticket);
                             onScan={handleScan}
                         />
                     )}
+                    {isScanning && (
+                        <Typography align="center" mt={1} color="white">
+                            Scanning...
+                        </Typography>
+                    )}
+
+                    {scanMessage && (
+                        <Typography align="center" mt={1} color={scanMessage.includes("✅") ? "white" : "error"}>
+                            {scanMessage}
+                        </Typography>
+                    )}
+
                 </Button>
             </Box>
 
 
             <Box display="flex" mt={2} gap={1}>
 
-                {/* <QrReader
-                    delay={delay}
-                    style={previewStyle}
-                    onError={handleError}
-                    onScan={handleScan}
-                /> */}
-                {/* <p>{result}</p> */}
+
                 <Button
                     variant="contained"
                     sx={{
@@ -217,6 +204,7 @@ console.log("Debug: flag.ticket", flag.ticket);
                 >
                     Verify
                 </Button>
+
             </Box>
 
             {["granted", "already", "invalid", "error"].includes(flag.status) && (
@@ -244,7 +232,6 @@ console.log("Debug: flag.ticket", flag.ticket);
                         >
                             <HeadingCommon title={flag.message} baseSize="23px" width={{ md: "34%" }} />
 
-                            {/* Render extra info and buttons only for 'granted' */}
                             {flag.status === "granted" && (
                                 <>
                                     <HeadingCommon
@@ -270,6 +257,7 @@ console.log("Debug: flag.ticket", flag.ticket);
                                                 width: { xs: "100%", sm: "auto", md: "auto" },
                                             }}
                                             onClick={handleConfirmEntry}
+                                            disabled={flag.ticket?.verifyEntry}
                                         >
                                             Confirm Entry
                                         </Button>
@@ -289,53 +277,75 @@ console.log("Debug: flag.ticket", flag.ticket);
                                                     "&:hover": { backgroundColor: "darkred" },
                                                     width: { xs: "100%", sm: "auto", md: "auto" },
                                                 }}
+                                                onClick={() => {
+                                                    setShowScanner((prev) => {
+                                                        const nextState = !prev;
+                                                        setIsScanning(nextState); // start scanning
+                                                        if (!nextState) {
+                                                            setScanMessage(null); // clear message on close
+                                                        }
+                                                        return nextState;
+                                                    });
+
+                                                    setResult('No result');
+                                                    setFlag({ status: '', message: '', ticket: undefined });
+                                                }}
 
                                             >
                                                 Cancel
                                             </Button>
                                             <Tooltip
+                                                arrow
+                                                disableInteractive
                                                 title={
-                                                    <Box sx={{ maxWidth: 250 }}>
-                                                        {flag.ticket?.userId ? (
+                                                    <Box sx={{ maxWidth: 250, p: 1, pointerEvents: 'none' }}>
+                                                        {flag.status === 'granted' && flag.ticket?.userId?.name ? (
                                                             <>
                                                                 <HeadingCommon
+                                                                    title={`Name: ${flag.ticket.userId.name}`}
                                                                     color="white"
-                                                                    title={`Name: ${flag.ticket.userId.name || "N/A"}`}
+                                                                    baseSize="14px"
+                                                                    mt={1}
+                                                                />
+                                                                <HeadingCommon color="white" title={`Email: ${flag.ticket.userId.email || "N/A"}`} baseSize="12px" />
+                                                                <HeadingCommon
+                                                                    color="white"
+                                                                    title={`Ticket Type: ${flag.ticket?.tickets?.[0]?.ticketType || 'N/A'}`}
                                                                     baseSize="12px"
                                                                 />
                                                                 <HeadingCommon
-                                                                    color="white"
-                                                                    title={`Email: ${flag.ticket.userId.email || "N/A"}`}
+                                                                    title={flag?.ticket?.verifyEntry ? "Ticket Status: Verified" : "Ticket Status: Unverified"}
                                                                     baseSize="12px"
+                                                                    color="white"
                                                                 />
-                                                                {/* ...other info */}
                                                             </>
                                                         ) : (
-                                                            <HeadingCommon title="No user data" color="white" baseSize="12px" />
+                                                            <Typography color="white" fontSize="12px">No user data</Typography>
                                                         )}
                                                     </Box>
                                                 }
-                                                arrow
-                                                placement="top"
                                             >
                                                 <IconButton sx={{ ml: 1 }}>
                                                     <Iconify icon="mdi:information-outline" />
                                                 </IconButton>
                                             </Tooltip>
+
+
                                         </Box>
                                     </Box>
                                 </>
                             )}
 
-                            {/* For all other statuses, show just info icon with tooltip if you want */}
                             {flag.status !== "granted" && (
                                 <Tooltip
                                     title={
-                                        flag.status === "invalid"
-                                            ? <HeadingCommon color="white" title="No data found in this ticket code" baseSize="12px" />
-                                            : flag.status === "already"
-                                                ? <HeadingCommon color="white" title="Book another ticket" baseSize="12px" />
-                                                : <HeadingCommon color="white" title="An error occurred" baseSize="12px" />
+                                        flag.status === "invalid" ? (
+                                            <HeadingCommon color="white" title="No data found in this ticket code" baseSize="12px" />
+                                        ) : flag.status === "already" ? (
+                                            <HeadingCommon color="white" title="Book another ticket" baseSize="12px" />
+                                        ) : (
+                                            <HeadingCommon color="white" title="An error occurred" baseSize="12px" />
+                                        )
                                     }
                                     arrow
                                 >
@@ -348,6 +358,7 @@ console.log("Debug: flag.ticket", flag.ticket);
                     </Grid>
                 </Grid>
             )}
+
 
 
 

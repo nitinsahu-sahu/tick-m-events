@@ -31,17 +31,14 @@ export function HelpCenterAndSecurity() {
                 </Typography>
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
-                        <Button fullWidth variant="contained" sx={{ backgroundColor: "#0a2940", borderRadius: 2 }}>
+                        <Button fullWidth variant="contained" sx={{ backgroundColor: "#0a2940", borderRadius: 2 }}
+                            href={`https://wa.me/${import.meta.env.VITE_SUPPORT_EMAIL}`} target="_blank">
                             Contact a TICK-M EVENTS Advisor
                         </Button>
                     </Grid>
                     <Grid item xs={12}>
-                        <Button fullWidth variant="contained" sx={{ backgroundColor: "#B0B3B8", color: "black", borderRadius: 2 }}>
-                            Contact a TICK-M EVENTS Advisor
-                        </Button>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Button fullWidth variant="contained" sx={{ backgroundColor: "#D32F2F", borderRadius: 2 }}>
+                        <Button fullWidth variant="contained" sx={{ backgroundColor: "#D32F2F", borderRadius: 2 }}
+                            href={`mailto:${import.meta.env.VITE_WHATSAPP_NUMBER}`} >
                             Report a Payment Issue
                         </Button>
                     </Grid>

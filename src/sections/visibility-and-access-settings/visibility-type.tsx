@@ -1,6 +1,87 @@
-import { Box, Button, Checkbox, FormControlLabel, FormGroup, Radio, RadioGroup, TextField, Typography } from '@mui/material';
+import { Box, Button, Tooltip, FormControl, IconButton, FormControlLabel, Grid, InputLabel, MenuItem, Radio, SelectChangeEvent, RadioGroup, Select, TextField, Typography } from '@mui/material';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { toast } from 'react-toastify';
+
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { AppDispatch, RootState } from 'src/redux/store';
+import { eventUpdate } from 'src/redux/actions/event.action';
 
 export function VisibilityType() {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { fullData } = useSelector((state: RootState) => state?.event);
+  const [selectedEventId, setSelectedEventId] = useState<string>('');
+  const [eventType, setEventType] = useState<'public' | 'private'>();
+
+
+  const [error, setError] = useState<string | null>(null);
+
+  const link = eventType === "private" ? `${import.meta.env.VITE_FRONT_URL}/our-event/${selectedEventId}` : `${import.meta.env.VITE_FRONT_URL}`
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // Reset after 2 sec
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+  // Find the selected event
+  const selectedEvent = fullData.find((event: any) => event._id === selectedEventId);
+
+  const handleEventChange = (event: SelectChangeEvent<string>) => {
+    setSelectedEventId(event.target.value);
+    setError(null);
+
+    // Update radio button based on selected event's type
+    if (event.target.value) {
+      const eventTy = fullData.find((e: any) => e._id === event.target.value);
+
+      setEventType(eventTy?.visibility?.visibilitySettings?.publicEvent ? 'public' : 'private');
+    }
+  };
+
+  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEventType(event.target.value as 'public' | 'private');
+  };
+
+
+  const handleSaveSettings = async () => {
+    if (!selectedEvent) {
+      setError('Please select an event first');
+      return;
+    }
+
+    // Check if user is trying to change from private to public
+    if (selectedEvent.visibility.visibilitySettings.publicEvent === false &&
+      eventType === 'public') {
+      setError('Cannot change private event to public. Please create a new public event.');
+      return;
+    }
+
+    // Here you would typically dispatch an action to save the settings
+    const updatedEvent = {
+      _id: selectedEventId,
+      eventType,
+    }
+    const result = await dispatch(eventUpdate(updatedEvent));
+
+    if (result?.status === 200) {
+      toast.success("Setting Saved Successfully...");
+      setTimeout(() => setSelectedEventId('')
+        , 2000);
+
+    } else {
+      toast.error(result?.message);
+    }
+    // Reset error on successful save
+    setError(null);
+  };
+
   return (
     <Box
       boxShadow={3}
@@ -9,75 +90,88 @@ export function VisibilityType() {
       mt={3}
       bgcolor="white"
     >
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
-        Visibility Type
-      </Typography>
+      <Box display="flex" justifyContent="space-between">
+        <HeadingCommon title="Visibility Type" />
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth size="small">
+            <InputLabel>Select Event</InputLabel>
+            <Select
+              value={selectedEventId}
+              onChange={handleEventChange}
+              label="Select Event"
+              sx={{ minWidth: 200 }}
+            >
+              {fullData.map((event: any) => (
+                <MenuItem key={event._id} value={event._id}>
+                  {event.eventName} ({event.date})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      </Box>
 
-      {/* Visibility Options */}
-      <RadioGroup defaultValue="private">
+      {/* Error message */}
+      {error && (
+        <Typography color="error" sx={{ mt: 2 }}>
+          {error}
+        </Typography>
+      )}
+
+      {/* Visibility Options - Disabled until event is selected */}
+      <RadioGroup
+        value={eventType}
+        onChange={handleRadioChange}
+        defaultValue="private"
+        sx={{ mt: 2 }}
+      >
         <FormControlLabel
           value="public"
           control={<Radio />}
           label="Public - Accessible to everyone"
+          disabled={!selectedEventId}
         />
         <FormControlLabel
           value="private"
           control={<Radio />}
           label="Private - Only via direct link"
+          disabled={!selectedEventId}
         />
       </RadioGroup>
 
-      {/* Custom Event URL */}
-      <Box mt={3}>
-        <Typography variant="subtitle2" mb={1}>
-          Custom Event URL
-        </Typography>
-        <TextField
-          fullWidth
-          placeholder="tickm.com/myevent2025"
-          variant="outlined"
-          size="medium"
-        />
-      </Box>
+      {/* Custom Event URL - Disabled until event is selected */}
+      {
+        !selectedEventId ? null : <Box mt={3} >
+          <Typography variant="subtitle2" mb={1}>
+            Event URL
+          </Typography>
+          <Typography
+            variant="subtitle2"
+            component="a"
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              color: 'primary.main',
+              textDecoration: 'none',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            }}
+          >
+            {link}
+          </Typography>
+          <Tooltip title={copied ? 'Copied!' : 'Copy'}>
+            <IconButton size="small" onClick={handleCopy} sx={{ ml: 1 }}>
+              <ContentCopyIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
 
-      {/* Secure Access */}
-      {/* <Box mt={3}>
-        <Typography variant="subtitle2" mb={1}>
-          Secure Access
-        </Typography>
-        <TextField
-          fullWidth
-          placeholder="Enter access code"
-          variant="outlined"
-          size="medium"
-        />
-      </Box> */}
+        </Box>
+      }
 
-     
 
-      {/* Participant Limit */}
-      {/* <Box mt={3}>
-        <Typography variant="subtitle2" mb={1}>
-          Participant Limit
-        </Typography>
-        <TextField
-          fullWidth
-          type="number"
-          placeholder="498"
-          variant="outlined"
-          size="medium"
-        />
-      </Box> */}
-
-      {/* Enable Waitlist */}
-      {/* <FormGroup sx={{ mt: 2 }}>
-        <FormControlLabel
-          control={<Checkbox />}
-          label="Enable Waitlist"
-        />
-      </FormGroup> */}
-
-      {/* Save Button */}
+      {/* Save Button - Disabled until event is selected */}
       <Box mt={4}>
         <Button
           fullWidth
@@ -90,6 +184,8 @@ export function VisibilityType() {
             textTransform: 'none',
             fontWeight: 'bold'
           }}
+          onClick={handleSaveSettings}
+          disabled={!selectedEventId}
         >
           Save Settings
         </Button>

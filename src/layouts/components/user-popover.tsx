@@ -79,10 +79,6 @@ export function UserPopover() {
                                 tabIndex={0}
                                 style={{ cursor: 'pointer', color: 'red' }}
                                 onClick={() => handleLogout()}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                    }
-                                }}
                             >
                                 Logout
                             </span>

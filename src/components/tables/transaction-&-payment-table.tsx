@@ -19,6 +19,7 @@ export function TransactionAndPaymentTable({ headers, data, type }: any) {
                             <TableCell
                                 key={header}
                                 sx={{
+                                    textAlign:'center',
                                     fontWeight: "bold",
                                     fontSize: { xs: "0.8rem", sm: "1rem" },
                                     color: theme.palette.common.black,
@@ -39,6 +40,8 @@ export function TransactionAndPaymentTable({ headers, data, type }: any) {
                                 <TableCell
                                     key={idx}
                                     sx={{
+                                    textAlign:'center',
+
                                         fontSize: { xs: "0.8rem", sm: "1rem" },
                                         fontWeight: "normal",
                                         ...(key === 'status' && {
@@ -78,6 +81,7 @@ export function TransactionAndPaymentTable({ headers, data, type }: any) {
                                                 <Button
                                                     key={actionIdx}
                                                     variant="contained"
+                                                    disabled={row.status === "Approved"}
                                                     sx={{
                                                         backgroundColor: action === 'Accept' 
                                                             ? theme.palette.success.main 
@@ -103,6 +107,7 @@ export function TransactionAndPaymentTable({ headers, data, type }: any) {
                                                 <Button
                                                     key={actionIdx}
                                                     variant="contained"
+                                                    disabled={row.status === "Pending"}
                                                     sx={{
                                                         backgroundColor: action.includes('PDF') 
                                                             ? '#1C8BC8' // Red for PDF

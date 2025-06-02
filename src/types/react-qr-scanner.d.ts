@@ -1,5 +1,5 @@
 declare module 'react-qr-scanner' {
-  import { Component } from 'react';
+  import { FC } from 'react';
 
   interface QrReaderProps {
     delay?: number | false;
@@ -14,5 +14,6 @@ declare module 'react-qr-scanner' {
     constraints?: MediaTrackConstraints;
   }
 
-  export default class QrReader extends Component<QrReaderProps> {}
+  const QrReader: FC<QrReaderProps>;
+  export default QrReader;
 }

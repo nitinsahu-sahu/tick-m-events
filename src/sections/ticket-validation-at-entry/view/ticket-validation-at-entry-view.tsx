@@ -4,9 +4,6 @@ import { useSelector } from "react-redux";
 
 import { PageTitleSection } from "src/components/page-title-section";
 import { RootState } from "src/redux/store";
-import { ChatProvider } from "src/redux/contaxt/ChatContext";
-import ChatPage from "../ChatPage";
-
 
 export function TicketValidationAtEntryView() {
     const currentUser = useSelector((state: RootState) => state?.auth?.user);
@@ -16,9 +13,6 @@ export function TicketValidationAtEntryView() {
                 title="Loyalty Program"
 
             />
-            <ChatProvider>
-                <ChatPage currentUser={currentUser} />
-            </ChatProvider>
 
             <Grid container spacing={2} sx={{ alignItems: "stretch" }}>  {/* Add alignItems: "stretch" */}
                 {/* Select Event */}

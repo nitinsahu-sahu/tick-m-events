@@ -26,8 +26,8 @@ export function VisibilityType() {
       await navigator.clipboard.writeText(link);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000); // Reset after 2 sec
-    } catch (error) {
-      toast.error(error);
+    } catch (err) {
+      toast.error(err);
     }
   };
   // Find the selected event

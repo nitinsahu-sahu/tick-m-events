@@ -4,7 +4,7 @@ import {
   Button,
   Typography,
   TextField,
-  Input,
+  Input,SelectChangeEvent
 } from '@mui/material';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,7 +12,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { eventCustomizationPageUpdate, eventUpdate } from 'src/redux/actions/event.action';
-import { SelectChangeEvent } from '@mui/material';
 
 export const EventCustomization = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -92,7 +91,7 @@ export const EventCustomization = () => {
     } else {
       toast.error(result?.message);
     }
-  }, []);
+  }, [dispatch,primaryColor,secondaryColor,selectedEventId]);
 
 
   return (

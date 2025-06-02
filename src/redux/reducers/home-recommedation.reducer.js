@@ -4,7 +4,8 @@ const initialState = {
     message: '',
     upcomingEvents: [],
     popularEvents: [],
-    recommendedEvents: []
+    recommendedEvents: [],
+    latestEvents:[]
 };
 
 const homeAndRecommandationReducer = (state, action) => {
@@ -23,6 +24,7 @@ const homeAndRecommandationReducer = (state, action) => {
                 upcomingEvents: action.payload.upcomingEvents,
                 popularEvents: action.payload.popularEvents,
                 recommendedEvents: action.payload.recommendedEvents,
+                latestEvents:action.payload.latestEvents,
             };
 
         case homeAndRecomConstants.GET_FAILURE:

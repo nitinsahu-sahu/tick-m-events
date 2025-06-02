@@ -73,12 +73,25 @@ export function UserPopover() {
                         <Typography textTransform="capitalize" fontWeight={600} color="#2295D4" fontFamily="Poppins, sans-serif">
                             {name}
                         </Typography>
-                        <Typography textTransform="capitalize" fontSize={12} color="gray" fontFamily="Poppins, sans-serif">
-                            {role} | <span
+                        <Typography
+                            textTransform="capitalize"
+                            fontSize={12}
+                            color="gray"
+                            fontFamily="Poppins, sans-serif"
+                        >
+                            {role} |
+                            <span
                                 role="button"
                                 tabIndex={0}
                                 style={{ cursor: 'pointer', color: 'red' }}
-                                onClick={() => handleLogout()}
+                                onClick={handleLogout}
+                                onKeyDown={(e) => {
+                                    // Trigger logout on both Enter and Spacebar
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        handleLogout();
+                                    }
+                                }}
+                                aria-label="Logout"
                             >
                                 Logout
                             </span>

@@ -1,20 +1,48 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMediaQuery, ToggleButtonGroup, List, Avatar, ListItemText, IconButton, ListItem, MenuItem, Box, Grid, Button, Card, CardContent, Typography, Select, Stack, ListItemAvatar, Divider, CardMedia, ToggleButton, LinearProgress } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useDispatch, useSelector } from 'react-redux';
 import Calendar from "react-calendar";
+import ReactHtmlParser from 'react-html-parser';
+
 import "react-calendar/dist/Calendar.css";
 import "../CustomCalendar.css"; // Custom styling for event indicators
+
 import { DashboardContent } from 'src/layouts/dashboard';
 import { Chart } from "src/components/chart";
 import { Iconify } from 'src/components/iconify';
 import { PageTitleSection } from 'src/components/page-title-section';
+import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
+import { AppDispatch, RootState } from 'src/redux/store';
+import { truncateText } from 'src/hooks/description-cutting';
 
 import { CountDownView } from '../count-down';
-import { latestSales, upcomingEvents, salesRevenuChartSeries, salesRevenuChartOptions, eventList, donutBestSellingChartSeries, donutBestSellingChartOptions, chartrevenuOptions, chartrevenuSeries, chartOptions, donutChartOptions } from "../utils";
+import { latestSales, salesRevenuChartSeries, salesRevenuChartOptions, donutBestSellingChartSeries, donutBestSellingChartOptions, chartrevenuOptions, chartrevenuSeries, chartOptions, donutChartOptions } from "../utils";
 import { AnalyticsFourCards } from '../analytics-four-card';
 import { BestSelling } from '../best-selling';
 
+function getDayNumber(dateString: any) {
+  // Method 1: Fastest (string manipulation)
+  return dateString.split('-')[2];
+}
+
+function getDayName(dateString: string): string {
+  const date = new Date(dateString);
+  
+  // Use Number.isNaN instead of global isNaN
+  if (Number.isNaN(date.getTime())) {
+    throw new Error("Invalid date");
+  }
+
+  // Returns full day name (e.g., "Saturday")
+  return date.toLocaleDateString('en-US', { weekday: 'long' });
+}
+
 export function OverviewAnalyticsView() {
+  const { upcomingEvents, latestEvents } = useSelector((state: RootState) => state?.homeRecom);
+  const dispatch = useDispatch<AppDispatch>();
+  const eventDates = latestEvents.map((event: any) => new Date(event.date).toDateString());
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedTicket, setSelectedTicket] = useState("VIP");
   const [selectedTab, setSelectedTab] = useState(0);
@@ -33,6 +61,13 @@ export function OverviewAnalyticsView() {
     new Date(2025, 1, 11), // 11 February 2025
   ].map((d) => d.toDateString());
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      dispatch(recommTrandingPopularEventFetch());
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
 
   return (
     <DashboardContent>
@@ -136,48 +171,50 @@ export function OverviewAnalyticsView() {
                     Recent Event List
                   </Typography>
                   <Grid container spacing={3}>
-                    {eventList.map((event) => (
+                    {upcomingEvents?.map((event: any) => (
                       <Grid item xs={12} key={event._id}>
-                        <Card sx={{ display: "flex", padding: 2, boxShadow: 3, borderRadius: 2 }}>
-                          <CardMedia component="img" image={event.img} alt={event.name} sx={{ width: 100, height: 85, borderRadius: 2 }} />
-                          <CardContent sx={{ flex: 1, pt: 0 }}>
-                            <Typography variant="h6" color={theme.palette.primary.main} sx={{ fontWeight: 500 }}>
-                              {event.name}
-                            </Typography>
-                            <Typography variant="body2" color={theme.palette.common.black}>
-                              {event.location}
-                            </Typography>
-                            <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                              {`${event.description.split(" ").slice(0, 5).join(" ")}...`}
-                            </Typography>
-                          </CardContent>
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <Stack alignItems="center" spacing={0.5}>
-                              <Avatar sx={{ bgcolor: "#f0f8ff" }}>
-                                <IconButton color="primary">
-                                  <Iconify width={20} icon="gg:dollar" />
-                                </IconButton>
-                              </Avatar>
-                              <Typography color="primary" fontSize={12}>{event.cost}</Typography>
-                            </Stack>
-                            <Stack alignItems="center" spacing={0.5}>
-                              <Avatar sx={{ bgcolor: "#f0f8ff" }}>
-                                <IconButton sx={{ color: event.stock === "0" ? "black" : "primary" }}>
-                                  <Iconify width={20} icon="ix:ticket-filled" />
-                                </IconButton>
-                              </Avatar>
-                              <Typography fontSize={12} sx={{ color: event.stock === "0" ? "black" : "#007bff" }}>
-                                {event.stock === "0" ? "SOLD OUT" : `${event.stock} pcs Left`}
+                        <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
+                          <Typography variant="h6" color={theme.palette.primary.main} sx={{ fontWeight: 500 }}>
+                            {event.eventName}
+                          </Typography>
+                          <Box display="flex" mt={1}>
+                            <CardMedia component="img" image={event?.coverImage?.url} alt={event.eventName} sx={{ width: 150, height: 85, borderRadius: 2 }} />
+                            <CardContent sx={{ flex: 1, pt: 0 }}>
+                              <Typography variant="body2" color={theme.palette.common.black}>
+                                {event.location}
                               </Typography>
-                            </Stack>
-                            <Stack alignItems="center" spacing={0.5}>
-                              <Avatar sx={{ bgcolor: "#f0f8ff" }}>
-                                <IconButton color="primary">
-                                  <Iconify width={20} icon="simple-line-icons:calender" />
-                                </IconButton>
-                              </Avatar>
-                              <Typography fontSize={12} color="primary">{event.Date}</Typography>
-                            </Stack>
+                              <Typography variant="body2" color="textSecondary" >
+                                {ReactHtmlParser(truncateText(event?.description))}
+                              </Typography>
+                            </CardContent>
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                              <Stack alignItems="center" spacing={0.5}>
+                                <Avatar sx={{ bgcolor: "#f0f8ff" }}>
+                                  <IconButton color="primary">
+                                    <Iconify width={20} icon="gg:dollar" />
+                                  </IconButton>
+                                </Avatar>
+                                <Typography color="primary" fontSize={12}>{event.soldTicket || 0} Sold</Typography>
+                              </Stack>
+                              <Stack alignItems="center" spacing={0.5}>
+                                <Avatar sx={{ bgcolor: "#f0f8ff" }}>
+                                  <IconButton sx={{ color: "primary" }}>
+                                    <Iconify width={20} icon="ix:ticket-filled" />
+                                  </IconButton>
+                                </Avatar>
+                                <Typography fontSize={12} color="primary">
+                                  {Number(event.ticketQuantity)} total pcs
+                                </Typography>
+                              </Stack>
+                              <Stack alignItems="center" spacing={0.5}>
+                                <Avatar sx={{ bgcolor: "#f0f8ff" }}>
+                                  <IconButton color="primary">
+                                    <Iconify width={20} icon="simple-line-icons:calender" />
+                                  </IconButton>
+                                </Avatar>
+                                <Typography fontSize={12} color="primary">{event.date}</Typography>
+                              </Stack>
+                            </Box>
                           </Box>
                         </Card>
                       </Grid>
@@ -197,23 +234,23 @@ export function OverviewAnalyticsView() {
                     Recent Event List
                   </Typography>
                   <Grid container spacing={3}>
-                    {eventList.map((event) => (
+                    {upcomingEvents.map((event: any) => (
                       <Grid item xs={12} key={event._id}>
                         <Card sx={{ display: "flex", flexDirection: "column", padding: 2, boxShadow: 3, borderRadius: 2 }}>
 
                           {/* Image Section */}
-                          <CardMedia component="img" image={event.img} alt={event.name} sx={{ width: "100%", height: 120, borderRadius: 2, objectFit: "cover" }} />
+                          <CardMedia component="img" image={event.coverImage.url} alt={event.eventName} sx={{ width: "100%", height: 120, borderRadius: 2, objectFit: "cover" }} />
 
                           {/* Content Section */}
                           <CardContent sx={{ textAlign: "center", pt: 1 }}>
                             <Typography variant="h6" color={theme.palette.primary.main} sx={{ fontWeight: 500 }}>
-                              {event.name}
+                              {event.eventName}
                             </Typography>
                             <Typography variant="body2" color={theme.palette.common.black}>
                               {event.location}
                             </Typography>
                             <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                              {`${event.description.split(" ").slice(0, 5).join(" ")}...`}
+                              {ReactHtmlParser(truncateText(event?.description))}
                             </Typography>
                           </CardContent>
 
@@ -225,16 +262,17 @@ export function OverviewAnalyticsView() {
                                   <Iconify width={20} icon="gg:dollar" />
                                 </IconButton>
                               </Avatar>
-                              <Typography color="primary" fontSize={12}>{event.cost}</Typography>
+                              <Typography color="primary" fontSize={12}>{event.soldTicket || 0} Sold</Typography>
+
                             </Stack>
                             <Stack alignItems="center" spacing={0.5}>
                               <Avatar sx={{ bgcolor: "#f0f8ff" }}>
-                                <IconButton sx={{ color: event.stock === "0" ? "black" : "primary" }}>
+                                <IconButton sx={{ color: "primary" }}>
                                   <Iconify width={20} icon="ix:ticket-filled" />
                                 </IconButton>
                               </Avatar>
-                              <Typography fontSize={12} sx={{ color: event.stock === "0" ? "black" : "#007bff" }}>
-                                {event.stock === "0" ? "SOLD OUT" : `${event.stock} pcs Left`}
+                              <Typography fontSize={12} color="primary">
+                                {Number(event.ticketQuantity)} total pcs
                               </Typography>
                             </Stack>
                             <Stack alignItems="center" spacing={0.5}>
@@ -243,7 +281,7 @@ export function OverviewAnalyticsView() {
                                   <Iconify width={20} icon="simple-line-icons:calender" />
                                 </IconButton>
                               </Avatar>
-                              <Typography fontSize={12} color="primary">{event.Date}</Typography>
+                              <Typography fontSize={12} color="primary">{event.date}</Typography>
                             </Stack>
                           </Box>
 
@@ -359,7 +397,10 @@ export function OverviewAnalyticsView() {
                   value={currentDate}
                   tileClassName={({ date }) => {
                     const today = new Date().toDateString();
-                    if (highlightedDates.includes(date.toDateString()) && date.toDateString() !== today) {
+                    const dateString = date.toDateString();
+
+                    // Highlight if the date is in eventDates and not today
+                    if (eventDates.includes(dateString) && dateString !== today) {
                       return "highlight";
                     }
                     return null;
@@ -372,79 +413,93 @@ export function OverviewAnalyticsView() {
                   Upcoming Events
                 </Typography>
 
-                {upcomingEvents.map((event) => (
+                {latestEvents.length === 0 ? (
                   <Box
-                    key={event._id}
-                    display="flex"
-                    alignItems="center"
-                    gap={2}
                     sx={{
-                      marginBottom: 2,
-                      flexDirection: { xs: "column", sm: "row" }, // Stacks on mobile, row on larger screens
-                      textAlign: { xs: "center", sm: "left" }, // Center align text on mobile
-                      width: "100%"
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: 200,
+                      color: "text.secondary"
                     }}
                   >
-                    {/* Date Circle */}
+                    <Typography variant="h6">No events found</Typography>
+                  </Box>
+                ) : (
+                  latestEvents.map((event: any) => (
                     <Box
+                      key={event._id}
+                      display="flex"
+                      alignItems="center"
+                      gap={2}
                       sx={{
-                        backgroundColor: "#F5FCFA",
-                        width: 60,
-                        height: 70,
-                        borderRadius: 3,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0, // Prevents shrinking on small screens
+                        marginBottom: 2,
+                        flexDirection: { xs: "column", sm: "row" },
+                        textAlign: { xs: "center", sm: "left" },
+                        width: "100%"
                       }}
                     >
-                      <Typography variant="h5" fontWeight="bold">
-                        {event.date}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {event.day}
-                      </Typography>
-                      <Avatar sx={{ width: 12, height: 12, bgcolor: "navy", mt: 1 }} />
-                    </Box>
-
-                    {/* Event Details */}
-                    <Box sx={{ width: "100%" }}>
-                      <Typography variant="body1" fontWeight="500" fontSize={14}>
-                        {event.name}
-                      </Typography>
-
+                      {/* Date Circle */}
                       <Box
-                        display="flex"
-                        justifyContent={{ xs: "center", sm: "space-between" }}
-                        alignItems="center"
-                        flexWrap="wrap"
-                        gap={1}
+                        sx={{
+                          backgroundColor: "#F5FCFA",
+                          width: 60,
+                          height: 70,
+                          borderRadius: 3,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
                       >
-                        <Typography variant="caption" color="text.secondary">
-                          Ticket Sold
+                        <Typography variant="h5" fontWeight="bold">
+                          {getDayNumber(event.date)}
                         </Typography>
-                        <Typography variant="caption" fontWeight="bold">
-                          {event.sold}/{event.total}
+                        <Typography variant="body2" color="text.secondary">
+                          {getDayName(event.date)}
                         </Typography>
+                        <Avatar sx={{ width: 12, height: 12, bgcolor: "navy", mt: 1 }} />
                       </Box>
 
-                      <Box display="flex" justifyContent={{ xs: "center", sm: "flex-start" }}>
-                        <LinearProgress
-                          variant="determinate"
-                          value={((event?.sold ?? 0) / (event?.total ?? 1)) * 100}
-                          sx={{
-                            width: { xs: "100%", sm: 100 },
-                            height: 6,
-                            borderRadius: 5,
-                            bgcolor: "#E0E0E0",
-                            marginTop: 1
-                          }}
-                        />
+                      {/* Event Details */}
+                      <Box sx={{ width: "100%" }}>
+                        <Typography variant="body1" fontWeight="500" fontSize={14}>
+                          {event.eventName}
+                        </Typography>
+
+                        <Box
+                          display="flex"
+                          justifyContent={{ xs: "center", sm: "space-between" }}
+                          alignItems="center"
+                          flexWrap="wrap"
+                          gap={1}
+                        >
+                          <Typography variant="caption" color="text.secondary">
+                            Ticket Sold
+                          </Typography>
+                          <Typography variant="caption" fontWeight="bold">
+                            {event.soldTicket || 0}/{event.ticketQuantity}
+                          </Typography>
+                        </Box>
+
+                        <Box display="flex" justifyContent={{ xs: "center", sm: "flex-start" }}>
+                          <LinearProgress
+                            variant="determinate"
+                            value={((event?.soldTicket ?? 0) / (event?.ticketQuantity ?? 1)) * 100}
+                            sx={{
+                              width: { xs: "100%", sm: 100 },
+                              height: 6,
+                              borderRadius: 5,
+                              bgcolor: "#E0E0E0",
+                              marginTop: 1
+                            }}
+                          />
+                        </Box>
                       </Box>
                     </Box>
-                  </Box>
-                ))}
+                  ))
+                )}
               </CardContent>
             </Card>
 

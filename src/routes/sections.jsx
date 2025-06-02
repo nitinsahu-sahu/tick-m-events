@@ -131,7 +131,10 @@ export function Router() {
         // -----------------------**************-------------------------
 
         // Organizer Route
-
+        {
+          path: '/',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><HomePage /></RoleProtectedRoute>
+        },
         {
           path: 'statistics-&-reports',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><StatisticsAndReportsPage /></RoleProtectedRoute>

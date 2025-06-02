@@ -13,6 +13,7 @@ export const recommTrandingPopularEventFetch = () => async (dispatch) => {
                 upcomingEvents: response?.data?.upcomingEvents,
                 popularEvents: response?.data?.popularEvents,
                 recommendedEvents: response?.data?.recommendedEvents,
+                latestEvents:response?.data?.latestEvents,
             },
         });
     } catch (error) {

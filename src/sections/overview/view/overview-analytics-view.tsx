@@ -28,7 +28,7 @@ function getDayNumber(dateString: any) {
 
 function getDayName(dateString: string): string {
   const date = new Date(dateString);
-  
+
   // Use Number.isNaN instead of global isNaN
   if (Number.isNaN(date.getTime())) {
     throw new Error("Invalid date");
@@ -41,7 +41,7 @@ function getDayName(dateString: string): string {
 export function OverviewAnalyticsView() {
   const { upcomingEvents, latestEvents } = useSelector((state: RootState) => state?.homeRecom);
   const dispatch = useDispatch<AppDispatch>();
-  const eventDates = latestEvents.map((event: any) => new Date(event.date).toDateString());
+  const eventDates = latestEvents?.map((event: any) => new Date(event.date).toDateString());
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedTicket, setSelectedTicket] = useState("VIP");
@@ -73,7 +73,6 @@ export function OverviewAnalyticsView() {
     <DashboardContent>
       <PageTitleSection
         title="Dashboard"
-        desc=""
         rightCom={<CountDownView />} // Passing SearchBar component as a prop
       />
 
@@ -400,7 +399,7 @@ export function OverviewAnalyticsView() {
                     const dateString = date.toDateString();
 
                     // Highlight if the date is in eventDates and not today
-                    if (eventDates.includes(dateString) && dateString !== today) {
+                    if (eventDates?.includes(dateString) && dateString !== today) {
                       return "highlight";
                     }
                     return null;
@@ -413,7 +412,7 @@ export function OverviewAnalyticsView() {
                   Upcoming Events
                 </Typography>
 
-                {latestEvents.length === 0 ? (
+                {!latestEvents || latestEvents.length === 0 ? (
                   <Box
                     sx={{
                       display: "flex",

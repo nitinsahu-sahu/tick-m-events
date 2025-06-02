@@ -55,6 +55,7 @@ export function OverviewTableCard() {
   return (
     <Paper
       sx={{
+        mt: 3,
         p: { xs: 2, sm: 3 },
         borderRadius: 3,
         border: '1px solid #E0E0E0',
@@ -142,7 +143,7 @@ export function OverviewTableCard() {
                     {user.status}
                   </Typography>
                 </div>
-                
+
                 <Stack
                   direction={{ xs: 'column', sm: 'row' }}
                   spacing={1}

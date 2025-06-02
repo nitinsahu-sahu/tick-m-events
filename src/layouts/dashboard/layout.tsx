@@ -1,6 +1,6 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
 import { useState } from 'react';
-import { InputBase, Button, Box, Alert, useMediaQuery, IconButton, Typography, ListItemText, ListItem, List, Paper } from '@mui/material';
+import { Button, Box, Alert, useMediaQuery, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
@@ -69,6 +69,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
   const hiddenCustomPhotoVideo = ['/custom-photo-or-video-filters-for-events'];
   const hiddenHomeRecommadation = ['/home-and-recommendations'];
   const hiddenTranPaymet = ['/transection-and-payment'];
+  const hiddenVisibilityAccess = ['/visibility-and-access-settings'];
   const hiddenDashboard = ['/'];
 
   const [navOpen, setNavOpen] = useState(false);
@@ -111,9 +112,6 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   onClose={() => setNavOpen(false)}
                 />
                 {
-                  hiddenSearchSelect.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Search & Select Service Providers" />
-                }
-                {
                   (hiddenReserContracts.some(path => pathname.includes(path)) ||
                     hiddenServiceCal.some(path => pathname.includes(path))) &&
                   !isMobileOrTablet && (
@@ -150,9 +148,6 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 }
                 {
                   hiddenUsrMange.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Admin Panel" />
-                }
-                {
-                  hiddenProfileService.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Profile & Services Management" />
                 }
                 {
                   hiddenMarketting.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="TICK-M EVENTS" />
@@ -327,7 +322,9 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                     }
                     {
                       !isMobileOrTablet && (
-                        role === 'organizer' && (
+                        role === 'organizer' &&
+                        !hiddenTranPaymet.some(path => pathname.includes(path)) &&
+                        (
                           <>
                             <Button
                               variant="contained"
@@ -348,6 +345,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                             <Link to='/visibility-and-access-settings'>
                               <Button
                                 variant="contained"
+                                disabled={hiddenVisibilityAccess?.toString() === pathname?.toString()}
 
                                 sx={{
                                   backgroundColor: "#0C2340",

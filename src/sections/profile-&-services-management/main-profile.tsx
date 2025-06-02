@@ -3,11 +3,10 @@ import { useSelector } from "react-redux";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { RootState } from "src/redux/store";
 
-export function MainProfile({ onModify }: any) {
+export function MainProfile({ handleAvalibility, setShowService, onModify }: any) {
     const { profile } = useSelector((state: RootState) => state?.profile);
-    
+
     const handleModifyClick = (rowData: any) => {
-        
         onModify(rowData);  // Call the callback with row data
     };
 
@@ -53,46 +52,46 @@ export function MainProfile({ onModify }: any) {
                     />
                 </Box>
 
-                <Box sx={{marginTop:"-43px"}}>
-                    <HeadingCommon variant="body1" title={profile?.name} weight={600} mb={0}/>
-                    <HeadingCommon variant="body" title={profile?.username} weight={400} baseSize="16px"/>
+                <Box sx={{ marginTop: "-43px" }}>
+                    <HeadingCommon variant="body1" title={profile?.name} weight={600} mb={0} />
+                    <HeadingCommon variant="body" title={profile?.username} weight={400} baseSize="16px" />
                 </Box>
             </Box>
 
             {/* Stats Section */}
-            <Box sx={{ width: "100%", p: 2 }}>
+            <Box mx={3}>
                 {/* Stats Box */}
-                <Box
+                <Grid container
                     sx={{
-                        borderRadius: "20px",
-                        border: "1px solid #00000066",
-                        backgroundColor: "#FFFFFF",
-                        px: { xs: 2, sm: 3 },
-                        py: { xs: 2, sm: 3 },
-                        mb: 3,
-                    }}
-                >
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6} md={3} textAlign="center">
-                            <Typography fontSize="13px" color="#1E1E1E">
-                                Overall Rating
+                        p: 2,
+                        display: 'flex',
+                        justifyContent: 'space-around',
+                        border: '1px solid #ccc',
+                        borderRadius: 3,
+                        textAlign: 'center',
+                        backgroundColor: '#fff',
+                    }}>
+                    <Grid item xs={6} sm={3}>
+                        <Typography fontSize="13px" color="#1E1E1E">
+                            Overall Rating
+                        </Typography>
+                        <Typography fontWeight="bold" fontSize="16px" mt={0.5}>
+                            {profile?.averageRating}/5{" "}
+                            <Typography component="span" fontSize="13px" color="#1E1E1E">
+                                ({profile?.reviewCount} reviews)
                             </Typography>
-                            <Typography fontWeight="bold" fontSize="16px" mt={0.5}>
-                                4.8/5{" "}
-                                <Typography component="span" fontSize="13px" color="#1E1E1E">
-                                    (20 reviews)
-                                </Typography>
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={3} textAlign="center">
-                            <Typography fontSize="13px" color="#1E1E1E">
-                                Completed Gigs
-                            </Typography>
-                            <Typography fontWeight="bold" fontSize="16px" mt={0.5}>
-                                120
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={3} textAlign="center">
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={6} sm={3}>
+                        <Typography fontSize="13px" color="#1E1E1E">
+                            Completed Gigs
+                        </Typography>
+                        <Typography fontWeight="bold" fontSize="16px" mt={0.5}>
+                            120
+                        </Typography>
+                    </Grid>
+                    {profile?.role === 'provider' && (
+                        <Grid xs={6} sm={3}>
                             <Typography fontSize="13px" color="#1E1E1E">
                                 Profile Views
                             </Typography>
@@ -103,47 +102,113 @@ export function MainProfile({ onModify }: any) {
                                 </Typography>
                             </Typography>
                         </Grid>
-                        <Grid item xs={12} sm={6} md={3} textAlign="center">
-                            <Typography fontSize="13px" color="#1E1E1E">
-                                Response Time
-                            </Typography>
-                            <Typography fontWeight="bold" fontSize="16px" mt={0.5}>
-                                within 1h
-                            </Typography>
-                        </Grid>
-                    </Grid>
-                </Box>
+                    )}
 
+                    <Grid xs={6} sm={3}>
+                        <Typography fontSize="13px" color="#1E1E1E">
+                            Response Time
+                        </Typography>
+                        <Typography fontWeight="bold" fontSize="16px" mt={0.5}>
+                            within 1h
+                        </Typography>
+                    </Grid>
+                </Grid>
 
                 {/* Action Buttons */}
-                <Grid container spacing={2}>
-                    {["Modify Profile", "Add a Service", "Update Availability", "Share Profile"].map((label, index) => (
-                        <Grid item xs={12} sm={6} md={3} key={index}>
-                            <Button
-                                fullWidth
-                                onClick={() => {
-                                    if (label === "Modify Profile") {
-                                        handleModifyClick(profile)// Log when "Modify Profile" is clicked
-                                    }
-                                    // Add other conditions if needed
-                                }}
-                                variant="contained"
-                                sx={{
-                                    backgroundColor: "#032D4F",
-                                    textTransform: "none",
-                                    borderRadius: "8px",
-                                    fontWeight: 500,
-                                    fontSize: "14px",
-                                    py: 1.5,
-                                    "&:hover": {
-                                        backgroundColor: "#021f37",
-                                    },
-                                }}
-                            >
-                                {label}
-                            </Button>
-                        </Grid>
-                    ))}
+                <Grid container spacing={2} my={2}>
+                    <Grid item xs={12} sm={6} md={profile?.role === 'provider' ? 3 : 6} >
+                        <Button
+                            fullWidth
+                            onClick={() => { handleModifyClick(profile) }}
+                            variant="contained"
+                            sx={{
+                                backgroundColor: "#032D4F",
+                                textTransform: "none",
+                                borderRadius: "8px",
+                                fontWeight: 500,
+                                fontSize: "14px",
+                                py: 1.5,
+                                "&:hover": {
+                                    backgroundColor: "#021f37",
+                                },
+                            }}
+                        >
+                            Modify Profile
+                        </Button>
+
+                    </Grid>
+                    {profile?.role === 'provider' && (
+                        <>
+                            <Grid item xs={12} sm={6} md={3} >
+                                <Button
+                                    onClick={() => { setShowService() }}
+
+                                    fullWidth
+                                    variant="contained"
+                                    sx={{
+                                        backgroundColor: "#032D4F",
+                                        textTransform: "none",
+                                        borderRadius: "8px",
+                                        fontWeight: 500,
+                                        fontSize: "14px",
+                                        py: 1.5,
+                                        "&:hover": {
+                                            backgroundColor: "#021f37",
+                                        },
+                                    }}
+                                >
+                                    Add a Service
+                                </Button>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3} >
+                                <Button
+                                    fullWidth
+                                    onClick={() => { handleAvalibility() }}
+
+                                    variant="contained"
+                                    sx={{
+                                        backgroundColor: "#032D4F",
+                                        textTransform: "none",
+                                        borderRadius: "8px",
+                                        fontWeight: 500,
+                                        fontSize: "14px",
+                                        py: 1.5,
+                                        "&:hover": {
+                                            backgroundColor: "#021f37",
+                                        },
+                                    }}
+                                >
+                                    Update Availability
+                                </Button>
+                            </Grid>
+                        </>
+                    )}
+
+                    <Grid item xs={12} sm={6} md={profile?.role === 'provider' ? 3 : 6} >
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            onClick={() => {
+                                const profileUrl = `${import.meta.env.VITE_FRONT_URL}/pro/${profile?._id}`;
+                                const whatsappMessage = `Check out my profile: ${profileUrl}`;
+                                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`;
+                                window.open(whatsappUrl, '_blank');
+                            }}
+                            sx={{
+                                backgroundColor: "#032D4F",
+                                textTransform: "none",
+                                borderRadius: "8px",
+                                fontWeight: 500,
+                                fontSize: "14px",
+                                py: 1.5,
+                                "&:hover": {
+                                    backgroundColor: "#021f37",
+                                },
+                            }}
+                        >
+                            Share Profile
+                        </Button>
+                    </Grid>
                 </Grid>
             </Box>
         </Box>

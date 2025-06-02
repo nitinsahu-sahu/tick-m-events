@@ -42,6 +42,7 @@ export function UserPopover() {
     const hiddenTranPaymet = ['/transection-and-payment'];
     const hiddenDashboard = ['/'];
     const hiddenEventDetails = ['/events/add-new'];
+    const hiddenVisibilityAccess = ['/visibility-and-access-settings'];
 
     const { _id, name, role, avatar } = useSelector((state: RootState) => state?.auth?.user);
 
@@ -72,17 +73,25 @@ export function UserPopover() {
                         <Typography textTransform="capitalize" fontWeight={600} color="#2295D4" fontFamily="Poppins, sans-serif">
                             {name}
                         </Typography>
-                        <Typography textTransform="capitalize" fontSize={12} color="gray" fontFamily="Poppins, sans-serif">
-                            {role} | <span
+                        <Typography
+                            textTransform="capitalize"
+                            fontSize={12}
+                            color="gray"
+                            fontFamily="Poppins, sans-serif"
+                        >
+                            {role} |
+                            <span
                                 role="button"
                                 tabIndex={0}
                                 style={{ cursor: 'pointer', color: 'red' }}
-                                onClick={() => handleLogout()}
+                                onClick={handleLogout}
                                 onKeyDown={(e) => {
+                                    // Trigger logout on both Enter and Spacebar
                                     if (e.key === 'Enter' || e.key === ' ') {
-                                        console.log('logout');
+                                        handleLogout();
                                     }
                                 }}
+                                aria-label="Logout"
                             >
                                 Logout
                             </span>
@@ -215,7 +224,9 @@ export function UserPopover() {
                         </Box>
                     }
                     {
-                        role === 'organizer' && (
+                        role === 'organizer' &&
+                        !hiddenTranPaymet.some(path => pathname.includes(path)) &&
+                        (
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
                                 <Button
                                     variant="contained"
@@ -244,6 +255,8 @@ export function UserPopover() {
                                         fontFamily: "Poppins, sans-serif",
                                         fontWeight: 600
                                     }}
+                                    disabled={hiddenVisibilityAccess?.toString() === pathname?.toString()}
+
                                 >
                                     <Link
                                         to="/visibility-and-access-settings"

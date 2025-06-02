@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Typography } from "@mui/material";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 interface TimeLeft {
     days: number;
@@ -71,13 +72,13 @@ export function CountDownCounter({ date,
                     backgroundColor: "#fff",
                 }}
             >
-                <Typography fontSize={{ xs: "1.2rem", md: "1.5rem" }} fontWeight="bold">
-                    Countdown to the Event
-                </Typography>
+                <HeadingCommon title=" Countdown to the Event" weight={600} baseSize="36px"/>
+                
                 <Grid container justifyContent="center" spacing={2} mt={1}>
                     {Object.entries(timeLeft).map(([unit, value]) => (
                         <Grid item key={unit}>
                             <Typography color="primary" fontSize={{ xs: "2rem", md: "2.5rem" }} fontWeight="bold">
+                        
                                 {value.toString().padStart(2, "0")}
                             </Typography>
                             <Typography textTransform="capitalize">{unit}</Typography>

@@ -1,35 +1,42 @@
+import { useState } from "react";
+
 import { DashboardContent } from "src/layouts/dashboard";
 import { PageTitleSection } from "src/components/page-title-section";
+
 
 import { TicketScanner } from "../ticket-scanner";
 import { EnterTicketCode } from "../enter-ticket-code";
 import { EntryListView } from "../entry-list-view";
 import { RealTimeStatistics } from "../real-time-statistics";
-import { Mode } from "../mode";
+import { EventBreadCrum } from "../event-status";
+
+interface EventInformation {
+    eventName?: any;
+    _id?: any;
+    // Add other expected fields
+}
+
 
 export function EventValidationView() {
 
+  const [view, setView] = useState('scan');
+ const [eventInformation, setEventInformation] = useState<EventInformation>({});
+    
   return (
     <DashboardContent>
       <PageTitleSection
         title="Entry Validation (QR Code Scan)"
-        desc="Lorem ipsum dolor sit amet"
       />
-
-      {/* Ticket Scanner Section */}
-      <TicketScanner />
-
-      {/* Ticket Code Section */}
-      <EnterTicketCode />
+      <EventBreadCrum setView={setView} view={view} eventInformation={eventInformation}/>
+      {
+        view === 'scan' ? <TicketScanner /> : <EnterTicketCode  setEventInformation={setEventInformation}/>
+      }
 
       {/* Entry List Section */}
       <EntryListView />
 
       {/* Statistics Section */}
       <RealTimeStatistics />
-
-      {/* Offline Mode Section */}
-      <Mode />
     </DashboardContent>
   );
 }

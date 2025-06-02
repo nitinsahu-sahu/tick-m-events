@@ -2,7 +2,9 @@ import { eventOrderConstants } from "../actions/constants";
 
 const initialState = {
     message: '',
-    order: {}
+    order: {},
+    verifiedOrders:[],
+    allOrders:[]
 };
 
 const eventOrderReducer = (state, action) => {
@@ -11,6 +13,23 @@ const eventOrderReducer = (state, action) => {
     }
     switch (action.type) {
         // Event bY ID FETCH
+        case eventOrderConstants.GET_REQUEST:
+            return { ...state };
+
+        case eventOrderConstants.GET_SUCCESS:
+            return {
+                ...state,
+                message: action.payload.message,
+                verifiedOrders: action.payload.verifiedOrders,
+                allOrders: action.payload.allOrders,
+            };
+
+        case eventOrderConstants.GET_FAILURE:
+            return {
+                ...state,
+                message: action.payload.message,
+            };
+        
         case eventOrderConstants.CREATE_REQUEST:
             return { ...state };
 

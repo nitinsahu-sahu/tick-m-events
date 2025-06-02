@@ -1,5 +1,4 @@
 import { Box, Button, Grid, Paper } from "@mui/material";
-import { QRCodeSVG } from 'qrcode.react';
 import CheckIcon from '@mui/icons-material/Check'; // Import check icon
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -12,9 +11,7 @@ import axios from "../../redux/helper/axios";
 export function FinalProcess({ onNext }: any) {
     const { order } = useSelector((state: RootState) => state?.order);
 
-    const qrData = JSON.stringify(order);
 
-   
     const handleDownloadTicket = async (orderId: string) => {
         try {
 
@@ -60,10 +57,15 @@ export function FinalProcess({ onNext }: any) {
                         mb: 2  // Optional bottom margin
                     }}
                 >
-                    <QRCodeSVG
-                        value={qrData}
-                        size={128}
-                        level="H"
+                    <img
+                        src={order?.qrCode}
+                        alt="QR Code"
+                        style={{
+                            width: '200px',
+                            height: '200px',
+                            border: '1px solid #ddd',
+                            borderRadius: '8px'
+                        }}
                     />
                 </Box>
 
@@ -77,9 +79,9 @@ export function FinalProcess({ onNext }: any) {
                     ))} */}
                     <Grid item xs={12} md={6}>
                         <Link to='/ticket-management'>
-                        <Button fullWidth variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "#fff", "&:hover": { backgroundColor: "#333" } }}>
-                            Ticket History
-                        </Button>
+                            <Button fullWidth variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "#fff", "&:hover": { backgroundColor: "#333" } }}>
+                                Ticket History
+                            </Button>
                         </Link>
                     </Grid>
                     <Grid item xs={12} md={6}>

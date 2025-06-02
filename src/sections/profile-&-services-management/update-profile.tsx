@@ -2,8 +2,7 @@ import {
     Avatar,
     Box,
     Button,
-    Typography,
-    TextField
+    TextField,
 } from "@mui/material";
 import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +15,7 @@ import { HeadingCommon } from "src/components/multiple-responsive-heading/headin
 import { profileFields, socialMediaFields } from "./utills";
 
 
+
 interface ApiResult {
     status: number;
     type: string;
@@ -25,6 +25,7 @@ interface ApiResult {
 
 const FormTextField = ({ name, type = 'text', value, onChange, placeholder, transform, multiline, minRows }: any) => (
     <TextField
+        label={name}
         name={name}
         type={type}
         value={value}
@@ -55,9 +56,9 @@ const FormTextField = ({ name, type = 'text', value, onChange, placeholder, tran
     />
 );
 
-export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, setProfileData, setSocialLinks }: any) {
+export function UpdateProfile({ profileData, socialLinks, setProfileData, setSocialLinks }: any) {
     const dispatch = useDispatch<AppDispatch>();
-    const { _id } = useSelector((state: RootState) => state?.auth?.user);
+    const { _id, role } = useSelector((state: RootState) => state?.auth?.user);
     const { profile } = useSelector((state: RootState) => state?.profile);
 
     const handleProfileUpdateChange = (event: any) => {
@@ -83,13 +84,13 @@ export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, 
         formProfileData.append("experience", profileData.experience);
         formProfileData.append("address", profileData.address);
         formProfileData.append("number", profileData.number);
+        formProfileData.append("serviceCategory", profileData.serviceCategory);
         formProfileData.append("website", profileData.website);
         formProfileData.append("socialLinks", JSON.stringify(socialLinks))
         try {
             const result = await dispatch(profileUpdate({ formProfileData, _id }));
             if ((result as ApiResult)?.status === 200) {
                 toast.success(result?.message);
-                setShowUpdateProfile(false)
                 setProfileData({
                     name: "",
                     email: "",
@@ -112,7 +113,7 @@ export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, 
         } catch (error) {
             toast.error("Profile update failed");
         }
-    }, [profileData, setProfileData, setSocialLinks, _id, socialLinks, setShowUpdateProfile, dispatch])
+    }, [profileData, setProfileData, setSocialLinks, _id, socialLinks,  dispatch])
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} bgcolor="#FFFFFF" p={3}>
@@ -149,8 +150,9 @@ export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, 
 
                 <Box component="form" display="flex" flexDirection="column" gap={2}>
                     {/* Profile Fields */}
-                    {profileFields.map((field) => (
+                    {profileFields.filter(field => !(field.name === 'serviceCategory' && role === 'organizer')).map((field) => (
                         <FormTextField
+
                             key={field.name}
                             name={field.name}
                             type={field.type}
@@ -162,7 +164,6 @@ export function UpdateProfile({ setShowUpdateProfile, profileData, socialLinks, 
                             minRows={field.minRows}
                         />
                     ))}
-
                     {/* Social Media Fields */}
                     {socialMediaFields.map((field) => (
                         <FormTextField

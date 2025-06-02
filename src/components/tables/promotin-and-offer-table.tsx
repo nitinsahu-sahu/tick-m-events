@@ -25,15 +25,21 @@ function formatDate(dateString: any) {
 const PromotionAndOfferTable = ({
     headers,
     data,
-    onModify
+    onModify,
+    onStatusChange,
 }: {
     headers: string[];
     data: any[];
-    onModify: (rowData: any) => void;  // Add this prop
+    onModify: (rowData: any) => void;
+    onStatusChange: (id: string, newStatus: string) => void; // Add this prop
 }) => {
     const theme = useTheme();
     const handleModifyClick = (rowData: any) => {
         onModify(rowData);  // Call the callback with row data
+    };
+    const handleCancelClick = (rowData: any) => {
+        const updatedStatus = rowData.status === 'active' ? 'inActive' : 'active'; // Toggle or set to 'inActive'
+        onStatusChange(rowData._id, updatedStatus); // 👈 Send to parent
     };
     return (
         <TableContainer component={Paper} sx={{ mt: 3 }}>
@@ -58,7 +64,7 @@ const PromotionAndOfferTable = ({
                 </TableHead>
 
                 <TableBody>
-                    {data.length === 0 ? (
+                    {!data || data.length === 0? (
                         <TableRow>
                             <TableCell colSpan={headers.length} align="center" sx={{ py: 4 }}>
                                 <Typography variant="body1" color="textSecondary">
@@ -87,7 +93,7 @@ const PromotionAndOfferTable = ({
                                 }}
                             >
                                 <TableCell align="center" sx={{ fontWeight: "bold", textTransform: "capitalize" }}>
-                                    {row.advantageType}
+                                    {row.promotionType}
                                 </TableCell>
                                 <TableCell align="center" sx={{ fontWeight: "bold" }}>
                                     {formatDate(row.validityPeriodStart)}
@@ -125,7 +131,7 @@ const PromotionAndOfferTable = ({
                                             borderColor: "gray",
                                             backgroundColor: "#0B2E4C"
                                         }}
-                                        onClick={() => handleModifyClick(row)}
+                                        onClick={() => handleCancelClick(row)}
                                     >
                                         Cancel
                                     </Button>
@@ -140,4 +146,3 @@ const PromotionAndOfferTable = ({
     );
 }
 export default memo(PromotionAndOfferTable)
-

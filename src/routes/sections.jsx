@@ -57,7 +57,7 @@ export const MarketplaceAndServiceProviderSupervisionPage = lazy(() => import('s
 export const PasswordRecoveryPage = lazy(() => import('src/pages/password-recovery'));
 export const ProfileAndServicesManagementPage = lazy(() => import('src/pages/profile-&-services-management'));
 
-// src/types/user.ts
+
 // ----------------------------------------------------------------------
 
 const renderFallback = (
@@ -133,6 +133,10 @@ export function Router() {
         // Organizer Route
         {
           path: '/',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><HomePage /></RoleProtectedRoute>
+        },
+        {
+          path: 'statistics-&-reports',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><StatisticsAndReportsPage /></RoleProtectedRoute>
         },
         {
@@ -159,7 +163,7 @@ export function Router() {
           path: 'search-&-select-service-providers',
           element: <RoleProtectedRoute allowedRoles={['organizer', 'provider']} currentRole={currentRole}><SearchAndSelectServiceProvidersPage /></RoleProtectedRoute>
         },
-{
+        {
           path: 'visibility-and-access-settings',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><VisibilityAndAccessSettingsPage /></RoleProtectedRoute>
         },
@@ -175,14 +179,14 @@ export function Router() {
           path: '/',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><StatisticsAndPerformancePage /> </RoleProtectedRoute>
         },
-        
+
         {
           path: 'home-and-global-view',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><HomeAndGlobalPage /></RoleProtectedRoute>
         },
         {
           path: 'profile-&-services-management',
-          element: <RoleProtectedRoute allowedRoles={['provider', 'admin', 'organizer']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
+          element: <RoleProtectedRoute allowedRoles={['provider', 'admin', 'organizer', 'participant']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
         },
         {
           path: 'confirmed-service-calendar',
@@ -219,7 +223,7 @@ export function Router() {
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><TicketingAndTransactionsSupervisionPage /></RoleProtectedRoute>
         },
         {
-          path: 'marketplace-&-service-provider-supervision',
+          path: '/',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><MarketplaceAndServiceProviderSupervisionPage /></RoleProtectedRoute>
         },
         // -----------------------**************-------------------------

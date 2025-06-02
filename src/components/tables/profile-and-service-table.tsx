@@ -60,7 +60,7 @@ const ProfileAndServiceTable = ({
                 </TableHead>
 
                 <TableBody>
-                    {data.length === 0 ? (
+                    {!data || data.length === 0? (
                         <TableRow>
                             <TableCell colSpan={headers.length} align="center" sx={{ py: 4 }}>
                                 <Typography variant="body1" color="textSecondary">

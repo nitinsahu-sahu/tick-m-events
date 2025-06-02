@@ -1,5 +1,5 @@
 import { Box, Button, Card, CardContent, Grid, Typography, Avatar } from '@mui/material';
-import StarIcon from '@mui/icons-material/Star';
+import { useCallback } from 'react';
 
 export const PopularEvent = ({ ticket }: any) => (
   <Card
@@ -93,3 +93,81 @@ export const PopularEvent = ({ ticket }: any) => (
     </CardContent>
   </Card>
 );
+
+export function ProviderListView({ providers,handleSelct }: any) {
+  const handleViewDetails = useCallback(() => {
+    handleSelct(providers); // Now passing the object directly
+  }, [handleSelct, providers]);
+  return (
+    <Card
+      sx={{
+        borderRadius: 3,
+        boxShadow: 3,
+        backgroundImage: `url(${providers.cover.url || './assets/images/event/image.png'} )`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        overflow: 'visible',
+        position: 'relative',
+        mt: 4,
+        overlay: 2.6
+      }}
+    >
+
+      <CardContent sx={{ textAlign: 'center', position: 'relative' }}>
+        <Avatar
+          src={providers.avatar.url}
+          alt={providers.name || 'avatar.png'}
+          sx={{
+            width: { xs: '80px', sm: '90px', md: '97px' },
+            height: { xs: '80px', sm: '90px', md: '97px' },
+            position: 'absolute',
+            top: -40,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            border: '3px solid #fff',
+            boxShadow: '0 0 0 4px #0B2E4C',
+          }}
+        />
+        <Typography
+          variant="h6"
+          fontWeight={600}
+          fontSize={{ xs: '15px', sm: '20px', md: '25px' }}
+          mt={5}
+          color="#0B2E4C"
+        >
+          {providers.name}
+        </Typography>
+        <Typography
+          variant="body2"
+          color="black"
+          fontWeight={400}
+          fontSize={{ xs: '8px', sm: '12px', md: '16px' }}
+        >
+          {providers.averageRating} ★ &nbsp; | &nbsp; {providers.username} &nbsp; | {providers.status}
+        </Typography>
+
+        <Grid container spacing={2} mt={2} justifyContent="center">
+          <Grid item>
+            <Button
+              variant="contained"
+              onClick={handleViewDetails}
+              sx={{ /* existing styles */ }}
+            >
+              View Details
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              // onClick={handleChatNow}
+              sx={{ /* existing styles */ }}
+            >
+              Chat Now
+            </Button>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  )
+}

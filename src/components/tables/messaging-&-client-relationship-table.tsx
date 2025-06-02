@@ -52,39 +52,39 @@ export function MessagingAndClientRelationshipTable({
                             <TableRow key={index} sx={{ backgroundColor }}>
                                 {/* Conditional cells based on type */}
                                 {(type === "1" || type === "2" || type === "5") && (
-                                    <TableCell sx={{ fontWeight: 600, align: "center" }}>
+                                    <TableCell sx={{ verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }}>
                                         {row.service || row.oganizer || row.file}
                                     </TableCell>
                                 )}
 
-                                <TableCell sx={{ fontWeight: 600, align: "center" }}>
+                                <TableCell sx={{  verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }}>
                                     {row.location || row.serviceConcerned || row.sdate}
                                 </TableCell>
 
-                                <TableCell sx={{ fontWeight: 600, align: "center" }}>
+                                <TableCell sx={{  verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }}>
                                     {row.datetime || row.lastMessage || row.type}
                                 </TableCell>
 
                                 {type === "1" && (
-                                    <TableCell sx={{ fontWeight: 600, align: "center" }}>
+                                    <TableCell sx={{  verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }}>
                                         {row.payment}
                                     </TableCell>
                                 )}
 
                                 {type !== "5" && (
-                                    <TableCell sx={{ fontWeight: 600, align: "center" }}>
+                                    <TableCell sx={{  verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }}>
                                         {row.status || row.budget}
                                     </TableCell>
                                 )}
 
                                 {type === "3" && (
-                                    <TableCell sx={{ fontWeight: 600, align: "center" }}>
+                                    <TableCell sx={{  verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }}>
                                         {row.describe}
                                     </TableCell>
                                 )}
 
                                 {(type === "1" || type === "2" || type === "5") && (
-                                    <TableCell sx={{ fontWeight: 600, align: "center",textAlign:"center" }} width="36%">
+                                    <TableCell sx={{  verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }} width="36%">
                                         {row.actions?.map((action: any, actionIndex: any) => (
                                             <Button
                                                 key={actionIndex}

@@ -24,7 +24,10 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
     const [promoInput, setPromoInput] = useState('');
     const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
     const [promoError, setPromoError] = useState('');
-
+    // Check if event has passed
+    const eventDateTime = new Date(`${date}T${time}`);
+    const currentDateTime = new Date();
+    const isEventPassed = currentDateTime > eventDateTime;
     // Define available promo codes
 
 
@@ -183,7 +186,31 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
 
             <Grid container spacing={3} mt={{ xs: 0.1, sm: 0.5, md: 1 }}>
                 <Grid item xs={12} sm={10} md={6} lg={6}>
-                    <Card sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3, boxShadow: 3 }}>
+                    <Card sx={{
+                        p: { xs: 2, sm: 3 }, borderRadius: 3, boxShadow: 3, position: 'relative',
+                        ...(isEventPassed && {
+                            opacity: 0.6,
+                            pointerEvents: 'none'
+                        })
+                    }}>
+                        {isEventPassed && (
+                            <Box sx={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex: 1,
+                                backgroundColor: 'rgba(255,255,255,0.7)'
+                            }}>
+                                <Typography variant="h6" color="error" fontWeight="bold">
+                                    This event has ended
+                                </Typography>
+                            </Box>
+                        )}
                         {tickets?.map((ticket: any) => (
                             ticket?.tickets.map((item: any) => (
                                 <Box key={item._id} mb={3}>

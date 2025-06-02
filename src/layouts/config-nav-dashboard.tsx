@@ -38,8 +38,19 @@ export const navData: NavItem[] = [
     icon: icon('ic-dashboard'),
     roles: ['organizer'],
   },
-
+ {
+    title: 'Home & Recommendations',
+    path: '/',
+    icon: icon('ic-analytics'),
+    roles: ['participant'],
+  },
   // Organizer Sidebar
+   {
+    title: 'Statistics And Reports',
+    path: '/statistics-&-reports',
+    icon: icon('ic-dashboard'),
+    roles: ['organizer'],
+  },
   {
     title: 'Events',
     path: '#',
@@ -97,12 +108,7 @@ export const navData: NavItem[] = [
     icon: icon('ic-analytics'),
     roles: ['organizer'],
   },
-  {
-    title: 'Home & Recommendations',
-    path: '/home-and-recommendations',
-    icon: icon('ic-analytics'),
-    roles: ['participant'],
-  },
+ 
   {
     title: 'Event Search & Details',
     path: '/event-search-and-details',
@@ -201,17 +207,17 @@ export const navData: NavItem[] = [
     roles: ['admin'],
 
   },
-  {
-    title: 'Marketplace & Service Provider Supervision',
-    path: '/marketplace-&-service-provider-supervision',
-    icon: icon('ic-analytics'),
-    roles: ['admin'],
-  },
+  // {
+  //   title: 'Marketplace & Service Provider Supervision',
+  //   path: '/marketplace-&-service-provider-supervision',
+  //   icon: icon('ic-analytics'),
+  //   roles: ['admin'],
+  // },
   {
     title: 'Profile & Services Management',
     path: '/profile-&-services-management',
     icon: icon('ic-analytics'),
-    roles: ['provider', 'admin'],
+    roles: ['provider', 'admin','organizer','organizer','participant'],
   },
 
 ];

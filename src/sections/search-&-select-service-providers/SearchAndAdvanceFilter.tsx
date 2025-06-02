@@ -1,272 +1,181 @@
 import {
   Box,
-  Slider,
+  Grid,
+  InputLabel,
+  FormControl,
   TextField,
+  MenuItem,
   Typography,
+  Slider,
+  FormControlLabel,
   Checkbox,
   Button,
-  FormControlLabel,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
   SelectChangeEvent,
-  Grid,
+  Select
 } from '@mui/material';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
-const categories = ['Web Development', 'Graphic Design', 'Marketing', 'Consulting'];
+import { providersListFetch } from 'src/redux/actions/searchSelect';
+import { AppDispatch } from 'src/redux/store';
 
-export const SearchAndAdvanceFilter = () => {
-  const [budget, setBudget] = useState(0);
-  const [rating, setRating] = useState(3);
-  const [certifiedOnly, setCertifiedOnly] = useState(false);
-  const [category, setCategory] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [location, setLocation] = useState('');
+const categories = ['Food', 'Web Development', 'Graphic Design', 'Marketing', 'Consulting'];
 
-  const handleApplyFilters = () => {
-    const filters = {
-      searchQuery,
-      category,
-      budget,
-      rating,
-      certifiedOnly,
-      location,
+interface FilterState {
+  search: string;
+  serviceCategory: string;
+  budget: number;
+  rating: number;
+  certified: boolean;
+  location: string;
+}
+
+export const SearchAndAdvanceFilter = ({ onChange }: any) => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    serviceCategory: '',
+    budget: 0,
+    rating: 0,
+    certified: false,
+    location: '',
+  });
+
+  const handleApplyFilters = async () => {
+    await dispatch(providersListFetch(filters));
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const target = e.target as HTMLInputElement;
+    setFilters(prev => ({
+      ...prev,
+      [target.name]: target.type === 'checkbox' ? target.checked : target.value
+    }));
+  };
+
+  const handleCategoryChange = (e: SelectChangeEvent) => {
+    setFilters(prev => ({
+      ...prev,
+      serviceCategory: e.target.value
+    }));
+  };
+
+  const handleSliderChange = (name: keyof FilterState) =>
+    (_: Event, value: number | number[]) => {
+      setFilters(prev => ({
+        ...prev,
+        [name]: Array.isArray(value) ? value[0] : value
+      }));
     };
-  };
-
-  const handleCategoryChange = (event: SelectChangeEvent) => {
-    setCategory(event.target.value as string);
-  };
 
   return (
-    <Box
-      sx={{
-        bgcolor: 'white',
-        borderRadius: 2.5,
-        p: { xs: 2, sm: 3, md: 4 },
-        boxShadow: 4,
-        maxWidth: '100%',
-        
-        mx: 'auto',
-        my: { xs: 3, md: 5 },
-      }}
-    >
-      <Typography variant="h3" gutterBottom textAlign="center">
-        Search & Advanced Filters
-      </Typography>
+    <Box sx={{
+      p: 3,
+      my: 3,
+      borderRadius: 3,
+      backgroundColor: '#fff',
+      border: '1px solid #E0E0E0',
+      boxShadow: 3,
+    }}>
+      <Box textAlign="center">
+        <HeadingCommon baseSize="30px" weight={700} variant="h3" title="Search & Advanced Filters" />
+      </Box>
 
       <Grid container spacing={2}>
+        {/* Search Field */}
         <Grid item xs={12}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Search by Name, Service, City..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            
-            sx={{
+          <FormControl fullWidth>
 
-              // Wrap all outline states under .MuiOutlinedInput-root
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '20px',
-                // Default border
-                '& fieldset': {
-                  borderColor: 'black',
-                  borderRadius: '20px',
-                },
-                // Hover state
-                '&:hover fieldset': {
-                  borderColor: 'black',
-                  borderRadius: '20px',
-                },
-                // Focused state
-                '&.Mui-focused fieldset': {
-                  borderColor: 'black',
-                  borderRadius: '20px',
-                },
-              },
-              // Label color
-              '& .MuiInputLabel-root': {
-                color: 'black',
-              },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: 'black',
-              },
-            }}
-          />
+            <TextField
+              fullWidth
+              name="search"
+              label="Search by Name..."
+              variant="outlined"
+              value={filters.search}
+              onChange={handleInputChange}
+            />
+          </FormControl>
         </Grid>
 
+        {/* Service Category */}
         <Grid item xs={12}>
-          <TextField
-            fullWidth
-            select
-            label="Select Service Category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            InputLabelProps={{
-              sx: {
-                
-                color: 'black',
-                '&.Mui-focused': { color: 'black' },
-              },
-            }}
-            sx={{
-              backgroundColor: '#fff',
-              borderRadius: '20px',
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '20px',
-                '& fieldset': { borderColor: 'black' },
-                '&:hover fieldset': { borderColor: 'black' },
-                '&.Mui-focused fieldset': { borderColor: 'black' },
-              },
-              '& .MuiSelect-icon': { color: 'black' },
-            }}
-          >
-            <MenuItem value="" disabled>
-              <em>Select Service Category</em>
-            </MenuItem>
-            {categories.map((cat) => (
-              <MenuItem key={cat} value={cat} sx={{ color: 'black' }}>
-                {cat}
+          <FormControl fullWidth>
+            <InputLabel id="service-category-label">Select Service Category</InputLabel>
+            <Select
+              labelId="service-category-label"
+              name="serviceCategory"
+              label="Select Service Category"
+              value={filters.serviceCategory}
+              onChange={handleCategoryChange}
+            >
+              <MenuItem value="" disabled>
+                <em>Select Service Category</em>
               </MenuItem>
-            ))}
-          </TextField>
+              {categories.map((cat) => (
+                <MenuItem key={cat} value={cat}>
+                  {cat}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
 
+        {/* Budget Slider */}
         <Grid item xs={12}>
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
-            Estimated Budget: ${budget}
+            Estimated Budget: ${filters.budget}
           </Typography>
-
           <Slider
-            value={budget}
-            onChange={(_, val) => setBudget(val as number)}
+            value={filters.budget}
+            onChange={handleSliderChange('budget')}
             min={0}
             max={10000}
             step={100}
             valueLabelDisplay="auto"
-            sx={{
-              width: '100%',
-              '& .MuiSlider-track': {
-                backgroundColor: 'rgba(11, 46, 76, 1)', // Custom track color
-                height: 8, // Thicker track
-              },
-              '& .MuiSlider-rail': {
-                backgroundColor: '#e0e0e0',
-                height: 8, // Thicker rail
-              },
-              '& .MuiSlider-thumb': {
-                width: 20, // Larger thumb
-                height: 20, // Larger thumb
-                backgroundColor: 'rgba(11, 46, 76, 1)', // Thumb color
-                border: '2px solid white', // Thumb border color
-                '&:hover, &.Mui-focusVisible': {
-                  boxShadow: 'none', // Remove box shadow on hover/focus
-                },
-              },
-              '& .MuiSlider-valueLabel': {
-                backgroundColor: 'rgba(11, 46, 76, 1)', // Background color for value label
-                color: '#fff', // White text color for the label
-                fontWeight: 'bold',
-              },
-            }}
           />
         </Grid>
 
+        {/* Location Field */}
         <Grid item xs={12}>
           <TextField
             fullWidth
+            label="Location (City, Region)"
+            name="location"
             variant="outlined"
-            placeholder="Location (City, Region)"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            sx={{
-              // Wrap all outline states under .MuiOutlinedInput-root
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '20px',
-                // Default border
-                '& fieldset': {
-                  borderColor: 'black',
-                  borderRadius: '20px',
-                },
-                // Hover state
-                '&:hover fieldset': {
-                  borderColor: 'black',
-                  borderRadius: '20px',
-                },
-                // Focused state
-                '&.Mui-focused fieldset': {
-                  borderColor: 'black',
-                  borderRadius: '20px',
-                },
-              },
-              // Label color
-              '& .MuiInputLabel-root': {
-                color: 'black',
-                borderRadius: '20px',
-              },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: 'black',
-                borderRadius: '20px',
-              },
-            }}
+            value={filters.location}
+            onChange={handleInputChange}
           />
         </Grid>
 
+        {/* Rating Slider */}
         <Grid item xs={12}>
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
-            Minimum Rating: {rating}★
+            Minimum Rating: {filters.rating}★
           </Typography>
-
           <Slider
-            value={rating}
-            onChange={(_, val) => setRating(val as number)}
+            value={filters.rating}
+            onChange={handleSliderChange('rating')}
             min={1}
             max={5}
             step={0.5}
             marks
             valueLabelDisplay="auto"
-            sx={{
-              width: '100%',
-              '& .MuiSlider-track': {
-                backgroundColor: 'rgba(11, 46, 76, 1)', // Custom track color
-                height: 8, // Thicker track
-              },
-              '& .MuiSlider-rail': {
-                backgroundColor: '#e0e0e0',
-                height: 8, // Thicker rail
-              },
-              '& .MuiSlider-thumb': {
-                width: 20, // Larger thumb
-                height: 20, // Larger thumb
-                backgroundColor: 'rgba(11, 46, 76, 1)', // Thumb color
-                border: '2px solid white', // Thumb border color
-                '&:hover, &.Mui-focusVisible': {
-                  boxShadow: 'none', // Remove box shadow on hover/focus
-                },
-              },
-              '& .MuiSlider-valueLabel': {
-                backgroundColor: 'rgba(11, 46, 76, 1)', // Background color for value label
-                color: '#fff', // White text color for the label
-                fontWeight: 'bold',
-              },
-            }}
           />
         </Grid>
 
+        {/* Certified Checkbox */}
         <Grid item xs={12}>
           <FormControlLabel
             control={
               <Checkbox
-                checked={certifiedOnly}
-                onChange={(e) => setCertifiedOnly(e.target.checked)}
+                name="certified"
+                checked={filters.certified}
+                onChange={handleInputChange}
                 sx={{
                   color: 'black',
-                  '&.Mui-checked': {
-                    color: '#0B2E4C',
-                  },
+                  '&.Mui-checked': { color: '#0B2E4C' },
                 }}
               />
             }
@@ -274,6 +183,7 @@ export const SearchAndAdvanceFilter = () => {
           />
         </Grid>
 
+        {/* Apply Button */}
         <Grid item xs={12}>
           <Button
             variant="contained"
@@ -285,9 +195,7 @@ export const SearchAndAdvanceFilter = () => {
               py: 1.5,
               fontWeight: 600,
               fontSize: '1rem',
-              '&:hover': {
-                bgcolor: '#003366',
-              },
+              '&:hover': { bgcolor: '#003366' },
             }}
           >
             Apply Filters

@@ -85,6 +85,37 @@ export const eventUpdate = (updatedEvent) => async (dispatch) => {
     }
 };
 
+export const eventCustomizationPageUpdate = (updatedEvent) => async (dispatch) => {
+
+    const eventId = updatedEvent?._id
+    dispatch({ type: eventConstants.EVENT_CUSTOMIZATION_UPDATE_REQUEST });
+
+    try {
+        const response = await axios.patch(`/event/eventPageCustomization/${eventId}`, updatedEvent.formData);
+        dispatch({
+            type: eventConstants.EVENT_CUSTOMIZATION_UPDATE_SUCCESS,
+            payload: { message: response?.data?.message },
+
+        });
+        return {
+            type: eventConstants.EVENT_CUSTOMIZATION_UPDATE_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
+    } catch (error) {
+        dispatch({
+            type: eventConstants.EVENT_CUSTOMIZATION_UPDATE_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+
+        return {
+            type: eventConstants.EVENT_CUSTOMIZATION_UPDATE_FAILURE,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status
+        };
+    }
+};
+
 export const wishlistEventFetch = () => async (dispatch) => {
     dispatch({ type: eventConstants.WISHLIST_GET_REQUEST });
 
@@ -262,4 +293,48 @@ export const eventByIdFetch = (eventId) => async (dispatch) => {
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },
         });
     }
+};
+
+export const fetchAllCategories = () => async (dispatch) => {
+    dispatch({ type: eventConstants.EVENT_CATEGORY_FETCH_REQUEST });
+ 
+    try {
+        const response = await axios.get("/event/allCategory");
+        dispatch({
+            type: eventConstants.EVENT_CATEGORY_FETCH_SUCCESS,
+            payload: {
+                categories: response?.data?.categories
+            },
+        });
+    } catch (error) {
+        dispatch({
+            type: eventConstants.EVENT_CATEGORY_FETCH_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Failed to fetch categories",
+                error: error.status
+            },
+        });
+    }
+};
+ 
+export const fetchChildCategories = (parentId) => async (dispatch) => {
+  dispatch({ type: eventConstants.CHILD_CATEGORY_FETCH_REQUEST });
+ 
+  try {
+    const response = await axios.get(`/event/children/${parentId}`);
+    dispatch({
+      type: eventConstants.CHILD_CATEGORY_FETCH_SUCCESS,
+      payload: {
+        childCategories: response?.data,
+      },
+    });
+  } catch (error) {
+    dispatch({
+      type: eventConstants.CHILD_CATEGORY_FETCH_FAILURE,
+      payload: {
+        message: error?.response?.data?.message || "Failed to fetch child categories",
+        error: error.status,
+      },
+    });
+  }
 };

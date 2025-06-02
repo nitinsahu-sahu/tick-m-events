@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo, useRef, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo, useRef, useCallback,  } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 export type User = {
@@ -50,23 +50,19 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const socketRef = useRef<Socket | null>(null);
     const isConnectingRef = useRef(false);
 
-    const initSocket = (_id: string) => {
-        // Prevent multiple connections
+    // Wrap all functions in useCallback to maintain stable references
+    const initSocket = useCallback((_id: string) => {
         if (socketRef.current || isConnectingRef.current) return;
 
         isConnectingRef.current = true;
 
         const newSocket = io('http://localhost:8080', {
             withCredentials: true,
-            // Optional: Add reconnection settings if needed
             reconnectionAttempts: 5,
             reconnectionDelay: 1000,
-            transports: ['websocket'], // force WebSocket (optional but recommended)
+            transports: ['websocket'],
         });
-        newSocket.on('connect', () => console.log('Connected to socket server'));
-        newSocket.on('disconnect', () => console.log('Disconnected from socket server'));
-        newSocket.on('connect_error', (err) => console.log('Connection error:', err));
-        // Setup event listeners
+
         const setupSocketListeners = () => {
             if (!newSocket) return;
 
@@ -123,39 +119,29 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 newSocket.off('conversations');
             }
         };
-    };
-
-    // Clean up socket on unmount
-    useEffect(() => {
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-                socketRef.current = null;
-            }
-        };
     }, []);
 
-
-    const getConversations = (_id: string) => {
-        if (!socket) return;
+    const getConversations = useCallback((_id: string) => {
+        if (!socketRef.current) return;
         setLoading(true);
-        socket.emit('getConversations', _id);
+        socketRef.current.emit('getConversations', _id);
         setLoading(false);
-    };
+    }, []);
 
-    const selectConversation = (_id: string, otherUserId: string) => {
-        if (!socket) return;
+    const selectConversation = useCallback((_id: string, otherUserId: string) => {
+        if (!socketRef.current) return;
         setLoading(true);
-        socket.emit('getChatHistory', { _id, otherUserId });
-        socket.emit('markAsRead', { _id, otherUserId });
+        socketRef.current.emit('getChatHistory', { _id, otherUserId });
+        socketRef.current.emit('markAsRead', { _id, otherUserId });
         setLoading(false);
-    };
+    }, []);
 
-    const sendMessage = (senderId: string, receiverId: string, message: string) => {
-        if (!socket) return;
-        socket.emit('sendMessage', { senderId, receiverId, message });
-    };
+    const sendMessage = useCallback((senderId: string, receiverId: string, message: string) => {
+        if (!socketRef.current) return;
+        socketRef.current.emit('sendMessage', { senderId, receiverId, message });
+    }, []);
 
+    // Now the useMemo dependencies are stable
     const contextValue = useMemo(() => ({
         socket,
         conversations,
@@ -167,7 +153,19 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         getConversations,
         selectConversation,
         sendMessage
-    }), [socket, conversations, currentChat, currentReceiver, loading, error]);
+    }), [
+        socket,
+        conversations,
+        currentChat,
+        currentReceiver,
+        loading,
+        error,
+        initSocket,
+        getConversations,
+        selectConversation,
+        sendMessage
+    ]);
+
     return (
         <ChatContext.Provider value={contextValue}>
             {children}

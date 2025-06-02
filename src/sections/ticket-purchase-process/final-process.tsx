@@ -12,7 +12,6 @@ export function FinalProcess({ onNext }: any) {
     const { order } = useSelector((state: RootState) => state?.order);
 
 
-
     const handleDownloadTicket = async (orderId: string) => {
         try {
 

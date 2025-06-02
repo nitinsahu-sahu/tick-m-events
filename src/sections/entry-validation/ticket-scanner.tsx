@@ -45,15 +45,32 @@ export function TicketScanner() {
     const [isScanning, setIsScanning] = useState(false);
     const [scanMessage, setScanMessage] = useState<string | null>(null);
 
-    const handleScan = (data: QRScanResult | null) => {
+
+    const handleScan = (data: string | null) => {
         if (data) {
-            setResult(data.text);
+            // Parse the string into your custom interface
+            const scanResult: QRScanResult = {
+                text: data,
+                // other properties if needed
+            };
+
+            setResult(scanResult.text);
             setShowScanner(false);
             setIsScanning(false);
             setScanMessage("✅ QR Code scanned successfully!");
-            setTimeout(() => setScanMessage(null), 3000); // auto-clear message
+            setTimeout(() => setScanMessage(null), 3000);
         }
     };
+    // pulkit
+    // const handleScan = (data: QRScanResult | null) => {
+    //     if (data) {
+    //         setResult(data.text);
+    //         setShowScanner(false);
+    //         setIsScanning(false);
+    //         setScanMessage("✅ QR Code scanned successfully!");
+    //         setTimeout(() => setScanMessage(null), 3000); // auto-clear message
+    //     }
+    // };
 
     const handleError = (err: Error) => {
         setIsScanning(false);

@@ -189,7 +189,7 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                             fullWidth
                             variant="contained"
                             onClick={() => {
-                                const profileUrl = `${import.meta.env.VITE_FRONT_URL}/pro/${profile?._id}`;
+                                const profileUrl = `${import.meta.env.VITE_ORIGINAL_SERVER_URL}/pro/${profile?._id}`;
                                 const whatsappMessage = `Check out my profile: ${profileUrl}`;
                                 const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`;
                                 window.open(whatsappUrl, '_blank');

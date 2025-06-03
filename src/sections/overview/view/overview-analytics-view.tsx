@@ -190,7 +190,7 @@ export function OverviewAnalyticsView() {
                               <Stack alignItems="center" spacing={0.5}>
                                 <Avatar sx={{ bgcolor: "#f0f8ff" }}>
                                   <IconButton color="primary">
-                                    <Iconify width={20} icon="gg:dollar" />
+                                    <Iconify width={20} icon="ep:sold-out" />
                                   </IconButton>
                                 </Avatar>
                                 <Typography color="primary" fontSize={12}>{event.soldTicket || 0} Sold</Typography>
@@ -258,7 +258,7 @@ export function OverviewAnalyticsView() {
                             <Stack alignItems="center" spacing={0.5}>
                               <Avatar sx={{ bgcolor: "#f0f8ff" }}>
                                 <IconButton color="primary">
-                                  <Iconify width={20} icon="gg:dollar" />
+                                  <Iconify width={20} icon="ep:sold-out" />
                                 </IconButton>
                               </Avatar>
                               <Typography color="primary" fontSize={12}>{event.soldTicket || 0} Sold</Typography>

@@ -31,7 +31,7 @@ export function RefundAndCancellationManangement() {
       </Typography>
  
       {/* Table */}
-      <TicketReservationManagementTable headers={refundCancelationTableHeaders} data={refundCancelationTableData} type="4" />
+      {/* <TicketReservationManagementTable headers={refundCancelationTableHeaders} data={refundCancelationTableData} type="4" /> */}
  
       {/* Refund Policy Configuration */}
       <Box mt={4}>

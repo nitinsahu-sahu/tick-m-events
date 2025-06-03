@@ -50,7 +50,7 @@ export function ReservationManagement() {
             </Typography>
 
             {/* Table */}
-            <TicketReservationManagementTable data={reservationManagementTableData} headers={reservationManagementTableHeaders} type="3" />
+            {/* <TicketReservationManagementTable data={reservationManagementTableData} headers={reservationManagementTableHeaders} type="3" /> */}
 
             {/* Export Buttons */}
             <Box mt={2} display="flex" gap={2}>

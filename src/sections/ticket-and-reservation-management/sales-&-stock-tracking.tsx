@@ -8,7 +8,7 @@ import { TicketReservationManagementTable } from "src/components/tables/ticket-r
 
 type TabType = 'monthly' | 'weekly' | 'daily';
 
-export function SalesAndStockTracking() {
+export function SalesAndStockTracking({ tickets }: any) {
     const [activeTab, setActiveTab] = useState<TabType>('monthly'); // 👈 typed state
     const theme = useTheme();
 
@@ -122,7 +122,7 @@ export function SalesAndStockTracking() {
             </Box>
 
             {/* Table */}
-            <TicketReservationManagementTable type="2" headers={realTimeSalseTrackingTableHeaders} data={realTimeSalseTrackingTableData} />
+            <TicketReservationManagementTable type="2" headers={realTimeSalseTrackingTableHeaders} data={tickets} />
 
             {/* Sales Graph */}
             <Box sx={{ mt: 3 }}>

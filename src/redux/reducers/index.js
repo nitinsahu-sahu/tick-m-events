@@ -7,6 +7,7 @@ import eventOrderReducer from './eventOrder.reducer'
 import searchSelectReducer from './searchSelect.reducer'
 import eventCategoryReducer from './category.reducer'
 import homeAndRecommandationReducer from './home-recommedation.reducer'
+import ticketTypeReducer from './ticket-reservation.reducer'
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
     providers: searchSelectReducer,
     eventCategories: eventCategoryReducer,
     homeRecom: homeAndRecommandationReducer,
+    ticketReservationMang: ticketTypeReducer,
 })
 
 export default rootReducer

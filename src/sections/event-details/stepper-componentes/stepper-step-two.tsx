@@ -173,7 +173,6 @@ export function StepperStepTwo() {
                 </ToggleButtonGroup>
             </Box>
             <form encType='multipart/form-data' onSubmit={handleTicketConfig}>
-
                 {ticketRows.map((row, index) => (
                     <Grid container spacing={2} alignItems="center" key={row.id} sx={{ mt: index > 0 ? 2 : 0, alignItems: "flex-start" }}>
                         {/* Ticket Types */}

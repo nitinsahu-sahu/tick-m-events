@@ -2,6 +2,7 @@ import { Box, Grid, Typography, Button, Card, CardMedia, CardContent, CircularPr
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import React, { useEffect } from "react";
 import Marquee from "react-fast-marquee";
+import { Link } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "src/redux/store";
@@ -28,7 +29,7 @@ export function ExploreMoreSection() {
         <>
           <Grid container spacing={3}>
             {categories?.length > 0 ? (
-              categories.map((cat: any) => (
+              categories.slice(0,4).map((cat: any) => (
                 <Grid item xs={12} sm={6} md={3} key={cat._id}>
                   <Card sx={{
                     borderRadius: 3,
@@ -151,6 +152,7 @@ export function ExploreMoreSection() {
           {/* Bottom CTA - Only show when categories exist */}
           {categories?.length > 0 && (
             <Box textAlign="center" mt={2}>
+              <Link to='/category' target="__blank">
               <Button
                 variant="contained"
                 fullWidth
@@ -166,7 +168,9 @@ export function ExploreMoreSection() {
                 }}
               >
                 View All Available Events
+                
               </Button>
+              </Link>
             </Box>
           )}
         </>

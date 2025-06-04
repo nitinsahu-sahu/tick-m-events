@@ -11,7 +11,9 @@ import { useState } from "react";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
 
-export function RefundAndCancellationManangement() {
+export function RefundAndCancellationManangement({ orderList }: any) {
+    const { order } = orderList
+
   const refundCancelationTableHeaders = ["Name", "Email", "Ticket Type", "Purchase Date", "Status", "Actions"];
   const refundCancelationTableData = [
     { name: "Jean M", email: "jean@email.com", resrvationTicketType: "Standard", purchaseDate: "02/02/2025", status: "Process", refundAction: ["Approve", "Deny"] },
@@ -36,7 +38,7 @@ export function RefundAndCancellationManangement() {
       />
 
       {/* Table */}
-      <TicketReservationManagementTable headers={refundCancelationTableHeaders} data={refundCancelationTableData} type="4" />
+      <TicketReservationManagementTable headers={refundCancelationTableHeaders} data={order} type="4" />
 
       {/* Refund Policy Configuration */}
       <Box mt={4}>

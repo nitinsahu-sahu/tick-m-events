@@ -42,7 +42,6 @@ export const createTicketType = (
 
     try {
         const response = await axios.post("/tickets", ticketTypeCreate);
-
         dispatch({
             type: ticketTypeConstants.CREATE_TICKET_TYPE_SUCCESS,
             payload: { message: response?.data?.message },

@@ -19,6 +19,7 @@ export function HeadingCommon({
     };
     return (
         <Typography
+        sx={{textTransform:"capitalize"}}
             variant={variant}
             color={color}
             width={width}

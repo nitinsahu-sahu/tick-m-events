@@ -133,7 +133,33 @@ export function TransactionAndPaymentTable({ headers, data, type }: any) {
                                                 </Button>
                                             ))}
                                         </Box>
-                                    ) : (
+                                    ) : key === "action" && type === "5" ? (
+                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                             {row.status !== 'Approved' && row[key].map((action: string, actionIdx: number) => (
+                                                <Button
+                                                    key={actionIdx}
+                                                    variant="contained"
+                                                    sx={{
+                                                        backgroundColor: action === 'Accept'
+                                                            ? theme.palette.success.main
+                                                            : theme.palette.error.main,
+                                                        color: 'white',
+                                                        "&:hover": {
+                                                            backgroundColor: action === 'Accept'
+                                                                ? theme.palette.success.dark
+                                                                : theme.palette.error.dark
+                                                        },
+                                                        fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                                                        px: 2,
+                                                        textTransform: 'none'
+                                                    }}
+                                                >
+                                                    {action}
+                                                </Button>
+                                            ))}
+ 
+                                        </Box>
+                                    ):(
                                         row[key]
                                     )}
                                 </TableCell>

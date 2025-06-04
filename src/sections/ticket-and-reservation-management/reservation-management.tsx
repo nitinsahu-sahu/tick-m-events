@@ -5,9 +5,12 @@ import { Link } from "react-router-dom";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
+import { getUniqueFileName } from "src/hooks/download_unique_name";
 import { useCSVExport, useExcelExport } from "src/hooks/downloadable";
 
-export function ReservationManagement() {
+export function ReservationManagement({ orderList }: any) {
+    const { order } = orderList
+
     const exportToExcel = useExcelExport();
     const exportToCSV = useCSVExport();
     const chartRealTimeOptions: ApexOptions = {
@@ -21,24 +24,32 @@ export function ReservationManagement() {
     };
 
     const reservationManagementTableHeaders = ["Name", "Email", "Ticket Type", "Purchase Date", "Status"];
-    const reservationManagementTableData = [
-        { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/02/2025", reservationStatus: "Pending" },
-        { name: "Jannifer", email: "janni2@email.com", resrvationTicketType: "Standard", purchaseDate: "02/03/2025", reservationStatus: "Pending" },
-        { name: "Nitin", email: "demo3@email.com", resrvationTicketType: "VIP", purchaseDate: "02/04/2025", reservationStatus: "Confirmed" },
-    ];
+
+    const transformDataForExport = (orders: any[]) =>
+        orders.map(item => ({
+            name: item.userId.name,
+            email: item.userId.email,
+            createdAt: item.createdAt,
+            paymentStatus: item.paymentStatus,
+            ticketType: item.tickets.map((t: any) => t.ticketType).join(' | '),
+            // For quantity if needed:
+            // quantity: order.tickets.reduce((sum, t) => sum + t.quantity, 0)
+        }));
 
     const handleExcelExport = () => {
-        exportToExcel(reservationManagementTableData, {
-            fileName: 'transaction_list',
-            sheetName: 'Reservalation Entry List'
+        const exportData = transformDataForExport(order);
+        exportToExcel(exportData, {
+            fileName: getUniqueFileName('reservation_management_table'),
+            sheetName: 'Reservation Entry List'
         });
     };
 
     const handleCSVExport = () => {
-        exportToCSV(reservationManagementTableData, {
-            fileName: 'transaction_list',
-            headers: reservationManagementTableHeaders,
-            fieldNames: ['name', 'email', 'resrvationTicketType', 'purchaseDate', 'reservationStatus'] // Map to your actual data properties
+        const exportData = transformDataForExport(order);
+        exportToCSV(exportData, {
+            fileName: getUniqueFileName('reservation_management_table'),
+            headers: ['Name', 'Email', 'Purchase Date', 'Payment Status', 'Ticket Type'],
+            fieldNames: ['name', 'email', 'createdAt', 'paymentStatus', 'ticketType']
         });
     };
 
@@ -53,7 +64,7 @@ export function ReservationManagement() {
             />
 
             {/* Table */}
-            <TicketReservationManagementTable data={reservationManagementTableData} headers={reservationManagementTableHeaders} type="3" />
+            <TicketReservationManagementTable data={order} headers={reservationManagementTableHeaders} type="3" />
 
             {/* Export Buttons */}
             <Box mt={2} display="flex" gap={2}>

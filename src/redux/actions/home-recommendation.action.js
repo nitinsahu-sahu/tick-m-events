@@ -5,7 +5,7 @@ export const recommTrandingPopularEventFetch = () => async (dispatch) => {
     dispatch({ type: homeAndRecomConstants.GET_REQUEST });
 
     try {
-        const response = await axios.get(`/home-recommendations`);
+        const response = await axios.get('/home-recommendations');
         dispatch({
             type: homeAndRecomConstants.GET_SUCCESS,
             payload: {

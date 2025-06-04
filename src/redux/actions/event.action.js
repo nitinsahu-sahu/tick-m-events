@@ -22,7 +22,6 @@ export const removeFromWishlist = ({ eventId }) => async (dispatch) => {
     }
 };
 
-
 export const eventAddToWishlist = (selectedViewEvent) => async (dispatch) => {
     const { _id } = selectedViewEvent.selectedViewEvent
     dispatch({ type: eventConstants.WISHLIST_ADD_REQUEST });

@@ -1,23 +1,50 @@
 import { Box, FormControl, MenuItem, Paper, Select, Tab, Tabs, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
+import { realTimeSalseTrackingTableHeaders } from "./utills";
 
 type TabType = 'monthly' | 'weekly' | 'daily';
 
-export function SalesAndStockTracking() {
+export function SalesAndStockTracking({ tickets }: any) {
     const [activeTab, setActiveTab] = useState<TabType>('monthly'); // 👈 typed state
     const theme = useTheme();
+    const [priceFilter, setPriceFilter] = useState("All");
+    const [nameFilter, setNameFilter] = useState("All");
 
-    const realTimeSalseTrackingTableHeaders = ["Ticket Type", "Price", "Total Stock", "Remaining Stock", "Tickets Sold", "Revenue Generated"];
-    const realTimeSalseTrackingTableData = [
-        { ticketType: "Standard", price: "10,000 XAF", totalStock: 500, remainingStock: 230, ticketSold: 270, revenueGenerated: "2,700,000 XAF" },
-        { ticketType: "VIP", price: "20,000 XAF", totalStock: 200, remainingStock: 50, ticketSold: 150, revenueGenerated: "3,000,000 XAF" },
-        { ticketType: "Advanced", price: "30,000 XAF", totalStock: 300, remainingStock: 100, ticketSold: 200, revenueGenerated: "6,000,000 XAF" },
-    ];
+    // Get unique ticket names for the name filter dropdown
+    const ticketNames = useMemo(() => {
+        const names = tickets?.map((ticket: any) => ticket.name);
+        return ["All", ...new Set(names)];
+    }, [tickets]);
+
+    const ticketPrice = useMemo(() => {
+        const price = tickets?.map((ticket: any) => ticket.price);
+        return ["All", ...new Set(price)];
+    }, [tickets]);
+
+    // Filter tickets based on selected filters
+    const filteredTickets = useMemo(() => {
+        if (!tickets) return [];
+
+        return tickets.filter((ticket: any) => {
+            // Apply category filter
+            const priceMatch =
+                priceFilter === "All" ||
+                (ticket.price === priceFilter)
+
+            // Apply name filter
+            const nameMatch =
+                nameFilter === "All" ||
+                ticket.name === nameFilter;
+
+            return priceMatch && nameMatch;
+        });
+    }, [tickets, priceFilter, nameFilter]);
 
     const salesGraphChartData: Record<TabType, {
         categories: string[];
@@ -56,20 +83,23 @@ export function SalesAndStockTracking() {
     return (
         <Paper sx={{ p: 3, borderRadius: 3, mt: 3, boxShadow: 3 }}>
             {/* Title */}
-            <Typography variant="h5" fontSize={{ xs: 25, sm: 30, md: 40 }} fontWeight="bold" sx={{ mb: 2 }} display="flex" justifyContent="center">
-                Sales & Stock Tracking
-            </Typography>
+            <Box sx={{ textAlign: 'center' }}>
+                <HeadingCommon
+                    baseSize="40px"
+                    weight={700}
+                    variant="h5"
+                    title="Sales & Stock Tracking"
+                />
+            </Box>
 
             {/* Filters */}
             <Box>
-                <Typography
+                <HeadingCommon
+                    baseSize="32px"
+                    weight={600}
                     variant="h5"
-                    fontSize={{ xs: 20, sm: 25, md: 32 }}
-                    fontWeight="500"
-                    sx={{ mb: 2 }}
-                >
-                    Real-time Sales Tracking
-                </Typography>
+                    title="Real-time Sales Tracking"
+                />
                 <Box
                     sx={{
                         display: "flex",  // Change to flex for better control
@@ -81,55 +111,85 @@ export function SalesAndStockTracking() {
                 >
                     {/* Ticket Category */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Typography sx={{ fontSize: "0.9rem", fontWeight: "500" }}>
-                            Ticket Category:
-                        </Typography>
-                        <FormControl sx={{ minWidth: 120 }}>
-                            <Select defaultValue="All" size="small">
-                                <MenuItem value="All">All</MenuItem>
-                                <MenuItem value="VIP">VIP</MenuItem>
-                                <MenuItem value="Standard">Standard</MenuItem>
+                        <HeadingCommon
+                            baseSize="14px"
+                            weight={400}
+                            title="Ticket Name:"
+                        />
+                        <FormControl sx={{ minWidth: 120 }} size="small">
+                            <Select
+                                value={nameFilter}
+                                onChange={(e) => setNameFilter(e.target.value)}
+                                size="small"
+                                sx={{
+                                    fontSize: '0.8rem',
+                                    height: '32px',
+                                    '& .MuiSelect-select': {
+                                        padding: '6px 12px'
+                                    }
+                                }}
+                            >
+                                {ticketNames.map((name: any) => (
+                                    <MenuItem
+                                        key={name}
+                                        value={name}
+                                        sx={{ fontSize: '0.8rem', minHeight: '32px', textTransform: "capitalize" }}
+                                    >
+                                        {name}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                     </Box>
 
                     {/* Ticket Status */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Typography sx={{ fontSize: "0.9rem", fontWeight: "500" }}>
-                            Ticket Status:
-                        </Typography>
-                        <FormControl sx={{ minWidth: 120 }}>
-                            <Select defaultValue="All" size="small">
-                                <MenuItem value="All">All</MenuItem>
-                                <MenuItem value="Sold">Sold</MenuItem>
-                                <MenuItem value="Remaining">Remaining</MenuItem>
+                        <HeadingCommon
+                            baseSize="14px"
+                            weight={400}
+                            title="Ticket Price:"
+                        />
+                        <FormControl sx={{ minWidth: 120 }} size="small">
+                            <Select
+                                value={priceFilter}
+                                onChange={(e) => setPriceFilter(e.target.value)}
+                                size="small"
+                                sx={{
+                                    fontSize: '0.8rem',
+                                    height: '32px',
+                                    '& .MuiSelect-select': {
+                                        padding: '6px 12px'
+                                    }
+                                }}
+                            >
+                                {ticketPrice.map((name: any) => (
+                                    <MenuItem
+                                        key={name}
+                                        value={name}
+                                        sx={{ fontSize: '0.8rem', minHeight: '32px', textTransform: "capitalize" }}
+                                    >
+                                        {name}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
-                    </Box>
-
-                    {/* Date Range */}
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Typography sx={{ fontSize: "0.9rem", fontWeight: "500" }}>
-                            Date Range:
-                        </Typography>
-                        <TextField
-                            type="date"
-                            size="small"
-                            InputLabelProps={{ shrink: true }}
-                        />
                     </Box>
                 </Box>
             </Box>
 
             {/* Table */}
-            <TicketReservationManagementTable type="2" headers={realTimeSalseTrackingTableHeaders} data={realTimeSalseTrackingTableData} />
+            <TicketReservationManagementTable type="2" headers={realTimeSalseTrackingTableHeaders} data={filteredTickets} />
 
             {/* Sales Graph */}
             <Box sx={{ mt: 3 }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6" sx={{ mb: 1 }}>
-                        Sales Graph
-                    </Typography>
+                    <HeadingCommon
+                        baseSize="20px"
+                        weight={500}
+                        variant="h5"
+                        title="Sales Graph"
+                        color="#2395D4"
+                    />
                     <Tabs
                         value={activeTab}
                         onChange={handleTabChange}

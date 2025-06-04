@@ -2,11 +2,15 @@ import { Box, Button, Checkbox, FormControlLabel, Typography } from "@mui/materi
 import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
 import { Link } from "react-router-dom";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
+import { getUniqueFileName } from "src/hooks/download_unique_name";
 import { useCSVExport, useExcelExport } from "src/hooks/downloadable";
 
-export function ReservationManagement() {
+export function ReservationManagement({ orderList }: any) {
+    const { order } = orderList
+
     const exportToExcel = useExcelExport();
     const exportToCSV = useCSVExport();
     const chartRealTimeOptions: ApexOptions = {
@@ -20,37 +24,47 @@ export function ReservationManagement() {
     };
 
     const reservationManagementTableHeaders = ["Name", "Email", "Ticket Type", "Purchase Date", "Status"];
-    const reservationManagementTableData = [
-        { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/02/2025", reservationStatus: "Pending" },
-        { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/03/2025", reservationStatus: "Pending" },
-        { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/04/2025", reservationStatus: "Pending" },
-    ];
+
+    const transformDataForExport = (orders: any[]) =>
+        orders.map(item => ({
+            name: item.userId.name,
+            email: item.userId.email,
+            createdAt: item.createdAt,
+            paymentStatus: item.paymentStatus,
+            ticketType: item.tickets.map((t: any) => t.ticketType).join(' | '),
+            // For quantity if needed:
+            // quantity: order.tickets.reduce((sum, t) => sum + t.quantity, 0)
+        }));
 
     const handleExcelExport = () => {
-        exportToExcel(reservationManagementTableData, {
-            fileName: 'transaction_list',
-            sheetName: 'Reservalation Entry List'
+        const exportData = transformDataForExport(order);
+        exportToExcel(exportData, {
+            fileName: getUniqueFileName('reservation_management_table'),
+            sheetName: 'Reservation Entry List'
         });
     };
 
     const handleCSVExport = () => {
-        exportToCSV(reservationManagementTableData, {
-            fileName: 'transaction_list',
-            headers: reservationManagementTableHeaders,
-            fieldNames: ['name', 'email', 'resrvationTicketType', 'purchaseDate', 'reservationStatus'] // Map to your actual data properties
+        const exportData = transformDataForExport(order);
+        exportToCSV(exportData, {
+            fileName: getUniqueFileName('reservation_management_table'),
+            headers: ['Name', 'Email', 'Purchase Date', 'Payment Status', 'Ticket Type'],
+            fieldNames: ['name', 'email', 'createdAt', 'paymentStatus', 'ticketType']
         });
     };
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
-
-            {/* Title */}
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-                Reservation Management
-            </Typography>
+            <HeadingCommon
+                baseSize="33px"
+                weight={600}
+                variant="h5"
+                title="Reservation Management"
+                color="#0B2E4E"
+            />
 
             {/* Table */}
-            <TicketReservationManagementTable data={reservationManagementTableData} headers={reservationManagementTableHeaders} type="3" />
+            <TicketReservationManagementTable data={order} headers={reservationManagementTableHeaders} type="3" />
 
             {/* Export Buttons */}
             <Box mt={2} display="flex" gap={2}>
@@ -64,11 +78,14 @@ export function ReservationManagement() {
             </Box>
 
             {/* Ticket Validation Section */}
-            <Box mt={4}>
-                <Typography variant="h6" fontWeight="bold">
-                    Ticket Validation
-                </Typography>
-
+            <Box mt={3}>
+                <HeadingCommon
+                    baseSize="30px"
+                    weight={600}
+                    variant="h5"
+                    title="Ticket Validation"
+                    color="#0B2E4E"
+                />
                 <Box display="flex" flexDirection="column" gap={1} mt={1}>
                     <FormControlLabel control={<Checkbox />} label="QR Code Scan" />
                     <FormControlLabel control={<Checkbox defaultChecked />} label="Manual Entry of Unique Code" />

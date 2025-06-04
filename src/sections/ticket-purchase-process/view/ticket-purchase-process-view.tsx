@@ -24,7 +24,6 @@ export function TicketPurchaseProcessView() {
     const [selectedTickets, setSelectedTickets] = useState<Ticket[]>([]);
     const [orderDetails, setOrderDetails] = useState<OrderDetails>({});
     const handleNext = useCallback(() => {
-        
         setActiveStep((prev) => Math.min(prev + 1, steps.length - 1));
     }, []);
 

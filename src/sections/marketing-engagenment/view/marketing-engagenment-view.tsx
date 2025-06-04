@@ -105,7 +105,7 @@ export function MarketingEngagenmentView() {
 
   return (
     <DashboardContent>
-      <PageTitleSection title="Promotions & Special Offers" desc="Lorem ipsum dolor sit amet" />
+      <PageTitleSection title="Promotions & Special Offers"  />
 
       {/* Active Promotion */}
       <ActivePromotion />

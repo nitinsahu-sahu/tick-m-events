@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Paper } from "@mui/material";
+import { Box, Button, Grid, Paper, Typography } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check'; // Import check icon
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -57,6 +57,7 @@ export function FinalProcess({ onNext }: any) {
                         mb: 2  // Optional bottom margin
                     }}
                 >
+                    <Typography>{order.ticketCode}</Typography>
                     <img
                         src={order?.qrCode}
                         alt="QR Code"

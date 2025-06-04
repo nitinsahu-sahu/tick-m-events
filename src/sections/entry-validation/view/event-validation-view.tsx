@@ -24,10 +24,11 @@ export function EventValidationView() {
     
   return (
     <DashboardContent>
+      <EventBreadCrum setView={setView} view={view} eventInformation={eventInformation}/>
+
       <PageTitleSection
         title="Entry Validation (QR Code Scan)"
       />
-      <EventBreadCrum setView={setView} view={view} eventInformation={eventInformation}/>
       {
         view === 'scan' ? <TicketScanner /> : <EnterTicketCode  setEventInformation={setEventInformation}/>
       }

@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import Calendar from "react-calendar";
 import ReactHtmlParser from 'react-html-parser';
+import { Link } from 'react-router-dom';
 
 import "react-calendar/dist/Calendar.css";
 import "../CustomCalendar.css"; // Custom styling for event indicators
@@ -15,6 +16,7 @@ import { PageTitleSection } from 'src/components/page-title-section';
 import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { truncateText } from 'src/hooks/description-cutting';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
 import { CountDownView } from '../count-down';
 import { latestSales, salesRevenuChartSeries, salesRevenuChartOptions, donutBestSellingChartSeries, donutBestSellingChartOptions, chartrevenuOptions, chartrevenuSeries, chartOptions, donutChartOptions } from "../utils";
@@ -52,19 +54,12 @@ export function OverviewAnalyticsView() {
   const isMobileTablet = useMediaQuery(theme.breakpoints.down("sm")); // Show mobile/tablet view
   const isDesktop = useMediaQuery(theme.breakpoints.up("md")); // Show desktop view
   const up = true;
-  const percentage = 75; // Dynamic Percentage Value
-  // Define highlighted dates
-  const highlightedDates = [
-    new Date(2025, 2, 11), // 11 March 2025
-    new Date(2025, 2, 15), // 15 March 2025
-    new Date(2025, 2, 22), // 22 March 2025
-    new Date(2025, 1, 11), // 11 February 2025
-  ].map((d) => d.toDateString());
+  const percentage = 75;
 
   useEffect(() => {
     const interval = setInterval(() => {
       dispatch(recommTrandingPopularEventFetch());
-    }, 60000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [dispatch]);
@@ -166,11 +161,11 @@ export function OverviewAnalyticsView() {
             {isDesktop && (
               <Card>
                 <CardContent>
-                  <Typography variant="h6" color={theme.palette.primary.main} gutterBottom>
-                    Recent Event List
-                  </Typography>
+                <HeadingCommon variant="h5" color="text.secondary" baseSize="20px" title="Recent Event List" />
+
+              
                   <Grid container spacing={3}>
-                    {upcomingEvents?.map((event: any) => (
+                    {upcomingEvents?.slice(0, 3).map((event: any) => (
                       <Grid item xs={12} key={event._id}>
                         <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
                           <Typography variant="h6" color={theme.palette.primary.main} sx={{ fontWeight: 500 }}>
@@ -190,7 +185,7 @@ export function OverviewAnalyticsView() {
                               <Stack alignItems="center" spacing={0.5}>
                                 <Avatar sx={{ bgcolor: "#f0f8ff" }}>
                                   <IconButton color="primary">
-                                    <Iconify width={20} icon="gg:dollar" />
+                                    <Iconify width={20} icon="ep:sold-out" />
                                   </IconButton>
                                 </Avatar>
                                 <Typography color="primary" fontSize={12}>{event.soldTicket || 0} Sold</Typography>
@@ -202,7 +197,9 @@ export function OverviewAnalyticsView() {
                                   </IconButton>
                                 </Avatar>
                                 <Typography fontSize={12} color="primary">
-                                  {Number(event.ticketQuantity)} total pcs
+                                  {event.ticketQuantity === "0"
+                                    ? "Unlimited"
+                                    : `${Number(event.ticketQuantity)} pcs`}
                                 </Typography>
                               </Stack>
                               <Stack alignItems="center" spacing={0.5}>
@@ -233,7 +230,7 @@ export function OverviewAnalyticsView() {
                     Recent Event List
                   </Typography>
                   <Grid container spacing={3}>
-                    {upcomingEvents.map((event: any) => (
+                    {upcomingEvents.slice(0, 3).map((event: any) => (
                       <Grid item xs={12} key={event._id}>
                         <Card sx={{ display: "flex", flexDirection: "column", padding: 2, boxShadow: 3, borderRadius: 2 }}>
 
@@ -258,7 +255,7 @@ export function OverviewAnalyticsView() {
                             <Stack alignItems="center" spacing={0.5}>
                               <Avatar sx={{ bgcolor: "#f0f8ff" }}>
                                 <IconButton color="primary">
-                                  <Iconify width={20} icon="gg:dollar" />
+                                  <Iconify width={20} icon="ep:sold-out" />
                                 </IconButton>
                               </Avatar>
                               <Typography color="primary" fontSize={12}>{event.soldTicket || 0} Sold</Typography>
@@ -288,10 +285,12 @@ export function OverviewAnalyticsView() {
                       </Grid>
                     ))}
                   </Grid>
+                  <Link to='/our-event' target='__blank'>
+                    <Button fullWidth variant="contained" sx={{ mt: 2, backgroundColor: '#0B2E4E' }}>
+                      Load More
+                    </Button>
+                  </Link>
 
-                  <Button fullWidth variant="contained" sx={{ mt: 2, backgroundColor: '#0B2E4E' }}>
-                    Load More
-                  </Button>
                 </CardContent>
               </Card>
             )}
@@ -408,9 +407,8 @@ export function OverviewAnalyticsView() {
               </Box>
 
               <CardContent>
-                <Typography variant="h6" color="primary" gutterBottom>
-                  Upcoming Events
-                </Typography>
+                <HeadingCommon variant="h5" color="text.secondary" baseSize="20px" title="Upcoming Events" />
+
 
                 {!latestEvents || latestEvents.length === 0 ? (
                   <Box
@@ -425,7 +423,7 @@ export function OverviewAnalyticsView() {
                     <Typography variant="h6">No events found</Typography>
                   </Box>
                 ) : (
-                  latestEvents.map((event: any) => (
+                  latestEvents.slice(0, 3).map((event: any) => (
                     <Box
                       key={event._id}
                       display="flex"
@@ -442,9 +440,8 @@ export function OverviewAnalyticsView() {
                       <Box
                         sx={{
                           backgroundColor: "#F5FCFA",
-                          width: 60,
-                          height: 70,
-                          borderRadius: 3,
+                          borderRadius: 1,
+                          p: 1,
                           display: "flex",
                           flexDirection: "column",
                           alignItems: "center",
@@ -452,21 +449,15 @@ export function OverviewAnalyticsView() {
                           flexShrink: 0,
                         }}
                       >
-                        <Typography variant="h5" fontWeight="bold">
-                          {getDayNumber(event.date)}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {getDayName(event.date)}
-                        </Typography>
+                        <HeadingCommon variant="h5" baseSize="28px" weight={600} title={getDayNumber(event.date)} />
+                        <HeadingCommon variant="h5" color="text.secondary" baseSize="14px" title={getDayName(event.date)} />
+
                         <Avatar sx={{ width: 12, height: 12, bgcolor: "navy", mt: 1 }} />
                       </Box>
 
                       {/* Event Details */}
                       <Box sx={{ width: "100%" }}>
-                        <Typography variant="body1" fontWeight="500" fontSize={14}>
-                          {event.eventName}
-                        </Typography>
-
+                        <HeadingCommon variant="h5" color="text.secondary" baseSize="14px" title={event.eventName} />
                         <Box
                           display="flex"
                           justifyContent={{ xs: "center", sm: "space-between" }}
@@ -478,7 +469,7 @@ export function OverviewAnalyticsView() {
                             Ticket Sold
                           </Typography>
                           <Typography variant="caption" fontWeight="bold">
-                            {event.soldTicket || 0}/{event.ticketQuantity}
+                            {event.soldTicket || 0}/{event.ticketQuantity === '0' ? 'Unlimited' : event.ticketQuantity}
                           </Typography>
                         </Box>
 

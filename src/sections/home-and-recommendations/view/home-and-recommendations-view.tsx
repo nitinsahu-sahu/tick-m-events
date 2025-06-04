@@ -1,4 +1,4 @@
-import { Typography, Grid, Box, Paper,  Button, IconButton } from '@mui/material';
+import { Typography, Grid, Box, Paper, Button, IconButton } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
@@ -17,71 +17,33 @@ import { ExploreMoreSection } from '../ExploreMore';
 
 export function HomeAndRecommendationsView() {
   const { upcomingEvents, popularEvents, recommendedEvents } = useSelector((state: RootState) => state?.homeRecom);
-
+console.log('====popularEvents================================');
+console.log(popularEvents);
+console.log('====================================');
   const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(() => {
-    dispatch(recommTrandingPopularEventFetch())
-  }, [dispatch]);
 
+  useEffect(() => {
+    // Initial fetch after 2 seconds
+    const initialFetchTimer = setTimeout(() => {
+      dispatch(recommTrandingPopularEventFetch());
+    }, 2000);
+
+    // Set up interval for periodic refresh (1 minute)
+    const interval = setInterval(() => {
+      dispatch(recommTrandingPopularEventFetch());
+    }, 60000); // 60,000ms = 1 minute
+
+    // Cleanup both timer and interval
+    return () => {
+      clearTimeout(initialFetchTimer);
+      clearInterval(interval);
+    };
+  }, [dispatch]);
   const events = [
     { title: 'Tech Conference 2025', location: 'New York, USA', date: 'April 15, 2025' },
     { title: 'Music Festival', location: 'New York, USA', date: 'April 15, 2025' },
     { title: 'Startup Expo', location: 'New York, USA', date: 'April 15, 2025' },
-  ];
-
-  const ticketst = [
-    {
-      id: 1,
-      title: 'Festival Urban Music',
-      image: 'festival.png',
-      location: 'Douala',
-      date: '10/02/2025',
-      time: '5:00 PM',
-      status: '5,000 XAF',
-      statusColor: '#0B2E4C',
-      rating: 4.8,
-      viewPromo: true,
-    },
-    {
-      id: 2,
-      title: 'Startup Summit 2025',
-      image: 'startup.png',
-      location: 'Yaoundé',
-      date: '10/02/2025',
-      time: '5:00 PM',
-      status: 'Free',
-      statusColor: '#0B2E4C',
-      rating: 4.8,
-      viewPromo: false,
-    },
-  ];
-
-  const eventsTickets = [
-    {
-      id: 1,
-      title: 'Tech Expo 2025',
-      image: 'tech.png',
-      location: 'Douala',
-      date: '10/02/2025',
-      time: '5:00 PM',
-      status: '$50',
-      statusColor: '#0B2E4C',
-      rating: 5.0,
-      viewPromo: false,
-    },
-    {
-      id: 2,
-      title: 'Startup Summit 2025',
-      image: 'startup1.png',
-      location: 'Yaoundé',
-      date: '10/02/2025',
-      time: '5:00 PM',
-      status: 'Free',
-      statusColor: '#0B2E4C',
-      rating: 4.8,
-      viewPromo: true,
-    },
   ];
 
   return (
@@ -103,8 +65,8 @@ export function HomeAndRecommendationsView() {
         <HeadingCommon title="Recommended Events for You" weight={600} baseSize="34px" variant="h5" />
         {/* Main Grid Layout */}
         <Grid container spacing={3} mt={3}>
-          {ticketst.map((ticketc, index) => (
-            <Grid item xs={12} sm={6} md={6} key={ticketc.id || index}>
+          {recommendedEvents?.slice(0, 2).map((ticketc: any, index: any) => (
+            <Grid item xs={12} sm={6} md={6} key={ticketc._id || index}>
               <TicketCard ticket={ticketc} key={index} />
             </Grid>
           ))}
@@ -117,11 +79,24 @@ export function HomeAndRecommendationsView() {
         <HeadingCommon title="Popular & Trending Events" weight={600} baseSize="34px" variant="h5" />
         {/* Main Grid Layout */}
         <Grid container spacing={3} mt={3}>
-          {eventsTickets.map((ticketc, index) => (
-            <Grid item xs={12} sm={6} md={6} key={ticketc.id || index}>
-              <PopularEvent ticket={ticketc} key={index} />
+          {popularEvents?.length > 0 ? (
+            popularEvents?.slice(0, 2).map((ticketc: any, index: any) => (
+              <Grid item xs={12} sm={6} md={6} key={ticketc._id || index}>
+                <PopularEvent ticket={ticketc} key={index} />
+              </Grid>
+            ))
+          ) : (
+            <Grid item xs={12} sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: 200
+            }}>
+              <Typography variant="h6" color="textSecondary">
+                No popular events available
+              </Typography>
             </Grid>
-          ))}
+          )}
         </Grid>
       </Box>
 

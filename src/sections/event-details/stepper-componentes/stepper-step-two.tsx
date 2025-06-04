@@ -1,38 +1,35 @@
 import {
-    Box,
-    Button,
-    Grid,
-    TextField,
-    Typography,
-    Switch,
-    FormControlLabel,
-    RadioGroup,
-    Radio,
-    Checkbox,
+    Box, Button, Grid, TextField, Typography, Switch, FormControlLabel, RadioGroup, Radio, Checkbox,
     InputAdornment,
     IconButton,
     FormControl,
-    ToggleButtonGroup,
-    ToggleButton
+    ToggleButtonGroup, MenuItem,
+    ToggleButton, Select
 } from '@mui/material';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PaymentIcon from '@mui/icons-material/Payment';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import MoneyIcon from '@mui/icons-material/AttachMoney';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { LoadingButton } from '@mui/lab';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
-import { AppDispatch } from 'src/redux/store';
+import { AppDispatch, RootState } from 'src/redux/store';
 import { Iconify } from 'src/components/iconify';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { ticketConfigCreate } from 'src/redux/actions/event.action';
+import { fetchTicketType } from 'src/redux/actions/ticket-&-reservation-management.action';
+
 
 export function StepperStepTwo() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const { tickets } = useSelector((state: RootState) => state?.ticketReservationMang);
+    const [selectedTicket, setSelectedTicket] = useState<string>("");
+    const [selectedRefundPolicy, setSelectedRefundPolicy] = useState("");
+
 
     const [fullRefundCheck, setFullRefundCheck] = useState(false);
     const [noRefundAfterDateCheck, setNoRefundAfterDateCheck] = useState(false);
@@ -61,6 +58,68 @@ export function StepperStepTwo() {
             isLimitedSeat: true
         }
     ]);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            dispatch(fetchTicketType());
+        }, 10000);
+
+        return () => clearInterval(interval);
+    }, [dispatch]);
+    const handleTicketSelect = (ticketId: string) => {
+        setSelectedTicket(ticketId);
+        const selected = tickets.find((t: any) => t._id === ticketId);
+
+        if (selected) {
+            // Find if this ticket already exists in our rows
+            const existingRowIndex = ticketRows.findIndex(row => row.id === selected._id);
+
+            if (existingRowIndex >= 0) {
+                // Update existing row
+                setTicketRows(ticketRows.map(row =>
+                    row.id === selected._id ? {
+                        ...row,
+                        ticketType: selected.name,
+                        price: selected.price,
+                        totalTickets: selected.quantity === "Unlimited" ? selected.quantity : selected.quantity,
+                        description: selected.ticketDescription.replace(/<[^>]*>/g, ''),
+                        isLimitedSeat: selected.quantity !== "Unlimited"
+                    } : row
+                ));
+            } else {
+                // Add new row if we have empty rows, or append to the end
+                const emptyRowIndex = ticketRows.findIndex(row => row.ticketType === '');
+
+                if (emptyRowIndex >= 0) {
+                    // Replace first empty row
+                    setTicketRows(ticketRows.map((row, index) =>
+                        index === emptyRowIndex ? {
+                            id: selected._id,
+                            ticketType: selected.name,
+                            price: selected.price,
+                            isLinkPramotion: false,
+                            totalTickets: selected.quantity === "Unlimited" ? selected.quantity : selected.quantity,
+                            description: selected.ticketDescription.replace(/<[^>]*>/g, ''),
+                            isLimitedSeat: selected.quantity !== "Unlimited"
+                        } : row
+                    ));
+                } else {
+                    // Add new row at the end
+                    setTicketRows([
+                        ...ticketRows,
+                        {
+                            id: selected._id,
+                            ticketType: selected.name,
+                            price: selected.price,
+                            isLinkPramotion: false,
+                            totalTickets: selected.quantity === "Unlimited" ? selected.quantity : selected.quantity,
+                            description: selected.ticketDescription.replace(/<[^>]*>/g, ''),
+                            isLimitedSeat: selected.quantity !== "Unlimited"
+                        }
+                    ]);
+                }
+            }
+        }
+    };
     const handleTickteConfigChange = (event: any) => {
         event.preventDefault(); // Prevent default form submission behavior
         const { name, value } = event.target;
@@ -99,29 +158,39 @@ export function StepperStepTwo() {
         formEventData.append("isPurchaseDeadlineEnabled", ticketConfigData.isPurchaseDeadlineEnabled);
         formEventData.append("paymentMethods", ticketConfigData.paymentMethods);
         formEventData.append("isRefundPolicyEnabled", refundEnabled.toString());
-        formEventData.append("fullRefundCheck", fullRefundCheck.toString());
-        formEventData.append("fullRefundDaysBefore", ticketConfigData.fullRefundDaysBefore);
-        formEventData.append("partialRefundPercent", ticketConfigData.partialRefundPercent);
-        formEventData.append("partialRefundCheck", partialRefundCheck.toString());
-        formEventData.append("noRefundDate", ticketConfigData.noRefundDate);
         formEventData.append("payStatus", payStatus);
-        formEventData.append("noRefundAfterDateCheck", noRefundAfterDateCheck.toString());
 
+        if (selectedRefundPolicy === "fullRefund") {
+            formEventData.append("fullRefundCheck", "true");
+            formEventData.append("fullRefundDaysBefore", ticketConfigData.fullRefundDaysBefore);
+        } else if (selectedRefundPolicy === "partialRefund") {
+            formEventData.append("partialRefundCheck", "true");
+            formEventData.append("partialRefundPercent", ticketConfigData.partialRefundPercent);
+        } else if (selectedRefundPolicy === "noRefundDate") {
+            formEventData.append("noRefundAfterDateCheck", "true");
+            formEventData.append("noRefundDate", ticketConfigData.noRefundDate);
+        }
 
         try {
-            // Get current search params
             const searchParams = new URLSearchParams(window.location.search);
-            const eventId = searchParams.get('eventId'); // Get existing eventId
+            const eventId = searchParams.get('eventId');
+
             const res = await dispatch(ticketConfigCreate({ formEventData, eventId }));
+            const ticketConfigId = res?.ticketConfigId;
 
-            const ticketConfigId = res?.ticketConfigId; // Adjust based on your response structure
-
-            // Add event ID to current URL as search param
             navigate(`?eventId=${eventId}&ticketConfigId=${ticketConfigId}`, { replace: true });
         } catch (error) {
             toast.error("Server Error");
         }
-    }, [navigate, payStatus, dispatch, ticketRows, ticketConfigData, fullRefundCheck, refundEnabled, partialRefundCheck, noRefundAfterDateCheck]);
+    }, [
+        navigate,
+        payStatus,
+        dispatch,
+        ticketRows,
+        ticketConfigData,
+        refundEnabled,
+        selectedRefundPolicy
+    ]);
 
     const handlePayStatus = (newValue: any) => {
         setPayStatus(newValue)
@@ -148,7 +217,29 @@ export function StepperStepTwo() {
     }
     return (
         <Box sx={{ p: 1, maxWidth: '100%', width: '100%' }}>
-            <HeadingCommon variant="h6" title="Ticket Configuration" weight={600} baseSize="33px" />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <HeadingCommon variant="h6" title="Ticket Configuration" weight={600} baseSize="33px" />
+                {tickets?.length > 0 && (
+                    <FormControl sx={{ minWidth: 200, ml: 2 }}>
+                        <Select
+                            value={selectedTicket}
+                            onChange={(e) => handleTicketSelect(e.target.value)}
+                            displayEmpty
+                            size="small"
+                            sx={{ height: 40 }}
+                        >
+                            <MenuItem value="" disabled>
+                                Select existing ticket
+                            </MenuItem>
+                            {tickets.map((ticket: any) => (
+                                <MenuItem key={ticket._id} value={ticket._id}>
+                                    {ticket.name} ({ticket.price})
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                )}
+            </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                 <Typography variant="body1" sx={{ mr: 2 }}>Ticket Type:</Typography>
                 <ToggleButtonGroup
@@ -173,7 +264,6 @@ export function StepperStepTwo() {
                 </ToggleButtonGroup>
             </Box>
             <form encType='multipart/form-data' onSubmit={handleTicketConfig}>
-
                 {ticketRows.map((row, index) => (
                     <Grid container spacing={2} alignItems="center" key={row.id} sx={{ mt: index > 0 ? 2 : 0, alignItems: "flex-start" }}>
                         {/* Ticket Types */}
@@ -200,9 +290,6 @@ export function StepperStepTwo() {
                                     fullWidth
                                     required
                                     label="Price for each ticket"
-                                    InputProps={{
-                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                                    }}
                                     placeholder="0 XAF"
                                     value={row.price}
                                     onChange={(e) => handleChange(row.id, 'price', e.target.value)}
@@ -449,98 +536,69 @@ export function StepperStepTwo() {
 
 
                                 {refundEnabled && (
-                                    <Box display="flex" flexDirection="column" gap={2} mt={2}>
-                                        <Box>
+                                    <Box mt={2}>
+                                        <RadioGroup
+                                            value={selectedRefundPolicy}
+                                            onChange={(e) => setSelectedRefundPolicy(e.target.value)}
+                                            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                                        >
+                                            {/* Full Refund */}
                                             <FormControlLabel
-                                                control={
-                                                    <Checkbox
-                                                        checked={fullRefundCheck}
-                                                        onChange={(e) => setFullRefundCheck(e.target.checked)}
-                                                        name="fullRefundCheck"
-                                                    />
-                                                }
-                                                label="Full Refund Available up to X days before the event:"
-                                                sx={{
-                                                    '& .MuiFormControlLabel-label': {
-                                                        fontSize: '11px',
-                                                        fontWeight: 'bold',
-                                                    }
-                                                }}
+                                                value="fullRefund"
+                                                control={<Radio size="small" />}
+                                                label="Full Refund Available up to X days before the event"
+                                                sx={{ '& .MuiFormControlLabel-label': { fontSize: '11px', fontWeight: 'bold' } }}
                                             />
-                                            <TextField
-                                                name="fullRefundDaysBefore"
-                                                type="text"
-                                                value={ticketConfigData.fullRefundDaysBefore}
-                                                onChange={handleTickteConfigChange}
-                                                fullWidth
-                                                size="small"
-                                                placeholder="Enter number of days"
-                                                sx={{ mt: 1 }}
-                                            />
-                                        </Box>
-
-                                        <Box>
+                                            {selectedRefundPolicy === "fullRefund" && (
+                                                <TextField
+                                                    name="fullRefundDaysBefore"
+                                                    type="text"
+                                                    size="small"
+                                                    placeholder="Enter number of days"
+                                                    value={ticketConfigData.fullRefundDaysBefore}
+                                                    onChange={handleTickteConfigChange}
+                                                    sx={{ ml: 4, width: "200px" }}
+                                                />
+                                            )}
+ 
+                                            {/* Partial Refund */}
                                             <FormControlLabel
-                                                control={
-                                                    <Checkbox
-                                                        checked={partialRefundCheck}
-                                                        onChange={(e) => setPartialRefundCheck(e.target.checked)}
-                                                        name="partialRefundC"
-
-                                                    />
-                                                }
-                                                sx={{
-                                                    '& .MuiFormControlLabel-label': {
-                                                        fontSize: '11px',  // Set font size to 20px
-                                                        // You can add other typography styles here if needed
-                                                        fontWeight: 'bold',
-                                                        // color: 'text.primary',
-                                                    }
-                                                }}
-                                                label="Partial Refund with Fee (% of ticket price retained):"
+                                                value="partialRefund"
+                                                control={<Radio size="small" />}
+                                                label="Partial Refund with Fee (% of ticket price retained)"
+                                                sx={{ '& .MuiFormControlLabel-label': { fontSize: '11px', fontWeight: 'bold' } }}
                                             />
-                                            <TextField
-                                                name="partialRefundPercent"
-                                                value={ticketConfigData.partialRefundPercent}
-                                                onChange={handleTickteConfigChange}
-                                                fullWidth
-                                                size="small"
-                                                placeholder="Enter percentage"
-                                                sx={{ mt: 1 }}
-                                            />
-                                        </Box>
-
-                                        <Box>
+                                            {selectedRefundPolicy === "partialRefund" && (
+                                                <TextField
+                                                    name="partialRefundPercent"
+                                                    type="text"
+                                                    size="small"
+                                                    placeholder="Enter percentage"
+                                                    value={ticketConfigData.partialRefundPercent}
+                                                    onChange={handleTickteConfigChange}
+                                                    sx={{ ml: 4, width: "200px" }}
+                                                />
+                                            )}
+ 
+                                            {/* No Refund After a Specific Date */}
                                             <FormControlLabel
-                                                control={
-                                                    <Checkbox
-                                                        checked={noRefundAfterDateCheck}
-                                                        onChange={(e) => setNoRefundAfterDateCheck(e.target.checked)}
-                                                        name="partialRefundC"
-
-                                                    />
-                                                }
-                                                sx={{
-                                                    '& .MuiFormControlLabel-label': {
-                                                        fontSize: '11px',  // Set font size to 20px
-                                                        // You can add other typography styles here if needed
-                                                        fontWeight: 'bold',
-                                                        // color: 'text.primary',
-                                                    }
-                                                }}
-                                                label="Partial Refund with Fee (% of ticket price retained):"
+                                                value="noRefundDate"
+                                                control={<Radio size="small" />}
+                                                label="No Refund After a Specific Date"
+                                                sx={{ '& .MuiFormControlLabel-label': { fontSize: '11px', fontWeight: 'bold' } }}
                                             />
-                                            <TextField
-                                                name="noRefundDate"
-                                                value={ticketConfigData.noRefundDate}
-                                                onChange={handleTickteConfigChange}
-                                                fullWidth
-                                                type="date"
-                                                size="small"
-                                                sx={{ mt: 1 }}
-                                                InputLabelProps={{ shrink: true }}
-                                            />
-                                        </Box>
+                                            {selectedRefundPolicy === "noRefundDate" && (
+                                                <TextField
+                                                    name="noRefundDate"
+                                                    type="date"
+                                                    size="small"
+                                                    value={ticketConfigData.noRefundDate}
+                                                    onChange={handleTickteConfigChange}
+                                                    sx={{ ml: 4, width: "200px" }}
+                                                    InputLabelProps={{ shrink: true }}
+                                                />
+                                            )}
+                                        </RadioGroup>
                                     </Box>
                                 )}
                             </Grid>

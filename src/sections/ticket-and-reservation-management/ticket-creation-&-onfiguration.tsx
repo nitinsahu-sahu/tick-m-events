@@ -1,36 +1,20 @@
-import { Button, Checkbox, FormControlLabel, Box, Paper, TextField, Typography } from "@mui/material";
-import { useTheme } from '@mui/material/styles';
-import { useCallback, useRef, useState } from "react";
+import { Button, Checkbox, FormControlLabel, Box, Paper, TextField, Typography, Grid } from "@mui/material";
+import { useCallback, useState } from "react";
 import { toast, ToastContent } from 'react-toastify';
 import { useDispatch } from "react-redux";
-
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { createTicketType } from "src/redux/actions/ticket-&-reservation-management.action";
 import { AppDispatch } from "src/redux/store";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
-interface FormRefs {
-    eventName: HTMLInputElement | null;
-    price: HTMLInputElement | null;
-    availableQuantity: HTMLInputElement | null;
-    ticketDescription: string;
-    validity: HTMLInputElement | null;
-    transferableTicket: HTMLInputElement | null;
-    activationCode: HTMLInputElement | null;
-}
-
 export interface TicketFormData {
-    eventName: string;
-    availableQuantity: number;
+    name: string;
+    quantity: string;
     ticketDescription: string;
-    price: number;
+    price: string;
     validity: string;
-    options: {
-        transferableTicket: boolean;
-        personalizedTicket: boolean;
-        activationCode: boolean;
-    };
+    options: any
 }
 
 interface ApiResponse {
@@ -41,47 +25,77 @@ interface ApiResponse {
 
 export function TicketCreationAndConfiguration() {
     const dispatch = useDispatch<AppDispatch>();
-
-    const theme = useTheme();
-    const [personalized, setPersonalized] = useState(true);
-    const formRef = useRef<FormRefs>({
-        eventName: null,
-        price: null,
-        availableQuantity: null,
-        ticketDescription: '',
-        validity: null,
-        transferableTicket: null,  // Changed from false to null
-        activationCode: null       // Changed from false to null
+    const [isFree, setIsFree] = useState(false);
+    const [isUnlimited, setIsUnlimited] = useState(false);
+    const [ticketTypeData, setTicketTypeData] = useState({
+        name: "",
+        price: "",
+        quantity: "",
+        validity: "",
+        description: "",
+    });
+    const [ticketTypeOption, setTicketTypeOption] = useState({
+        transferableTicket: false,
+        personalizedTicket: false,
+        activationCode: false,
     });
 
-    const quillRef = useRef<ReactQuill>(null);
+    const handleIsFreeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const isChecked = event.target.checked;
+        setIsFree(isChecked);
 
+        // Automatically set price to "FREE" when checked, or clear when unchecked
+        setTicketTypeData(prev => ({
+            ...prev,
+            price: isChecked ? "Free" : ""
+        }));
+    };
 
+    const handleIsUnlimitedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const isChecked = event.target.checked;
+        setIsUnlimited(isChecked);
 
-    const handleSubmit = useCallback(async (event: any) => {
+        // Automatically set price to "FREE" when checked, or clear when unchecked
+        setTicketTypeData(prev => ({
+            ...prev,
+            quantity: isChecked ? "Unlimited" : ""
+        }));
+    };
+
+    const handleChange = (e: any) => {
+        const { name, value, type, checked } = e.target;
+        setTicketTypeData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    // Special handler for Quill editor
+    const handleDescriptionChange = (value: any) => {
+        setTicketTypeData(prev => ({ ...prev, description: value }));
+    };
+    const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = event.target;
+        setTicketTypeOption(prev => ({
+            ...prev,
+            [name]: checked
+        }));
+    };
+
+    const handleSubmit = useCallback(async (event: React.FormEvent) => {
         event.preventDefault(); // Prevent default form submission behavior
-        if (!formRef.current.eventName?.value ||
-            !formRef.current.price?.value ||
-            !formRef.current.availableQuantity?.value ||
-            !formRef.current.validity?.value) {
-            return;
-        }
-
-        const formData: TicketFormData = {
-            eventName: formRef.current.eventName.value,
-            availableQuantity: parseInt(formRef.current.availableQuantity.value, 10),
-            ticketDescription: quillRef.current?.getEditor().root.innerHTML ?? '',
-            price: parseFloat(formRef.current.price.value),
-            validity: formRef.current.validity.value,
-            options: {
-                transferableTicket: formRef.current.transferableTicket?.checked || false,
-                personalizedTicket: personalized,
-                activationCode: formRef.current.activationCode?.checked || false
-            }
+        // Create TicketFormData object instead of FormData
+        const ticketData: TicketFormData = {
+            name: ticketTypeData.name,
+            quantity: isUnlimited ? "Unlimited" : ticketTypeData.quantity,
+            ticketDescription: ticketTypeData.description,
+            price: isFree ? "Free" : ticketTypeData.price,
+            validity: ticketTypeData.validity,
+            options: ticketTypeOption // Make sure this matches the TicketFormData options interface
         };
-        try {
-            const result = await dispatch(createTicketType(formData) as unknown as ApiResponse)
 
+        try {
+            const result = await dispatch(createTicketType(ticketData) as unknown as Promise<ApiResponse>)
             if (result.status === 201) {
                 toast.success(result.message as ToastContent);
             } else {
@@ -90,14 +104,14 @@ export function TicketCreationAndConfiguration() {
         } catch (error) {
             toast.error('An unexpected error occurred' as ToastContent);
         }
-    }, [personalized, dispatch]);
+    }, [dispatch, ticketTypeOption, isUnlimited, isFree, ticketTypeData]);
 
     return (
         <Box boxShadow={3} borderRadius={3} mt={3}>
             <Paper sx={{ width: "100%", p: 3, maxWidth: { xs: "800px", sm: "800px", md: "100%" } }}>
                 {/* Section Title */}
-                <HeadingCommon baseSize="33px" weight={600} variant="h5" color='#0B2E4C' title="Ticket Creation & Configuration"/>
-               
+                <HeadingCommon baseSize="33px" weight={600} variant="h5" color='#0B2E4C' title="Ticket Creation & Configuration" />
+
 
                 {/* Table Header */}
                 <Box
@@ -129,125 +143,186 @@ export function TicketCreationAndConfiguration() {
                 </Box>
 
                 {/* Form Section */}
-                <HeadingCommon baseSize="33px" weight={600} variant="h5" color='#0B2E4C' title="Create a Ticket Type" mt={3}/>
+                <HeadingCommon baseSize="33px" weight={600} variant="h5" color='#0B2E4C' title="Create a Ticket Type" mt={3} />
 
                 {/* Inputs - Responsive Grid */}
-                <Box
-                    sx={{
-                        display: "grid",
-                        gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" },
-                        gap: 2,
-                        mt: 2,
-                    }}
-                >
-                    <TextField
-                        label="Event Name"
-                        placeholder="e.g., Tech Conference 2025"
-                        fullWidth
-                        inputRef={(el: HTMLInputElement) => {
-                            formRef.current.eventName = el;
-                            return el; // or return undefined;
+                <form onSubmit={handleSubmit}>
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" },
+                            gap: 2,
+                            mt: 2,
                         }}
-                    />
-                    <TextField
-                        label="Price"
-                        placeholder="10000"
-                        fullWidth
-                        type="number"
-                        inputRef={(el: HTMLInputElement) => {
-                            formRef.current.price = el;
-                            return el; // or return undefined;
-                        }}
-                    />
-                    <TextField
-                        label="Available Quantity"
-                        placeholder="Enter quantity"
-                        fullWidth
-                        type="number"
-                        inputRef={(el: HTMLInputElement) => {
-                            formRef.current.availableQuantity = el;
-                            return el; // or return undefined;
-                        }}
-
-                    />
-                </Box>
-
-                {/* Description */}
-                <ReactQuill
-                    theme="snow"
-                    style={{ height: '90px', margin: "20px 0px 40px 0px" }}
-                    ref={quillRef}
-                />
-
-                {/* Validity */}
-                <TextField
-                    label="Validity e.g., 2025-06-15"
-                    type="date"
-                    fullWidth
-                    sx={{ mt: { xs: 6, sm: 5, md: 3 } }}
-                    inputRef={(el: HTMLInputElement) => {
-                        formRef.current.validity = el;
-                        return el; // or return undefined;
-                    }}
-                />
-
-                {/* Checkboxes */}
-                <Box sx={{ mt: 2 }}>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                inputRef={(el: HTMLInputElement) => {
-                                    formRef.current.transferableTicket = el;
-                                    return el; // or return undefined;
-                                }}
-                                sx={{ color: "blue", "&.Mui-checked": { color: "#0B2E4C" } }}
-                            />
-                        }
-                        label="Transferable Ticket (Can be resold or given to another person)"
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                sx={{ color: "blue", "&.Mui-checked": { color: "#0B2E4C" } }}
-                                checked={personalized}
-                                onChange={(e) => setPersonalized(e.target.checked)}
-                            />
-                        }
-                        label="Personalized Ticket (Participant's name and account ID required for validation)"
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                inputRef={(el: HTMLInputElement) => {
-                                    formRef.current.activationCode = el;
-                                    return el; // or return undefined;
-                                }}
-                                sx={{ color: "blue", "&.Mui-checked": { color: "#0B2E4C" } }}
-                            />
-                        }
-                        label="Activation Code (Unique QR Code or manual code for entrance validation)"
-                    />
-                </Box>
-
-                {/* Buttons - Centered on Mobile */}
-                <Box
-                    sx={{
-                        mt: 3,
-                        display: "flex",
-                        gap: 2,
-                        flexWrap: "wrap",
-                        justifyContent: { xs: "center", md: "flex-start" },
-                    }}
-                >
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        sx={{ backgroundColor: '#0B2E4C' }}
-                        onClick={handleSubmit}
                     >
-                        Save & Publish Tickets
-                    </Button>
-                </Box>
+                        <TextField
+                            label="name"
+                            name="name"
+                            placeholder="e.g., Vip"
+                            value={ticketTypeData.name}
+                            onChange={handleChange}
+                            sx={{
+                                '& input': {
+                                    textTransform: 'capitalize',
+                                },
+                            }}
+                            required
+                            fullWidth
+                            type="text"
+                        />
+                        <Grid item xs={12} sm={5} md={3}>
+                            <TextField
+                                label="Price"
+                                name="price"
+                                required
+                                placeholder={isFree ? undefined : "10000 XAF"}
+                                value={isFree ? "FREE" : ticketTypeData.price}
+                                disabled={isFree}
+                                onChange={handleChange}
+                                sx={{
+                                    '& input': {
+                                        textTransform: 'uppercase',
+                                    },
+                                }}
+                                fullWidth
+                            />
+                            <Box sx={{ width: "100%" }}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            size="small"
+                                            checked={isFree}
+                                            onChange={handleIsFreeChange}
+                                        />
+                                    }
+                                    label="Free"
+                                    sx={{
+                                        '& .MuiFormControlLabel-label': {
+                                            fontSize: '11px',
+                                        },
+                                        mr: 1,
+                                    }}
+                                />
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12} sm={5} md={3}>
+                            <TextField
+                                label="Available Quantity"
+                                name="quantity"
+                                placeholder={isUnlimited ? undefined : "1"}
+                                value={isUnlimited ? "Unlimited" : ticketTypeData.quantity}
+                                disabled={isUnlimited}
+                                onChange={handleChange}
+                                fullWidth
+                                required
+                            />
+                            <Box sx={{ width: "100%" }}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            size="small"
+                                            checked={isUnlimited}
+                                            onChange={handleIsUnlimitedChange}
+                                        />
+                                    }
+                                    label="Unlimited"
+                                    sx={{
+                                        '& .MuiFormControlLabel-label': {
+                                            fontSize: '11px',
+                                        },
+                                        mr: 1,
+                                    }}
+                                />
+                            </Box>
+                        </Grid>
+
+                    </Box>
+
+                    {/* Description */}
+                    <ReactQuill
+                        theme="snow"
+                        value={ticketTypeData.description}
+                        onChange={handleDescriptionChange}
+                        style={{ height: '90px', margin: "20px 0px 40px 0px" }}
+                    />
+
+                    {/* Validity */}
+                    <TextField
+                        label="Validity e.g., 2025-06-15"
+                        type="date"
+                        name="validity"
+                        required
+                        value={ticketTypeData.validity}
+                        onChange={handleChange}
+                        fullWidth
+                        InputLabelProps={{
+                            shrink: true, // Forces the label to always appear above (no placeholder overlap)
+                        }}
+                        InputProps={{
+                            inputProps: {
+                                placeholder: "", // Explicitly set empty placeholder
+                            },
+                        }}
+                        sx={{ mt: { xs: 6, sm: 5, md: 3 } }}
+                    />
+
+                    {/* Checkboxes */}
+                    <Box sx={{ mt: 2 }}>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    name="transferableTicket"
+                                    checked={ticketTypeOption.transferableTicket}
+                                    onChange={handleOptionChange}
+                                    sx={{ color: "blue", "&.Mui-checked": { color: "#0B2E4C" } }}
+                                />
+                            }
+                            label="Transferable Ticket (Can be resold or given to another person)"
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    name="personalizedTicket"
+                                    checked={ticketTypeOption.personalizedTicket}
+                                    onChange={handleOptionChange}
+                                    sx={{ color: "blue", "&.Mui-checked": { color: "#0B2E4C" } }}
+                                />
+                            }
+                            label="Personalized Ticket (Participant's name and account ID required for validation)"
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    name="activationCode"
+                                    checked={ticketTypeOption.activationCode}
+                                    onChange={handleOptionChange}
+                                    sx={{ color: "blue", "&.Mui-checked": { color: "#0B2E4C" } }}
+                                />
+                            }
+                            label="Activation Code (Unique QR Code or manual code for entrance validation)"
+                        />
+                    </Box>
+
+                    {/* Buttons - Centered on Mobile */}
+                    <Box
+                        sx={{
+                            mt: 3,
+                            display: "flex",
+                            gap: 2,
+                            flexWrap: "wrap",
+                            justifyContent: { xs: "center", md: "flex-start" },
+                        }}
+                    >
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            sx={{ backgroundColor: '#0B2E4C' }}
+                        >
+                            Save & Publish Tickets
+                        </Button>
+                    </Box>
+                </form>
             </Paper>
         </Box>
     )

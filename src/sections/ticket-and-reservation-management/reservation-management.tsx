@@ -2,6 +2,7 @@ import { Box, Button, Checkbox, FormControlLabel, Typography } from "@mui/materi
 import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
 import { Link } from "react-router-dom";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
 import { useCSVExport, useExcelExport } from "src/hooks/downloadable";
@@ -22,8 +23,8 @@ export function ReservationManagement() {
     const reservationManagementTableHeaders = ["Name", "Email", "Ticket Type", "Purchase Date", "Status"];
     const reservationManagementTableData = [
         { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/02/2025", reservationStatus: "Pending" },
-        { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/03/2025", reservationStatus: "Pending" },
-        { name: "Jean M", email: "jean@email.com", resrvationTicketType: "VIP", purchaseDate: "02/04/2025", reservationStatus: "Pending" },
+        { name: "Jannifer", email: "janni2@email.com", resrvationTicketType: "Standard", purchaseDate: "02/03/2025", reservationStatus: "Pending" },
+        { name: "Nitin", email: "demo3@email.com", resrvationTicketType: "VIP", purchaseDate: "02/04/2025", reservationStatus: "Confirmed" },
     ];
 
     const handleExcelExport = () => {
@@ -43,14 +44,16 @@ export function ReservationManagement() {
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
-
-            {/* Title */}
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-                Reservation Management
-            </Typography>
+            <HeadingCommon
+                baseSize="33px"
+                weight={600}
+                variant="h5"
+                title="Reservation Management"
+                color="#0B2E4E"
+            />
 
             {/* Table */}
-            {/* <TicketReservationManagementTable data={reservationManagementTableData} headers={reservationManagementTableHeaders} type="3" /> */}
+            <TicketReservationManagementTable data={reservationManagementTableData} headers={reservationManagementTableHeaders} type="3" />
 
             {/* Export Buttons */}
             <Box mt={2} display="flex" gap={2}>
@@ -64,11 +67,14 @@ export function ReservationManagement() {
             </Box>
 
             {/* Ticket Validation Section */}
-            <Box mt={4}>
-                <Typography variant="h6" fontWeight="bold">
-                    Ticket Validation
-                </Typography>
-
+            <Box mt={3}>
+                <HeadingCommon
+                    baseSize="30px"
+                    weight={600}
+                    variant="h5"
+                    title="Ticket Validation"
+                    color="#0B2E4E"
+                />
                 <Box display="flex" flexDirection="column" gap={1} mt={1}>
                     <FormControlLabel control={<Checkbox />} label="QR Code Scan" />
                     <FormControlLabel control={<Checkbox defaultChecked />} label="Manual Entry of Unique Code" />

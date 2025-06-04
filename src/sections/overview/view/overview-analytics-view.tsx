@@ -52,19 +52,12 @@ export function OverviewAnalyticsView() {
   const isMobileTablet = useMediaQuery(theme.breakpoints.down("sm")); // Show mobile/tablet view
   const isDesktop = useMediaQuery(theme.breakpoints.up("md")); // Show desktop view
   const up = true;
-  const percentage = 75; // Dynamic Percentage Value
-  // Define highlighted dates
-  const highlightedDates = [
-    new Date(2025, 2, 11), // 11 March 2025
-    new Date(2025, 2, 15), // 15 March 2025
-    new Date(2025, 2, 22), // 22 March 2025
-    new Date(2025, 1, 11), // 11 February 2025
-  ].map((d) => d.toDateString());
+  const percentage = 75;
 
   useEffect(() => {
     const interval = setInterval(() => {
       dispatch(recommTrandingPopularEventFetch());
-    }, 60000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [dispatch]);
@@ -202,7 +195,9 @@ export function OverviewAnalyticsView() {
                                   </IconButton>
                                 </Avatar>
                                 <Typography fontSize={12} color="primary">
-                                  {Number(event.ticketQuantity)} total pcs
+                                  {event.ticketQuantity === "0"
+                                    ? "Unlimited"
+                                    : `${Number(event.ticketQuantity)} pcs`}
                                 </Typography>
                               </Stack>
                               <Stack alignItems="center" spacing={0.5}>
@@ -478,7 +473,7 @@ export function OverviewAnalyticsView() {
                             Ticket Sold
                           </Typography>
                           <Typography variant="caption" fontWeight="bold">
-                            {event.soldTicket || 0}/{event.ticketQuantity}
+                            {event.soldTicket || 0}/{event.ticketQuantity==='0'?'Unlimited':event.ticketQuantity}
                           </Typography>
                         </Box>
 

@@ -1,39 +1,42 @@
 import {
-    Box,
-    Button,
-    Grid,
-    TextField,
-    Typography,
-    Switch,
-    FormControlLabel,
-    RadioGroup,
-    Radio,
-    Checkbox,
+    Box, Button, Grid, TextField, Typography, Switch, FormControlLabel, RadioGroup, Radio, Checkbox,
     InputAdornment,
     IconButton,
     FormControl,
-    ToggleButtonGroup,
-    ToggleButton
+    ToggleButtonGroup,MenuItem,
+    ToggleButton,Select
 } from '@mui/material';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PaymentIcon from '@mui/icons-material/Payment';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import MoneyIcon from '@mui/icons-material/AttachMoney';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { LoadingButton } from '@mui/lab';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
-import { AppDispatch } from 'src/redux/store';
+import { AppDispatch, RootState } from 'src/redux/store';
 import { Iconify } from 'src/components/iconify';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { ticketConfigCreate } from 'src/redux/actions/event.action';
+import { fetchTicketType } from 'src/redux/actions/ticket-&-reservation-management.action';
+
 
 export function StepperStepTwo() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const { tickets } = useSelector((state: RootState) => state?.ticketReservationMang);
+    const [selectedTicket, setSelectedTicket] = useState<string>("");
 
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      dispatch(fetchTicketType());
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
     const [fullRefundCheck, setFullRefundCheck] = useState(false);
     const [noRefundAfterDateCheck, setNoRefundAfterDateCheck] = useState(false);
     const [refundEnabled, setRefundEnabled] = useState(false);
@@ -61,6 +64,62 @@ export function StepperStepTwo() {
             isLimitedSeat: true
         }
     ]);
+
+    const handleTicketSelect = (ticketId: string) => {
+        setSelectedTicket(ticketId);
+        const selected = tickets.find((t: any) => t._id === ticketId);
+
+        if (selected) {
+            // Find if this ticket already exists in our rows
+            const existingRowIndex = ticketRows.findIndex(row => row.id === selected._id);
+
+            if (existingRowIndex >= 0) {
+                // Update existing row
+                setTicketRows(ticketRows.map(row =>
+                    row.id === selected._id ? {
+                        ...row,
+                        ticketType: selected.name,
+                        price: selected.price,
+                        totalTickets: selected.quantity === "Unlimited" ? selected.quantity : selected.quantity,
+                        description: selected.ticketDescription.replace(/<[^>]*>/g, ''),
+                        isLimitedSeat: selected.quantity !== "Unlimited"
+                    } : row
+                ));
+            } else {
+                // Add new row if we have empty rows, or append to the end
+                const emptyRowIndex = ticketRows.findIndex(row => row.ticketType === '');
+
+                if (emptyRowIndex >= 0) {
+                    // Replace first empty row
+                    setTicketRows(ticketRows.map((row, index) =>
+                        index === emptyRowIndex ? {
+                            id: selected._id,
+                            ticketType: selected.name,
+                            price: selected.price,
+                            isLinkPramotion: false,
+                            totalTickets: selected.quantity === "Unlimited" ? selected.quantity : selected.quantity,
+                            description: selected.ticketDescription.replace(/<[^>]*>/g, ''),
+                            isLimitedSeat: selected.quantity !== "Unlimited"
+                        } : row
+                    ));
+                } else {
+                    // Add new row at the end
+                    setTicketRows([
+                        ...ticketRows,
+                        {
+                            id: selected._id,
+                            ticketType: selected.name,
+                            price: selected.price,
+                            isLinkPramotion: false,
+                            totalTickets: selected.quantity === "Unlimited" ? selected.quantity : selected.quantity,
+                            description: selected.ticketDescription.replace(/<[^>]*>/g, ''),
+                            isLimitedSeat: selected.quantity !== "Unlimited"
+                        }
+                    ]);
+                }
+            }
+        }
+    };
     const handleTickteConfigChange = (event: any) => {
         event.preventDefault(); // Prevent default form submission behavior
         const { name, value } = event.target;
@@ -93,7 +152,9 @@ export function StepperStepTwo() {
     const handleTicketConfig = useCallback(async (event: any) => {
         event.preventDefault();
         const formEventData = new FormData();
-
+        console.log('==========ticketRows==========================');
+        console.log(ticketRows);
+        console.log('====================================');
         formEventData.append("tickets", JSON.stringify(ticketRows));
         formEventData.append("purchaseDeadlineDate", ticketConfigData.purchaseDeadlineDate);
         formEventData.append("isPurchaseDeadlineEnabled", ticketConfigData.isPurchaseDeadlineEnabled);
@@ -148,7 +209,29 @@ export function StepperStepTwo() {
     }
     return (
         <Box sx={{ p: 1, maxWidth: '100%', width: '100%' }}>
-            <HeadingCommon variant="h6" title="Ticket Configuration" weight={600} baseSize="33px" />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <HeadingCommon variant="h6" title="Ticket Configuration" weight={600} baseSize="33px" />
+                {tickets?.length > 0 && (
+                    <FormControl sx={{ minWidth: 200, ml: 2 }}>
+                        <Select
+                            value={selectedTicket}
+                            onChange={(e) => handleTicketSelect(e.target.value)}
+                            displayEmpty
+                            size="small"
+                            sx={{ height: 40 }}
+                        >
+                            <MenuItem value="" disabled>
+                                Select existing ticket
+                            </MenuItem>
+                            {tickets.map((ticket: any) => (
+                                <MenuItem key={ticket._id} value={ticket._id}>
+                                    {ticket.name} ({ticket.price})
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                )}
+            </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                 <Typography variant="body1" sx={{ mr: 2 }}>Ticket Type:</Typography>
                 <ToggleButtonGroup
@@ -199,9 +282,6 @@ export function StepperStepTwo() {
                                     fullWidth
                                     required
                                     label="Price for each ticket"
-                                    InputProps={{
-                                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                                    }}
                                     placeholder="0 XAF"
                                     value={row.price}
                                     onChange={(e) => handleChange(row.id, 'price', e.target.value)}

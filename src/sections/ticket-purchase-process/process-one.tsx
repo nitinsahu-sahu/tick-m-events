@@ -30,7 +30,6 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
     const [promoInput, setPromoInput] = useState('');
     const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
     const [promoError, setPromoError] = useState('');
-    const [hasInitialized, setHasInitialized] = useState(false);
 
     // Memoized event data
     const eventId = useMemo(() => eventWithDetails?._id || '', [eventWithDetails]);
@@ -103,7 +102,11 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         tickets.forEach((ticket: any) => {
             ticket.tickets.forEach((item: any) => {
                 const quantity = ticketQuantities[item._id] || 0;
-                const price = parseFloat(item.price.replace(/[^0-9.]/g, ''));
+
+                const price = item.price === "Free" ? 0 : parseFloat(item.price.replace(/[^0-9.]/g, ''))
+                console.log('===========quantity=========================');
+                console.log(quantity, price);
+                console.log('=========================price===========');
                 subtotal += quantity * price;
             });
         });
@@ -157,11 +160,10 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                 const quantity = ticketQuantities[item._id] || 0;
                 if (quantity > 0) {
                     selected.push({
-
-                        ticketId: item._id,
+                        ticketId: item.id,
                         ticketType: item.ticketType,
                         quantity,
-                        unitPrice: parseFloat(item.price.replace(/[^0-9.]/g, ''))
+                        unitPrice: item.price === "Free" ? 0 : parseFloat(item.price.replace(/[^0-9.]/g, ''))
                     });
                 }
             });
@@ -218,14 +220,11 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
             totalAmount: calculateTotal(),
             eventId
         };
+        console.log('====================selection================');
+        console.log(selection);
+        console.log('====================================');
         onTicketsSelected(selection);
     }, [ticketQuantities, eventId, getSelectedTickets, calculateTotal, onTicketsSelected]);
-
-    // Memoized UI values
-    const subtotal = useMemo(() => calculateSubtotal(), [calculateSubtotal]);
-    const discount = useMemo(() => calculateDiscount(), [calculateDiscount]);
-    const total = useMemo(() => calculateTotal(), [calculateTotal]);
-    const selectedTickets = useMemo(() => getSelectedTickets(), [getSelectedTickets]);
 
 
     return (
@@ -389,7 +388,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                 />
             </Box>
             <Box mt={3} display="flex" justifyContent="center">
-                <Button onClick={onNext} fullWidth variant="contained" sx={{ bgcolor: "#0B3558", mt: 2 }} disabled={calculateSubtotal() <= 0}>
+                <Button onClick={onNext} fullWidth variant="contained" sx={{ bgcolor: "#0B3558", mt: 2 }}>
                     Proceed to Participant Details
                 </Button>
             </Box>

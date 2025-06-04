@@ -11,7 +11,6 @@ import { SalesAndStockTracking } from "../sales-&-stock-tracking";
 import { ReservationManagement } from "../reservation-management";
 import { RefundAndCancellationManangement } from "../refund-&-cancellation-management";
 
-
 import("../style.css")
 
 export function TicketAndReservationManagementView() {
@@ -22,7 +21,7 @@ export function TicketAndReservationManagementView() {
   useEffect(() => {
     const interval = setInterval(() => {
       dispatch(fetchTicketType());
-    }, 2000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [dispatch]);

@@ -1,5 +1,5 @@
-import { Button, Checkbox, FormControlLabel, Box, Paper, TextField, RadioGroup, Radio, Typography, Grid } from "@mui/material";
-import { useCallback, useRef, useState } from "react";
+import { Button, Checkbox, FormControlLabel, Box, Paper, TextField, Typography, Grid } from "@mui/material";
+import { useCallback, useState } from "react";
 import { toast, ToastContent } from 'react-toastify';
 import { useDispatch } from "react-redux";
 import ReactQuill from 'react-quill';
@@ -7,17 +7,6 @@ import 'react-quill/dist/quill.snow.css';
 import { createTicketType } from "src/redux/actions/ticket-&-reservation-management.action";
 import { AppDispatch } from "src/redux/store";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
-
-
-interface FormRefs {
-    name: HTMLInputElement | null;
-    price: HTMLInputElement | null;
-    quantity: HTMLInputElement | null;
-    ticketDescription: string;
-    validity: HTMLInputElement | null;
-    transferableTicket: HTMLInputElement | null;
-    activationCode: HTMLInputElement | null;
-}
 
 export interface TicketFormData {
     name: string;
@@ -72,9 +61,6 @@ export function TicketCreationAndConfiguration() {
             quantity: isChecked ? "Unlimited" : ""
         }));
     };
-    // const handleIsUnlimitedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     setIsUnlimited(event.target.checked);
-    // };
 
     const handleChange = (e: any) => {
         const { name, value, type, checked } = e.target;
@@ -96,7 +82,7 @@ export function TicketCreationAndConfiguration() {
         }));
     };
 
-   const handleSubmit = useCallback(async (event: React.FormEvent) => {
+    const handleSubmit = useCallback(async (event: React.FormEvent) => {
         event.preventDefault(); // Prevent default form submission behavior
         const ticketTypeCreate = new FormData();
         ticketTypeCreate.append("name", ticketTypeData.name);
@@ -116,7 +102,7 @@ export function TicketCreationAndConfiguration() {
         } catch (error) {
             toast.error('An unexpected error occurred' as ToastContent);
         }
-    }, [dispatch, ticketTypeOption, ticketTypeData]);
+    }, [dispatch, ticketTypeOption, isUnlimited, isFree, ticketTypeData]);
 
     return (
         <Box boxShadow={3} borderRadius={3} mt={3}>

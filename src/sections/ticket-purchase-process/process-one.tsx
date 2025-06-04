@@ -104,9 +104,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                 const quantity = ticketQuantities[item._id] || 0;
 
                 const price = item.price === "Free" ? 0 : parseFloat(item.price.replace(/[^0-9.]/g, ''))
-                console.log('===========quantity=========================');
-                console.log(quantity, price);
-                console.log('=========================price===========');
+          
                 subtotal += quantity * price;
             });
         });
@@ -220,9 +218,6 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
             totalAmount: calculateTotal(),
             eventId
         };
-        console.log('====================selection================');
-        console.log(selection);
-        console.log('====================================');
         onTicketsSelected(selection);
     }, [ticketQuantities, eventId, getSelectedTickets, calculateTotal, onTicketsSelected]);
 
@@ -241,6 +236,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                             onChange={handleEventChange}
                             sx={{
                                 mt: 2,
+                                textTransform:"capitalize",
                                 width: "100%",
                                 '& .MuiOutlinedInput-root': {
                                     '& fieldset': { borderColor: 'black' },

@@ -11,9 +11,7 @@ export function TicketManagement({tickets}:any) {
 
     const ticketManagementTableHeaders = ["Ticket Name", "Price", "Quantity Available", "Ticket Description", "Remaining Stock", "Actions"];
 
-console.log('==tickets===tickets===============================');
-console.log(tickets);
-console.log('====================================');
+
     return (
         <Box>
             <HeadingCommon baseSize="33px" weight={600} variant="h5" title="Ticket Management" />

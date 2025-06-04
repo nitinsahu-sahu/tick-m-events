@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "src/redux/store";
 import { updateTicketType } from "src/redux/actions/ticket-&-reservation-management.action";
+import { formatEventDate } from "src/hooks/formate-time";
 
 interface ApiResult {
     status: number;
@@ -94,54 +95,72 @@ export function TicketReservationManagementTable({
                         data?.map((row, index) => (
                             <TableRow key={row._id} sx={{ backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#e0e0e0" }}>
                                 <TableCell align="center" sx={{ fontWeight: "bold", textTransform: 'capitalize' }}>
-                                    {row.name}
+                                    {row.name || row.userId.name}
                                 </TableCell>
-
-                                <TableCell align="center" >
-                                    {editingId === row._id ? (
-                                        <TextField
-                                            value={editedData.price}
-                                            onChange={(e) => handleFieldChange('price', e.target.value)}
-                                            sx={{ width: '100px' }}
-                                            size="small"
-                                        />
-                                    ) : (
-                                        <span style={{ textTransform: 'capitalize' }}>{row.price || row.email}</span>
-                                    )}
-                                </TableCell>
-
-                                <TableCell align="center" >
-                                    {editingId === row._id ? (
-                                        <TextField
-                                            value={editedData.quantity}
-                                            onChange={(e) => handleFieldChange('quantity', e.target.value)}
-                                            sx={{ width: '100px' }}
-                                            size="small"
-                                        />
-                                    ) : (
-                                        <span style={{ textTransform: 'capitalize' }}>{row.quantity || row.resrvationTicketType}</span>
-                                    )}
-                                </TableCell>
-
-                                <TableCell align="center" >
-                                    {editingId === row._id ? (
-                                        <TextField
-                                            value={editedData.ticketDescription}
-                                            onChange={(e) => handleFieldChange('ticketDescription', e.target.value)}
-                                            multiline
-                                            rows={3}
-                                            sx={{ width: '200px' }}
-                                            size="small"
-                                        />
-                                    ) : (
-                                        type === "1" ? ReactHtmlParser(row?.ticketDescription) :
-                                            type === '3' || type === '4' ? row.purchaseDate : row.quantity === "Unlimited" ? row.quantity : parseInt(row.quantity, 10) - parseInt(row.sold || 0, 10)
-                                    )}
-                                </TableCell>
+                                {
+                                    type === "3" || type === "4" ? <TableCell align="center">
+                                        {row.userId.email}
+                                    </TableCell> : <TableCell align="center" >
+                                        {editingId === row._id ? (
+                                            <TextField
+                                                value={editedData.price}
+                                                onChange={(e) => handleFieldChange('price', e.target.value)}
+                                                sx={{ width: '100px' }}
+                                                size="small"
+                                            />
+                                        ) : (
+                                            <span style={{ textTransform: 'capitalize' }}>{row.price || row.email}</span>
+                                        )}
+                                    </TableCell>
+                                }
 
                                 {
-                                    type === '4' ?
-                                        <TableCell align="center" >{row.status}</TableCell>
+                                    type === "3" || type === "4" ? (
+                                        <TableCell align="center" sx={{ textTransform: "capitalize" }}>
+                                            {row.tickets && row.tickets.length > 0
+                                                ? row.tickets
+                                                    .map((t: any) => t.ticketType)
+                                                    .join(" | ")
+                                                : "-"}
+                                        </TableCell>
+                                    ) : <TableCell align="center" >
+                                        {editingId === row._id ? (
+                                            <TextField
+                                                value={editedData.quantity}
+                                                onChange={(e) => handleFieldChange('quantity', e.target.value)}
+                                                sx={{ width: '100px' }}
+                                                size="small"
+                                            />
+                                        ) : (
+                                            <span style={{ textTransform: 'capitalize' }}>{row.quantity || row.resrvationTicketType}</span>
+                                        )}
+                                    </TableCell>
+                                }
+
+
+                                {
+                                    type === '3' || type === "4" ? <TableCell align="center">{formatEventDate(row.createdAt)}</TableCell> : <TableCell align="center" >
+                                        {editingId === row._id ? (
+                                            <TextField
+                                                value={editedData.ticketDescription}
+                                                onChange={(e) => handleFieldChange('ticketDescription', e.target.value)}
+                                                multiline
+                                                rows={3}
+                                                sx={{ width: '200px' }}
+                                                size="small"
+                                            />
+                                        ) : (
+                                            type === "1" ? ReactHtmlParser(row?.ticketDescription) :
+                                                type === '3' || type === '4' ? row.purchaseDate : row.quantity === "Unlimited" ? row.quantity : parseInt(row.quantity, 10) - parseInt(row.sold || 0, 10)
+                                        )}
+                                    </TableCell>
+                                }
+
+
+                                {
+
+                                    type === "3" || type === "4" ?
+                                        <TableCell align="center" sx={{ textTransform: "capitalize" }} >{row.paymentStatus}</TableCell>
                                         :
                                         <TableCell align="center" >
                                             {type === "3" ? row.reservationStatus : type === "1" ? row.quantity === "Unlimited" ? row.quantity : parseInt(row.quantity, 10) - parseInt(row.sold || 0, 10) : `${row.sold === undefined ? 0 : row.sold}` || 0}
@@ -182,7 +201,7 @@ export function TicketReservationManagementTable({
                                             >
                                                 Edit
                                             </Button>
-                                        ) : row.price === "Free" ? row.price : parseInt(row.price, 10) * parseInt(row.sold||0, 10)
+                                        ) : row.price === "Free" ? row.price : parseInt(row.price, 10) * parseInt(row.sold || 0, 10)
                                     }
                                 </TableCell>}
                                 {

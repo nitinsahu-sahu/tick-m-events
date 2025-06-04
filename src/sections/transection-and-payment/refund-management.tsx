@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Button, Checkbox, FormControlLabel, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, Radio, FormControlLabel, RadioGroup, TextField, Typography } from "@mui/material";
 
 import { TransactionAndPaymentTable } from "src/components/tables/transaction-&-payment-table";
 
@@ -7,7 +7,10 @@ import { RefundTableData, RefundTableHeaders } from "./utils";
 
 export function RefundManagementHistory() {
     const [selectedOption, setSelectedOption] = useState(null);
-
+    const [selectedPolicy, setSelectedPolicy] = useState("");
+    const [daysBeforeEvent, setDaysBeforeEvent] = useState("");
+    const [partialRefundPercent, setPartialRefundPercent] = useState("");
+    const [cutoffDate, setCutoffDate] = useState("");
     const handleChange = (option: any) => {
         setSelectedOption(option);
     };
@@ -20,48 +23,76 @@ export function RefundManagementHistory() {
             <Box mt={2} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
                 {/* Card Wrapper */}
                 <TransactionAndPaymentTable
-                        headers={RefundTableHeaders}
-                        data={RefundTableData}
-                        type="2"
-                    />
+                    headers={RefundTableHeaders}
+                    data={RefundTableData}
+                    type="2"
+                />
 
                 <Box mt={3}>
                     <Typography variant="h6" fontWeight="bold" gutterBottom>
                         Configurable Refund Policies
                     </Typography>
 
-                    <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                            <FormControlLabel
-                                control={<Checkbox checked={selectedOption === "full_refund"} onChange={() => handleChange("full_refund")} />}
-                                label="Full refund up to X days before the event (Editable field)"
+                    <RadioGroup
+                        value={selectedPolicy}
+                        onChange={(e) => setSelectedPolicy(e.target.value)}
+                        sx={{ mt: 2 }}
+                    >
+                        {/* Full Refund Option */}
+                        <FormControlLabel
+                            value="full_refund"
+                            control={<Radio />}
+                            label="Full refund up to X days before the event"
+                        />
+                        {selectedPolicy === "full_refund" && (
+                            <TextField
+                                size="small"
+                                placeholder="Enter number of days"
+                                value={daysBeforeEvent}
+                                onChange={(e) => setDaysBeforeEvent(e.target.value)}
+                                sx={{ ml: 4, mt: 1, width: "200px" }}
                             />
-                            <TextField fullWidth disabled={selectedOption !== "full_refund"} placeholder="Enter number of days" variant="outlined" />
-                        </Grid>
+                        )}
 
-                        <Grid item xs={12}>
-                            <FormControlLabel
-                                control={<Checkbox checked={selectedOption === "partial_refund"} onChange={() => handleChange("partial_refund")} />}
-                                label="Partial refund with penalty (Percentage of ticket price retained)"
+                        {/* Partial Refund Option */}
+                        <FormControlLabel
+                            value="partial_refund"
+                            control={<Radio />}
+                            label="Partial refund with penalty (percentage of ticket price retained)"
+                        />
+                        {selectedPolicy === "partial_refund" && (
+                            <TextField
+                                size="small"
+                                placeholder="Enter percentage"
+                                value={partialRefundPercent}
+                                onChange={(e) => setPartialRefundPercent(e.target.value)}
+                                sx={{ ml: 4, mt: 1, width: "200px" }}
                             />
-                            <TextField fullWidth disabled={selectedOption !== "partial_refund"} placeholder="Enter percentage" variant="outlined" />
-                        </Grid>
+                        )}
 
-                        <Grid item xs={12}>
-                            <FormControlLabel
-                                control={<Checkbox checked={selectedOption === "no_refund_purchase"} onChange={() => handleChange("no_refund_purchase")} />}
-                                label="No refund after ticket purchase"
-                            />
-                        </Grid>
+                        {/* No Refund After Purchase */}
+                        <FormControlLabel
+                            value="no_refund_purchase"
+                            control={<Radio />}
+                            label="No refund after ticket purchase"
+                        />
 
-                        <Grid item xs={12}>
-                            <FormControlLabel
-                                control={<Checkbox checked={selectedOption === "no_refund_date"} onChange={() => handleChange("no_refund_date")} />}
-                                label="No refund after a specific date"
+                        {/* No Refund After Specific Date */}
+                        <FormControlLabel
+                            value="no_refund_date"
+                            control={<Radio />}
+                            label="No refund after a specific date"
+                        />
+                        {selectedPolicy === "no_refund_date" && (
+                            <TextField
+                                type="date"
+                                size="small"
+                                value={cutoffDate}
+                                onChange={(e) => setCutoffDate(e.target.value)}
+                                sx={{ ml: 4, mt: 1, width: "200px" }}
                             />
-                            <TextField fullWidth disabled={selectedOption !== "no_refund_date"} placeholder="Select a date" variant="outlined" type="date" />
-                        </Grid>
-                    </Grid>
+                        )}
+                    </RadioGroup>
 
                     <Box sx={{ mt: 3, textAlign: "center" }}>
                         <Button

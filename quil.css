@@ -17,3 +17,10 @@
 .css-1jzfpru{
 color: black !important;
 }
+
+.react-calendar__navigation__arrow{
+    display: none;
+}
+.react-calendar__navigation{
+    border: 1px solid #2395D4 !important;
+}

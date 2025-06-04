@@ -84,16 +84,18 @@ export function TicketCreationAndConfiguration() {
 
     const handleSubmit = useCallback(async (event: React.FormEvent) => {
         event.preventDefault(); // Prevent default form submission behavior
-        const ticketTypeCreate = new FormData();
-        ticketTypeCreate.append("name", ticketTypeData.name);
-        ticketTypeCreate.append("quantity", isUnlimited ? "Unlimited" : ticketTypeData.quantity);
-        ticketTypeCreate.append("ticketDescription", ticketTypeData.description);
-        ticketTypeCreate.append("price", isFree ? "Free" : ticketTypeData.price);
-        ticketTypeCreate.append("validity", ticketTypeData.validity);
-        ticketTypeCreate.append("optionList", JSON.stringify(ticketTypeOption));
-        try {
-            const result = await dispatch(createTicketType(ticketTypeCreate) as unknown as Promise<ApiResponse>);
+        // Create TicketFormData object instead of FormData
+        const ticketData: TicketFormData = {
+            name: ticketTypeData.name,
+            quantity: isUnlimited ? "Unlimited" : ticketTypeData.quantity,
+            ticketDescription: ticketTypeData.description,
+            price: isFree ? "Free" : ticketTypeData.price,
+            validity: ticketTypeData.validity,
+            options: ticketTypeOption // Make sure this matches the TicketFormData options interface
+        };
 
+        try {
+            const result = await dispatch(createTicketType(ticketData) as unknown as Promise<ApiResponse>)
             if (result.status === 201) {
                 toast.success(result.message as ToastContent);
             } else {

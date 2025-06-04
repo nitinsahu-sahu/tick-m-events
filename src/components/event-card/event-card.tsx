@@ -1,17 +1,20 @@
 import { Box, Button, Card, CardContent, Grid, Typography, Avatar } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
+import { formatTimeTo12Hour } from 'src/hooks/formate-time';
+
+import { HeadingCommon } from '../multiple-responsive-heading/heading';
 
 export const TicketCard = ({ ticket }: any) => (
   <Card
     sx={{
       borderRadius: 3,
       boxShadow: 3,
-      backgroundImage: `url('./assets/images/event/image.png')`,
-      backgroundSize: 'auto',
+      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("${ticket?.coverImage?.url || './assets/images/event/image.png'}")`,
+      backgroundSize: "cover",
       backgroundPosition: 'center',
       overflow: 'visible',
       position: 'relative',
-      mt:4
+      mt: 4
 
     }}
   >
@@ -53,7 +56,7 @@ export const TicketCard = ({ ticket }: any) => (
 
     <CardContent sx={{ textAlign: 'center', position: 'relative' }}>
       <Avatar
-        src={`/assets/images/home-and-recommendations/${ticket.image}`}
+        src={ticket?.customization?.eventLogo?.url || `/assets/images/home-and-recommendations/${ticket.image}`}
         alt={ticket.title}
         sx={{
           width: { xs: '80px', sm: '90px', md: '97px' },
@@ -64,23 +67,8 @@ export const TicketCard = ({ ticket }: any) => (
           transform: 'translateX(-50%)',
         }}
       />
-      <Typography
-        variant="h6"
-        fontWeight={600}
-        fontSize={{ xs: '15px', sm: '20px', md: '25px' }}
-        mt={5}
-        color="#0B2E4C"
-      >
-        {ticket.title}
-      </Typography>
-      <Typography
-        variant="body2"
-        color="black"
-        fontWeight={400}
-        fontSize={{ xs: '8px', sm: '12px', md: '16px' }}
-      >
-        {ticket.location} | {ticket.date} | {ticket.time}
-      </Typography>
+      <HeadingCommon title={ticket.eventName} weight={600} baseSize="25px" color="#2395D4" mt={6} />
+      <HeadingCommon title={`${ticket.location} | ${ticket.date} | ${formatTimeTo12Hour(ticket.time)}`} color="white" weight={400} baseSize="16px" />
       <Typography
         variant="body2"
         fontSize={{ xs: '8px', sm: '12px', md: '16px' }}

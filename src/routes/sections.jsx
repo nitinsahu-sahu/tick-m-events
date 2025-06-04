@@ -32,6 +32,8 @@ export const HomePage = lazy(() => import('src/pages/home'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const FrontHomePage = lazy(() => import('src/pages/front-home'));
 export const EventsPage = lazy(() => import('src/pages/events'));
+export const CategoriesPage = lazy(() => import('src/pages/category/category'));
+export const SingleCategoryPage = lazy(() => import('src/pages/category/single-category'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const TicketAndReservationManagementPage = lazy(() => import('src/pages/ticket-and-reservation-management'));
 
@@ -263,6 +265,18 @@ export function Router() {
       path: '/our-event',
       element: (
         <EventsPage />
+      ),
+    },
+    {
+      path: '/category/:categoryId',
+      element: (
+        <SingleCategoryPage />
+      ),
+    },
+    {
+      path: '/category',
+      element: (
+        <CategoriesPage />
       ),
     },
     {

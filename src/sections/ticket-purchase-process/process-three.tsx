@@ -24,6 +24,9 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
     };
 
     const handleSubmit = async (event: React.FormEvent) => {
+        console.log('==================tickets==================');
+        console.log(tickets);
+        console.log('====================================');
         event.preventDefault();
         const orderFormEntry = new FormData();
         orderFormEntry.append("eventId", tickets.eventId);

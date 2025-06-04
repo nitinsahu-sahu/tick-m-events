@@ -1,7 +1,6 @@
 import { AnyAction } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 
-// import { TicketFormData } from 'src/sections/ticket-and-reservation-management/ticket-creation-&-onfiguration';
 
 import axios from "../helper/axios";
 import { RootState } from "../store";

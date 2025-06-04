@@ -1,4 +1,4 @@
-import { TableContainer, Typography, CircularProgress, Table, TableRow, TableBody, Paper, TableHead, TableCell, Button, TextField } from "@mui/material";
+import { TableContainer, Typography, CircularProgress, Table, TableRow, TableBody, Paper, TableHead, TableCell, Button, TextField, Box } from "@mui/material";
 import { useState } from "react";
 import ReactHtmlParser from 'react-html-parser';
 import { toast } from 'react-toastify';
@@ -43,9 +43,6 @@ export function TicketReservationManagementTable({
     };
 
     const handleApplyClick = async () => {
-        console.log('====================================');
-        console.log(editedData);
-        console.log('====================================');
         try {
             const result = await dispatch(updateTicketType({ editedData }));
             if ((result as ApiResult)?.status === 200) {
@@ -100,7 +97,7 @@ export function TicketReservationManagementTable({
                                     {row.name}
                                 </TableCell>
 
-                                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                                <TableCell align="center" >
                                     {editingId === row._id ? (
                                         <TextField
                                             value={editedData.price}
@@ -109,11 +106,11 @@ export function TicketReservationManagementTable({
                                             size="small"
                                         />
                                     ) : (
-                                        <span style={{ textTransform: 'uppercase' }}>{row.price}</span>
+                                        <span style={{ textTransform: 'capitalize' }}>{row.price || row.email}</span>
                                     )}
                                 </TableCell>
 
-                                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                                <TableCell align="center" >
                                     {editingId === row._id ? (
                                         <TextField
                                             value={editedData.quantity}
@@ -122,11 +119,11 @@ export function TicketReservationManagementTable({
                                             size="small"
                                         />
                                     ) : (
-                                        <span style={{ textTransform: 'capitalize' }}>{row.quantity}</span>
+                                        <span style={{ textTransform: 'capitalize' }}>{row.quantity || row.resrvationTicketType}</span>
                                     )}
                                 </TableCell>
 
-                                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                                <TableCell align="center" >
                                     {editingId === row._id ? (
                                         <TextField
                                             value={editedData.ticketDescription}
@@ -137,15 +134,21 @@ export function TicketReservationManagementTable({
                                             size="small"
                                         />
                                     ) : (
-                                        type === "1" ? ReactHtmlParser(row?.ticketDescription) : parseInt(row.quantity,10) - parseInt(row.sold,10)
+                                        type === "1" ? ReactHtmlParser(row?.ticketDescription) :
+                                            type === '3' || type === '4' ? row.purchaseDate : row.quantity === "Unlimited" ? row.quantity : parseInt(row.quantity, 10) - parseInt(row.sold || 0, 10)
                                     )}
                                 </TableCell>
 
-                                <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                    {row.sold || 0}
-                                </TableCell>
+                                {
+                                    type === '4' ?
+                                        <TableCell align="center" >{row.status}</TableCell>
+                                        :
+                                        <TableCell align="center" >
+                                            {type === "3" ? row.reservationStatus : type === "1" ? row.quantity === "Unlimited" ? row.quantity : parseInt(row.quantity, 10) - parseInt(row.sold || 0, 10) : `${row.sold === undefined ? 0 : row.sold}` || 0}
+                                        </TableCell>
+                                }
 
-                                <TableCell align="center">
+                                {type === "3" || type === '4' ? null : <TableCell align="center">
                                     {
                                         type === "1" ? editingId === row._id ? (
                                             <Button
@@ -179,9 +182,52 @@ export function TicketReservationManagementTable({
                                             >
                                                 Edit
                                             </Button>
-                                        ) : row.price === "Free" ? row.price : parseInt(row.price, 10) * parseInt(row.sold, 10)
+                                        ) : row.price === "Free" ? row.price : parseInt(row.price, 10) * parseInt(row.sold||0, 10)
                                     }
-                                </TableCell>
+                                </TableCell>}
+                                {
+                                    type === "4" ? <TableCell align="center">
+                                        <Box sx={{
+                                            display: 'flex',
+                                            gap: 1, // Adds 8px gap between buttons
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
+                                        }}>
+                                            <Button
+                                                variant="contained"
+                                                size="small" // Makes button smaller
+                                                sx={{
+                                                    backgroundColor: '#0B2E4E',
+                                                    color: 'white',
+                                                    "&:hover": {
+                                                        backgroundColor: "#0b243d"
+                                                    },
+                                                    fontSize: { xs: "0.65rem", sm: "0.8rem" }, // Smaller font
+                                                    padding: { xs: "4px 8px", sm: "6px 12px" }, // Tighter padding
+                                                    minWidth: 'auto' // Allows button to shrink
+                                                }}
+                                            >
+                                                Approve
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                size="small"
+                                                sx={{
+                                                    backgroundColor: 'red',
+                                                    color: 'white',
+                                                    "&:hover": {
+                                                        backgroundColor: "darkred" // Changed to darkred for better hover state
+                                                    },
+                                                    fontSize: { xs: "0.65rem", sm: "0.8rem" },
+                                                    padding: { xs: "4px 8px", sm: "6px 12px" },
+                                                    minWidth: 'auto'
+                                                }}
+                                            >
+                                                Deny
+                                            </Button>
+                                        </Box>
+                                    </TableCell> : null
+                                }
                             </TableRow>
                         ))
                     )}
@@ -190,92 +236,3 @@ export function TicketReservationManagementTable({
         </TableContainer >
     );
 }
-
-{/* <TableRow
-    key={index}
-    sx={{
-        backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#e0e0e0",
-    }}
->
-    <TableCell align="center" sx={{ fontWeight: "bold" }}>
-        {row.type || row.ticketType || row.name}
-    </TableCell>
-
-    {/* Conditionally Render based on type */}
-// {
-//     type === "1" ?
-//         <>
-//             {[row.price, row.total, row.remaining].map((value, i) => (
-//                 <TableCell key={i} align="center">
-//                     {value}
-//                 </TableCell>
-//             ))}
-//         </>
-//         :
-//         type === "3" || type === "4" ?
-//             <>
-//                 {[row.email, row.resrvationTicketType, row.purchaseDate].map((value, i) => (
-//                     <TableCell key={i} align="center">
-//                         {value}
-//                     </TableCell>
-//                 ))}
-//             </>
-//             :
-//             <>
-//                 {[row.price, row.totalStock, row.remainingStock].map((value, i) => (
-//                     <TableCell key={i} align="center">
-//                         {value}
-//                     </TableCell>
-//                 ))}
-//             </>
-// }
-
-
-// {
-//     row.status ? (
-//         <TableCell align="center">
-//             {row.status}
-//         </TableCell>
-//     ) : (
-//         <TableCell align="center">
-//             {row.sold || row.ticketSold || row.reservationStatus}
-//         </TableCell>
-//     )
-// }
-
-// {
-//     type === '3' ? null : <TableCell align="center">
-//         {
-//             type === "1" ? <Button
-//                 variant="contained"
-//                 sx={{
-//                     backgroundColor: '#0B2E4E',
-//                     color: 'white',
-//                     "&:hover": {
-//                         backgroundColor: "#0b243d"
-//                     },
-//                     fontSize: { xs: "0.7rem", sm: "1rem" },
-//                     width: { xs: "100%", sm: "auto" },
-//                 }}
-//             >
-//                 {row.action}
-//             </Button>
-//                 : type === "4" ?
-//                     row.refundAction.map((action: any) => (
-//                         <Button variant="outlined" size="small" sx={{ marginX: 0.5, color: action === "Deny" ? "white" : "black", borderColor: "gray", backgroundColor: action === "Deny" ? "#FF0000" : "white" }}>{action}</Button>
-//                     ))
-//                     // <>
-//                     //     <Button variant="outlined" size="small" sx={{ marginX: 0.5, color: "black", borderColor: "gray" }}>Small</Button>
-//                     //     <Button variant="contained" size="small" sx={{ marginX: 0.5, backgroundColor: "#FF0000", borderColor: "gray" }} >Small</Button>
-//                     // </>
-
-//                     :
-//                     row.revenue || row.revenueGenerated
-
-//         }
-
-//     </TableCell>
-// }
-
-
-// </TableRow > */}

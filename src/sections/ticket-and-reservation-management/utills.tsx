@@ -62,3 +62,5 @@ export const chartRealTimeOptions: ApexOptions = {
     dataLabels: { enabled: true },
     responsive: [{ breakpoint: 768, options: { legend: { position: "bottom" } } }],
 };
+
+export const realTimeSalseTrackingTableHeaders = ["Ticket Type", "Price", "Total Stock", "Remaining Stock", "Tickets Sold", "Revenue Generated"];

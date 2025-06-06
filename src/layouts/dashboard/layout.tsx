@@ -125,9 +125,6 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   hiddenTransectionPayment.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Transaction & Payment Management" />
                 }
                 {
-                  hiddenLoyaltyProgram.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="My Loyalty Points" />
-                }
-                {
                   hiddenMessageClientRel.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Messaging & Client Relationship" />
                 }
                 {
@@ -135,10 +132,6 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 }
                 {
                   hiddenServiceReq.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Service Request & Negotiation" />
-                }
-
-                {
-                  hiddenCustomPhotoVideo.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Custom Photo or Video Filter" />
                 }
                 {
                   hiddenGlobalOverview.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Global Overview & General Statistics" />
@@ -157,20 +150,11 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 }
                 {
                   (
-                    hiddenHomeRecommadation.some(path => pathname.includes(path)) ||
-                    hiddenEventSearchDetails.some(path => pathname.includes(path)) ||
-                    hiddenPaths.some(path => pathname.includes(path))) &&
-                  !hiddenProfileService.some(path => pathname.includes(path)) && (
+                    role === 'participant' &&
                     <Typography fontWeight={600} fontSize={{ xs: "18px", sm: "24px", md: "30px" }} key={_id}>
                       Hey Welcome, <span>{name}</span>!
                     </Typography>
                   )
-                }
-                {
-                  hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
-                  <Typography fontWeight={600} fontSize={{ xs: "18px", sm: "24px", md: "30px" }} key={_id}>
-                    Event Name
-                  </Typography>
                 }
               </>
             ),
@@ -179,10 +163,6 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 {
                   role === 'organizer' && (<SearchEvent />)
                 }
-                {/* Search Bar */}
-
-
-
                 {/* Notifications & Popovers (Hidden on Mobile & Tablet) */}
                 {!isMobileOrTablet && (
                   <>
@@ -235,10 +215,17 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 )}
                 {
                   (
+                    role === 'participant' &&
+                    <>
+                      <WishlistPopover />
+                    </>
+                  )
+                }
+                {
+                  (
                     hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
                     <>
                       <Iconify icon="typcn:filter" width={24} />
-                      <WishlistPopover />
                     </>
                   )
                 }

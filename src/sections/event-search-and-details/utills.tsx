@@ -1,29 +1,4 @@
-export const ticketst = [
-    {
-        id: 1,
-        title: 'Festival Urban Music',
-        image: 'festival.png',
-        location: 'Douala',
-        date: '10/02/2025',
-        time: '5:00 PM',
-        status: '5,000 XAF',
-        statusColor: '#0B2E4C',
-        rating: 4.8,
-        viewPromo: false,
-    },
-    {
-        id: 2,
-        title: 'Startup Summit 2025',
-        image: 'startup.png',
-        location: 'Yaoundé',
-        date: '10/02/2025',
-        time: '5:00 PM',
-        status: 'Free',
-        statusColor: '#0B2E4C',
-        rating: 4.8,
-        viewPromo: false,
-    },
-];
+
 
 export const eventsTickets = [
     {

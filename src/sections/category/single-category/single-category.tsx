@@ -1,9 +1,10 @@
 import { Box, Grid, Typography, Card, CardMedia, Button } from '@mui/material';
-import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { TicketCard } from 'src/components/event-card/event-card';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Marquee from 'react-fast-marquee';
 import React, { useEffect } from 'react';
+
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { TicketCard } from 'src/components/event-card/event-card';
 
 export function SingleCategoriesView() {
   // Example category data with a beautiful arts/culture banner image
@@ -67,7 +68,9 @@ export function SingleCategoriesView() {
       {/* Enhanced Category Banner with beautiful image */}
       <Card
         sx={{
-          borderRadius: 3,
+          borderRadius: 0, // Reset all border radius first
+          borderBottomLeftRadius: 12,
+          borderBottomRightRadius: 12,
           mb: 4,
           position: 'relative',
           overflow: 'hidden',
@@ -81,14 +84,13 @@ export function SingleCategoriesView() {
       >
         <CardMedia
           component="img"
-          height="350" // Slightly taller for more impact
+          height="350"
           image={category.cover.url}
           alt={category.name}
           sx={{
             objectFit: 'cover',
             width: '100%',
-            borderTopLeftRadius: 12,
-            borderTopRightRadius: 12,
+            borderRadius: 0, // Make sure top corners are not rounded
           }}
         />
 
@@ -194,17 +196,79 @@ export function SingleCategoriesView() {
         </Box>
       </Card>
 
-      {/* Events Section */}
-      <Typography variant="h5" fontWeight={700} mb={3} sx={{ color: '#0B2E4C' }}>
-        Upcoming {category.name}
-      </Typography>
-      <Grid container spacing={3}>
-        {category.events.map((event) => (
-          <Grid item xs={12} sm={6} md={4} key={event.id}>
-            <TicketCard ticket={event} />
-          </Grid>
-        ))}
-      </Grid>
+      {/* Events Section - Final Enhanced Version */}
+      <Box
+        sx={{
+          mt: 6,
+          px: { xs: 2, sm: 3, md: 4 },
+          maxWidth: '1400px',
+          mx: 'auto',
+          mb: 8, // Added proper bottom margin for the page
+        }}
+      >
+        <Typography
+          variant="h4"
+          fontWeight={700}
+          mb={4}
+          sx={{
+            color: '#0B2E4C',
+            position: 'relative',
+            '&:after': {
+              content: '""',
+              display: 'block',
+              width: '60px',
+              height: '4px',
+              backgroundColor: 'primary.main',
+              mt: 2,
+              borderRadius: '2px',
+            },
+          }}
+        >
+          Upcoming {category.name}
+        </Typography>
+
+        <Grid
+          container
+          spacing={{ xs: 2, sm: 3, md: 4 }}
+          sx={{
+            justifyContent: { xs: 'center', sm: 'flex-start' },
+          }}
+        >
+          {category.events.map((event) => (
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              lg={4}
+              key={event.id}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                transition: 'transform 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-5px)',
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  width: '100%',
+                  maxWidth: '360px',
+                  '& .MuiButton-contained': {
+                    // Targeting the Book Now button
+                    whiteSpace: 'nowrap', // Ensures text stays in one line
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  },
+                }}
+              >
+                <TicketCard ticket={event} />
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
     </Box>
   );
 }

@@ -18,7 +18,8 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { useSelector } from 'react-redux';
 import { RootState } from 'src/redux/store';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { PopularEvent } from './PopularEvent';
+import { PopularEvent } from '../home-and-recommendations/PopularEvent';
+
  
 export function FindYourEvent({ handleEventDetails }: any) {
   const { fullData } = useSelector((state: RootState) => state?.event);
@@ -378,7 +379,7 @@ export function FindYourEvent({ handleEventDetails }: any) {
         <Grid container spacing={3}>
           {filteredEvents.slice(0, visibleEvents).map((item: any) => (
             <Grid item xs={12} sm={6} md={6} key={item._id}>
-              <PopularEvent event={item} handleEventDetails={handleEventDetails} />
+              <PopularEvent event={item} handleEventDetails={handleEventDetails} flag="search"/>
             </Grid>
           ))}
         </Grid>

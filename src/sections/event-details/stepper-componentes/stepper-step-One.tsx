@@ -25,6 +25,7 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
     const dispatch = useDispatch<AppDispatch>();
     // ye dala hai
     const { categories } = useSelector((state: RootState) => state.event);
+    
     useEffect(() => {
         dispatch(fetchAllCategories());
     }, [dispatch]);

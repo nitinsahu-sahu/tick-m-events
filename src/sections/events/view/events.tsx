@@ -1,4 +1,4 @@
-import { Grid, Box } from '@mui/material';
+import { Grid, Box,Fade,Typography } from '@mui/material';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { TicketCard } from 'src/components/event-card/event-card';
 
@@ -44,14 +44,36 @@ const events = [
 
 export function EventsView() {
   return (
-    <Box p={2}>
-      <HeadingCommon title="Events List" weight={600} baseSize="34px" variant="h5" />
+    <Box
+      sx={{
+        px: { xs: 2, md: 6 },
+        py: { xs: 4, md: 8 },
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        minHeight: '100vh',
+      }}
+    >
+      <HeadingCommon title="🎉 Upcoming Events" weight={700} baseSize="38px" variant="h4" />
+      <Typography
+        sx={{
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          color: '#555',
+          mt: 1,
+          mb: 4,
+        }}
+        fontSize={{ xs: '16px', md: '18px' }}
+      >
+        Discover the most exciting events happening around you.
+      </Typography>
 
-      <Grid container spacing={3} mt={2}>
-        {events.map((event) => (
-          <Grid item xs={12} sm={6} md={4} key={event.id}>
-            <TicketCard ticket={event} />
-          </Grid>
+      <Grid container spacing={4}>
+        {events.map((event, index) => (
+          <Fade in timeout={500 + index * 200} key={event.id}>
+            <Grid item xs={12} sm={6} md={4}>
+              <TicketCard ticket={event} />
+            </Grid>
+          </Fade>
         ))}
       </Grid>
     </Box>

@@ -28,16 +28,17 @@ export const eventAddToWishlist = (selectedViewEvent) => async (dispatch) => {
 
     try {
         const response = await axios.post("event-wishlist", { eventId: _id });
-
         dispatch({
             type: eventConstants.WISHLIST_ADD_SUCCESS,
             payload: {
                 message: response?.data?.message
             },
         });
+        dispatch(wishlistEventFetch())
         return {
             type: eventConstants.WISHLIST_ADD_SUCCESS,
             message: response?.data?.message,
+            status: response?.status,
         };
     } catch (error) {
         dispatch({
@@ -46,7 +47,8 @@ export const eventAddToWishlist = (selectedViewEvent) => async (dispatch) => {
         });
         return {
             type: eventConstants.WISHLIST_ADD_FAILURE,
-            message: error?.response?.data?.message
+            message: error?.response?.data?.message,
+            status: error?.status,
         };
     }
 };

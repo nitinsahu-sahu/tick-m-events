@@ -1,4 +1,4 @@
-import { Typography, Grid, Box, Paper, Button, IconButton } from '@mui/material';
+import { Typography, Grid, Box, Paper, Button, IconButton, CircularProgress } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
@@ -17,29 +17,7 @@ import { ExploreMoreSection } from '../ExploreMore';
 
 export function HomeAndRecommendationsView() {
   const { upcomingEvents, popularEvents, recommendedEvents } = useSelector((state: RootState) => state?.homeRecom);
-console.log('====popularEvents================================');
-console.log(popularEvents);
-console.log('====================================');
-  const dispatch = useDispatch<AppDispatch>();
 
-
-  useEffect(() => {
-    // Initial fetch after 2 seconds
-    const initialFetchTimer = setTimeout(() => {
-      dispatch(recommTrandingPopularEventFetch());
-    }, 2000);
-
-    // Set up interval for periodic refresh (1 minute)
-    const interval = setInterval(() => {
-      dispatch(recommTrandingPopularEventFetch());
-    }, 60000); // 60,000ms = 1 minute
-
-    // Cleanup both timer and interval
-    return () => {
-      clearTimeout(initialFetchTimer);
-      clearInterval(interval);
-    };
-  }, [dispatch]);
   const events = [
     { title: 'Tech Conference 2025', location: 'New York, USA', date: 'April 15, 2025' },
     { title: 'Music Festival', location: 'New York, USA', date: 'April 15, 2025' },
@@ -65,24 +43,36 @@ console.log('====================================');
         <HeadingCommon title="Recommended Events for You" weight={600} baseSize="34px" variant="h5" />
         {/* Main Grid Layout */}
         <Grid container spacing={3} mt={3}>
-          {recommendedEvents?.slice(0, 2).map((ticketc: any, index: any) => (
-            <Grid item xs={12} sm={6} md={6} key={ticketc._id || index}>
-              <TicketCard ticket={ticketc} key={index} />
-            </Grid>
-          ))}
+          {
+            recommendedEvents?.length > 0 ? (
+              recommendedEvents?.slice(0, 2).map((ticketc: any, index: any) => (
+                <Grid item xs={12} sm={6} md={6} key={ticketc._id || index}>
+                  <PopularEvent event={ticketc} key={index} />
+                </Grid>
+              ))
+            ) : (
+              <Grid item xs={12} sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: 50
+              }}>
+                <CircularProgress color="primary" size={50}/>
+              </Grid>
+            )
+          }
         </Grid>
       </Box>
 
       {/* PopularEvent component */}
       <Box mt={3}>
-
         <HeadingCommon title="Popular & Trending Events" weight={600} baseSize="34px" variant="h5" />
         {/* Main Grid Layout */}
         <Grid container spacing={3} mt={3}>
           {popularEvents?.length > 0 ? (
             popularEvents?.slice(0, 2).map((ticketc: any, index: any) => (
               <Grid item xs={12} sm={6} md={6} key={ticketc._id || index}>
-                <PopularEvent ticket={ticketc} key={index} />
+                <PopularEvent event={ticketc} key={index} />
               </Grid>
             ))
           ) : (
@@ -90,11 +80,9 @@ console.log('====================================');
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              minHeight: 200
+              minHeight: 100
             }}>
-              <Typography variant="h6" color="textSecondary">
-                No popular events available
-              </Typography>
+              <CircularProgress color="primary" />
             </Grid>
           )}
         </Grid>

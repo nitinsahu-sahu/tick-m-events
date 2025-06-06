@@ -56,13 +56,13 @@ export function OverviewAnalyticsView() {
   const up = true;
   const percentage = 75;
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      dispatch(recommTrandingPopularEventFetch());
-    }, 6000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     dispatch(recommTrandingPopularEventFetch());
+  //   }, 6000);
 
-    return () => clearInterval(interval);
-  }, [dispatch]);
+  //   return () => clearInterval(interval);
+  // }, [dispatch]);
 
   return (
     <DashboardContent>

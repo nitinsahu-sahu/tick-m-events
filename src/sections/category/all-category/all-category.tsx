@@ -1,7 +1,7 @@
 import {
   Box,
   Grid,
-  Typography,
+  Typography,Container,
   Button,
   Card,
   CardMedia,
@@ -11,78 +11,184 @@ import {
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import React, { useEffect } from 'react';
 import Marquee from 'react-fast-marquee';
-import { PageTitleSection } from 'src/components/page-title-section';
-
 import { useDispatch, useSelector } from 'react-redux';
+
+import { PageTitleSection } from 'src/components/page-title-section';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { eventCategoryFetch } from 'src/redux/actions/category.action';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { fetchAllCategories } from 'src/redux/actions/event.action';
 
 export function AllCategoriesView() {
   const dispatch = useDispatch<AppDispatch>();
-  const { categories, loading } = useSelector((state: RootState) => state?.eventCategories);
-
+ 
+  const { categories,loading} = useSelector((state: RootState) => state.event);
   useEffect(() => {
-    dispatch(eventCategoryFetch());
+    dispatch(fetchAllCategories());
   }, [dispatch]);
 
   return (
     <DashboardContent>
-      <PageTitleSection title="Categories" />
-      <Box boxShadow={3} borderRadius={3} p={3} mt={3} bgcolor="#fff">
-        <HeadingCommon title="Categories List" weight={600} baseSize="34px" variant="h5" />
+      <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 }, py: 3 }}>
+        <PageTitleSection />
 
-        {loading ? (
-          <Box display="flex" justifyContent="center" py={8}>
-            <CircularProgress color="primary" />
+        <Box
+          sx={{
+            borderRadius: 3,
+            p: { xs: 2, sm: 3, md: 4 },
+            mt: 3,
+            bgcolor: 'background.paper',
+            boxShadow: 1,
+            '&:hover': {
+              boxShadow: 3,
+            },
+            transition: 'box-shadow 0.3s ease-in-out',
+          }}
+        >
+          <Box
+            sx={{
+              mb: 4,
+              textAlign: 'center',
+              position: 'relative',
+              '&:after': {
+                content: '""',
+                display: 'block',
+                width: '80px',
+                height: '4px',
+                backgroundColor: 'primary.main',
+                margin: '16px auto 0',
+                borderRadius: '2px',
+              },
+            }}
+          >
+            <HeadingCommon
+              title="Explore Our Categories"
+              weight={600}
+              baseSize="34px"
+              variant="h4"
+              sx={{
+                color: 'text.primary',
+                letterSpacing: '0.5px',
+              }}
+            />
+            <Typography
+              variant="subtitle1"
+              color="text.secondary"
+              sx={{
+                mt: 1,
+                maxWidth: '700px',
+                mx: 'auto',
+              }}
+            >
+              Browse through our diverse range of event categories
+            </Typography>
           </Box>
-        ) : (
-          <>
-            <Grid container spacing={3}>
-              {categories?.length > 0
-                ? categories.map((cat: any) => (
-                    <Grid item xs={12} sm={6} md={4} key={cat._id}>
+
+          {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="300px">
+              <CircularProgress color="primary" size={60} />
+            </Box>
+          ) : (
+            <>
+              {categories?.length > 0 ? (
+                <Grid
+                  container
+                  spacing={{ xs: 2, sm: 3, md: 4 }}
+                  sx={{
+                    px: { xs: 0, sm: 2 },
+                    py: 1,
+                  }}
+                >
+                  {categories.map((cat: any) => (
+                    <Grid
+                      item
+                      xs={12}
+                      sm={6}
+                      md={4}
+                      lg={3}
+                      key={cat._id}
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                      }}
+                    >
                       <Card
                         sx={{
                           borderRadius: 3,
                           height: '100%',
                           display: 'flex',
                           flexDirection: 'column',
-                          transition: 'transform 0.3s ease-in-out',
+                          transition: 'all 0.3s ease-in-out',
+                          maxWidth: '360px',
+                          width: '100%',
+                          position: 'relative',
+                          overflow: 'hidden',
+                          minHeight: '320px', // Reduced height
                           '&:hover': {
-                            transform: 'scale(1.03)',
+                            transform: 'translateY(-8px)',
                             boxShadow: 6,
                           },
                         }}
                       >
-                        <CardMedia
-                          component="img"
-                          height="180"
-                          image={cat.cover.url}
-                          alt={cat.name}
+                        {/* Background Image with Overlay */}
+                        <Box
                           sx={{
-                            borderTopLeftRadius: 12,
-                            borderTopRightRadius: 12,
-                            objectFit: 'cover',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            zIndex: 0,
+                            '&::after': {
+                              content: '""',
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              background:
+                                'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%)',
+                            },
                           }}
-                        />
+                        >
+                          <CardMedia
+                            component="img"
+                            image={cat.cover.url}
+                            alt={cat.name}
+                            sx={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                            }}
+                          />
+                        </Box>
+
+                        {/* Card Content */}
                         <CardContent
                           sx={{
-                            bgcolor: '#f5f5f5',
-                            borderBottomLeftRadius: 12,
-                            borderBottomRightRadius: 12,
+                            position: 'relative',
+                            zIndex: 1,
                             flexGrow: 1,
                             display: 'flex',
                             flexDirection: 'column',
+                            p: 3,
+                            height: '100%',
+                            color: 'text.primary',
+                            backgroundColor: 'transparent',
+                            // Add this new rule:
+                            '& h6': {
+                              color: 'common.white',
+                            },
                           }}
                         >
                           <HeadingCommon
                             title={cat.name}
                             weight={600}
                             baseSize="20px"
-                            variant="subtitle1"
+                            variant="h6"
                             sx={{
+                              mb: 2,
+                              textAlign: 'center',
                               minHeight: '60px',
                               display: 'flex',
                               alignItems: 'center',
@@ -91,16 +197,22 @@ export function AllCategoriesView() {
                               textOverflow: 'ellipsis',
                               WebkitLineClamp: 2,
                               WebkitBoxOrient: 'vertical',
-                              textAlign: 'center',
+                              color: 'text.primary', // Added white color
                             }}
                           />
-
+                          <Box sx={{ flexGrow: 1 }} /> {/* Spacer to push content down */}
+                          {/* Marquee moved to bottom */}
                           <Box
                             sx={{
                               minHeight: '50px',
                               display: 'flex',
                               alignItems: 'center',
                               mb: 2,
+                              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                              borderRadius: 1,
+                              px: 1,
+                              py: 0.5,
+                              backdropFilter: 'blur(4px)',
                             }}
                           >
                             <Marquee speed={50} gradient={false}>
@@ -110,10 +222,11 @@ export function AllCategoriesView() {
                                     variant="body2"
                                     component="span"
                                     sx={{
-                                      color: '#0B2E4C',
+                                      color: 'common.white',
                                       display: 'inline-block',
                                       px: 1,
                                       fontWeight: 500,
+                                      whiteSpace: 'nowrap',
                                     }}
                                   >
                                     {subcat.name}
@@ -122,36 +235,31 @@ export function AllCategoriesView() {
                                     <Typography
                                       component="span"
                                       sx={{
-                                        color: '#0B2E4C',
+                                        color: 'rgba(255, 255, 255, 0.7)',
                                         px: 1,
                                       }}
                                     >
-                                      |
+                                      •
                                     </Typography>
                                   )}
                                 </React.Fragment>
                               ))}
                             </Marquee>
                           </Box>
-
-                          <Box
-                            display="flex"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            mt="auto"
-                          >
+                          <Box display="flex" justifyContent="space-between" alignItems="center">
                             <Button
                               size="small"
                               variant="contained"
                               sx={{
-                                borderRadius: 1,
+                                borderRadius: 2,
                                 fontSize: '12px',
                                 px: 2,
-                                py: 0.5,
-                                backgroundColor: '#0B2E4C',
+                                py: 1,
+                                backgroundColor: 'primary.main',
                                 whiteSpace: 'nowrap',
+                                fontWeight: 600,
                                 '&:hover': {
-                                  backgroundColor: '#05406b',
+                                  backgroundColor: 'primary.dark',
                                 },
                               }}
                             >
@@ -160,60 +268,49 @@ export function AllCategoriesView() {
 
                             <Button
                               size="small"
+                              variant="outlined"
                               sx={{
-                                minWidth: '30px',
-                                backgroundColor: 'white',
-                                borderRadius: '15px',
-                                color: '#0B2E4C',
+                                minWidth: '36px',
+                                minHeight: '36px',
+                                borderRadius: '50%',
+                                color: 'common.white',
+                                borderColor: 'common.white',
                                 '&:hover': {
-                                  backgroundColor: '#f0f0f0',
+                                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                  borderColor: 'common.white',
                                 },
                               }}
                             >
-                              <ArrowForwardIcon />
+                              <ArrowForwardIcon fontSize="small" />
                             </Button>
                           </Box>
                         </CardContent>
                       </Card>
                     </Grid>
-                  ))
-                : !loading && (
-                    <Box width="100%" textAlign="center" py={8}>
-                      <Typography variant="h6" color="textSecondary">
-                        No categories found
-                      </Typography>
-                    </Box>
-                  )}
-            </Grid>
-
-            {/* Bottom CTA - Only show when categories exist */}
-            {categories?.length > 0 && (
-              <Box textAlign="center" mt={4}>
-                <Button
-                  variant="outlined"
-                  fullWidth
+                  ))}
+                </Grid>
+              ) : (
+                <Box
+                  width="100%"
+                  textAlign="center"
+                  py={8}
                   sx={{
-                    borderRadius: '999px',
-                    px: 5,
-                    py: 1.5,
-                    fontWeight: 600,
-                    color: '#0B2E4C',
-                    borderColor: '#0B2E4C',
-                    '&:hover': {
-                      bgcolor: '#0B2E4C',
-                      color: 'white',
-                      borderColor: '#0B2E4C',
-                    },
-                    maxWidth: '400px',
+                    backgroundColor: 'background.default',
+                    borderRadius: 3,
                   }}
                 >
-                  Browse All Categories
-                </Button>
-              </Box>
-            )}
-          </>
-        )}
-      </Box>
+                  <Typography variant="h5" color="text.secondary">
+                    No categories found
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+                    Please check back later or contact support
+                  </Typography>
+                </Box>
+              )}
+            </>
+          )}
+        </Box>
+      </Container>
     </DashboardContent>
   );
 }

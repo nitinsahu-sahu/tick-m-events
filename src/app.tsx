@@ -10,6 +10,7 @@ import { ThemeProvider } from 'src/theme/theme-provider';
 import { eventFetch, wishlistEventFetch } from './redux/actions/event.action';
 import { AppDispatch } from './redux/store';
 import { eventOrderFetch } from './redux/actions/eventOrder';
+import { recommTrandingPopularEventFetch } from './redux/actions/home-recommendation.action';
 
 
 // ----------------------------------------------------------------------
@@ -22,6 +23,7 @@ export default function App() {
     dispatch(wishlistEventFetch())
     dispatch(eventFetch());
     dispatch(eventOrderFetch())
+    dispatch(recommTrandingPopularEventFetch());
   }, [dispatch]);
   return (
     <ThemeProvider>

@@ -1,10 +1,12 @@
 import { useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from 'src/redux/store';
+
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { FindYourEvent } from '../find-your-event';
 import { MusicFestival } from '../music-festival';
 import { EventShare } from '../event-share';
-import { ticketst } from '../utills';
 import { DiscoverEvent } from '../discover-event';
 
 export function EventSearchAndDetailsView() {
@@ -12,12 +14,13 @@ export function EventSearchAndDetailsView() {
   const handleEventDetails = useCallback((selectedViewEvent: any) => {
     setSelectedEvent(selectedViewEvent?.selectedViewEvent)
   }, [])
+  const { upcomingEvents } = useSelector((state: RootState) => state?.homeRecom);
 
   return (
     <DashboardContent>
       <PageTitleSection title="Discover Events" />
 
-      <DiscoverEvent list={ticketst} />
+      <DiscoverEvent list={upcomingEvents} />
 
       <FindYourEvent handleEventDetails={handleEventDetails} />
 

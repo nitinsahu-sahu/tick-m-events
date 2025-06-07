@@ -93,45 +93,45 @@ export function TabWithTableView() {
                 )}
                 {tabValue === 1 && (
                     <RequestTabSection
-                    title="Signed Contracts"
-                    description="Tracks confirmed services with the 10% commission deposit to TICK-M."
-                    headers={signedContractTableHeader}
-                    data={signedContractTableData}
-                    type="2"
-                    detailsTitle="Contract Details"
-                    details={[
-                        { label: "Service", value: serviceContract.service },
-                        { label: "Organizer", value: serviceContract.organizer },
-                        { label: "Provider", value: serviceContract.provider },
-                        { label: "Location", value: serviceContract.location },
-                        { label: "Date", value: serviceContract.date },
-                        { label: "Amount", value: serviceContract.amount },
-                        { label: "Deposit", value: serviceContract.deposit },
-                        { label: "Remaining Payment", value: serviceContract.payment },
-                        { label: "Terms & Conditions", value: serviceContract["terms & Conditions"] }
-                    ]}
-                    buttons={[
-                        { label: "Download Contract (PDF)", variant: "contained" },
-                        { label: "Contact the Organizer", variant: "outlined" }
-                    ]}
-                />
+                        title="Signed Contracts"
+                        description="Tracks confirmed services with the 10% commission deposit to TICK-M."
+                        headers={signedContractTableHeader}
+                        data={signedContractTableData}
+                        type="2"
+                        detailsTitle="Contract Details"
+                        details={[
+                            { label: "Service", value: serviceContract.service },
+                            { label: "Organizer", value: serviceContract.organizer },
+                            { label: "Provider", value: serviceContract.provider },
+                            { label: "Location", value: serviceContract.location },
+                            { label: "Date", value: serviceContract.date },
+                            { label: "Amount", value: serviceContract.amount },
+                            { label: "Deposit", value: serviceContract.deposit },
+                            { label: "Remaining Payment", value: serviceContract.payment },
+                            { label: "Terms & Conditions", value: serviceContract["terms & Conditions"] }
+                        ]}
+                        buttons={[
+                            { label: "Download Contract (PDF)", variant: "contained" },
+                            { label: "Contact the Organizer", variant: "outlined" }
+                        ]}
+                    />
                 )}
                 {tabValue === 2 && (
                     <RequestTabSection
-                title="Ongoing & Completed Services"
-                description="Manage confirmed services and track their progress."
-                headers={onServiceTableHeader}
-                data={onServiceTableData}
-                type="3"
-            />
+                        title="Ongoing & Completed Services"
+                        description="Manage confirmed services and track their progress."
+                        headers={onServiceTableHeader}
+                        data={onServiceTableData}
+                        type="3"
+                    />
                 )}
             </Paper>
 
 
 
-            
 
-            
+
+
 
         </>
 

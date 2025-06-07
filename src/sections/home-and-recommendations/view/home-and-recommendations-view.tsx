@@ -1,7 +1,7 @@
 import { Typography, Grid, Box, Paper, Button, IconButton, CircularProgress } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -13,31 +13,105 @@ import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommen
 import { UpComingCard } from '../UpComingCard';
 import { PopularEvent } from '../PopularEvent';
 import { ExploreMoreSection } from '../ExploreMore';
+import axios from "../../../redux/helper/axios";
+
+interface EventDetails {
+  eventName: string;
+  date: string;
+}
+
+interface TicketItem {
+  ticketType: string;
+}
+
+// You can reuse this for each ticket in the list
+interface Ticket {
+  eventDetails?: EventDetails;
+  tickets: TicketItem[];
+  qrCode: string;
+  verifyEntry: string;
+}
 
 
 export function HomeAndRecommendationsView() {
-  const { upcomingEvents, popularEvents, recommendedEvents } = useSelector((state: RootState) => state?.homeRecom);
+  const { popularEvents, recommendedEvents } = useSelector((state: RootState) => state?.homeRecom);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const { _id } = useSelector((state: RootState) => state?.auth?.user);
+  const [upcomingQrTicket, setUpcomingQrTicket] = useState<Ticket | null>(null);
 
-  const events = [
-    { title: 'Tech Conference 2025', location: 'New York, USA', date: 'April 15, 2025' },
-    { title: 'Music Festival', location: 'New York, USA', date: 'April 15, 2025' },
-    { title: 'Startup Expo', location: 'New York, USA', date: 'April 15, 2025' },
-  ];
+
+  useEffect(() => {
+    async function fetchTickets() {
+      try {
+        const response = await axios.get(`/event-order/user/${_id}`);
+        const allTickets: Ticket[] = response.data;
+        setTickets(allTickets);
+
+        const upcomingTicket = allTickets
+          .filter(ticket => {
+            const dateStr = ticket.eventDetails?.date;
+            const eventDate = dateStr ? new Date(dateStr) : null;
+            return eventDate !== null &&
+              !Number.isNaN(eventDate.getTime()) &&
+              eventDate > new Date() &&
+              ticket.qrCode;
+          })
+          .sort((a, b) => {
+            const dateA = new Date(a.eventDetails?.date || '');
+            const dateB = new Date(b.eventDetails?.date || '');
+            return dateA.getTime() - dateB.getTime();
+          })[0];
+        setUpcomingQrTicket(upcomingTicket || null);
+
+      } catch (error) {
+        console.error("Error fetching tickets:", error);
+      }
+    }
+
+    if (_id) {
+      fetchTickets();
+    }
+  }, [_id]);
 
   return (
     <DashboardContent>
       <PageTitleSection title="Home & Recommendations" />
       {/* UpComingCard component */}
-      <Box >
+
+      <Box sx={{ width: '100%', overflowX: 'auto' }}>
         <HeadingCommon title="My Active Tickets" weight={600} baseSize="34px" variant="h5" />
-        <Grid container spacing={3}>
-          {events.map((event, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <UpComingCard {...event} />
+
+          {tickets?.length ? (
+            <Grid
+              container
+              spacing={3}
+              sx={{
+                flexWrap: 'nowrap',
+                paddingBottom: '16px',
+                width: 'max-content',
+                direction: 'rtl',
+                '& > *': {
+                  direction: 'ltr'
+                }
+              }}
+            >
+              {tickets.map((ticket, index) => (
+                <Grid item key={index} sx={{ minWidth: 400 }}>
+                  <UpComingCard ticket={ticket} />
+                </Grid>
+              ))}
             </Grid>
-          ))}
-        </Grid>
+          ) : (
+            <Typography variant="body1" sx={{
+              textAlign: 'center',
+              padding: 3,
+              color: 'text.secondary'
+            }}>
+              No active tickets available
+            </Typography>
+          )}
       </Box>
+
       {/* EventCard component */}
       <Box mt={3}>
         <HeadingCommon title="Recommended Events for You" weight={600} baseSize="34px" variant="h5" />
@@ -57,7 +131,7 @@ export function HomeAndRecommendationsView() {
                 alignItems: 'center',
                 minHeight: 50
               }}>
-                <CircularProgress color="primary" size={50}/>
+                <CircularProgress color="primary" size={50} />
               </Grid>
             )
           }
@@ -167,8 +241,6 @@ export function HomeAndRecommendationsView() {
               >
                 {/* Message */}
                 <Typography sx={{ fontWeight: 500, mb: { xs: 1, sm: 0 } }}>{item.text}</Typography>
-
-
                 <Box
                   mt={{ xs: 1, sm: 0 }}
                   sx={{

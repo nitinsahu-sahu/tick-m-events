@@ -120,6 +120,9 @@ export function ExploreMoreSection() {
                     </Button>
 
                     <Button
+                      component={Link}
+                      to={`/category/${cat?._id}`}
+                      target="_blank"
                       size="small"
                       sx={{
                         minWidth: "30px",

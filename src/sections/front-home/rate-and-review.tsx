@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Grid, Typography, LinearProgress, TextField, Select, MenuItem, Card, CardContent, Avatar,Collapse } from "@mui/material";
+import { Box, Button, Divider, Grid, Typography, LinearProgress, TextField, Select, MenuItem, Card, CardContent, Avatar, Collapse } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 import StarHalfIcon from "@mui/icons-material/StarHalf";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -10,6 +10,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { eventAddReview } from "src/redux/actions/reviewOnEvent.action";
 import { AppDispatch } from "src/redux/store";
 import { useParams } from "react-router-dom";
+import { eventSubmitRating } from "src/redux/actions/event.action";
 
 interface ApiResult {
     status: number;
@@ -36,87 +37,89 @@ function renderStars(rating: any) {
 
 
 const ReviewCard = ({ name, rating, comment, createdAt }: any) => {
-  const [isReplying, setIsReplying] = useState(false);
-  const [replyText, setReplyText] = useState('');
+    const [isReplying, setIsReplying] = useState(false);
+    const [replyText, setReplyText] = useState('');
 
-  const handleReplySubmit = () => {
-    // Here you would typically send the reply to your API
-    setReplyText('');
-    setIsReplying(false);
-  };
+    const handleReplySubmit = () => {
+        // Here you would typically send the reply to your API
+        setReplyText('');
+        setIsReplying(false);
+    };
 
-  return (
-    <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid #ddd", mb: 2 }}>
-      <CardContent>
-        {/* Review Header */}
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Box display="flex" alignItems="center">
-              <Avatar sx={{ bgcolor: "black", color: "white", mr: 1 }}>{name[0]}</Avatar>
-              <Box>
-                <Typography fontWeight="bold">{name}</Typography>
-                <Box display="flex" alignItems="center">
-                  {[...Array(rating)].map((_, i) => (
-                    <StarIcon key={i} sx={{ color: "gold", fontSize: 18 }} />
-                  ))}
+
+    return (
+        <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid #ddd", mb: 2 }}>
+            <CardContent>
+                {/* Review Header */}
+                <Grid container alignItems="center" justifyContent="space-between">
+                    <Grid item>
+                        <Box display="flex" alignItems="center">
+                            <Avatar sx={{ bgcolor: "black", color: "white", mr: 1 }}>{name[0]}</Avatar>
+                            <Box>
+                                <Typography fontWeight="bold">{name}</Typography>
+                                <Box display="flex" alignItems="center">
+                                    {[...Array(rating)].map((_, i) => (
+                                        <StarIcon key={i} sx={{ color: "gold", fontSize: 18 }} />
+                                    ))}
+                                </Box>
+                            </Box>
+                        </Box>
+                    </Grid>
+                    <Grid item>
+                        <Typography fontSize="14px" color="gray">
+                            {new Date(createdAt).toLocaleDateString()}
+                        </Typography>
+                    </Grid>
+                </Grid>
+
+                {/* Review Comment */}
+                <Typography mt={1}>{comment}</Typography>
+
+                {/* Reply Section */}
+                <Box mt={2} textAlign="right">
+                    <Button
+                        variant="outlined"
+                        startIcon={<ChatBubbleOutlineIcon />}
+                        sx={{ textTransform: "none" }}
+                        onClick={() => setIsReplying(!isReplying)}
+                    >
+                        {isReplying ? 'Cancel Reply' : 'Reply to Review'}
+                    </Button>
+
+                    <Collapse in={isReplying}>
+                        <Box mt={2} display="flex" alignItems="flex-end">
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={2}
+                                variant="outlined"
+                                placeholder="Write your reply..."
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                sx={{ mr: 1 }}
+                            />
+                            <Button
+                                variant="contained"
+                                endIcon={<SendIcon />}
+                                onClick={handleReplySubmit}
+                                disabled={!replyText.trim()}
+                            >
+                                Send
+                            </Button>
+                        </Box>
+                    </Collapse>
                 </Box>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item>
-            <Typography fontSize="14px" color="gray">
-              {new Date(createdAt).toLocaleDateString()}
-            </Typography>
-          </Grid>
-        </Grid>
-
-        {/* Review Comment */}
-        <Typography mt={1}>{comment}</Typography>
-
-        {/* Reply Section */}
-        <Box mt={2} textAlign="right">
-          <Button
-            variant="outlined"
-            startIcon={<ChatBubbleOutlineIcon />}
-            sx={{ textTransform: "none" }}
-            onClick={() => setIsReplying(!isReplying)}
-          >
-            {isReplying ? 'Cancel Reply' : 'Reply to Review'}
-          </Button>
-
-          <Collapse in={isReplying}>
-            <Box mt={2} display="flex" alignItems="flex-end">
-              <TextField
-                fullWidth
-                multiline
-                rows={2}
-                variant="outlined"
-                placeholder="Write your reply..."
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                sx={{ mr: 1 }}
-              />
-              <Button
-                variant="contained"
-                endIcon={<SendIcon />}
-                onClick={handleReplySubmit}
-                disabled={!replyText.trim()}
-              >
-                Send
-              </Button>
-            </Box>
-          </Collapse>
-        </Box>
-      </CardContent>
-    </Card>
-  );
+            </CardContent>
+        </Card>
+    );
 };
 
-export function RateAndReview({ reviews }: any) {
+export function RateAndReview({ reviews, reviewCount,rating }: any) {
     const [filter, setFilter] = useState("date");
     const dispatch = useDispatch<AppDispatch>()
     const { eventId } = useParams();
-
+    const [userRating, setUserRating] = useState(rating || 0);
+    const [hoverRating, setHoverRating] = useState(0);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -154,6 +157,41 @@ export function RateAndReview({ reviews }: any) {
             [name]: value
         }));
     }, []);
+
+
+
+    // Function to handle rating click
+    const handleRatingClick = async (ratingValue: any) => {
+        setUserRating(ratingValue);
+        const participantRating = {
+            ratingValue,
+            eventId
+        }
+        const result = await dispatch(eventSubmitRating(participantRating))
+    };
+
+    // Function to render interactive stars
+    function renderInteractiveStars (averageRating: any){
+        return (
+            <Box display="flex">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <Box
+                        key={star}
+                        sx={{ cursor: 'pointer' }}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        onClick={() => handleRatingClick(star)}
+                    >
+                        {(hoverRating || userRating) >= star ? (
+                            <StarIcon sx={{ color: '#FFD700', fontSize: '1.5rem' }} />
+                        ) : (
+                            <StarBorderIcon sx={{ color: '#FFD700', fontSize: '1.5rem' }} />
+                        )}
+                    </Box>
+                ))}
+            </Box>
+        );
+    };
     return (
         <>
             <Box p={3} m={3} alignItems="center">
@@ -184,12 +222,15 @@ export function RateAndReview({ reviews }: any) {
                         >
                             <Box alignItems="center" mt={1}>
                                 <Typography fontSize={{ xs: "28px", sm: "32px", md: "40px" }} fontWeight="bold">
-                                    4.7 / 5
+                                    {userRating > 0 ? `${userRating} / 5` : '0 / 5'}
                                 </Typography>
-                                <Box ml={1}>{renderStars(4.7)}</Box>
+
+                                <Box ml={1}>
+                                    {userRating > 0 ? renderInteractiveStars(userRating) : renderInteractiveStars(4.7)}
+                                </Box>
                             </Box>
                             <Typography fontSize="0.9rem" mt={1} color="black">
-                                based on 14,997 reviews
+                                {userRating > 0 ? 'Thanks for your rating!' : 'based on 14,997 reviews'}
                             </Typography>
                         </Box>
                     </Grid>

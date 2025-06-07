@@ -2,11 +2,23 @@ import { Box, Grid, Typography, Card, CardMedia, Button } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Marquee from 'react-fast-marquee';
 import React, { useEffect } from 'react';
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { TicketCard } from 'src/components/event-card/event-card';
+import { AppDispatch, RootState } from 'src/redux/store';
+import { categoryByIdFetch } from 'src/redux/actions/event.action';
+import { PopularEvent } from 'src/sections/home-and-recommendations/PopularEvent';
 
 export function SingleCategoriesView() {
+  const { categoryId } = useParams();
+  const dispatch = useDispatch<AppDispatch>();
+  const { _id, name, cover, subcategories, events } = useSelector((state: RootState) => state?.event?.category);
+
+  useEffect(() => {
+    dispatch(categoryByIdFetch(categoryId));
+  }, [dispatch, categoryId]);
   // Example category data with a beautiful arts/culture banner image
   const category = {
     id: '1',
@@ -64,13 +76,10 @@ export function SingleCategoriesView() {
   };
 
   return (
-    <Box>
+    <Box key={_id}>
       {/* Enhanced Category Banner with beautiful image */}
       <Card
         sx={{
-          borderRadius: 0, // Reset all border radius first
-          borderBottomLeftRadius: 12,
-          borderBottomRightRadius: 12,
           mb: 4,
           position: 'relative',
           overflow: 'hidden',
@@ -85,12 +94,11 @@ export function SingleCategoriesView() {
         <CardMedia
           component="img"
           height="350"
-          image={category.cover.url}
-          alt={category.name}
+          image={cover?.url}
+          alt={name}
           sx={{
             objectFit: 'cover',
             width: '100%',
-            borderRadius: 0, // Make sure top corners are not rounded
           }}
         />
 
@@ -112,18 +120,25 @@ export function SingleCategoriesView() {
             weight={600}
             baseSize="34px"
             variant="h4"
-            sx={{
-              color: 'white',
-              textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-              mb: 2,
-            }}
+            color="white"
           />
 
           {/* Animated subcategories marquee */}
           <Box sx={{ mb: 3, overflow: 'hidden' }}>
             <Marquee speed={40} gradient={false}>
-              {category.subcategories.map((subcat, index) => (
-                <React.Fragment key={subcat.id}>
+              {subcategories?.map((subcat: any, index: any) => (
+                <React.Fragment key={subcat._id || index}>
+                  {index < category.subcategories.length - 1 && (
+                    <Box
+                      component="span"
+                      sx={{
+                        color: 'white',
+                        fontSize: '1.2rem',
+                      }}
+                    >
+                      •
+                    </Box>
+                  )}
                   <Typography
                     variant="body1"
                     component="span"
@@ -137,17 +152,7 @@ export function SingleCategoriesView() {
                   >
                     {subcat.name}
                   </Typography>
-                  {index < category.subcategories.length - 1 && (
-                    <Box
-                      component="span"
-                      sx={{
-                        color: 'white',
-                        fontSize: '1.2rem',
-                      }}
-                    >
-                      •
-                    </Box>
-                  )}
+
                 </React.Fragment>
               ))}
             </Marquee>
@@ -171,26 +176,7 @@ export function SingleCategoriesView() {
                 transition: 'all 0.3s ease',
               }}
             >
-              {category.events.length} Events Available
-            </Button>
-
-            <Button
-              variant="contained"
-              size="small"
-              sx={{
-                minWidth: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'rgba(255,255,255,0.3)',
-                  transform: 'rotate(45deg)',
-                },
-                transition: 'all 0.3s ease',
-              }}
-            >
-              <ArrowForwardIcon />
+              {events?.length} Events Available
             </Button>
           </Box>
         </Box>
@@ -224,7 +210,7 @@ export function SingleCategoriesView() {
             },
           }}
         >
-          Upcoming {category.name}
+          Category Events
         </Typography>
 
         <Grid
@@ -232,41 +218,52 @@ export function SingleCategoriesView() {
           spacing={{ xs: 2, sm: 3, md: 4 }}
           sx={{
             justifyContent: { xs: 'center', sm: 'flex-start' },
+            minHeight: 200 // Ensures consistent spacing when empty
           }}
         >
-          {category.events.map((event) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              lg={4}
-              key={event.id}
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                transition: 'transform 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-5px)',
-                },
-              }}
-            >
-              <Box
+          {events?.length > 0 ? (
+            events.map((event: any) => (
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={4}
+                lg={4}
+                key={event.id}
                 sx={{
-                  width: '100%',
-                  maxWidth: '360px',
-                  '& .MuiButton-contained': {
-                    // Targeting the Book Now button
-                    whiteSpace: 'nowrap', // Ensures text stays in one line
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  transition: 'transform 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-5px)',
                   },
                 }}
               >
-                <TicketCard ticket={event} />
-              </Box>
+                <Box
+                  sx={{
+                    width: '100%',
+                    maxWidth: '360px',
+                    '& .MuiButton-contained': {
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    },
+                  }}
+                >
+                  <PopularEvent event={event} flag='singleCagetory'/>
+                </Box>
+              </Grid>
+            ))
+          ) : (
+            <Grid item xs={12} sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="h6" color="textSecondary">
+                No events found
+              </Typography>
+              <Typography variant="body1" color="textSecondary" sx={{ mt: 1 }}>
+                Check back later for upcoming events
+              </Typography>
             </Grid>
-          ))}
+          )}
         </Grid>
       </Box>
     </Box>

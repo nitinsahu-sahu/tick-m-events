@@ -1,7 +1,7 @@
 import {
   Box,
   Grid,
-  Typography,Container,
+  Typography, Container,
   Button,
   Card,
   CardMedia,
@@ -18,20 +18,19 @@ import { AppDispatch, RootState } from 'src/redux/store';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { fetchAllCategories } from 'src/redux/actions/event.action';
+import { Link } from 'react-router-dom';
 
 export function AllCategoriesView() {
   const dispatch = useDispatch<AppDispatch>();
- 
-  const { categories,loading} = useSelector((state: RootState) => state.event);
+
+  const { categories, loading } = useSelector((state: RootState) => state.event);
   useEffect(() => {
     dispatch(fetchAllCategories());
   }, [dispatch]);
 
   return (
     <DashboardContent>
-      <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 }, py: 3 }}>
-        <PageTitleSection />
-
+      <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 }, mb: 3 }}>
         <Box
           sx={{
             borderRadius: 3,
@@ -267,7 +266,10 @@ export function AllCategoriesView() {
                             </Button>
 
                             <Button
+                              component={Link}
+                              to={`/category/${cat?._id}`}
                               size="small"
+                              target="_blank"
                               variant="outlined"
                               sx={{
                                 minWidth: '36px',
@@ -300,10 +302,7 @@ export function AllCategoriesView() {
                   }}
                 >
                   <Typography variant="h5" color="text.secondary">
-                    No categories found
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-                    Please check back later or contact support
+                    Loading...
                   </Typography>
                 </Box>
               )}

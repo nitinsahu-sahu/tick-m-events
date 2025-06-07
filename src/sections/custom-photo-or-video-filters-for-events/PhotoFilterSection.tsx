@@ -17,7 +17,6 @@ export function PhotoFilterSection() {
     >
       <Box sx={{ maxWidth: 600, mx: 'auto' }}>
         <HeadingCommon variant="h5" title="Photo And Filter" weight={600} />
-        <HeadingCommon title="Customize your filter" color="#888" baseSize="16px" />
 
         {/* Dashed Box */}
         <Box
@@ -37,29 +36,6 @@ export function PhotoFilterSection() {
           <HeadingCommon color="#888" variant="body2" title="No Filter Available" baseSize="14px" />
 
         </Box>
-
-        {/* Bottom Button */}
-        <Grid container spacing={2} mt={1} justifyContent="center">
-          <Grid item xs={12} >
-            <Button
-              fullWidth
-              variant="contained"
-              sx={{
-                backgroundColor: '#0B2E4C',
-                color: '#fff',
-                textTransform: 'none',
-                fontWeight: 400,
-                py: 1,
-                borderRadius: 1.3,
-                '&:hover': {
-                  backgroundColor: '#083040',
-                },
-              }}
-            >
-              No filter defined by the organizer, create and use my filter for this event.
-            </Button>
-          </Grid>
-        </Grid>
       </Box>
     </Box>
   );

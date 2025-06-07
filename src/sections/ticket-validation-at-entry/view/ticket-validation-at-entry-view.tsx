@@ -10,7 +10,7 @@ export function TicketValidationAtEntryView() {
     return (
         <Box p={3}>
             <PageTitleSection
-                title="Loyalty Program"
+                title="Entry Validation"
 
             />
 
@@ -30,7 +30,7 @@ export function TicketValidationAtEntryView() {
 
                         {/* Ticket Status */}
                         <Card sx={{ p: 2, marginTop: 2, borderRadius: "12px", flex: 1, boxShadow: 3 }}>  {/* Add flex: 1 */}
-                            <Typography fontWeight={600} fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>Ticket QR Code Display</Typography>
+                            <Typography fontWeight={600} fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>Ticket Status</Typography>
                             <Typography variant="body2" color="black" mb={2}>
                                 Please keep your QR code visible for quick scanning.
                             </Typography>
@@ -45,12 +45,19 @@ export function TicketValidationAtEntryView() {
                                     mb: 2  // Optional bottom margin
                                 }}
                             >
-                                <Typography fontWeight={600} fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>
-                                    Ticket Status <br /><span style={{ color: "orange", fontWeight: 700 }}>Pending</span>
+                                <Typography fontWeight={600} color="orange" fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>
+                                    Pending
                                 </Typography>
                                 <Typography variant="body2" fontWeight={400} fontSize={{ xs: "10px", sm: "12px", md: "14px" }}>
-                                    Your ticket has been successfully scanned. In validation process, please wait.
+                                    Pending: In validation proccess, Please wait.
                                 </Typography>
+                                 <Typography variant="body2" fontWeight={400} fontSize={{ xs: "10px", sm: "12px", md: "14px" }}>
+                                    Validated: Your ticket has been successfully scanned, you may enter.
+                                </Typography>
+                                 <Typography variant="body2" fontWeight={400} fontSize={{ xs: "10px", sm: "12px", md: "14px" }}>
+                                    Denied: ticket already used or invalid.
+                                </Typography>
+                                
                                 <Button
                                     fullWidth
                                     variant="contained"
@@ -92,9 +99,7 @@ export function TicketValidationAtEntryView() {
                         </Box>
                         {/* Buttons */}
                         <Box mt={2} display="flex" gap={1} justifyContent="center">
-                            <Button variant="contained" sx={{ fontWeight: 500, fontSize: { xs: "12px", sm: "14px", md: "16px", }, backgroundColor: "#0B2E4C" }} >
-                                Add to Apple Wallet / Google Pay
-                            </Button>
+
                             <Button variant="outlined"
                                 sx={{ fontWeight: 500, color: "#0B2E4C", borderColor: "#0B2E4C", fontSize: { xs: "12px", sm: "14px", md: "16px", } }}
                             >Share My Ticket</Button>

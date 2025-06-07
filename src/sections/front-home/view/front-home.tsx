@@ -160,9 +160,8 @@ export function FrontHome() {
     const dispatch = useDispatch<AppDispatch>();
     const { eventId } = useParams();
     const { _id, eventName, date, time, category, eventType, coverImage, location, formate, description,
-        organizer, customization, tickets, visibility, review
+        organizer, customization, tickets, visibility, averageRating,reviewCount,review
     } = useSelector((state: RootState) => state?.event?.eventWithDetails);
-
     useEffect(() => {
         const fetchEvent = async () => {
             try {
@@ -249,7 +248,7 @@ export function FrontHome() {
                 <CountDownCounter date={date} time={time}/>
 
                 {/* Rate and Review */}
-                <RateAndReview reviews={review} />
+                <RateAndReview reviews={review} reviewCount={reviewCount} rating={averageRating}/>
 
                 {/* Rate and Review */}
                 <CompanyMarquee />

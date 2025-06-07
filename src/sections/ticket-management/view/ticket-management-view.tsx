@@ -12,10 +12,28 @@ import { TicketHistoryCancelRefundCard } from '../t-h-c-r';
 import { TicketCard } from '../ticket-card';
 import axios from "../../../redux/helper/axios";
 
+interface EventDetails {
+  eventName: string;
+  date: string;
+}
+
+interface TicketItem {
+  ticketType: string;
+}
+
+// You can reuse this for each ticket in the list
+interface Ticket {
+  eventDetails?: EventDetails;
+  tickets: TicketItem[];
+  qrCode: string;
+  verifyEntry: string;
+}
+
 export function TicketManagementView() {
   const [activeTab, setActiveTab] = useState('Active Tickets');
-  const [tickets, setTickets] = useState([]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const { _id } = useSelector((state: RootState) => state?.auth?.user);
+  const [upcomingQrTicket, setUpcomingQrTicket] = useState<Ticket | null>(null);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -25,20 +43,54 @@ export function TicketManagementView() {
     async function fetchTickets() {
       try {
         const response = await axios.get(`/event-order/user/${_id}`);
-        setTickets(response?.data);
+        const allTickets: Ticket[] = response.data;
+        setTickets(allTickets);
+
+        const upcomingTicket = allTickets
+          .filter(ticket => {
+            const dateStr = ticket.eventDetails?.date;
+            const eventDate = dateStr ? new Date(dateStr) : null;
+            return eventDate !== null &&
+              !Number.isNaN(eventDate.getTime()) &&
+              eventDate > new Date() &&
+              ticket.qrCode;
+          })
+          .sort((a, b) => {
+            const dateA = new Date(a.eventDetails?.date || '');
+            const dateB = new Date(b.eventDetails?.date || '');
+            return dateA.getTime() - dateB.getTime();
+          })[0];
+
+        setUpcomingQrTicket(upcomingTicket || null);
       } catch (error) {
         console.error("Error fetching tickets:", error);
       }
     }
 
-    fetchTickets();
+    if (_id) {
+      fetchTickets();
+    }
   }, [_id]);
 
+  const now = new Date();
+
+  const activeCount = tickets.filter(ticket => {
+    if (!ticket.eventDetails?.date) return false;
+    const eventDate = new Date(ticket.eventDetails.date);
+    return eventDate > now;
+  }).length;
+
+  const expiredCount = tickets.filter(ticket => {
+    if (!ticket.eventDetails?.date) return false;
+    const eventDate = new Date(ticket.eventDetails.date);
+    return eventDate <= now;
+  }).length;
+
   const metrics = [
-    { title: 'Total', value: '10' },
-    { title: 'Active', value: '6' },
-    { title: 'Refunded', value: '2' },
-    { title: 'Expired', value: '2' },
+    { title: 'Total', value: (tickets?.length ?? 0).toString() },
+    { title: 'Active', value: (activeCount ?? 0).toString() },
+    { title: 'Refunded', value: '2' }, // Replace with real data when available
+    { title: 'Expired', value: (expiredCount ?? 0).toString() },
   ];
 
   const ticketHistory = [
@@ -136,15 +188,23 @@ export function TicketManagementView() {
           >
             My Active Tickets
           </Typography>
-          <Grid container spacing={3} mt={3}>
-            {tickets.map((ticketc, index) => (
-              <Grid item xs={12} sm={6} md={6} key={index} mb={6}>
-                <TicketCard ticket={ticketc} />
-              </Grid>
-            ))}
-          </Grid>
+
+          {tickets?.length > 0 ? (
+            <Grid container spacing={3} mt={3}>
+              {tickets.slice(0, 2).map((ticketc, index) => (
+                <Grid item xs={12} sm={6} md={6} key={index} mb={6}>
+                  <TicketCard ticket={ticketc} />
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <Typography variant="body1" color="textSecondary" mt={2}>
+              You don&apos;t have any active tickets.
+            </Typography>
+          )}
         </Box>
       )}
+
 
       {activeTab === 'History' && (
         <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
@@ -215,61 +275,73 @@ export function TicketManagementView() {
       )}
 
       {/* QR Code Section (Shown regardless of tab) */}
-      <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
-        <Typography
-          variant="h5"
-          fontWeight={600}
-          mb={3}
-          fontSize={{ xs: '20px', sm: '26px', md: '34px' }}
-        >
-          QR Code & Ticket Validation
-        </Typography>
-        <Box display="flex" justifyContent="center">
-          <Card
-            sx={{
-              width: { xs: '100%', sm: '400px', md: '450px', lg: '500px' },
-              p: 3,
-              borderRadius: 3,
-              boxShadow: 3,
-              textAlign: 'center',
-            }}
+      {upcomingQrTicket && upcomingQrTicket.eventDetails ? (
+        <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
+          <Typography
+            variant="h5"
+            fontWeight={600}
+            mb={3}
+            fontSize={{ xs: '20px', sm: '26px', md: '34px' }}
           >
-            <Box
+            QR Code & Ticket Validation
+          </Typography>
+          <Box display="flex" justifyContent="center">
+            <Card
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
+                width: { xs: '100%', sm: '400px', md: '450px', lg: '500px' },
+                p: 3,
+                borderRadius: 3,
+                boxShadow: 3,
                 textAlign: 'center',
-                mb: 2,
               }}
             >
-              <Typography
-                variant="body1"
-                fontWeight={600}
-                fontSize={{ xs: '18px', sm: '22px', md: '26px' }}
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  mb: 2,
+                }}
               >
-                Urban Music Festival
-              </Typography>
-              <Typography variant="body1" color="text.secondary" mb={2}>
-                10/02/2025 - VIP
-              </Typography>
-              <QrCodeIcon sx={{ fontSize: 100, mb: 1 }} />
-              <Button variant="contained" sx={{ mt: 2, backgroundColor: '#0a2540', color: '#fff' }}>
-                Scan QR Code
-              </Button>
-            </Box>
-          </Card>
+                <Typography
+                  variant="body1"
+                  fontWeight={600}
+                  fontSize={{ xs: '18px', sm: '22px', md: '26px' }}
+                >
+                  {upcomingQrTicket.eventDetails.eventName}
+                </Typography>
+                <Typography variant="body1" color="text.secondary" mb={2}>
+                  {upcomingQrTicket.eventDetails.date} - {upcomingQrTicket.tickets?.[0]?.ticketType}
+                </Typography>
+                <Button variant="contained" sx={{ mt: 2, backgroundColor: '#0a2540', color: '#fff' }}>
+                  <img
+                    src={upcomingQrTicket.qrCode}
+                    alt="QR Code"
+                    style={{ width: 180, height: 180, marginBottom: 16 }}
+                  />
+                </Button>
+              </Box>
+            </Card>
+          </Box>
+          <Box display="flex" justifyContent="center" mt={2}>
+            <Button
+              variant="contained"
+              sx={{ backgroundColor: 'red', color: '#fff', fontWeight: 'bold' }}
+            >
+              {upcomingQrTicket?.verifyEntry ? 'Valid' : 'Pending Validation'}
+            </Button>
+          </Box>
         </Box>
-        <Box display="flex" justifyContent="center" mt={2}>
-          <Button
-            variant="contained"
-            sx={{ backgroundColor: 'red', color: '#fff', fontWeight: 'bold' }}
-          >
-            Invalid Ticket - Entry Denied
-          </Button>
+      ) : (
+        <Box display="flex" justifyContent="center">
+          <Typography variant="h6" color="text.secondary" fontWeight="500" textAlign="center">
+            <QrCodeIcon sx={{ fontSize: 100, mb: 1 }} />
+            No upcoming event
+          </Typography>
         </Box>
-      </Box>
+      )}
     </DashboardContent>
   );
 }

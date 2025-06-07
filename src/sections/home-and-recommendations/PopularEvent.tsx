@@ -17,7 +17,7 @@ interface ApiResult {
 
 export function PopularEvent({ event, handleEventDetails, flag }: any) {
   const dispatch = useDispatch<AppDispatch>();
- 
+
   const handleViewEvent = (selectedViewEvent: any) => {
     handleEventDetails(selectedViewEvent)
   };
@@ -125,12 +125,12 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
                 key={i}
                 fontSize="small"
                 sx={{
-                  color: i < Math.floor(event.rating) ? '#fbc02d' : '#ddd',
+                  color: i < Math.floor(event.averageRating) ? '#fbc02d' : '#ddd',
                 }}
               />
             ))}
             <Typography color="white" fontWeight="bold" ml={0.5} fontSize={{ xs: '12px', sm: '14px' }}>
-              {event.rating || 0} / 5
+              {event.averageRating || 0} / 5
             </Typography>
 
           </Box>
@@ -139,46 +139,52 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
         <Grid container spacing={2} mt={2} justifyContent="center">
           <Grid item xs={12} sm={10} md={11}>
             <Grid container spacing={2}>
-              {['Wishlist', 'Share'].concat(flag === "search" ? ["View Details"] : ['Book Now']).map((text) => (
+              {['Share'].concat(
+                flag === "search" ? ["View Details", "Book Now"] :
+                  flag === "singleCategory" ? ["Book Now"] :
+                    ["Book Now", "Wishlist"]
+              ).map((text) => (
                 <Grid item xs={4} key={text}>
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      if (text === "View Details") {
-                        handleViewEvent({ selectedViewEvent: event })// Log when "Modify Profile" is clicked
-                      }
-                      if (text === "Book Now") {
-                        window.location.href = "/ticket-purchase-process";
-                      }
-                      if (text === "Share") {
-                        const eventUrl = `${import.meta.env.VITE_Live_URL}/our-event/${event?._id}`;
-                        const eventTitle = `*${event?.eventName || "Exciting Event"}*`;
-                        const eventDate = `*Date:* ${event?.date}`;
-                        const eventTime = `*Time:* ${formatTimeTo12Hour(event?.time)}`;
-
-                        // Create a text message with clickable image link
-                        const message = `${eventTitle}\n\n${eventDate}\n${eventTime}\n\n` +
-                          `*Event Link:* ${eventUrl}\n\n` +
-                          `Check it out!`;
-
-                        // Create WhatsApp share URL
-                        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-
-                        // Open in new tab
-                        window.open(whatsappUrl, '_blank');
-                      }
-                      if (text === "Wishlist") {
-                        handleAddEventWishlist({ selectedViewEvent: event })// Log when "Modify Profile" is clicked
-                      }
-                    }}
-                    fullWidth
-                    sx={{
-                      fontSize: { xs: '12px', sm: '14px', md: '14px' },
-                      fontWeight: 500,
-                    }}
-                  >
-                    {text}
-                  </Button>
+                  {text === "Book Now" ? (
+                    <Link to="/ticket-purchase-process" style={{ textDecoration: 'none', width: '100%' }}>
+                      <Button
+                        variant="contained"
+                        fullWidth
+                        sx={{
+                          fontSize: { xs: '12px', sm: '14px', md: '14px' },
+                          fontWeight: 500,
+                        }}
+                      >
+                        {text}
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        if (text === "View Details") {
+                          handleViewEvent({ selectedViewEvent: event });
+                        } else if (text === "Share") {
+                          const eventUrl = `${import.meta.env.VITE_Live_URL}/our-event/${event?._id}`;
+                          const eventTitle = `*${event?.eventName || "Exciting Event"}*`;
+                          const eventDate = `*Date:* ${event?.date}`;
+                          const eventTime = `*Time:* ${formatTimeTo12Hour(event?.time)}`;
+                          const message = `${eventTitle}\n\n${eventDate}\n${eventTime}\n\n*Event Link:* ${eventUrl}\n\nCheck it out!`;
+                          const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                          window.open(whatsappUrl, '_blank');
+                        } else if (text === "Wishlist") {
+                          handleAddEventWishlist({ selectedViewEvent: event });
+                        }
+                      }}
+                      fullWidth
+                      sx={{
+                        fontSize: { xs: '12px', sm: '14px', md: '14px' },
+                        fontWeight: 500,
+                      }}
+                    >
+                      {text}
+                    </Button>
+                  )}
                 </Grid>
               ))}
             </Grid>

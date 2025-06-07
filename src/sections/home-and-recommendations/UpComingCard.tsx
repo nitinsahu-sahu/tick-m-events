@@ -1,27 +1,20 @@
 import { Card, CardContent, Typography, Button, Box, Grid } from '@mui/material';
+import { formatTimeTo12Hour } from 'src/hooks/formate-time';
 
-export const UpComingCard = ({
-  title,
-  location,
-  date,
-}: {
-  title: string;
-  location: string;
-  date: string;
-}) => (
+export const UpComingCard = ({ticket}: any) => (
   <Card sx={{ height: '100%' }}>
-    
+
     <CardContent>
       <Typography variant="h6" fontWeight="bold" gutterBottom>
-        {title}
+        {ticket.eventDetails.eventName}
       </Typography>
       <Typography variant="body2" color="text.primary">
-        {location} | {date}
+        {ticket.eventDetails.location} | {ticket.eventDetails.date} | {formatTimeTo12Hour(ticket.eventDetails.time)}
       </Typography>
       <Box mt={2}>
         <Grid container spacing={1}>
           {[
-            { text: 'View Ticket', color: 'primary'  as 'primary' },
+            { text: 'View Ticket', color: 'primary' as 'primary' },
             { text: 'Explore More', custom: true },
             { text: 'Share', custom: true },
           ].map(({ text, color, custom }) => (

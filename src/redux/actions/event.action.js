@@ -339,3 +339,61 @@ export const fetchChildCategories = (parentId) => async (dispatch) => {
     });
   }
 };
+
+export const eventSubmitRating = (participantRating) => async (dispatch) => {
+    dispatch({ type: eventConstants.EVENT_SUBMIT_RATING_REQUEST });
+
+    try {
+        const response = await axios.post("/event/rating", participantRating);
+        const successAction = {
+            type: eventConstants.EVENT_SUBMIT_RATING_SUCCESS,
+            payload: {
+                message: response?.data?.message
+            },
+        };
+        
+        dispatch(successAction);
+        dispatch(eventByIdFetch(participantRating.eventId));
+        
+        // Return the success action consistently
+        return successAction;
+
+    } catch (error) {
+        const failureAction = {
+            type: eventConstants.EVENT_SUBMIT_RATING_FAILURE,
+            payload: { 
+                message: error?.response?.data?.message || "Server error", 
+                error: error.status 
+            },
+        };
+        dispatch(failureAction);
+        
+        // Return the failure action consistently
+        return failureAction;
+    }
+};
+
+export const categoryByIdFetch = (categoryId) => async (dispatch) => {
+    dispatch({ type: eventConstants.SINGLE_CATEGORY_FETCH_REQUEST });
+ 
+    try {
+        const response = await axios.get(`/event/category/${categoryId}`);
+        console.log('=====single===============================');
+        console.log(response);
+        console.log('====================================');
+        dispatch({
+            type: eventConstants.SINGLE_CATEGORY_FETCH_SUCCESS,
+            payload: {
+                category: response?.data?.category
+            },
+        });
+    } catch (error) {
+        dispatch({
+            type: eventConstants.SINGLE_CATEGORY_FETCH_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Failed to fetch categories",
+                error: error.status
+            },
+        });
+    }
+};

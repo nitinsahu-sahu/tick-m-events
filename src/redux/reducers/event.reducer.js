@@ -8,6 +8,7 @@ const initialState = {
     wishlist: [],
     eventWithDetails: {},
     categories: [],
+    category:{},
     loadingCategories: false,
     childCategories: [],
     loadingChildCategories: false,
@@ -19,6 +20,27 @@ const eventReducer = (state, action) => {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
+        case eventConstants.SINGLE_CATEGORY_FETCH_REQUEST:
+            return {
+                ...state,
+                loadingCategories: true,
+                error: null,
+            };
+
+        case eventConstants.SINGLE_CATEGORY_FETCH_SUCCESS:
+            return {
+                ...state,
+                loadingCategories: false,
+                category: action.payload.category,
+            };
+
+        case eventConstants.SINGLE_CATEGORY_FETCH_FAILURE:
+            return {
+                ...state,
+                loadingCategories: false,
+                error: action.payload.message,
+            };
+
         case eventConstants.EVENT_CATEGORY_FETCH_REQUEST:
             return {
                 ...state,

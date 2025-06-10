@@ -1,48 +1,36 @@
-import { Grid, Box,Fade,Typography } from '@mui/material';
-import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { TicketCard } from 'src/components/event-card/event-card';
+import { Grid, Box, Fade, Typography, CircularProgress } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
 
-// Sample event data (replace this with real data or Redux state)
-const events = [
-  {
-    id: 1,
-    title: 'Festival Urban Music',
-    image: 'festival.png',
-    location: 'Douala',
-    date: '10/02/2025',
-    time: '5:00 PM',
-    status: '5,000 XAF',
-    statusColor: '#0B2E4C',
-    rating: 4.8,
-    viewPromo: true,
-  },
-  {
-    id: 2,
-    title: 'Startup Summit 2025',
-    image: 'startup.png',
-    location: 'Yaoundé',
-    date: '10/02/2025',
-    time: '5:00 PM',
-    status: 'Free',
-    statusColor: '#0B2E4C',
-    rating: 4.8,
-    viewPromo: false,
-  },
-  {
-    id: 3,
-    title: 'Tech Expo 2025',
-    image: 'tech.png',
-    location: 'Douala',
-    date: '15/02/2025',
-    time: '6:00 PM',
-    status: '$50',
-    statusColor: '#0B2E4C',
-    rating: 5.0,
-    viewPromo: false,
-  },
-];
+import { AppDispatch, RootState } from 'src/redux/store';
+import { PopularEvent } from 'src/sections/home-and-recommendations/PopularEvent';
+import { eventFetch } from 'src/redux/actions/event.action';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
 export function EventsView() {
+  const { fullData } = useSelector((state: RootState) => state?.event);
+  const dispatch = useDispatch<AppDispatch>();
+  const [loading, setLoading] = useState(true);
+  const [showEvents, setShowEvents] = useState(false);
+
+  useEffect(() => {
+    dispatch(eventFetch());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (fullData && fullData.length > 0) {
+      const timer = setTimeout(() => {
+        setLoading(false);
+        setShowEvents(true);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+
+    setLoading(false);
+    return () => { }; // Explicit empty cleanup
+  }, [fullData]);
+
   return (
     <Box
       sx={{
@@ -52,7 +40,12 @@ export function EventsView() {
         minHeight: '100vh',
       }}
     >
-      <HeadingCommon title="🎉 Upcoming Events" weight={700} baseSize="38px" variant="h4" />
+      <HeadingCommon
+        title="🎉 Upcoming Events"
+        weight={700}
+        baseSize="38px"
+        variant="h4"
+      />
       <Typography
         sx={{
           whiteSpace: 'nowrap',
@@ -67,15 +60,56 @@ export function EventsView() {
         Discover the most exciting events happening around you.
       </Typography>
 
-      <Grid container spacing={4}>
-        {events.map((event, index) => (
-          <Fade in timeout={500 + index * 200} key={event.id}>
-            <Grid item xs={12} sm={6} md={4}>
-              <TicketCard ticket={event} />
+      {/* Main content area */}
+      {!fullData ? (
+        // Initial loading state while waiting for data
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '50vh'
+        }}>
+          <CircularProgress size={60} />
+        </Box>
+      ) : fullData.length === 0 ? (
+        // No events found state
+        <Box sx={{
+          textAlign: 'center',
+          p: 4,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '50vh'
+        }}>
+          <Typography variant="h5" color="textSecondary">
+            No upcoming events found
+          </Typography>
+        </Box>
+      ) : (
+        // Data loaded state with 5-second loading delay
+        <>
+          {loading ? (
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '50vh'
+            }}>
+              <CircularProgress size={60} />
+            </Box>
+          ) : (
+            <Grid container spacing={4}>
+              {fullData.map((event: any, index: number) => (
+                <Fade in={showEvents} timeout={500 + index * 200} key={event.id || index}>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <PopularEvent event={event} />
+                  </Grid>
+                </Fade>
+              ))}
             </Grid>
-          </Fade>
-        ))}
-      </Grid>
+          )}
+        </>
+      )}
     </Box>
   );
 }

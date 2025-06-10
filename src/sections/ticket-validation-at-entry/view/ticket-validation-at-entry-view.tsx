@@ -1,12 +1,29 @@
-import { Box, Button, Card, Divider, Grid, MenuItem, Select, Typography } from "@mui/material";
-import QrCodeIcon from "@mui/icons-material/QrCode";
-import { useSelector } from "react-redux";
+import { Box, Grid } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
+import { eventFetch, todayEventFetch } from "src/redux/actions/event.action";
 import { PageTitleSection } from "src/components/page-title-section";
-import { RootState } from "src/redux/store";
+import { AppDispatch, RootState } from "src/redux/store";
+
+import { Order, SelectTickets } from "../select-event";
+import { TicketsStatus } from "../ticket-status";
+import { TicketQRDisplay } from "../ticket-qr-display";
+import { ScannedTickets } from "../scanned-tickets";
+
 
 export function TicketValidationAtEntryView() {
-    const currentUser = useSelector((state: RootState) => state?.auth?.user);
+    const { currentEvents } = useSelector((state: RootState) => state?.event);
+    const dispatch = useDispatch<AppDispatch>();
+    const [selectedEventOrder, setSelectedEventOrder] = useState<Order | null>(null);
+    const handleEventSelectOrder = (order: Order | null) => {
+        setSelectedEventOrder(order);
+    };
+  
+    useEffect(() => {
+         dispatch(todayEventFetch());
+    }, [dispatch]);
+
     return (
         <Box p={3}>
             <PageTitleSection
@@ -14,144 +31,26 @@ export function TicketValidationAtEntryView() {
 
             />
 
-            <Grid container spacing={2} sx={{ alignItems: "stretch" }}>  {/* Add alignItems: "stretch" */}
-                {/* Select Event */}
-                <Grid item xs={12} md={6} sx={{ display: "flex" }} >  {/* Add display: "flex" */}
+            <Grid container spacing={2} sx={{ alignItems: "stretch" }}>
+                <Grid item xs={12} md={6} sx={{ display: "flex" }} >
                     <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-                        <Card sx={{ p: 2, borderRadius: "12px", boxShadow: 3 }}>  {/* Add flex: 1 */}
-                            <Typography variant="body1" fontSize={{ xs: "18px", sm: "22px", md: "26px" }} fontWeight={600} mb={1}>
-                                Select Event:
-                            </Typography>
-                            <Select fullWidth defaultValue="concert">
-                                <MenuItem value="concert">Concert Night</MenuItem>
-                                <MenuItem value="festival">Urban Music Festival</MenuItem>
-                            </Select>
-                        </Card>
+                        {/* Select Event and Order */}
+                        <SelectTickets 
+                            events={currentEvents} 
+                            onEventSelectOrder={handleEventSelectOrder} 
+                            selectedEventOrder={selectedEventOrder} 
+                        />
 
                         {/* Ticket Status */}
-                        <Card sx={{ p: 2, marginTop: 2, borderRadius: "12px", flex: 1, boxShadow: 3 }}>  {/* Add flex: 1 */}
-                            <Typography fontWeight={600} fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>Ticket Status</Typography>
-                            <Typography variant="body2" color="black" mb={2}>
-                                Please keep your QR code visible for quick scanning.
-                            </Typography>
-                            <Divider sx={{ border: "1px solid #C3C3C3" }} />
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',  // Horizontal centering
-                                    justifyContent: 'center',  // Vertical centering (if needed)
-                                    textAlign: 'center',  // Center text
-                                    mb: 2  // Optional bottom margin
-                                }}
-                            >
-                                <Typography fontWeight={600} color="orange" fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>
-                                    Pending
-                                </Typography>
-                                <Typography variant="body2" fontWeight={400} fontSize={{ xs: "10px", sm: "12px", md: "14px" }}>
-                                    Pending: In validation proccess, Please wait.
-                                </Typography>
-                                 <Typography variant="body2" fontWeight={400} fontSize={{ xs: "10px", sm: "12px", md: "14px" }}>
-                                    Validated: Your ticket has been successfully scanned, you may enter.
-                                </Typography>
-                                 <Typography variant="body2" fontWeight={400} fontSize={{ xs: "10px", sm: "12px", md: "14px" }}>
-                                    Denied: ticket already used or invalid.
-                                </Typography>
-                                
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    sx={{ mt: 3, backgroundColor: "#0B2E4C", color: "white", py: 1.5 }}
-                                >
-                                    Retry
-                                </Button>
-                            </Box>
-                        </Card>
+                        <TicketsStatus selectedOrder={selectedEventOrder} />
                     </Box>
                 </Grid>
 
                 {/* Ticket QR Code */}
-                <Grid item xs={12} md={6} sx={{ display: "flex" }}>  {/* Add display: "flex" */}
-                    <Card sx={{ p: 2, borderRadius: "12px", width: "100%", boxShadow: 3 }}>  {/* Ensure full width */}
-                        <Typography variant="body1" fontWeight={600} fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>
-                            Ticket QR Code Display
-                        </Typography>
-                        <Typography variant="body2" color="black" mb={2}>
-                            Please keep your QR code visible for quick scanning.
-                        </Typography>
-                        <Divider sx={{ border: "1px solid #C3C3C3" }} />
-                        {/* QR Code */}
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',  // Horizontal centering
-                                justifyContent: 'center',  // Vertical centering (if needed)
-                                textAlign: 'center',  // Center text
-                                mb: 2  // Optional bottom margin
-                            }}
-                        >
-                            <Typography variant="body1" fontWeight={600} fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>
-                                Your Ticket
-                            </Typography>
-                            <QrCodeIcon sx={{ fontSize: 100, mb: 1 }} />
-                            <Typography fontWeight={600} fontSize={{ xs: "12px", sm: "14px", md: "16px" }}>Ticket ID: 1234567890</Typography>
-                        </Box>
-                        {/* Buttons */}
-                        <Box mt={2} display="flex" gap={1} justifyContent="center">
-
-                            <Button variant="outlined"
-                                sx={{ fontWeight: 500, color: "#0B2E4C", borderColor: "#0B2E4C", fontSize: { xs: "12px", sm: "14px", md: "16px", } }}
-                            >Share My Ticket</Button>
-                            <Button variant="outlined" sx={{ color: "#0B2E4C", borderColor: "#0B2E4C", fontWeight: 500, fontSize: { xs: "12px", sm: "14px", md: "16px", } }}>View Ticket Details</Button>
-                        </Box>
-                    </Card>
-                </Grid>
+                <TicketQRDisplay selectedOrder={selectedEventOrder}/>
 
                 {/* Scanned Tickets */}
-                <Grid item xs={12} md={12}>
-                    <Card sx={{ p: 3, borderRadius: "12px" }}>
-                        <Typography fontWeight="bold">Scanned Tickets</Typography>
-                        <Typography variant="body2" color="black" mb={2}>
-                            Please keep your QR code visible for quick scanning.
-                        </Typography>
-
-                        {/* Ticket 1 */}
-                        <Box display="flex" justifyContent="space-between" borderBottom="1px solid #ddd" py={1}>
-                            <Box>
-                                <Typography fontWeight="bold">Urban Music Festival</Typography>
-                                <Typography variant="body2" color="black">
-                                    Date: 02/10/2025 | Time: 8:30 PM
-                                </Typography>
-                            </Box>
-                            <Typography color="green">Validated</Typography>
-                        </Box>
-
-                        {/* Ticket 2 */}
-                        <Box display="flex" justifyContent="space-between" py={1}>
-                            <Box>
-                                <Typography fontWeight="bold">Urban Music Festival</Typography>
-                                <Typography variant="body2" color="black">
-                                    Date: 02/10/2025 | Time: 8:30 PM
-                                </Typography>
-                            </Box>
-                            <Typography color="green">Validated</Typography>
-                        </Box>
-
-                        {/* Full History Button */}
-                        <Button
-                            fullWidth
-                            sx={{
-                                mt: 2,
-                                backgroundColor: "#0D3B66",
-                                color: "white",
-                                "&:hover": { backgroundColor: "#092C4C" },
-                            }}
-                        >
-                            View My Full History
-                        </Button>
-                    </Card>
-                </Grid>
+                <ScannedTickets />
             </Grid>
         </Box>
 

@@ -38,14 +38,15 @@ export const navData: NavItem[] = [
     icon: icon('ic-dashboard'),
     roles: ['organizer'],
   },
- {
-    title: 'Home & Recommendations',
+  // Home and Recommandation
+  {
+    title: 'Home',
     path: '/',
-    icon: icon('ic-analytics'),
+    icon: icon('ic-dashboard'),
     roles: ['participant'],
   },
   // Organizer Sidebar
-   {
+  {
     title: 'Statistics And Reports',
     path: '/statistics-&-reports',
     icon: icon('ic-dashboard'),
@@ -108,41 +109,41 @@ export const navData: NavItem[] = [
     icon: icon('ic-analytics'),
     roles: ['organizer'],
   },
- 
+
   {
-    title: 'Event Search & Details',
+    title: 'Event Search',
     path: '/event-search-and-details',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_event'),
     roles: ['participant'],
   },
   {
     title: 'Ticket Purchase Process',
     path: '/ticket-purchase-process',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_tickets'),
     roles: ['participant'],
   },
   {
     title: 'Ticket Management',
     path: '/ticket-management',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_ticket_manage'),
     roles: ['participant'],
   },
   {
-    title: 'Ticket Validation at Entry',
+    title: 'Ticket Validation',
     path: '/ticket-validation-at-entry',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_ticket_validation'),
     roles: ['participant'],
   },
   {
-    title: 'Loyalty Program',
+    title: 'Loyalty & Rewards',
     path: '/loyalty-program',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_loyality_rewards'),
     roles: ['participant'],
   },
   {
-    title: 'Custom Photo/Video Filters for Events',
+    title: 'Photo/Video Filters',
     path: '/custom-photo-or-video-filters-for-events',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_photo_video'),
     roles: ['participant'],
   },
   {
@@ -216,8 +217,8 @@ export const navData: NavItem[] = [
   {
     title: 'Profile & Services Management',
     path: '/profile-&-services-management',
-    icon: icon('ic-analytics'),
-    roles: ['provider', 'admin','organizer','organizer','participant'],
+    icon: icon('ic_profile_service'),
+    roles: ['provider', 'admin', 'organizer', 'organizer', 'participant'],
   },
 
 ];

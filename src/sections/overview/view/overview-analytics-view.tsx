@@ -161,16 +161,15 @@ export function OverviewAnalyticsView() {
             {isDesktop && (
               <Card>
                 <CardContent>
-                <HeadingCommon variant="h5" color="text.secondary" baseSize="20px" title="Recent Event List" />
+                  <HeadingCommon variant="h5" color="text.secondary" baseSize="20px" title="Recent Event List" />
 
-              
+
                   <Grid container spacing={3}>
                     {upcomingEvents?.slice(0, 3).map((event: any) => (
                       <Grid item xs={12} key={event._id}>
                         <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
-                          <Typography variant="h6" color={theme.palette.primary.main} sx={{ fontWeight: 500 }}>
-                            {event.eventName}
-                          </Typography>
+                          <HeadingCommon variant="h6" color={theme.palette.primary.main} baseSize="20px" title={event.eventName} />
+
                           <Box display="flex" mt={1}>
                             <CardMedia component="img" image={event?.coverImage?.url} alt={event.eventName} sx={{ width: 150, height: 85, borderRadius: 2 }} />
                             <CardContent sx={{ flex: 1, pt: 0 }}>

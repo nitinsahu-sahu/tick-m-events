@@ -1,6 +1,10 @@
 import { ApexOptions } from "apexcharts";
 import { Box, Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Grid } from "@mui/material";
 import Chart from "react-apexcharts";
+import { AppDispatch, RootState } from "src/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchTicketType } from "src/redux/actions/ticket-&-reservation-management.action";
 
 const ticketData = [
     { type: "Standard", price: 10000, stock: 3000, sold: 2500, percentage: 55, revenue: 25000000, color: "#2196F3" },
@@ -35,6 +39,17 @@ const chartOptions: ApexOptions = {
 
 const chartSeries = ticketData.map((t) => t.percentage);
 export function TicketDetailsAndCategories() {
+    const dispatch = useDispatch<AppDispatch>();
+
+    const { tickets } = useSelector((state: RootState) => state?.ticketReservationMang);
+    useEffect(() => {
+        dispatch(fetchTicketType());
+        const interval = setInterval(() => {
+            dispatch(fetchTicketType());
+        }, 15000);
+
+        return () => clearInterval(interval);
+    }, [dispatch]);
     return (
         <Box boxShadow={3} borderRadius={3} mt={3}>
             <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>
@@ -45,30 +60,38 @@ export function TicketDetailsAndCategories() {
                     <Table>
                         <TableHead>
                             <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                                <TableCell><b>Ticket Type</b></TableCell>
-                                <TableCell><b>Price</b></TableCell>
-                                <TableCell><b>Total Stock</b></TableCell>
-                                <TableCell><b>Tickets Sold</b></TableCell>
-                                <TableCell><b>% of Sales</b></TableCell>
-                                <TableCell><b>Revenue</b></TableCell>
+                                <TableCell align="center"><b>Ticket Type</b></TableCell>
+                                <TableCell align="center"><b>Price</b></TableCell>
+                                <TableCell align="center"><b>Total Stock</b></TableCell>
+                                <TableCell align="center"><b>Tickets Sold</b></TableCell>
+                                <TableCell align="center"><b>% of Sales</b></TableCell>
+                                <TableCell align="center"><b>Revenue</b></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {ticketData.map((ticket, index) => (
+                            {tickets?.map((ticket: any, index: any) => (
                                 <TableRow key={index}>
-                                    <TableCell>{ticket.type}</TableCell>
-                                    <TableCell>{ticket.price.toLocaleString()} XAF</TableCell>
-                                    <TableCell>{ticket.stock.toLocaleString()}</TableCell>
-                                    <TableCell>{ticket.sold.toLocaleString()}</TableCell>
-                                    <TableCell>{ticket.percentage}%</TableCell>
-                                    <TableCell>{ticket.revenue.toLocaleString()} XAF</TableCell>
+                                    <TableCell align="center">{ticket.name}</TableCell>
+                                    <TableCell align="center">{ticket.price}</TableCell>
+                                    <TableCell align="center">{ticket.quantity}</TableCell>
+                                    <TableCell align="center">{ticket.sold || 0}</TableCell>
+                                    <TableCell align="center">
+                                        {ticket.quantity > 0
+                                            ? `${Math.round((ticket.sold / ticket.quantity) * 100) || 0}%`
+                                            : "0%"
+                                        }
+                                    </TableCell>
+                                    <TableCell align="center">{ticket.price === "Free"
+                                        ? ticket.price
+                                        : `${parseInt(ticket.price, 10) * parseInt(ticket.sold || 0, 10)} XAF`
+                                    }</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
 
-                <Grid container mt={2} alignItems="center" sx={{ border: "2px solid grey", borderRadius: 3, py: 2, px:6 }}>
+                <Grid container mt={2} alignItems="center" sx={{ border: "2px solid grey", borderRadius: 3, py: 2, px: 6 }}>
                     <Grid item xs={12} md={6}>
                         <Typography variant="h6" fontWeight="bold">Ticket Sales Distribution</Typography>
                     </Grid>

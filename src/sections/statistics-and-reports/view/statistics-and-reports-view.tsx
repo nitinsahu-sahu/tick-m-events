@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Button, Box, Grid } from "@mui/material";
+
+import { eventFetch } from "src/redux/actions/event.action";
+import { AppDispatch, RootState } from "src/redux/store";
 import { PageTitleSection } from "src/components/page-title-section";
 import { DashboardContent } from "src/layouts/dashboard";
+
 import { LiveSalesRevenueData } from "../live-sales-&-revenue-data";
 import { MainDashboardStatistics } from "../main-dashboard-statistics";
 import { TicketDetailsAndCategories } from "../ticket-details-&-categories";
@@ -11,7 +16,22 @@ import { TicketDetails } from "../ticket-details";
 
 export function StatisticsAndReportsView() {
   const [activeTab, setActiveTab] = useState("Overview");
+  const { fullData } = useSelector((state: RootState) => state?.event);
+    const dispatch = useDispatch<AppDispatch>();
+  
+  useEffect(() => {
+    // Fetch immediately on mount
+    dispatch(eventFetch());
 
+    // Set up polling every 5 minutes (300,000 ms)
+    const intervalId = setInterval(() => {
+      dispatch(eventFetch());
+    }, 300000); // 5 minutes in milliseconds
+
+    // Clean up interval on unmount
+    return () => clearInterval(intervalId);
+  }, [dispatch]);
+  
   const tabs = [
     "Overview",
     "Ticket Details",
@@ -84,7 +104,7 @@ export function StatisticsAndReportsView() {
         </>
       )}
 
-      {activeTab === "Ticket Details" && <TicketDetails />}
+      {activeTab === "Ticket Details" && <TicketDetails events={fullData}/>}
 
       {activeTab === "Participant Engagement" && <TicketDetailsAndCategories />}
 

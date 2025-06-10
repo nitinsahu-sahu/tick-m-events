@@ -109,7 +109,7 @@ export function TicketReservationManagementTable({
                                                 size="small"
                                             />
                                         ) : (
-                                            <span style={{ textTransform: 'capitalize' }}>{row.price || row.email}</span>
+                                            <span style={{ textTransform: row.price ? 'uppercase' : 'capitalize' }}>{row.price || row.email}</span>
                                         )}
                                     </TableCell>
                                 }
@@ -139,21 +139,24 @@ export function TicketReservationManagementTable({
 
 
                                 {
-                                    type === '3' || type === "4" ? <TableCell align="center">{formatEventDate(row.createdAt)}</TableCell> : <TableCell align="center" >
-                                        {editingId === row._id ? (
-                                            <TextField
-                                                value={editedData.ticketDescription}
-                                                onChange={(e) => handleFieldChange('ticketDescription', e.target.value)}
-                                                multiline
-                                                rows={3}
-                                                sx={{ width: '200px' }}
-                                                size="small"
-                                            />
-                                        ) : (
-                                            type === "1" ? ReactHtmlParser(row?.ticketDescription) :
-                                                type === '3' || type === '4' ? row.purchaseDate : row.quantity === "Unlimited" ? row.quantity : parseInt(row.quantity, 10) - parseInt(row.sold || 0, 10)
-                                        )}
-                                    </TableCell>
+                                    type === '3' || type === "4" ?
+                                        <TableCell align="center">{formatEventDate(row.createdAt)}</TableCell> : <TableCell align="center" >
+                                            {editingId === row._id ? (
+                                                <TextField
+                                                    value={editedData.ticketDescription}
+                                                    onChange={(e) => handleFieldChange('ticketDescription', e.target.value)}
+                                                    multiline
+                                                    rows={3}
+                                                    sx={{ width: '200px' }}
+                                                    size="small"
+                                                />
+                                            ) : (
+                                                type === "1" ? ReactHtmlParser(row?.ticketDescription) :
+                                                    type === '3' || type === '4' ?
+                                                        row.purchaseDate : row.quantity === "Unlimited" ?
+                                                            row.quantity : parseInt(row.quantity, 10) - parseInt(row.sold || 0, 10)
+                                            )}
+                                        </TableCell>
                                 }
 
 
@@ -163,7 +166,10 @@ export function TicketReservationManagementTable({
                                         <TableCell align="center" sx={{ textTransform: "capitalize" }} >{row.paymentStatus}</TableCell>
                                         :
                                         <TableCell align="center" >
-                                            {type === "3" ? row.reservationStatus : type === "1" ? row.quantity === "Unlimited" ? row.quantity : parseInt(row.quantity, 10) - parseInt(row.sold || 0, 10) : `${row.sold === undefined ? 0 : row.sold}` || 0}
+                                            {type === "3" ?
+                                                row.reservationStatus : type === "1" ? row.quantity === "Unlimited" ?
+                                                    row.quantity : parseInt(row.quantity, 10) - parseInt(row.sold || 0, 10) :
+                                                    `${row.sold === undefined ? 0 : row.sold}` || 0}
                                         </TableCell>
                                 }
 
@@ -201,7 +207,12 @@ export function TicketReservationManagementTable({
                                             >
                                                 Edit
                                             </Button>
-                                        ) : row.price === "Free" ? row.price : parseInt(row.price, 10) * parseInt(row.sold || 0, 10)
+                                        ) : <span>
+                                            {row.price === "Free"
+                                                ? row.price
+                                                : `${parseInt(row.price, 10) * parseInt(row.sold || 0, 10)} XAF`
+                                            }
+                                        </span>
                                     }
                                 </TableCell>}
                                 {

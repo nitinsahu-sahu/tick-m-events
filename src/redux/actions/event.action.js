@@ -378,9 +378,6 @@ export const categoryByIdFetch = (categoryId) => async (dispatch) => {
  
     try {
         const response = await axios.get(`/event/category/${categoryId}`);
-        console.log('=====single===============================');
-        console.log(response);
-        console.log('====================================');
         dispatch({
             type: eventConstants.SINGLE_CATEGORY_FETCH_SUCCESS,
             payload: {
@@ -394,6 +391,30 @@ export const categoryByIdFetch = (categoryId) => async (dispatch) => {
                 message: error?.response?.data?.message || "Failed to fetch categories",
                 error: error.status
             },
+        });
+    }
+};
+
+export const todayEventFetch = () => async (dispatch) => {
+    dispatch({ type: eventConstants.GET_TODAY_EVENT_REQUEST });
+
+    try {
+        const response = await axios.get(`/event/currentDateEvents`);
+        console.log('===================today=================');
+        console.log(response);
+        console.log('====================================');
+        dispatch({
+            type: eventConstants.GET_TODAY_EVENT_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                currentEvents: response?.data?.currentEvents,
+            },
+
+        });
+    } catch (error) {
+        dispatch({
+            type: eventConstants.GET_TODAY_EVENT_FAILURE,
+            payload: { message: "denied", error: error.status },
         });
     }
 };

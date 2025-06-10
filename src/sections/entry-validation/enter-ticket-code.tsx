@@ -219,7 +219,7 @@ export function EnterTicketCode({setEventInformation}:any) {
                 </Grid>
             </form>
 
-            {flag.counter === 'invalid' ? <Grid container spacing={2} mt={2}>
+            {flag.counter === 'invalid' || flag.counter === 'expired' ? <Grid container spacing={2} mt={2}>
                 <Grid item xs={12} >
                     <Card
                         sx={{

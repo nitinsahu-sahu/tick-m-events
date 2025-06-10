@@ -21,9 +21,6 @@ import("../style.css")
 export function TicketAndReservationManagementView() {
   const { tickets } = useSelector((state: RootState) => state?.ticketReservationMang);
   const { fullData } = useSelector((state: RootState) => state?.event);
-console.log('====fullData================================');
-console.log(fullData);
-console.log('====================================');
   const dispatch = useDispatch<AppDispatch>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const handleEventSelect = (event: Event | null) => {

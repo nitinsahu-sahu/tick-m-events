@@ -95,7 +95,7 @@ export function HomeAndRecommendationsView() {
                 }
               }}
             >
-              {tickets.map((ticket, index) => (
+              {tickets?.slice()?.reverse()?.map((ticket, index) => (
                 <Grid item key={index} sx={{ minWidth: 400 }}>
                   <UpComingCard ticket={ticket} />
                 </Grid>

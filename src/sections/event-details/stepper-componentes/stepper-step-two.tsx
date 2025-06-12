@@ -14,7 +14,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { LoadingButton } from '@mui/lab';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { AppDispatch, RootState } from 'src/redux/store';
 import { Iconify } from 'src/components/iconify';
@@ -29,12 +29,7 @@ export function StepperStepTwo() {
     const { tickets } = useSelector((state: RootState) => state?.ticketReservationMang);
     const [selectedTicket, setSelectedTicket] = useState<string>("");
     const [selectedRefundPolicy, setSelectedRefundPolicy] = useState("");
-
-
-    const [fullRefundCheck, setFullRefundCheck] = useState(false);
-    const [noRefundAfterDateCheck, setNoRefundAfterDateCheck] = useState(false);
     const [refundEnabled, setRefundEnabled] = useState(false);
-    const [partialRefundCheck, setPartialRefundCheck] = useState(false);
     const [payStatus, setPayStatus] = useState('paid');
     const [ticketConfigData, setTicketConfigData] = useState({
         purchaseDeadlineDate: "",
@@ -58,13 +53,23 @@ export function StepperStepTwo() {
             isLimitedSeat: true
         }
     ]);
+
+    const filteredTickets = tickets?.filter((ticket: any) => {
+        if (payStatus === 'free') {
+            return ticket.price === '0' || ticket.price === '0 XAF' || ticket.price.includes('Free');
+        }
+        return ticket.price !== '0' && ticket.price !== '0 XAF' && !ticket.price.includes('Free');
+    });
+
     useEffect(() => {
+        dispatch(fetchTicketType());
         const interval = setInterval(() => {
             dispatch(fetchTicketType());
-        }, 10000);
+        }, 20000);
 
         return () => clearInterval(interval);
     }, [dispatch]);
+
     const handleTicketSelect = (ticketId: string) => {
         setSelectedTicket(ticketId);
         const selected = tickets.find((t: any) => t._id === ticketId);
@@ -219,25 +224,41 @@ export function StepperStepTwo() {
         <Box sx={{ p: 1, maxWidth: '100%', width: '100%' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <HeadingCommon variant="h6" title="Ticket Configuration" weight={600} baseSize="33px" />
-                {tickets?.length > 0 && (
+                {filteredTickets?.length > 0 ? (
                     <FormControl sx={{ minWidth: 200, ml: 2 }}>
                         <Select
                             value={selectedTicket}
                             onChange={(e) => handleTicketSelect(e.target.value)}
                             displayEmpty
                             size="small"
-                            sx={{ height: 40 }}
+                            sx={{ height: 40, textTransform:"capitalize" }}
                         >
                             <MenuItem value="" disabled>
                                 Select existing ticket
                             </MenuItem>
-                            {tickets.map((ticket: any) => (
-                                <MenuItem key={ticket._id} value={ticket._id}>
+                            {filteredTickets.map((ticket: any) => (
+                                <MenuItem key={ticket._id} value={ticket._id} sx={{textTransform:"capitalize"}}>
                                     {ticket.name} ({ticket.price})
                                 </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
+                ) : (
+                    <Box sx={{ ml: 2, display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
+                            No {payStatus === 'free' ? 'free' : 'paid'} tickets available.
+                        </Typography>
+                        <Link
+                            to="/ticket-and-reservation-management"
+                            style={{
+                                color: "primary",
+                                textDecoration: 'underline',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Create ticket
+                        </Link>
+                    </Box>
                 )}
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
@@ -560,7 +581,7 @@ export function StepperStepTwo() {
                                                     sx={{ ml: 4, width: "200px" }}
                                                 />
                                             )}
- 
+
                                             {/* Partial Refund */}
                                             <FormControlLabel
                                                 value="partialRefund"
@@ -579,7 +600,7 @@ export function StepperStepTwo() {
                                                     sx={{ ml: 4, width: "200px" }}
                                                 />
                                             )}
- 
+
                                             {/* No Refund After a Specific Date */}
                                             <FormControlLabel
                                                 value="noRefundDate"

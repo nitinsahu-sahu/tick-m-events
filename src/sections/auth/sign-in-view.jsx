@@ -92,17 +92,36 @@ export function SignInView() {
     }
   }, [formRegisterData, navigate, avatar, dispatch]);
 
+  // const handleSignIn = useCallback(async (event) => {
+  //   event.preventDefault(); // Prevent default form submission behavior
+  //   const result = await dispatch(login(formData));
+
+  //   if (result.status === 200) {
+  //     toast.success(result?.message);
+  //   } else {
+  //     toast.error(result?.message);
+  //   }
+  // }, [formData, dispatch]);
+
   const handleSignIn = useCallback(async (event) => {
-    event.preventDefault(); // Prevent default form submission behavior
+    event.preventDefault();
     const result = await dispatch(login(formData));
 
     if (result.status === 200) {
-      toast.success(result?.message);
+        toast.success(result?.message);
+        
+        // Check for pending purchase
+        const pendingPurchase = sessionStorage.getItem('pendingPurchase');
+        if (pendingPurchase) {
+            const purchaseData = JSON.parse(pendingPurchase);
+            navigate(purchaseData.redirectTo);
+        } else {
+            navigate("/");
+        }
     } else {
-      toast.error(result?.message);
+        toast.error(result?.message);
     }
-  }, [formData, dispatch]);
-
+}, [formData, dispatch,navigate]);
 
   useEffect(() => {
     if (auth?.authenticate) {

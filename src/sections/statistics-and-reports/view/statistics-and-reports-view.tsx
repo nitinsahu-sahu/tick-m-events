@@ -17,8 +17,8 @@ import { TicketDetails } from "../ticket-details";
 export function StatisticsAndReportsView() {
   const [activeTab, setActiveTab] = useState("Overview");
   const { fullData } = useSelector((state: RootState) => state?.event);
-    const dispatch = useDispatch<AppDispatch>();
-  
+  const dispatch = useDispatch<AppDispatch>();
+
   useEffect(() => {
     // Fetch immediately on mount
     dispatch(eventFetch());
@@ -31,7 +31,7 @@ export function StatisticsAndReportsView() {
     // Clean up interval on unmount
     return () => clearInterval(intervalId);
   }, [dispatch]);
-  
+
   const tabs = [
     "Overview",
     "Ticket Details",
@@ -86,7 +86,7 @@ export function StatisticsAndReportsView() {
                   boxShadow: activeTab === text
                     ? '0 4px 12px rgba(0, 42, 91, 0.3)'
                     : 'none',
-                 
+
                 }}
               >
                 {text}
@@ -104,7 +104,7 @@ export function StatisticsAndReportsView() {
         </>
       )}
 
-      {activeTab === "Ticket Details" && <TicketDetails events={fullData}/>}
+      {activeTab === "Ticket Details" && <TicketDetails events={fullData} />}
 
       {activeTab === "Participant Engagement" && <TicketDetailsAndCategories />}
 

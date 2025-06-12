@@ -1,4 +1,7 @@
 import { Modal, Box, Typography, Divider, Button } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { RootState } from 'src/redux/store';
 
 interface PurchaseModalProps {
     open: boolean;
@@ -21,6 +24,28 @@ export function PurchaseModal({
     selectedTickets,
     totalAmount
 }: PurchaseModalProps) {
+
+    const navigate = useNavigate();
+    const { authenticate } = useSelector((state: RootState) => state?.auth)
+
+
+    const handleProceedToPayment = () => {
+        const redirectUrl = `/ticket-purchase-process?eventId=${eventId}`
+        if (!authenticate) {
+            // Store ticket data in session storage before redirecting to login
+            sessionStorage.setItem('pendingPurchase', JSON.stringify({
+                eventId,
+                eventName,
+                selectedTickets,
+                totalAmount,
+                redirectTo: redirectUrl
+            }));
+            navigate('/sign-in');
+        } else {
+            window.open(redirectUrl, '_blank');
+        }
+    };
+
     return (
         <Modal open={open} onClose={onClose}>
             <Box sx={{
@@ -38,7 +63,7 @@ export function PurchaseModal({
                     Confirm Your Purchase
                 </Typography>
 
-                <Typography variant="body1" mb={1}>
+                <Typography variant="body1" mb={1} textTransform="capitalize">
                     <strong>Event:</strong> {eventName}
                 </Typography>
                 <Typography variant="body1" mb={3}>
@@ -53,7 +78,7 @@ export function PurchaseModal({
 
                 {selectedTickets.map((ticket, index) => (
                     <Box key={index} mb={2}>
-                        <Typography>
+                        <Typography textTransform="capitalize">
                             <strong>{ticket.ticketName}</strong> × {ticket.quantity}
                         </Typography>
                         <Typography color="text.secondary">
@@ -72,7 +97,7 @@ export function PurchaseModal({
                     <Button variant="outlined" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button variant="contained" color="primary">
+                    <Button onClick={handleProceedToPayment} variant="contained" color="primary">
                         Proceed to Payment
                     </Button>
                 </Box>

@@ -214,14 +214,14 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                         {tickets?.map((ticket: any) => (
                             ticket?.tickets.map((item: any) => (
                                 <Box key={item._id} mb={3}>
-                                    <Typography fontWeight="bold" fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>
+                                    <Typography fontWeight="bold" textTransform="capitalize" fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>
                                         {item.ticketType} Ticket
                                         {item.isLimitedSeat && item.totalTickets === "0" && (
                                             <span style={{ color: "#3CB1F1" }}> (Sold Out)</span>
                                         )}
                                     </Typography>
                                     <Box display="flex" alignItems="center" justifyContent="space-between">
-                                        <Typography fontWeight={600} fontSize={{ xs: "0.8rem", sm: "1rem", md: "1.2rem" }}>
+                                        <Typography fontWeight={600} textTransform="uppercase" fontSize={{ xs: "0.8rem", sm: "1rem", md: "1.2rem" }}>
                                             {item.price}
                                             {item.isLimitedSeat && item.totalTickets !== "0" && (
                                                 <span style={{ fontSize: "0.8rem", color: "#666" }}>

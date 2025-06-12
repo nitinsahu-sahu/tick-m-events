@@ -50,6 +50,7 @@ export function TicketDetailsAndCategories() {
 
         return () => clearInterval(interval);
     }, [dispatch]);
+
     return (
         <Box boxShadow={3} borderRadius={3} mt={3}>
             <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3 }}>

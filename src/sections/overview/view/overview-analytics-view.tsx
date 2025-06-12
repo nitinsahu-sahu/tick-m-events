@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useMediaQuery, ToggleButtonGroup, List, Avatar, ListItemText, IconButton, ListItem, MenuItem, Box, Grid, Button, Card, CardContent, Typography, Select, Stack, ListItemAvatar, Divider, CardMedia, ToggleButton, LinearProgress } from '@mui/material';
+import { useMediaQuery, ToggleButtonGroup, List, Avatar, ListItemText, IconButton, ListItem, MenuItem, Box, Grid, Button, Card, CardContent, Typography, Select, Stack, ListItemAvatar, Divider, CardMedia, ToggleButton, LinearProgress, CircularProgress } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import Calendar from "react-calendar";
@@ -162,8 +162,22 @@ export function OverviewAnalyticsView() {
               <Card>
                 <CardContent>
                   <HeadingCommon variant="h5" color="text.secondary" baseSize="20px" title="Recent Event List" />
-
-
+                  {/* Loading/Empty State */}
+                  {!upcomingEvents && (
+                    <Box textAlign="center" py={4}>
+                      <CircularProgress size={24} />
+                    </Box>
+                  )}
+                  {upcomingEvents?.length === 0 && (
+                    <Typography
+                      variant="body1"
+                      textAlign="center"
+                      color="text.secondary"
+                      sx={{ py: 3 }}
+                    >
+                      No events found
+                    </Typography>
+                  )}
                   <Grid container spacing={3}>
                     {upcomingEvents?.slice(0, 3).map((event: any) => (
                       <Grid item xs={12} key={event._id}>
@@ -215,9 +229,16 @@ export function OverviewAnalyticsView() {
                       </Grid>
                     ))}
                   </Grid>
-                  <Button fullWidth variant="contained" sx={{ mt: 2, backgroundColor: '#0B2E4E' }}>
-                    Load More
-                  </Button>
+                  {/* Conditionally show "Load More" only if 4+ events exist */}
+                  {upcomingEvents?.length >= 4 && (
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      sx={{ mt: 2, backgroundColor: '#0B2E4E' }}
+                    >
+                      Load More
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             )}

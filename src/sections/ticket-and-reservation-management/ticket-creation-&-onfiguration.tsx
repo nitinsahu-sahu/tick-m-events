@@ -97,7 +97,7 @@ export function TicketCreationAndConfiguration() {
         try {
             const result = await dispatch(createTicketType(ticketData) as unknown as Promise<ApiResponse>)
             if (result.status === 201) {
-                toast.success(result.message as ToastContent);
+                toast.success("Saved and Published Tickets Successfully...");
             } else {
                 toast.error(result.message as ToastContent);
             }

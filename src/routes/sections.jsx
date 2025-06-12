@@ -135,7 +135,7 @@ export function Router() {
 
         // Organizer Route
         {
-          path: '/',
+          path: '/overview',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><HomePage /></RoleProtectedRoute>
         },
         {
@@ -175,13 +175,14 @@ export function Router() {
 
         // Service Provider Route
         {
+          path: '/statistics-&-performance',
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><StatisticsAndPerformancePage /> </RoleProtectedRoute>
+        },
+        {
           path: 'tracking-of-booked-services-&-providers',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><TrackingBookedServicesAndProvidersView /></RoleProtectedRoute>
         },
-        {
-          path: '/',
-          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><StatisticsAndPerformancePage /> </RoleProtectedRoute>
-        },
+        
 
         {
           path: 'home-and-global-view',
@@ -214,6 +215,10 @@ export function Router() {
         },
         // -----------------------**************-------------------------
         {
+          path: '/marketplace-&-service-provider-supervision',
+          element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><MarketplaceAndServiceProviderSupervisionPage /></RoleProtectedRoute>
+        },
+        {
           path: 'global-overview-&-general-statistics',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><GlobalOverviewAndGeneralStatisticsPage /></RoleProtectedRoute>
         },
@@ -225,10 +230,7 @@ export function Router() {
           path: 'ticketing-&-transactions-supervision',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><TicketingAndTransactionsSupervisionPage /></RoleProtectedRoute>
         },
-        {
-          path: '/',
-          element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><MarketplaceAndServiceProviderSupervisionPage /></RoleProtectedRoute>
-        },
+        
         // -----------------------**************-------------------------
 
         {
@@ -241,8 +243,6 @@ export function Router() {
             <MultipleDashboard />
           </RoleProtectedRoute>
         },
-
-        // { element: <HomePage />, index: true, },
 
         { path: 'password-recovery', element: <PasswordRecoveryPage /> },
       ],

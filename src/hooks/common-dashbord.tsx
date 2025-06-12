@@ -46,7 +46,7 @@ export function MultipleDashboard() {
                         case 'provider':
                             return <StatisticsAndPerformancePage />;
                         default:
-                            return <HomePage />;
+                            return <HomeAndRecommendationsPage />;
                     }
                 })()}
             </Box>

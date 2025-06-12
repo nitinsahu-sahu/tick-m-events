@@ -132,7 +132,9 @@ export function TicketReservationManagementTable({
                                                 size="small"
                                             />
                                         ) : (
-                                            <span style={{ textTransform: 'capitalize' }}>{row.quantity || row.resrvationTicketType}</span>
+                                            <span style={{ textTransform: 'capitalize' }}>
+                                                {row.quantity > 5000 ? 'Unlimited' : (row.quantity || row.reservationTicketType)}
+                                            </span>
                                         )}
                                     </TableCell>
                                 }

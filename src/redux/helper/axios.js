@@ -14,8 +14,8 @@ import axios from 'axios'
 
 // for live
 const instance = axios.create({
-    // baseURL: 'https://tick-m-events-server.onrender.com/api/v1',
-    baseURL: 'http://localhost:8000/api/v1',
+    baseURL: 'https://tick-m-events-server.onrender.com/api/v1',
+    // baseURL: 'http://localhost:8000/api/v1',
     withCredentials: true,
 });
 

@@ -164,7 +164,7 @@ export function Router() {
         },
         {
           path: 'search-&-select-service-providers',
-          element: <RoleProtectedRoute allowedRoles={['organizer', 'provider']} currentRole={currentRole}><SearchAndSelectServiceProvidersPage /></RoleProtectedRoute>
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><SearchAndSelectServiceProvidersPage /></RoleProtectedRoute>
         },
         {
           path: 'visibility-and-access-settings',
@@ -173,7 +173,7 @@ export function Router() {
 
         // -----------------------**************-------------------------
 
-        // Service Provider Route
+        
         {
           path: '/statistics-&-performance',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><StatisticsAndPerformancePage /> </RoleProtectedRoute>

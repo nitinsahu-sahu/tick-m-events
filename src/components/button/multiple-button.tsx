@@ -1,9 +1,8 @@
-import { Box,Tab, Tabs, Typography } from "@mui/material";
+import { Box, Tab, Tabs, Typography } from "@mui/material";
 
-export function TabButton({ providersList, tabValue, onChange, tabLabels }: any) {
-
-    return (
-           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+export function TabButton({ providersList, tabValue, onChange, tabLabels, filtersApplied }: any) {
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <Tabs
         value={tabValue}
         onChange={onChange}
@@ -27,18 +26,19 @@ export function TabButton({ providersList, tabValue, onChange, tabLabels }: any)
             label={
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 {label}
-                {index === Math.floor(tabLabels.length / 2) && (
-                  <Typography 
-                    sx={{ 
+                {index === 1 && (
+                  <Typography
+                    sx={{
                       ml: 1,
                       color: tabValue === index ? 'white' : 'black'
                     }}
                   >
-                    ({providersList?.length || 0})
+                    ({filtersApplied ? providersList?.length || 0 : '-'})
                   </Typography>
                 )}
               </Box>
             }
+            disabled={index === 1 && !filtersApplied}
             sx={{
               px: { xs: 1, sm: 3 },
               margin: "0px 5px",
@@ -49,11 +49,15 @@ export function TabButton({ providersList, tabValue, onChange, tabLabels }: any)
               backgroundColor: tabValue === index ? "#0B2E4C" : "white",
               fontWeight: tabValue === index ? "bold" : "normal",
               color: tabValue === index ? "white" : "black",
-              fontSize: { xs: "0.75rem", sm: "0.875rem" }
+              fontSize: { xs: "0.75rem", sm: "0.875rem" },
+              '&.Mui-disabled': {
+                opacity: 0.5,
+                borderColor: '#ccc'
+              }
             }}
           />
         ))}
       </Tabs>
     </Box>
-    )
+  )
 }

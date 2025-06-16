@@ -1,6 +1,35 @@
 import { Box, Typography, Button, Avatar, Grid, Paper } from '@mui/material';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 
 export function ProfileCard({ selectedProvider }: any) {
+  // Check if selectedProvider is empty or invalid
+  const isEmptyProvider = !selectedProvider ||
+    (typeof selectedProvider === 'object' &&
+      Object.keys(selectedProvider).length === 0);
+
+  if (isEmptyProvider) {
+    return (
+      <Paper elevation={3} sx={{
+        borderRadius: 2.5,
+        p: 4,
+        textAlign: 'center',
+        mt: 3,
+        mb: 4,
+        backgroundColor: '#f9f9f9'
+      }}>
+        <Box sx={{ mb: 2 }}>
+          <PersonOutlineIcon sx={{ fontSize: 60, color: 'text.disabled' }} />
+        </Box>
+        <Typography variant="h6" color="textSecondary">
+          No profile available
+        </Typography>
+        <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+          {!selectedProvider ? 'Select a provider to view details' : 'No providers details your current filters'}
+        </Typography>
+      </Paper>
+    );
+  }
+
   return (
     <Paper
       elevation={3}
@@ -15,7 +44,7 @@ export function ProfileCard({ selectedProvider }: any) {
       <Box
         sx={{
           height: { xs: 150, sm: 170, md: 200 },
-          backgroundImage: `url(${selectedProvider.cover.url || '/assets/images/home-and-recommendations/tech.png'})`,
+          backgroundImage: `url(${selectedProvider?.cover?.url || '/assets/images/home-and-recommendations/tech.png'})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -24,7 +53,7 @@ export function ProfileCard({ selectedProvider }: any) {
       {/* Profile Section */}
       <Box sx={{ p: { xs: 2, sm: 2, md: 3 }, position: 'relative' }}>
         <Avatar
-          src={selectedProvider.avatar.url || '/assets/images/Profile.jpg'}
+          src={selectedProvider?.avatar?.url || '/assets/images/Profile.jpg'}
           sx={{
             width: 100,
             height: 100,
@@ -33,6 +62,7 @@ export function ProfileCard({ selectedProvider }: any) {
             left: { xs: 'calc(50% - 40px)', sm: 'calc(50% - 40px)', md: 24 },
           }}
         />
+
         <Box sx={{
           ml: { xs: 0, sm: 15, md: 15 },
           mt: { xs: 8, sm: 8, md: -2 },
@@ -101,7 +131,8 @@ export function ProfileCard({ selectedProvider }: any) {
             Share Profile
           </Button>
         </Grid>
+
       </Box>
     </Paper>
   );
-};
+}

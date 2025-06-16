@@ -1,15 +1,13 @@
-import { Box, Paper, Typography, Button, Grid } from '@mui/material';
+import { Box, Paper, Typography, Button, Grid, List, ListItem, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
 import { useState } from 'react';
-
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-
 import { ProviderListView } from './PopularEvent';
-import { eventTickets } from './Utills';
 
-
-export default function ProviderCardList({ handleSelct,providersList }: any) {
-  const [view, setView] = useState('card');
-  
+export default function ProviderCardList({ handleSelct, providersList }: any) {
+  const [view, setView] = useState<'card' | 'list'>('card');
+  console.log('====================================');
+  console.log(providersList);
+  console.log('==providersList==================================');
   return (
     <Paper
       sx={{
@@ -36,38 +34,118 @@ export default function ProviderCardList({ handleSelct,providersList }: any) {
             mr: 2,
           }}
         >
-          <ToggleStyleButton active={view === 'card'} onClick={() => setView('card')} >
+          <ToggleStyleButton active={view === 'card'} onClick={() => setView('card')}>
             Card View
           </ToggleStyleButton>
-          <ToggleStyleButton active={view === 'map'} onClick={() => setView('map')}>
-            Map View
+          <ToggleStyleButton active={view === 'list'} onClick={() => setView('list')}>
+            List View
           </ToggleStyleButton>
         </Box>
       </Box>
 
-      {/* Cards Grid */}
-      <Grid container spacing={3} mt={3}>
-        {providersList?.length > 0 ? (
-          providersList?.map((ticketc: any, index: any) => (
-            <Grid item xs={12} sm={6} md={6} key={ticketc.id || index}>
-              <ProviderListView providers={ticketc} key={index} handleSelct={handleSelct}/>
-            </Grid>
-          ))
-        ) : (
-          <Grid item xs={12} sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h6" color="textSecondary">
-              {providersList === null
-                ? "Please apply filters to see service providers"
-                : "No providers match your current filters"}
-            </Typography>
+      {providersList?.length > 0 ? (
+        view === 'card' ? (
+          // Card View
+          <Grid container spacing={3} mt={3}>
+            {providersList.map((ticketc: any, index: any) => (
+              <Grid item xs={12} sm={6} md={6} key={ticketc.id || index}>
+                <ProviderListView providers={ticketc} key={index} handleSelct={handleSelct} />
+              </Grid>
+            ))}
           </Grid>
-        )}
-      </Grid>
-
+        ) : (
+          // List View
+          // List View
+          <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+            {providersList.map((provider: any, index: any) => (
+              <ListItem
+                key={provider._id || index}
+                sx={{
+                  borderBottom: '1px solid #eee',
+                  '&:hover': { backgroundColor: '#f5f5f5' },
+                  alignItems: 'flex-start', // Align items to top
+                  py: 2, // Add vertical padding
+                }}
+                secondaryAction={
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{
+                        textTransform: 'none',
+                        borderRadius: '20px',
+                        borderColor: '#0B2E4C',
+                        color: '#0B2E4C',
+                        '&:hover': {
+                          backgroundColor: '#0B2E4C10', // Slight tint on hover
+                          borderColor: '#0B2E4C',
+                        },
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Handle view details action
+                        handleSelct(provider);
+                      }}
+                    >
+                      View Details
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      sx={{
+                        textTransform: 'none',
+                        borderRadius: '20px',
+                        backgroundColor: '#0B2E4C',
+                        '&:hover': {
+                          backgroundColor: '#071E33',
+                        },
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      Chat Now
+                    </Button>
+                  </Box>
+                }
+              >
+                <ListItemAvatar>
+                  <Avatar
+                    src={provider.avatar.url}
+                    alt={provider.name}
+                    sx={{ width: 56, height: 56, mr: 2 }}
+                  />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={provider.name}
+                  primaryTypographyProps={{ fontWeight: 'bold', variant: 'h6' }}
+                  secondary={
+                    <>
+                      <Typography component="span" variant="body2" color="text.primary">
+                        {provider.category}
+                      </Typography>
+                      {provider.description && ` — ${provider.description}`}
+                    </>
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        )
+      ) : (
+        <Grid item xs={12} sx={{ textAlign: 'center', py: 8 }}>
+          <Typography variant="h6" color="textSecondary">
+            {providersList === null
+              ? "Please apply filters to see service providers"
+              : "No providers match your current filters"}
+          </Typography>
+        </Grid>
+      )}
     </Paper>
   );
 }
 
+// ToggleStyleButton remains the same
 function ToggleStyleButton({
   active,
   children,
@@ -92,7 +170,6 @@ function ToggleStyleButton({
         '&:hover': {
           backgroundColor: active ? '#071E33' : '#f0f0f0',
         },
-
       }}
     >
       {children}

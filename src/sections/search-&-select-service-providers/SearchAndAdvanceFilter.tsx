@@ -13,12 +13,12 @@ import {
   SelectChangeEvent,
   Select
 } from '@mui/material';
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
-import { providersListFetch } from 'src/redux/actions/searchSelect';
-import { AppDispatch } from 'src/redux/store';
+import { providersCateFetch, providersListFetch } from 'src/redux/actions/searchSelect';
+import { AppDispatch, RootState } from 'src/redux/store';
 
 const categories = ['Food', 'Web Development', 'Graphic Design', 'Marketing', 'Consulting'];
 
@@ -31,8 +31,9 @@ interface FilterState {
   location: string;
 }
 
-export const SearchAndAdvanceFilter = ({ onChange }: any) => {
+export const SearchAndAdvanceFilter = ({ onChange, onFiltersApplied }: any) => {
   const dispatch = useDispatch<AppDispatch>();
+  const { serviceCate } = useSelector((state: RootState) => state?.providers);
 
   const [filters, setFilters] = useState<FilterState>({
     search: '',
@@ -43,8 +44,15 @@ export const SearchAndAdvanceFilter = ({ onChange }: any) => {
     location: '',
   });
 
+
+  useEffect(() => {
+    dispatch(providersCateFetch());
+  }, [dispatch]);
+
   const handleApplyFilters = async () => {
     await dispatch(providersListFetch(filters));
+    onFiltersApplied(); // Notify parent that filters were applied
+    onChange(null, 1); // Switch to provider list tab
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -69,6 +77,8 @@ export const SearchAndAdvanceFilter = ({ onChange }: any) => {
         [name]: Array.isArray(value) ? value[0] : value
       }));
     };
+
+
 
   return (
     <Box sx={{
@@ -113,7 +123,7 @@ export const SearchAndAdvanceFilter = ({ onChange }: any) => {
               <MenuItem value="" disabled>
                 <em>Select Service Category</em>
               </MenuItem>
-              {categories.map((cat) => (
+              {serviceCate?.map((cat:any) => (
                 <MenuItem key={cat} value={cat}>
                   {cat}
                 </MenuItem>

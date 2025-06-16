@@ -65,7 +65,6 @@ export function TicketManagementView() {
       try {
         const response = await axios.get(`/event-order/user/${_id}`);
         const allTickets: Ticket[] = response.data;
-        console.log("all", allTickets);
         setTickets(allTickets);
 
         const upcomingTicket = allTickets
@@ -162,9 +161,9 @@ export function TicketManagementView() {
   // });
 
   const metrics = useMemo(() => {
-   const refundedOrderIdss = refundRequests
-  .filter(req => req.refundStatus !== 'cancelled')
-  .map(req => req.orderId);
+    const refundedOrderIdss = refundRequests
+      .filter(req => req.refundStatus !== 'cancelled')
+      .map(req => req.orderId);
     const activeTickets = tickets.filter(ticket => {
       const eventDate = ticket.eventDetails?.date ? new Date(ticket.eventDetails.date) : null;
       const isRefunded = refundedOrderIdss.includes((ticket as any)._id); // Ensure ticket has _id
@@ -190,46 +189,6 @@ export function TicketManagementView() {
       { title: 'Expired', value: expiredTicketsList.length.toString() },
     ];
   }, [tickets, refundRequests, now]);
-
-  const ticketHistory = [
-    {
-      title: 'Urban Music Festival',
-      date: '10/02/2024',
-      type: 'VIP',
-      status: 'Used',
-      statusColor: 'green',
-      button: ['Download Invoice', 'Leave a Review'],
-    },
-    {
-      title: 'Urban Music Festival',
-      date: '10/02/2024',
-      type: 'VIP',
-      status: 'Expired',
-      statusColor: 'red',
-      button: ['Download Invoice', 'Leave a Review'],
-    },
-  ];
-
-  const cancelAndRefund = [
-    {
-      title: 'Urban Music Festival',
-      date: '10/02/2024',
-      type: 'VIP',
-      money: '',
-      status: 'In Progress',
-      statusColor: 'green',
-      btnColor: '#0B2E4C',
-      button: ['Request Refund'],
-    },
-    {
-      title: 'Startup Summit 2025',
-      date: '15/04/2025',
-      type: 'Standard',
-      money: '1000 XAF',
-      status: 'Denied',
-      statusColor: 'red',
-    },
-  ];
 
   const handleDownloadInvoice = async (ticket: Ticket) => {
     try {

@@ -74,6 +74,10 @@ export const searchSelectProviderConstants = {
     GET_REQUEST: 'GET_REQUEST',
     GET_FAILURE: 'GET_FAILURE',
     GET_SUCCESS: 'GET_SUCCESS',
+
+    GET_CATEGORY_REQUEST: 'GET_CATEGORY_REQUEST',
+    GET_CATEGORY_FAILURE: 'GET_CATEGORY_FAILURE',
+    GET_CATEGORY_SUCCESS: 'GET_CATEGORY_SUCCESS',
 }
 
 export const homeAndRecomConstants = {

@@ -21,7 +21,7 @@ const EventsInfo = () => <Label color="success" variant="inverted">3</Label>
 export const navData: NavItem[] = [
   // All Users Dashboard
   {
-    title: 'Statistics & Performance',
+    title: 'Statistics',
     path: '/',
     icon: icon('ic-analytics'),
     roles: ['provider'],
@@ -98,10 +98,9 @@ export const navData: NavItem[] = [
   {
     title: 'Find a Service Provider',
     path: '/search-&-select-service-providers',
-    icon: icon('ic-analytics'),
-    roles: ['organizer', 'provider'],
+    icon: icon('ic_find_service'),
+    roles: ['organizer'],
   },
-
   // Provider Sidebar
   {
     title: 'Event Settings',
@@ -149,62 +148,62 @@ export const navData: NavItem[] = [
   {
     title: 'Home & Global View',
     path: '/home-and-global-view',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_global_view'),
     roles: ['provider'],
   },
   {
     title: 'Reservations & Contracts',
     path: '/reservations-and-contracts',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_contract'),
     roles: ['provider'],
   },
   {
     title: 'Confirmed Service Calendar',
     path: '/confirmed-service-calendar',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_calender'),
     roles: ['provider'],
   },
   {
     title: 'Transaction & Payment Management',
     path: '/transaction-&-payment-management',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_payment_management'),
     roles: ['provider'],
   },
   {
     title: 'Messaging & Client Relationship',
     path: '/messaging-&-client-relationship',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_client_relation'),
     roles: ['provider'],
   },
   {
     title: 'Service Request & Negotiation',
     path: '/service-request-&-negotiation',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_request'),
     roles: ['provider'],
   },
   {
     title: 'Tracking of Booked Services & Providers',
     path: '/tracking-of-booked-services-&-providers',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_book_service'),
     roles: ['provider'],
   },
   {
     title: 'Global Overview & General Statistics',
     path: '/global-overview-&-general-statistics',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_global_overview'),
     roles: ['admin'],
   },
   {
     title: 'User Management',
     path: '/user-management',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_user_management'),
     roles: ['admin'],
 
   },
   {
     title: 'Ticketing & Transactions Supervision',
     path: '/ticketing-&-transactions-supervision',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_supervision'),
     roles: ['admin'],
 
   },

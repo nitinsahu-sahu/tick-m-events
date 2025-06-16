@@ -21,10 +21,11 @@ export function ScannedTickets() {
                 if (response.data.success) {
                     setTickets(response.data.tickets);
                 } else {
+
                     setError(response.data.message || 'Failed to fetch tickets');
                 }
             } catch (err) {
-                setError(err.message || 'An error occurred while fetching tickets');
+                setError(err.response.data.message || 'An error occurred while fetching tickets');
             } finally {
                 setLoading(false);
             }
@@ -42,7 +43,20 @@ export function ScannedTickets() {
     }
 
     if (error) {
-        return <HeadingCommon variant="body2" title={`Error: ${error}`} baseSize="16px" weight={400} />
+        return <Box
+            display="flex"
+            justifyContent="center" // horizontal centering
+            alignItems="center"    // vertical centering
+            minHeight="100px"
+            m="auto"
+        >
+            <HeadingCommon
+                variant="body2"
+                title={error}
+                baseSize="16px"
+                weight={400}
+            />
+        </Box>
     }
 
     if (tickets.length === 0) {
@@ -68,7 +82,7 @@ export function ScannedTickets() {
                         py={1}
                     >
                         <Box>
-                            <HeadingCommon  title={ticket?.event?.name || 'Unnamed Event'} baseSize="16px" weight={600} />
+                            <HeadingCommon title={ticket?.event?.name || 'Unnamed Event'} baseSize="16px" weight={600} />
                             <HeadingCommon variant="body2" title={`Date: ${ticket?.event?.date || 'N/A'} | Time: ${formatTimeTo12Hour(ticket?.event?.time) || 'N/A'}`} baseSize="16px" weight={400} />
                         </Box>
                         <HeadingCommon color="#3A8810" variant="body2" title="Validated" baseSize="16px" weight={600} />

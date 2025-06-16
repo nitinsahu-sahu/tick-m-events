@@ -15,7 +15,7 @@ import { ProfileCard } from '../ProfileCard';
 
 export function SearchAndSelectServiceProvidersView() {
   const { providersList } = useSelector((state: RootState) => state?.providers);
-  
+
   const [select, setSelected] = useState({})
   const [filtersApplied, setFiltersApplied] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
@@ -41,6 +41,13 @@ export function SearchAndSelectServiceProvidersView() {
   useEffect(() => {
     dispatch(providersListFetch())
   }, [dispatch, providersList])
+
+  // In your organizer view component:
+  const handleRequestService = (serviceId: string) => {
+    // Implement your request logic here
+    console.log(`Requesting service ${serviceId}`);
+    // Typically would open a modal or make an API call
+  };
 
   return (
     <DashboardContent>
@@ -70,7 +77,7 @@ export function SearchAndSelectServiceProvidersView() {
         </>
       )}
       {tabValue === 2 && (
-        <ProfileCard selectedProvider={select} />
+        <ProfileCard selectedProvider={select} onRequestService={handleRequestService}/>
       )}
     </DashboardContent>
   );

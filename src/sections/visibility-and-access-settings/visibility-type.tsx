@@ -99,10 +99,10 @@ export function VisibilityType() {
               value={selectedEventId}
               onChange={handleEventChange}
               label="Select Event"
-              sx={{ minWidth: 200 }}
+              sx={{minWidth: 200,textTransform:"capitalize"}}
             >
               {fullData.map((event: any) => (
-                <MenuItem key={event._id} value={event._id}>
+                <MenuItem key={event._id} value={event._id} sx={{textTransform:"capitalize"}}>
                   {event.eventName} ({event.date})
                 </MenuItem>
               ))}

@@ -1,7 +1,20 @@
-import { Box, Typography, Button, Avatar, Grid, Paper } from '@mui/material';
+import { Box, Select, MenuItem, InputLabel, FormControl, Typography, Button, Avatar, Grid, Paper, Divider, SelectChangeEvent } from '@mui/material';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
-export function ProfileCard({ selectedProvider }: any) {
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { RootState } from 'src/redux/store';
+
+import { ServiceCard } from './ServiceCard';
+
+export function ProfileCard({ selectedProvider, onRequestService }: any) {
+  const { services } = selectedProvider
+  const { fullData } = useSelector((state: RootState) => state?.event);
+  const [selectedEventId, setSelectedEventId] = useState<string>('');
+  const handleEventChange = (event: SelectChangeEvent<string>) => {
+    setSelectedEventId(event.target.value);
+  };
   // Check if selectedProvider is empty or invalid
   const isEmptyProvider = !selectedProvider ||
     (typeof selectedProvider === 'object' &&
@@ -132,7 +145,48 @@ export function ProfileCard({ selectedProvider }: any) {
           </Button>
         </Grid>
 
+        {/* Services Section */}
+        {services.length > 0 && (
+          <Box sx={{ mt: 4 }}>
+            <Divider sx={{ mb: 2 }} />
+            <Box display="flex" justifyContent="space-between">
+              <HeadingCommon variant="h6" mb={1} baseSize="24px" weight={600} title='Offered Services' />
+
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Select Event</InputLabel>
+                  <Select
+                    value={selectedEventId}
+                    onChange={handleEventChange}
+                    label="Select Event"
+                    sx={{ minWidth: 200, textTransform: "capitalize" }}
+                  >
+                    {fullData.map((event: any) => (
+                      <MenuItem key={event._id} value={event._id} sx={{ textTransform: "capitalize" }}>
+                        {event.eventName} ({event.date})
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Box>
+            <Grid container spacing={2}>
+              {services.map((service: any) => (
+                <Grid item xs={12} sm={6} key={service._id}>
+                  <ServiceCard
+                    eventId={selectedEventId}
+                    service={service}
+                    onRequest={() => onRequestService(service._id)}
+                    disabled={!selectedEventId} // Disable if no event selected
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
+
       </Box>
     </Paper>
   );
 }
+

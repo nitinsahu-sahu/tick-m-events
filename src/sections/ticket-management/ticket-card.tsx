@@ -3,11 +3,13 @@ import { HeadingCommon } from "src/components/multiple-responsive-heading/headin
 import { formatTimeTo12Hour } from "src/hooks/formate-time";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { text } from "stream/consumers";
 import axios from "../../redux/helper/axios";
 
 
 export function TicketCard({ ticket }: any) {
+    console.log('===effe=================================');
+    console.log(ticket);
+    console.log('====================================');
     const navigate = useNavigate();
     const [showQr, setShowQr] = useState(false);
     const today = new Date();
@@ -35,7 +37,6 @@ export function TicketCard({ ticket }: any) {
             ? 'partial'
             : null;
 
-    const isRefundable = !!refundType;
 
 
     const [openRefundModal, setOpenRefundModal] = useState(false);

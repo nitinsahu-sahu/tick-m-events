@@ -15,16 +15,27 @@ import { ProfileCard } from '../ProfileCard';
 
 export function SearchAndSelectServiceProvidersView() {
   const { providersList } = useSelector((state: RootState) => state?.providers);
+  
   const [select, setSelected] = useState({})
+  const [filtersApplied, setFiltersApplied] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const [tabValue, setTabValue] = useState(0);
+  const tabLabels = ["Global Search", "List of Providers", "Profile Display"];
+
   const handleSelct = (row: any) => {
     setSelected(row)
   }
 
-  const dispatch = useDispatch<AppDispatch>();
-  const [tabValue, setTabValue] = useState(0);
-  const tabLabels = ["Global Search", "List of Providers", "Profile Display"];
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    // Only allow switching to provider list if filters are applied and providers exist
+    if (newValue === 1 && (!filtersApplied || !providersList?.length)) {
+      return;
+    }
     setTabValue(newValue);
+  };
+
+  const handleFiltersApplied = () => {
+    setFiltersApplied(true);
   };
 
   useEffect(() => {
@@ -35,28 +46,32 @@ export function SearchAndSelectServiceProvidersView() {
     <DashboardContent>
       <PageTitleSection title="Search & Select Service Providers" />
 
-      <>
-        <Box
-          display='flex'
-          justifyContent='center'
-        >
-          <TabButton providersList={providersList} tabValue={tabValue} tabLabels={tabLabels} onChange={handleTabChange} />
-        </Box>
+      <Box display='flex' justifyContent='center'>
+        <TabButton
+          providersList={providersList}
+          tabValue={tabValue}
+          tabLabels={tabLabels}
+          onChange={handleTabChange}
+          filtersApplied={filtersApplied}
+        />
+      </Box>
 
 
-        {tabValue === 0 && (
-          <SearchAndAdvanceFilter onChange={handleTabChange} />
-        )}
-        {tabValue === 1 && (
-          <>
-            <ProviderCardList handleSelct={handleSelct} providersList={providersList} />
-            <CompareProviders />
-          </>
-        )}
-        {tabValue === 2 && (
-          <ProfileCard selectedProvider={select} />
-        )}
-      </>
+      {tabValue === 0 && (
+        <SearchAndAdvanceFilter
+          onChange={handleTabChange}
+          onFiltersApplied={handleFiltersApplied}
+        />
+      )}
+      {tabValue === 1 && (
+        <>
+          <ProviderCardList handleSelct={handleSelct} providersList={providersList} />
+          <CompareProviders />
+        </>
+      )}
+      {tabValue === 2 && (
+        <ProfileCard selectedProvider={select} />
+      )}
     </DashboardContent>
   );
 }

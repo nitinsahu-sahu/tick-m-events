@@ -2,7 +2,7 @@ import { searchSelectProviderConstants } from "./constants";
 import axios from "../helper/axios";
 
 export const providersListFetch = (data) => async (dispatch) => {
- 
+
   dispatch({ type: searchSelectProviderConstants.GET_REQUEST });
 
   try {
@@ -18,6 +18,28 @@ export const providersListFetch = (data) => async (dispatch) => {
     dispatch({
       type: searchSelectProviderConstants.GET_FAILURE,
       payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+    });
+  }
+};
+
+export const providersCateFetch = () => async (dispatch) => {
+  dispatch({ type: searchSelectProviderConstants.GET_CATEGORY_REQUEST });
+
+  try {
+    const response = await axios.get(`/auth/providers/service`);
+    dispatch({
+      type: searchSelectProviderConstants.GET_CATEGORY_SUCCESS,
+      payload: {
+        serviceCate: response?.data?.categories
+      },
+    });
+  } catch (error) {
+    dispatch({
+      type: searchSelectProviderConstants.GET_CATEGORY_FAILURE,
+      payload: {
+        message: error?.response?.data?.message || "Server error",
+        error: error.status
+      }
     });
   }
 };

@@ -5,9 +5,6 @@ import { ProviderListView } from './PopularEvent';
 
 export default function ProviderCardList({ handleSelct, providersList }: any) {
   const [view, setView] = useState<'card' | 'list'>('card');
-  console.log('====================================');
-  console.log(providersList);
-  console.log('==providersList==================================');
   return (
     <Paper
       sx={{

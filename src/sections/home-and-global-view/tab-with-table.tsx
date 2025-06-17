@@ -1,12 +1,25 @@
 import { Box, Button, Paper, Tab, Tabs, Typography, Grid, TextField, CardContent, Card } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import { MatrixOneCard } from "src/components/matrix-three-cards/matrix-one-cards";
+import { getRequestsByProvider } from "src/redux/actions/service-request";
+import { AppDispatch, RootState } from "src/redux/store";
+
 import { RequestTabSection } from "./request-tab-section";
-import { metrics, MessagingNegotiationsTableData, MessagingNegotiationsTableHeader, availableProjectsTableData, availableProjectsTableHeaders, confirmedServicesTableData, confirmedServicesTableHeader, PaymentTrackingTableData, PaymentTrackingTableHeader } from "./utills";
+import { metrics, MessagingNegotiationsTableData, MessagingNegotiationsTableHeader, availableProjectsTableHeaders, confirmedServicesTableData, confirmedServicesTableHeader, PaymentTrackingTableData, PaymentTrackingTableHeader } from "./utills";
 
 export function TabWithTableView() {
     const [tabValue, setTabValue] = useState(0);
+    const { requests } = useSelector((state: RootState) => state?.serviceRequest);
+console.log('====================================');
+console.log(requests);
+console.log('====================================');
     const tabLabels = ["Available Projects", "Confirmed Services", "Messaging", "Payments"];
+    const dispatch = useDispatch<AppDispatch>()
+    useEffect(() => {
+        dispatch(getRequestsByProvider());
+    }, [dispatch]);
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
@@ -72,7 +85,7 @@ export function TabWithTableView() {
                             title="Available Projects (Organizer Requests)"
                             description=""
                             headers={availableProjectsTableHeaders}
-                            data={availableProjectsTableData}
+                            data={requests}
                             type="1"
                         />
                         {/* Proposal Form */}
@@ -231,13 +244,6 @@ export function TabWithTableView() {
                     </>
                 )}
             </Paper>
-
-
-
-
-
-
-
         </>
 
     )

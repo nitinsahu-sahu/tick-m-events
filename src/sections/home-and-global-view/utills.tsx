@@ -16,7 +16,7 @@ export const requestDetails = {
     discussionStatus: "We’d like to finalize the menu before signing",
 };
 
-export const availableProjectsTableHeaders = ["Service", "Organizer", "Date Posted", "Budget", "Actions"];
+export const availableProjectsTableHeaders = ["Event Name", "Organizer", "Event Date", "Budget", "Actions"];
 export const availableProjectsTableData = [
     { service: "DJ & Entertainment", organizer: "Jean M.", datePosted: "02/02/2025", budget: "200,000 - 300,000 XAF", actions: ["View Details", "Apply"] },
     { service: "DJ & Entertainment", organizer: "Jean M.", datePosted: "02/02/2025", budget: "200,000 - 300,000 XAF", actions: ["View Details", "Apply"] },

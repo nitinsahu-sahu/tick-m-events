@@ -21,10 +21,10 @@ const ProfileAndServiceTable = ({
     headers: string[];
     activeSection: any;
     data: any[];
-    setActiveSection:any
+    setActiveSection: any
     onModify: (rowData: any) => void;  // Add this prop
 }) => {
-    
+
     const [editingRowId, setEditingRowId] = useState<string | null>(null);
 
     const handleModifyClick = (rowData: any) => {
@@ -60,7 +60,7 @@ const ProfileAndServiceTable = ({
                 </TableHead>
 
                 <TableBody>
-                    {!data || data.length === 0? (
+                    {!data || data.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={headers.length} align="center" sx={{ py: 4 }}>
                                 <Typography variant="body1" color="textSecondary">
@@ -88,7 +88,7 @@ const ProfileAndServiceTable = ({
                                     },
                                 }}
                             >
-                                 <TableCell align="center" sx={{ fontWeight: "bold", textTransform: "capitalize" }}>
+                                <TableCell align="center" sx={{ fontWeight: "bold", textTransform: "capitalize" }}>
                                     {row.serviceName}
                                 </TableCell>
                                 <TableCell align="center" sx={{ fontWeight: "bold" }}>

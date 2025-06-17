@@ -1,12 +1,13 @@
-import { Box, Typography, Select, MenuItem, FormControl, InputLabel, Chip, Button, Paper, SelectChangeEvent, Divider, Grid } from '@mui/material';
+import { Box, Typography, Chip, Dialog, Button, DialogTitle, Paper, Divider, 
+  DialogContent,TextField,FormControlLabel,Checkbox, DialogActions,CircularProgress } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { useDispatch, useSelector } from 'react-redux';
-import { useCallback, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
-
 import EventIcon from '@mui/icons-material/Event';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { organizerRequstToProvider } from 'src/redux/actions/service-request';
 import { AppDispatch } from 'src/redux/store';
@@ -20,37 +21,37 @@ function truncateHtmlText(html: string, wordCount: number) {
   return words.length > wordCount ? `${truncated}...` : truncated;
 }
 
-interface ApiResult {
-  status: number;
-  type: string;
-  message: any;
-}
-
 // ServiceCard.tsx (new component)
 export function ServiceCard({ service, onRequest, eventId, disabled = false }: any) {
   const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [negotiation, setNegotiation] = useState('');
+  const [negotiationMessage, setNegotiationMessage] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const handleOpenDialog = () => setOpenDialog(true);
+  const handleCloseDialog = () => setOpenDialog(false);
 
   const handleRequest = async () => {
     if (!eventId || !service?._id) return;
-
+    if (!termsAccepted) {
+      toast.error('Please accept the terms and conditions');
+      return;
+    }
     setIsLoading(true);
     setError(null);
 
     const request = {
       serviceId: service._id,
       eventId,
-      message: negotiation
+      message: negotiationMessage
     }
     try {
       const result = await dispatch(organizerRequstToProvider(request));
-      console.log('====================================');
-      console.log(result);
-      console.log('====================================');
       if (result?.status === 201) {
         toast.success(result?.message);
+        handleCloseDialog()
+        setNegotiationMessage('')
       } else {
         toast.error(result?.message);
       }
@@ -79,111 +80,164 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
   }
 
   return (
-    <Paper elevation={2} sx={{
-      p: 2,
-      borderRadius: 2,
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      opacity: disabled ? 0.7 : 1,
-      filter: disabled ? 'grayscale(50%)' : 'none',
-      transition: 'all 0.3s ease'
-    }}>
-      {/* Status Chip and Service Type */}
-      <Box sx={{ mt: 'auto' }} display='flex' justifyContent="space-between">
-        <HeadingCommon
-          variant="subtitle1"
-          mb={1}
-          baseSize="15px"
-          weight={600}
-          title={service.serviceType}
-          sx={{ color: disabled ? 'text.disabled' : 'inherit' }}
-        />
+    <>
+      <Paper elevation={2} sx={{
+        p: 2,
+        borderRadius: 2,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        opacity: disabled ? 0.7 : 1,
+        filter: disabled ? 'grayscale(50%)' : 'none',
+        transition: 'all 0.3s ease'
+      }}>
+        {/* Status Chip and Service Type */}
+        <Box sx={{ mt: 'auto' }} display='flex' justifyContent="space-between">
+          <HeadingCommon
+            variant="subtitle1"
+            mb={1}
+            baseSize="15px"
+            weight={600}
+            title={service.serviceType}
+            sx={{ color: disabled ? 'text.disabled' : 'inherit' }}
+          />
 
-        <Chip
-          label={service.status}
+          <Chip
+            label={service.status}
+            size="small"
+            color={service.status === 'active' ? 'success' : 'default'}
+            sx={{
+              mb: 0,
+              textTransform: 'capitalize',
+              opacity: disabled ? 0.7 : 1
+            }}
+          />
+        </Box>
+
+        {/* Service Details */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          mb: 1,
+          color: disabled ? 'text.disabled' : 'inherit'
+        }}>
+          <EventIcon color={disabled ? 'disabled' : 'action'} sx={{ mr: 1, fontSize: '18px' }} />
+          <Typography variant="body2">
+            {new Date(service.dateAndTime).toLocaleString()}
+          </Typography>
+        </Box>
+
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          mb: 1,
+          color: disabled ? 'text.disabled' : 'inherit'
+        }}>
+          <LocationOnIcon color={disabled ? 'disabled' : 'action'} sx={{ mr: 1, fontSize: '18px' }} />
+          <Typography variant="body2">
+            {service.eventLocation}
+          </Typography>
+        </Box>
+
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          mb: 2,
+          color: disabled ? 'text.disabled' : 'inherit'
+        }}>
+          <AttachMoneyIcon color={disabled ? 'disabled' : 'action'} sx={{ mr: 1, fontSize: '18px' }} />
+          <Typography variant="body2" fontWeight={500}>
+            {service.budget}
+          </Typography>
+        </Box>
+
+        {/* Description */}
+        <Divider sx={{ my: 1 }} />
+        <Box sx={{
+          mb: 2,
+          color: disabled ? 'text.disabled' : 'text.secondary'
+        }}>
+          <Typography variant="body2">
+            {truncateHtmlText(service.description, 25)}
+          </Typography>
+        </Box>
+
+        {/* Request Button - Now opens dialog instead of sending directly */}
+        <Button
+          fullWidth
+          variant="contained"
           size="small"
-          color={service.status === 'active' ? 'success' : 'default'}
+          startIcon={<CheckCircleIcon />}
+          onClick={handleOpenDialog}
           sx={{
-            mb: 0,
-            textTransform: 'capitalize',
-            opacity: disabled ? 0.7 : 1
+            mt: 1,
+            backgroundColor: disabled ? '#e0e0e0' : '#4CAF50',
+            color: disabled ? '#9e9e9e' : 'white',
+            '&:hover': {
+              backgroundColor: disabled ? '#e0e0e0' : '#388E3C',
+              boxShadow: 'none'
+            },
+            '& .MuiSvgIcon-root': {
+              color: disabled ? '#9e9e9e' : 'white'
+            }
           }}
-        />
-      </Box>
+          disabled={disabled || service.status !== 'active'}
+        >
+          {disabled ? 'Select an event first' :
+            service.status === 'active' ? 'Request Service' : 'Not Available'}
+        </Button>
+      </Paper>
 
-      {/* Service Details */}
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        mb: 1,
-        color: disabled ? 'text.disabled' : 'inherit'
-      }}>
-        <EventIcon color={disabled ? 'disabled' : 'action'} sx={{ mr: 1, fontSize: '18px' }} />
-        <Typography variant="body2">
-          {new Date(service.dateAndTime).toLocaleString()}
-        </Typography>
-      </Box>
+      <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+        <DialogTitle>Request Service</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              label="Negotiation Message (Optional)"
+              value={negotiationMessage}
+              onChange={(e) => setNegotiationMessage(e.target.value)}
+              placeholder="Write your custom message or special requests..."
+              variant="outlined"
+            />
+          </Box>
 
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        mb: 1,
-        color: disabled ? 'text.disabled' : 'inherit'
-      }}>
-        <LocationOnIcon color={disabled ? 'disabled' : 'action'} sx={{ mr: 1, fontSize: '18px' }} />
-        <Typography variant="body2">
-          {service.eventLocation}
-        </Typography>
-      </Box>
+          <Box sx={{ mt: 3 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="I agree to the terms and conditions"
+            />
+          </Box>
 
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        mb: 2,
-        color: disabled ? 'text.disabled' : 'inherit'
-      }}>
-        <AttachMoneyIcon color={disabled ? 'disabled' : 'action'} sx={{ mr: 1, fontSize: '18px' }} />
-        <Typography variant="body2" fontWeight={500}>
-          {service.budget}
-        </Typography>
-      </Box>
-
-      {/* Description */}
-      <Divider sx={{ my: 1 }} />
-      <Box sx={{
-        mb: 2,
-        color: disabled ? 'text.disabled' : 'text.secondary'
-      }}>
-        <Typography variant="body2">
-          {truncateHtmlText(service.description, 25)}
-        </Typography>
-      </Box>
-
-      {/* Request Button */}
-      <Button
-        fullWidth
-        variant="contained"
-        size="small"
-        startIcon={<CheckCircleIcon />}
-        onClick={handleRequest}
-        sx={{
-          mt: 1,
-          backgroundColor: disabled ? '#e0e0e0' : '#4CAF50',
-          color: disabled ? '#9e9e9e' : 'white',
-          '&:hover': {
-            backgroundColor: disabled ? '#e0e0e0' : '#388E3C',
-            boxShadow: 'none'
-          },
-          '& .MuiSvgIcon-root': {
-            color: disabled ? '#9e9e9e' : 'white'
-          }
-        }}
-        disabled={disabled || service.status !== 'active'}
-      >
-        {disabled ? 'Select an event first' :
-          service.status === 'active' ? 'Request Service' : 'Not Available'}
-      </Button>
-    </Paper>
+          {error && (
+            <Typography color="error" sx={{ mt: 1 }}>
+              {error}
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="secondary">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleRequest}
+            color="primary"
+            variant="contained"
+            disabled={isLoading || !termsAccepted}
+            startIcon={isLoading ? <CircularProgress size={20} /> : null}
+          >
+            {isLoading ? 'Sending...' : 'Send Request'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

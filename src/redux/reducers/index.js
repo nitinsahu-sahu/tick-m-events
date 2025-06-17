@@ -8,6 +8,7 @@ import searchSelectReducer from './searchSelect.reducer'
 import homeAndRecommandationReducer from './home-recommedation.reducer'
 import ticketTypeReducer from './ticket-reservation.reducer'
 import transactionPaymentReducer from './transactionPayment.reducer'
+import eventServiceReqReducer from './event-service-request.reducer'
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -18,7 +19,8 @@ const rootReducer = combineReducers({
     providers: searchSelectReducer,
     homeRecom: homeAndRecommandationReducer,
     ticketReservationMang: ticketTypeReducer,
-    transactions: transactionPaymentReducer
+    transactions: transactionPaymentReducer,
+    serviceRequest: eventServiceReqReducer
 })
 
 export default rootReducer

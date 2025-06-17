@@ -1,4 +1,6 @@
-import { Paper, Typography, Box, Button } from "@mui/material";
+import { Paper, Typography, Box, Button, TextField, MenuItem, Stack } from "@mui/material";
+import { useState } from "react";
+import DatePicker from "@mui/lab/DatePicker";
 
 import { HomeAndGlobalTable } from "src/components/tables/home-and-global-table";
 
@@ -18,6 +20,66 @@ export function RequestTabSection({
     data,
     type
 }: RequestSectionProps) {
+    const [filters, setFilters] = useState({
+        eventName: '',
+        budget: '',
+        date: null
+    });
+
+    const handleFilterChange = (e:any) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleDateChange = (date:any) => {
+        setFilters(prev => ({
+            ...prev,
+            date
+        }));
+    };
+
+    const filteredData = data.filter(item => {
+        // Filter by event name
+        if (filters.eventName && !item.eventId.eventName.toLowerCase().includes(filters.eventName.toLowerCase())) {
+            return false;
+        }
+        
+        // Filter by budget
+        if (filters.budget) {
+            const [min, max] = filters.budget.split('-').map(Number);
+            const itemBudget = item.serviceRequestId.budget;
+            const itemMin = Number(itemBudget.split('-')[0].replace(/\D/g, ''));
+            const itemMax = Number(itemBudget.split('-')[1].replace(/\D/g, ''));
+            
+            if (itemMin > max || itemMax < min) {
+                return false;
+            }
+        }
+        
+        // Filter by date
+        if (filters.date) {
+            const filterDate = new Date(filters.date).setHours(0, 0, 0, 0);
+            const itemDate = new Date(item.eventId.date).setHours(0, 0, 0, 0);
+            if (filterDate !== itemDate) {
+                return false;
+            }
+        }
+        
+        return true;
+    });
+
+    const budgetRanges = [
+        { label: "All Budgets", value: "" },
+        { label: "0 - 1000 XAF", value: "0-1000" },
+        { label: "1000 - 2000 XAF", value: "1000-2000" },
+        { label: "2000 - 3000 XAF", value: "2000-3000" },
+        { label: "3000 - 4000 XAF", value: "3000-4000" },
+        { label: "4000+ XAF", value: "4000-100000" }
+    ];
+
     return (
         <>
             <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -27,8 +89,70 @@ export function RequestTabSection({
                 {description}
             </Typography>
 
-            <HomeAndGlobalTable headers={headers} data={data} type={type} />
+            {/* Filter Controls */}
+            <Box sx={{ mb: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                    <TextField
+                        label="Search Event Name"
+                        variant="outlined"
+                        size="small"
+                        name="eventName"
+                        value={filters.eventName}
+                        onChange={handleFilterChange}
+                        sx={{ minWidth: 200 }}
+                    />
+                    
+                    <TextField
+                        select
+                        label="Budget Range"
+                        variant="outlined"
+                        size="small"
+                        name="budget"
+                        value={filters.budget}
+                        onChange={handleFilterChange}
+                        sx={{ minWidth: 200 }}
+                    >
+                        {budgetRanges.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                    
+                    <DatePicker
+                        label="Filter by Date"
+                        value={filters.date}
+                        onChange={handleDateChange}
+                        renderInput={(params:any) => (
+                            <TextField 
+                                {...params} 
+                                size="small" 
+                                sx={{ minWidth: 200 }} 
+                            />
+                        )}
+                    />
+                    
+                    <Button
+                        variant="outlined"
+                        onClick={() => setFilters({
+                            eventName: '',
+                            budget: '',
+                            date: null
+                        })}
+                        sx={{ height: 40 }}
+                    >
+                        Clear Filters
+                    </Button>
+                </Stack>
+            </Box>
+
+            <HomeAndGlobalTable headers={headers} data={filteredData} type={type} />
+            
+            <Box display="flex" justifyContent="flex-end" mt={2}>
+                <Typography variant="body2" fontStyle="italic" color="text.secondary">
+                    NB: Negotiable Budget
+                </Typography>
+            </Box>
         </>
     );
 };
-

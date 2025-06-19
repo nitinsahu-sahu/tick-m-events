@@ -6,14 +6,10 @@ import {
   InputAdornment,
   Button,
   Paper,
-  useMediaQuery,
 } from "@mui/material";
-import { AttachFile, Send, Call, AddBox, Close, VideoCall } from "@mui/icons-material";
-import { useTheme } from "@mui/material/styles";
+import { AttachFile, Call,  Close, VideoCall } from "@mui/icons-material";
 
-export const ChatBox = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+export function ChatBox() {
   return (
     <Paper
       elevation={6}
@@ -82,7 +78,7 @@ export const ChatBox = () => {
             fontFamily: 'Poppins',
             fontWeight: 600,
             fontSize: '22',
-            border:"3px solid #1F8FCD"
+            border: "3px solid #1F8FCD"
           }}
         >
           Generate Contract
@@ -93,11 +89,11 @@ export const ChatBox = () => {
           variant="contained"
           sx={{
             borderRadius: 1,
-             backgroundColor: "#0B2E4C",
-              fontFamily: 'Poppins',
+            backgroundColor: "#0B2E4C",
+            fontFamily: 'Poppins',
             fontWeight: 600,
             fontSize: '22',
-             border:"3px solid #1F8FCD"
+            border: "3px solid #1F8FCD"
           }}
         >
           Accept Service

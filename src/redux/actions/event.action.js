@@ -400,9 +400,7 @@ export const todayEventFetch = () => async (dispatch) => {
 
     try {
         const response = await axios.get(`/event/currentDateEvents`);
-        console.log('===================today=================');
-        console.log(response);
-        console.log('====================================');
+  
         dispatch({
             type: eventConstants.GET_TODAY_EVENT_SUCCESS,
             payload: {

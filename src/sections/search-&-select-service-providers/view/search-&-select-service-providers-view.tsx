@@ -7,6 +7,7 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { TabButton } from 'src/components/button/multiple-button';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { providersListFetch } from 'src/redux/actions/searchSelect';
+import { eventFetch } from 'src/redux/actions/event.action';
 
 import { SearchAndAdvanceFilter } from '../SearchAndAdvanceFilter';
 import ProviderCardList from '../ProviderCardList';
@@ -40,6 +41,7 @@ export function SearchAndSelectServiceProvidersView() {
 
   useEffect(() => {
     dispatch(providersListFetch())
+    dispatch(eventFetch());
   }, [dispatch, providersList])
 
   // In your organizer view component:

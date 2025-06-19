@@ -12,9 +12,7 @@ import { metrics, MessagingNegotiationsTableData, MessagingNegotiationsTableHead
 export function TabWithTableView() {
     const [tabValue, setTabValue] = useState(0);
     const { requests } = useSelector((state: RootState) => state?.serviceRequest);
-console.log('====================================');
-console.log(requests);
-console.log('====================================');
+
     const tabLabels = ["Available Projects", "Confirmed Services", "Messaging", "Payments"];
     const dispatch = useDispatch<AppDispatch>()
     useEffect(() => {

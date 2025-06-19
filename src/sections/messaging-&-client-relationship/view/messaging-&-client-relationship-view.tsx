@@ -4,9 +4,7 @@ import { TabWithTableView } from "../tab-with-table";
 export function MessagingAndClientRelationshipView() {
     return (
         <DashboardContent>
-
             <TabWithTableView />
-
         </DashboardContent>
     )
 }

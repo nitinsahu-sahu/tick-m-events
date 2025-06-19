@@ -15,11 +15,9 @@ export const requestDetails = {
     discussionStatus: "We’d like to finalize the menu before signing",
 };
 
-export const pendingRequestTableHeaders = ["Organizer", "Requested Service", "Budget", "Actions"];
-export const pendingRequestTableData = [
-    { organizer: "DJ Animation", requestedService: "DJ & Entertainment", budget: "250,000 XAF", actions: ["View Details", "Contact Client"] },
-    { organizer: "DJ Animation", requestedService: "DJ & Entertainment", budget: "250,000 XAF", actions: ["View Details", "Contact Client"] },
-];
+export const pendingRequestTableHeaders = ["Organizer", "Requested Service", "Budget", 'Status', "Actions"];
+export const tabLabels = ["Pending Requests", "Signed Contracts", "Ongoing & Completed"];
+
 
 export const signedContractTableHeader = ["Service", "Location", "Date", "Amount", "Status", "Actions"];
 export const signedContractTableData = [

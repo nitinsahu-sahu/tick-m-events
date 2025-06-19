@@ -1,14 +1,17 @@
 import { Box, Select, MenuItem, InputLabel, FormControl, Typography, Button, Avatar, Grid, Paper, Divider, SelectChangeEvent } from '@mui/material';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { RootState } from 'src/redux/store';
+import { AppDispatch, RootState } from 'src/redux/store';
+import { eventFetch } from 'src/redux/actions/event.action';
 
 import { ServiceCard } from './ServiceCard';
 
 export function ProfileCard({ selectedProvider, onRequestService }: any) {
+  const dispatch = useDispatch<AppDispatch>();
+
   const { services } = selectedProvider
   const { fullData } = useSelector((state: RootState) => state?.event);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
@@ -42,6 +45,8 @@ export function ProfileCard({ selectedProvider, onRequestService }: any) {
       </Paper>
     );
   }
+
+
 
   return (
     <Paper

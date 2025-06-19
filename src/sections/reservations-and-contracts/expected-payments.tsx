@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ReservationsAndContractsTable } from "src/components/tables/reservations-&-contracts-table";
 import { expectedPaymentsTableData, expectedPaymentsTableHeader } from "./utills";
 
-export function ExpectedPayments() {
+export function ExpectedPayments({requests}:any) {
     const [paymentMethod, setPaymentMethod] = useState("");
 
     return (
@@ -24,7 +24,7 @@ export function ExpectedPayments() {
                     Displays the status of payments after service completion.
                 </Typography>
 
-                <ReservationsAndContractsTable headers={expectedPaymentsTableHeader} data={expectedPaymentsTableData} type="4" />
+                <ReservationsAndContractsTable headers={expectedPaymentsTableHeader} data={requests} type="4" />
                 {/* Request Details */}
 
                 {/* Update My Payment Method Button */}

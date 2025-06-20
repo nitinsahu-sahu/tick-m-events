@@ -366,7 +366,7 @@ export function SignInView() {
 
       </Box>
       {/* Divider */}
-      <Divider
+      {/* <Divider
         sx={{
           my: 2,
           "&::before, &::after": { borderTopStyle: "dashed" },
@@ -374,10 +374,10 @@ export function SignInView() {
       >
         <HeadingCommon baseSize="12px" variant="overline" title="Or connect with your social account" />
 
-      </Divider>
+      </Divider> */}
 
       {/* Social buttons */}
-      <Box
+      {/* <Box
         sx={{
           display: "flex",
           justifyContent: "center",
@@ -425,7 +425,7 @@ export function SignInView() {
         >
           <Iconify icon="ic:twotone-apple" />
         </IconButton>
-      </Box>
+      </Box> */}
     </>
 
   );

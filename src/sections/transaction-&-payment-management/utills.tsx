@@ -1,8 +1,8 @@
 // Data for metric cards
 export const metrics = [
-    { title: "Current Balance", value: "$2,500" },
-    { title: "Pending Payments", value: "$500" },
-    { title: "Deducted Commissions", value: "$200" },
+    { title: "Current Balance", value: "2,500 XAF" },
+    { title: "Pending Payments", value: "500 XAF" },
+    { title: "Deducted Commissions", value: "200 XAF" },
 ];
 
 export const transactionsPaymentHistoryTableHeaders = ["Date","Service","Location","Amount (XAF)","Payment Method","Status","Actions"];

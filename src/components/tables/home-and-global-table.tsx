@@ -103,23 +103,19 @@ export function HomeAndGlobalTable({
                                     {
                                         type === "3" || type === "4" ? null : (
                                             <TableCell align="center">
-                                                {row.message ? (
-                                                    <Box display="flex" alignItems="center" justifyContent="center">
-                                                        <Typography variant="body2">
-                                                            {row.budget || row.finalBudget || row.serviceRequestId.budget}
-                                                        </Typography>
-                                                        <Typography
-                                                            variant="caption"
-                                                            color="text.secondary"
-                                                            sx={{ ml: 0.5 }}
-                                                            fontWeight={700}
-                                                        >
-                                                            (NB)
-                                                        </Typography>
-                                                    </Box>
-                                                ) : (
-                                                    row.budget || row.finalBudget || row.serviceRequestId.budget
-                                                )}
+                                                <Box display="flex" alignItems="center" justifyContent="center">
+                                                    <Typography variant="body2">
+                                                        {`${row.orgBudget} XAF`}
+                                                    </Typography>
+                                                    <Typography
+                                                        variant="caption"
+                                                        color="text.secondary"
+                                                        sx={{ ml: 0.5 }}
+                                                        fontWeight={700}
+                                                    >
+                                                        (NB)
+                                                    </Typography>
+                                                </Box>
                                             </TableCell>
                                         )
                                     }

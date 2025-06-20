@@ -62,11 +62,11 @@ export function ReservationsContractModal({ openModal, handleCloseModal, selecte
                                 {selectedRow.contractStatus}
                             </span>
                         </Typography>
-                        <Typography variant="body1" sx={{ mb: 1 }}>
-                            <strong>Requirements:</strong> Buffet for 150 people with vegetarian options Discussion
+                        <Typography variant="body1" sx={{ mb: 1 }} textTransform="capitalize">
+                            <strong>Requirements:</strong> {selectedRow.orgRequirement}
                         </Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            <strong>Discussion Status:</strong> We’d like to finalize the menu before signing
+                            <strong>Discussion Status:</strong> {selectedRow.discussion || 'N/A'}
                         </Typography>
                         {/* Add more details as needed */}
 

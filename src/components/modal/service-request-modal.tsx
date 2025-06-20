@@ -150,11 +150,18 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
             </DetailItem>
             
             <DetailItem>
+              <DetailLabel variant="body2">Req. by Organizer:</DetailLabel>
+              <DetailValue variant="body2" textTransform="capitalize">
+                {data.orgRequirement}
+              </DetailValue>
+            </DetailItem>
+
+            <DetailItem>
               <DetailLabel variant="body2">Negotiable:</DetailLabel>
               <DetailValue variant="body2">
                 <Chip 
-                  label={data.message || 'NA'} 
-                  color={data.message ? "success" : "default"} 
+                  label={`${data.orgBudget} XAF` || 'NA'} 
+                  color={data.orgBudget ? "success" : "default"} 
                   size="small"
                   variant="outlined"
                 />

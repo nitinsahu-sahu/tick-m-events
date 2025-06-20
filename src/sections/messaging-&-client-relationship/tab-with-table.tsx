@@ -1,12 +1,31 @@
 import { Box, Button, Paper, Tab, Tabs, Typography, Stack, Grid } from "@mui/material";
-import { useState } from "react";
-import { ActiveConversationsTableHeaders, ActiveConversationsTableData, SharedFilesDocumentsTableHeader, SharedFilesDocumentsTableData, GeneralConversationsTableHeaders, GeneralConversationsTableData, ChatOrganizerTableHeaders, ChatOrganizerTableData } from "./utills";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import { AppDispatch, RootState } from "src/redux/store";
+import { getRequestsByProvider } from "src/redux/actions/service-request";
+
+import {
+    ActiveConversationsTableHeaders, ActiveConversationsTableData, SharedFilesDocumentsTableHeader,
+    SharedFilesDocumentsTableData, GeneralConversationsTableHeaders, 
+    ChatOrganizerTableHeaders, ChatOrganizerTableData
+} from "./utills";
 import { RequestTabSection } from "./request-tab-section";
 import { ChatBox } from "./chatbox";
 
+
 export function TabWithTableView() {
+    const { requests } = useSelector((state: RootState) => state?.serviceRequest);
+    const dispatch = useDispatch<AppDispatch>()
     const [tabValue, setTabValue] = useState(0);
     const tabLabels = ["Inbox", "Important Messages", "Shared Files", "Conversation History"];
+    const [openModal, setOpenModal] = useState(false);
+    const [selectedRow, setSelectedRow] = useState<any>(null);
+console.log('selectedRow>>',selectedRow);
+
+    useEffect(() => {
+        dispatch(getRequestsByProvider());
+    }, [dispatch]);
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
@@ -23,6 +42,17 @@ export function TabWithTableView() {
             type: 'normal',
         },
     ];
+
+     const handleOpenModal = (row: any) => {
+        setSelectedRow(row);
+        setOpenModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
+        setSelectedRow(null);
+    };
+
     return (
         <>
             <Box
@@ -87,6 +117,7 @@ export function TabWithTableView() {
                             headers={ActiveConversationsTableHeaders}
                             data={ActiveConversationsTableData}
                             type="1"
+                            handleOpenModal=""
                         />
                     </Paper>
 
@@ -103,31 +134,36 @@ export function TabWithTableView() {
                             title="Conversations"
                             description=""
                             headers={GeneralConversationsTableHeaders}
-                            data={GeneralConversationsTableData}
+                            data={requests}
                             type="2"
+                            handleOpenModal={handleOpenModal}
                         />
                     </Paper>
 
+                    {
+                        openModal && <Paper elevation={6}
+                            sx={{
+                                mt: 3,
+                                p: 3,
+                                borderRadius: 2,
+                                boxShadow: 3,
+                                overflow: "hidden",
+                            }}
+                        >
+                            <RequestTabSection
+                                title="Chat with Organizer"
+                                description="Project Details"
+                                headers={ChatOrganizerTableHeaders}
+                                data={ChatOrganizerTableData}
+                                type="3"
+                                handleOpenModal=""
+                            />
+                            <ChatBox handleCloseModal={handleCloseModal} conv={selectedRow}/>
 
-                    <Paper elevation={6}
-                        sx={{
-                            mt: 3,
-                            p: 3,
-                            borderRadius: 2,
-                            boxShadow: 3,
-                            overflow: "hidden",
-                        }}
-                    >
-                        <RequestTabSection
-                            title="Chat with Organizer"
-                            description="Project Details"
-                            headers={ChatOrganizerTableHeaders}
-                            data={ChatOrganizerTableData}
-                            type="3"
-                        />
-                        <ChatBox />
 
-                    </Paper>
+                        </Paper>
+                    }
+
 
                 </>
 
@@ -156,8 +192,8 @@ export function TabWithTableView() {
                         sx={{
                             borderRadius: 3,
                             overflow: 'hidden',
-                            boxShadow:3,
-                            border:"1px solid black"
+                            boxShadow: 3,
+                            border: "1px solid black"
                         }}
                     >
                         {notifications.map((item, index) => (
@@ -219,6 +255,7 @@ export function TabWithTableView() {
                             headers={SharedFilesDocumentsTableHeader}
                             data={SharedFilesDocumentsTableData}
                             type="5"
+                            handleOpenModal=""
                         />
                         <Box sx={{ mt: 2 }}>
                             <Grid container spacing={2}>
@@ -252,8 +289,8 @@ export function TabWithTableView() {
                         </Box>
                     </Paper>
                 </>
-
             )}
+
             {tabValue === 3 && (
                 <Paper elevation={6}
                     sx={{

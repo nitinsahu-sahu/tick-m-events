@@ -20,7 +20,7 @@ interface RequestSectionProps {
     headers: any[];
     data: any[];
     type: string;
-
+handleOpenModal:any
 }
 
 export function RequestTabSection({
@@ -29,6 +29,8 @@ export function RequestTabSection({
     headers,
     data,
     type,
+    handleOpenModal,
+    
 }: RequestSectionProps) {
     return (
         <>
@@ -46,7 +48,7 @@ export function RequestTabSection({
                 }}>
                 {description}
             </Typography>
-            <MessagingAndClientRelationshipTable headers={headers} data={data} type={type} />
+            <MessagingAndClientRelationshipTable handleOpenModal={handleOpenModal} headers={headers} data={data} type={type} />
         </>
     );
 };

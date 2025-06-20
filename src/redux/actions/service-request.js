@@ -23,11 +23,11 @@ export const getRequestsByProvider = (request) => async (dispatch) => {
 };
 
 // Event creating
-export const organizerRequstToProvider = (request) => async (dispatch) => {
+export const organizerRequstToProvider = (formDataObj) => async (dispatch) => {
     dispatch({ type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_REQUEST });
 
     try {
-        const response = await axios.post("/event-requests", request);
+        const response = await axios.post("/event-requests", formDataObj);
         dispatch({
             type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_SUCCESS,
             payload: {

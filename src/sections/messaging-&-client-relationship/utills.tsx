@@ -7,10 +7,6 @@ export const ActiveConversationsTableData = [
 ];
 
 export const GeneralConversationsTableHeaders = ["Organizer", "Service Concerned", "Last Message", "Status", "Action"];
-export const GeneralConversationsTableData = [
-  { oganizer: "Jean M.", serviceConcerned: "DJ & Animation", lastMessage: "What is your final price?", status: "In Negotiation", actions: ["Open Conversation"] },
-  { oganizer: "Jean M.", serviceConcerned: "DJ & Animation", lastMessage: "What is your final price?", status: "In Negotiation", actions: ["Open Conversation"] },
-];
 
 export const ChatOrganizerTableHeaders = ["Location", "Date & Time", "Budget", "Description"];
 export const ChatOrganizerTableData = [

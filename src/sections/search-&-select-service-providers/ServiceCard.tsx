@@ -1,5 +1,7 @@
-import { Box, Typography, Chip, Dialog, Button, DialogTitle, Paper, Divider, 
-  DialogContent,TextField,FormControlLabel,Checkbox, DialogActions,CircularProgress } from '@mui/material';
+import {
+  Box, Typography, Chip, Dialog, Button, DialogTitle, Paper, Divider,
+  DialogContent, TextField, FormControlLabel, Checkbox, DialogActions, CircularProgress, InputAdornment
+} from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useDispatch } from 'react-redux';
 import { useState } from 'react';
@@ -21,43 +23,62 @@ function truncateHtmlText(html: string, wordCount: number) {
   return words.length > wordCount ? `${truncated}...` : truncated;
 }
 
+interface ApiResult {
+  status: number;
+  type: string;
+  message: any;
+}
+
 // ServiceCard.tsx (new component)
 export function ServiceCard({ service, onRequest, eventId, disabled = false }: any) {
   const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [negotiationMessage, setNegotiationMessage] = useState('');
+  const [formData, setFormData] = useState({
+    orgBudget: '',
+    orgRequirement: '',
+  });
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
 
-  const handleRequest = async () => {
-    if (!eventId || !service?._id) return;
-    if (!termsAccepted) {
-      toast.error('Please accept the terms and conditions');
-      return;
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSaveRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    const request = {
-      serviceId: service._id,
-      eventId,
-      message: negotiationMessage
-    }
     try {
-      const result = await dispatch(organizerRequstToProvider(request));
-      if (result?.status === 201) {
-        toast.success(result?.message);
-        handleCloseDialog()
-        setNegotiationMessage('')
+      const formDataObj = new FormData();
+      formDataObj.append('orgBudget', formData.orgBudget);
+      formDataObj.append('orgRequirement', formData.orgRequirement);
+      formDataObj.append('eventId', eventId);
+      formDataObj.append('serviceRequestId', service._id); // assuming service has an id
+
+      const result = await dispatch(organizerRequstToProvider(formDataObj));
+      if ((result as ApiResult)?.status === 201) {
+        toast.success(result.message);
+        handleCloseDialog();
+        setFormData({
+          orgBudget: '',
+          orgRequirement: '',
+        })
+        setTermsAccepted(false)
       } else {
-        toast.error(result?.message);
+        toast.error(result.message);
       }
 
     } catch (err) {
-      toast.error(err.message || 'Failed to send request');
+      setError(err.message || 'Failed to send request');
+      toast.error('Failed to send request');
     } finally {
       setIsLoading(false);
     }
@@ -189,54 +210,82 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
       </Paper>
 
       <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-        <DialogTitle>Request Service</DialogTitle>
-        <DialogContent>
-          <Box sx={{ mt: 2 }}>
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              label="Negotiation Message (Optional)"
-              value={negotiationMessage}
-              onChange={(e) => setNegotiationMessage(e.target.value)}
-              placeholder="Write your custom message or special requests..."
-              variant="outlined"
-            />
-          </Box>
+        <form onSubmit={handleSaveRequest}>
+          <DialogTitle>Request Service</DialogTitle>
+          <DialogContent>
+            <Box sx={{ mt: 2 }}>
+              <TextField
+                required
+                type="number"  // Changed from "text" to "number" for currency input
+                fullWidth
+                name="orgBudget"
+                label="Negotiation Price"
+                value={formData.orgBudget}
+                onChange={handleInputChange}
+                placeholder="Enter your budget..."
+                variant="outlined"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      XAF
+                    </InputAdornment>
+                  ),
+                  inputProps: {
+                    min: 0  // Ensures only positive numbers
+                  }
+                }}
+              />
+            </Box>
+            <Box sx={{ mt: 2 }}>
+              <TextField
+                required
+                type="text"
+                fullWidth
+                multiline
+                rows={4}
+                name="orgRequirement"
+                label="Requirements"
+                value={formData.orgRequirement}
+                onChange={handleInputChange}
+                placeholder="Write your requirements..."
+                variant="outlined"
+              />
+            </Box>
+            <Box sx={{ mt: 3 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    color="primary"
+                    required
+                  />
+                }
+                label="I agree to the terms and conditions"
+              />
+            </Box>
 
-          <Box sx={{ mt: 3 }}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                  color="primary"
-                />
-              }
-              label="I agree to the terms and conditions"
-            />
-          </Box>
-
-          {error && (
-            <Typography color="error" sx={{ mt: 1 }}>
-              {error}
-            </Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleRequest}
-            color="primary"
-            variant="contained"
-            disabled={isLoading || !termsAccepted}
-            startIcon={isLoading ? <CircularProgress size={20} /> : null}
-          >
-            {isLoading ? 'Sending...' : 'Send Request'}
-          </Button>
-        </DialogActions>
+            {error && (
+              <Typography color="error" sx={{ mt: 1 }}>
+                {error}
+              </Typography>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog} color="secondary">
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              color="primary"
+              variant="contained"
+              disabled={isLoading || !termsAccepted}
+              startIcon={isLoading ? <CircularProgress size={20} /> : null}
+            >
+              {isLoading ? 'Sending...' : 'Send Request'}
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </>
   );

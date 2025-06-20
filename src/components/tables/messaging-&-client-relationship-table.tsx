@@ -1,24 +1,19 @@
 import {
-    TableContainer,
-    Table,
-    TableRow,
-    TableBody,
-    Paper,
-    TableHead,
-    TableCell,
-    Button,
+    Typography, TableContainer, Table, TableRow, TableBody, Paper,
+    TableHead, TableCell, Button,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 export function MessagingAndClientRelationshipTable({
     headers,
     data,
-    type
+    type,
+    handleOpenModal
 }: {
     headers: string[];
     type: string;
     data: any[];
-
+     handleOpenModal: (row: any) => void; // Add proper typing
 }) {
     const theme = useTheme();
 
@@ -45,49 +40,68 @@ export function MessagingAndClientRelationshipTable({
                 </TableHead>
 
                 <TableBody>
-                    {data.map((row, index) => {
-                        const backgroundColor = index % 2 === 0 ? "#f5f5f5" : "#e0e0e0";
+                    {!data || data.length === 0 ? (
+                        <TableRow>
+                            <TableCell colSpan={headers.length} align="center" sx={{ py: 4 }}>
+                                <Typography variant="body1" color="textSecondary">
+                                    No Reqest available
+                                </Typography>
+                            </TableCell>
+                        </TableRow>
+                    ) : (
+                        data.map((row, index) => {
+                            const backgroundColor = index % 2 === 0 ? "#f5f5f5" : "#e0e0e0";
 
-                        return (
-                            <TableRow key={index} sx={{ backgroundColor }}>
-                                {/* Conditional cells based on type */}
-                                {(type === "1" || type === "2" || type === "5") && (
-                                    <TableCell sx={{ verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }}>
-                                        {row.service || row.oganizer || row.file}
+                            return (
+                                <TableRow key={row._id} sx={{ backgroundColor }}>
+                                    {/* Conditional cells based on type */}
+                                    {(type === "1" || type === "2" || type === "5") && (
+                                        <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }}>
+                                            {row.service || row?.organizerId?.name || row.file}
+                                        </TableCell>
+                                    )}
+
+                                    <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }}>
+                                        {row.location || row?.serviceRequestId?.serviceType || row.sdate}
                                     </TableCell>
-                                )}
 
-                                <TableCell sx={{  verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }}>
-                                    {row.location || row.serviceConcerned || row.sdate}
-                                </TableCell>
-
-                                <TableCell sx={{  verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }}>
-                                    {row.datetime || row.lastMessage || row.type}
-                                </TableCell>
-
-                                {type === "1" && (
-                                    <TableCell sx={{  verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }}>
-                                        {row.payment}
+                                    <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }}>
+                                        {row.datetime || `-` || row.type}
                                     </TableCell>
-                                )}
 
-                                {type !== "5" && (
-                                    <TableCell sx={{  verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }}>
-                                        {row.status || row.budget}
-                                    </TableCell>
-                                )}
+                                    {type === "1" && (
+                                        <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }}>
+                                            {row.payment}
+                                        </TableCell>
+                                    )}
 
-                                {type === "3" && (
-                                    <TableCell sx={{  verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }}>
-                                        {row.describe}
-                                    </TableCell>
-                                )}
 
-                                {(type === "1" || type === "2" || type === "5") && (
-                                    <TableCell sx={{  verticalAlign:'middle',textAlign:'center',fontWeight: 600, align: "center" }} width="36%">
-                                        {row.actions?.map((action: any, actionIndex: any) => (
+                                    {type !== "5" && (
+                                        <TableCell sx={{
+                                            textTransform: 'capitalize',
+                                            verticalAlign: 'middle',
+                                            textAlign: 'center',
+                                            align: "center",
+                                            fontWeight: 600,
+                                            color:
+                                                row.contractStatus === "pending" ? "#F69809" :
+                                                    row.contractStatus === "signed" ? "#3A86FF" :
+                                                        row.contractStatus === "ongoing" ? "#8338EC" :
+                                                            "#46B800" // default for completed
+                                        }}>
+                                            {row.contractStatus || row.budget}
+                                        </TableCell>
+                                    )}
+
+                                    {type === "3" && (
+                                        <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }}>
+                                            {row.describe}
+                                        </TableCell>
+                                    )}
+
+                                    {
+                                        type === '2' ? <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }} width="25%">
                                             <Button
-                                                key={actionIndex}
                                                 variant="outlined"
                                                 size="small"
                                                 sx={{
@@ -96,15 +110,36 @@ export function MessagingAndClientRelationshipTable({
                                                     borderColor: "gray",
                                                     backgroundColor: "#0B2E4C"
                                                 }}
+                                                onClick={() => handleOpenModal(row)}
                                             >
-                                                {action}
+                                                Open Conversation
                                             </Button>
-                                        ))}
-                                    </TableCell>
-                                )}
-                            </TableRow>
-                        );
-                    })}
+                                        </TableCell> : null
+                                    }
+                                    {(type === "1" || type === "5") && (
+                                        <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }} width="36%">
+                                            {row.actions?.map((action: any, actionIndex: any) => (
+                                                <Button
+                                                    key={actionIndex}
+                                                    variant="outlined"
+                                                    size="small"
+                                                    sx={{
+                                                        marginX: 0.5,
+                                                        color: "white",
+                                                        borderColor: "gray",
+                                                        backgroundColor: "#0B2E4C"
+                                                    }}
+                                                >
+                                                    {action}
+                                                </Button>
+                                            ))}
+                                        </TableCell>
+                                    )}
+                                </TableRow>
+                            );
+                        })
+                    )}
+
                 </TableBody>
             </Table>
         </TableContainer>

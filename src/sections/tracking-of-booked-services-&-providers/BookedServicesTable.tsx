@@ -140,32 +140,13 @@ export default function BookedServicesTable() {
                   <Typography sx={{ color: 'green', fontWeight: 'bold' }}>{item.status}</Typography>
                 </div>
 
-                <Stack
-                  direction={{ xs: 'column', sm: 'row' }}
-                  spacing={1}
-                  flexWrap="wrap"
-                  useFlexGap
-                  sx={{
-                    mt: { xs: 1, sm: 0 },
-                    '& button': {
-                      flex: { xs: '1 1 auto', sm: 'none' },
-                      minWidth: { xs: '100%', sm: 100 },
-                      backgroundColor: '#0D1B2A',
-                      color: 'white',
-                      fontWeight: 500,
-                      textTransform: 'none',
-                      '&:hover': {
-                        backgroundColor: '#112A46',
-                      },
-                    },
-                  }}
-                >
+                <Box>
                   {item.actions.map((label, i) => (
-                    <Button key={i} size="small">
+                    <Button key={i} size="small" sx={{border:1, m:1}}>
                       {label}
                     </Button>
                   ))}
-                </Stack>
+                </Box>
               </Box>
             ))}
           </Box>

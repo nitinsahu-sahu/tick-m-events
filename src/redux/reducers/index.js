@@ -9,10 +9,12 @@ import homeAndRecommandationReducer from './home-recommedation.reducer'
 import ticketTypeReducer from './ticket-reservation.reducer'
 import transactionPaymentReducer from './transactionPayment.reducer'
 import eventServiceReqReducer from './event-service-request.reducer'
+import { activityReducer } from "./activity.reducer";
 
 const rootReducer = combineReducers({
     auth: authReducer,
     event: eventReducer,
+    activities: activityReducer,
     promotionList: promotionReducer,
     profile: profileServiceReducer,
     order: eventOrderReducer,

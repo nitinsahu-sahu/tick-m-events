@@ -85,23 +85,9 @@ export function HomeAndGlobalTable({
                                     <TableCell align="center" >
                                         {row.amountDue || row.datePosted || row.dateTime || row.lastMessage || row.eventId.date}
                                     </TableCell>
-                                    {
-                                        type === "4" ? <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                            {row.method}
-                                        </TableCell>
-
-                                            : null
-                                    }
-                                    {
-                                        type === "4" ? <TableCell align="center">
-                                            {row.status}
-                                        </TableCell>
-
-                                            : null
-                                    }
 
                                     {
-                                        type === "3" || type === "4" ? null : (
+                                        type === "2" ? null : (
                                             <TableCell align="center">
                                                 <Box display="flex" alignItems="center" justifyContent="center">
                                                     <Typography variant="body2">
@@ -143,7 +129,7 @@ export function HomeAndGlobalTable({
                                                 }}>Apply
                                             </Button>
                                         </TableCell> :
-                                            <TableCell align="center" sx={{ width: type === "2" ? "46%" : "25%" }}>
+                                            <TableCell align="center" sx={{ width: type === "2" ? "35%" : "25%" }}>
                                                 {row.actions?.map((action: any) => (
                                                     <Button
                                                         variant="outlined"

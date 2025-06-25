@@ -1,29 +1,142 @@
-import { Avatar, Box, Button, Grid, Typography } from "@mui/material";
-import { useSelector } from "react-redux";
+import { Avatar, Box, Button, Grid, Typography, IconButton } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import EditIcon from '@mui/icons-material/Edit';
+import { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
+
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
-import { RootState } from "src/redux/store";
+import { AppDispatch, RootState } from "src/redux/store";
+import { profileGet, updateProAvatar, updateProCover } from "src/redux/actions";
+
+import axios from "../../redux/helper/axios";
+
+interface ApiResult {
+    status: number;
+    type: string;
+    message: any;
+}
 
 export function MainProfile({ handleAvalibility, setShowService, onModify }: any) {
     const { profile } = useSelector((state: RootState) => state?.profile);
-
+    const dispatch = useDispatch<AppDispatch>();
+    const [covererror, setCoverError] = useState(null)
+    const [avatarerror, setAvatarError] = useState(null)
+    const avatarInputRef = useRef<HTMLInputElement>(null);
+    const coverInputRef = useRef<HTMLInputElement>(null);
     const handleModifyClick = (rowData: any) => {
         onModify(rowData);  // Call the callback with row data
+    };
+
+    useEffect(() => {
+        dispatch(profileGet(profile?._id));
+    }, [dispatch, profile?._id])
+    const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const formData = new FormData();
+            formData.append('cover', file);
+
+            try {
+                const result = await dispatch(updateProCover(formData))
+                if ((result as ApiResult)?.status === 200) {
+                    setCoverError(null);
+                    dispatch(profileGet(profile?._id));
+                } else {
+                    setCoverError(result.message);
+
+                }
+            } catch (error) {
+                toast.error(error.message);
+            }
+        }
+    };
+
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            try {
+                const result = await dispatch(updateProAvatar(formData))
+                if ((result as ApiResult)?.status === 200) {
+                    setAvatarError(null);
+                    dispatch(profileGet(profile?._id));
+                } else {
+                    toast.error(result.message);
+                }
+            } catch (error) {
+                toast.error(error.message);
+            }
+        }
+    };
+
+    const triggerAvatarInput = () => {
+        avatarInputRef.current?.click();
+    };
+
+    const triggerCoverInput = () => {
+        coverInputRef.current?.click();
     };
 
     return (
         <Box boxShadow={3} borderRadius={3} bgcolor="#FFFFFF" mt={3} >
             {/* Banner Image */}
+            {/* Hidden file inputs */}
+            <input
+                type="file"
+                ref={avatarInputRef}
+                onChange={handleAvatarChange}
+                accept="image/*"
+                style={{ display: 'none' }}
+            />
+            <input
+                type="file"
+                ref={coverInputRef}
+                onChange={handleCoverChange}
+                accept="image/*"
+                style={{ display: 'none' }}
+            />
+
+            {/* Banner Image with Edit Button */}
             <Box
                 borderRadius="24px 24px 0px 0px"
                 sx={{
                     width: "100%",
                     height: { xs: "150px", sm: "220px" },
-                    backgroundImage:
-                        "url('https://res.cloudinary.com/dm624gcgg/image/upload/v1745399695/a33ffade6c44792172af87c950e914099ba87c45_dg1rab.png')",
+                    backgroundImage: profile?.cover?.url
+                        ? `url(${profile.cover.url})`
+                        : `url(https://res.cloudinary.com/dm624gcgg/image/upload/v1745399695/a33ffade6c44792172af87c950e914099ba87c45_dg1rab.png)`,
                     backgroundSize: "cover",
-                    backgroundPosition: "center",
+                    backgroundPosition: "center center", // More specific position
+                    backgroundRepeat: "no-repeat",
+                    position: 'relative',
+                    overflow: 'hidden' // Ensures rounded corners work properly
                 }}
-            />
+            >
+                <IconButton
+                    onClick={triggerCoverInput}
+                    sx={{
+                        position: 'absolute',
+                        bottom: 16,
+                        right: 16,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        color: 'white',
+                        '&:hover': {
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)'
+                        }
+                    }}
+                >
+                    <EditIcon fontSize="small" />
+                </IconButton>
+                <Typography sx={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 16,
+
+                }} color="red" fontSize={15} fontWeight={600}>{covererror}</Typography>
+
+            </Box>
 
             {/* Profile Info */}
             <Box display="flex" alignItems="center" gap={3} p={3} >
@@ -37,7 +150,7 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                         }}
                     />
                     {/* Inset Active Dot */}
-                    <Box
+                    {/* <Box
                         sx={{
                             position: "absolute",
                             bottom: 4,
@@ -49,7 +162,23 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                             borderRadius: "50%",
                             zIndex: 1,
                         }}
-                    />
+                    /> */}
+                    {/* Avatar Edit Button */}
+                    <IconButton
+                        onClick={triggerAvatarInput}
+                        sx={{
+                            position: 'absolute',
+                            bottom: -2,
+                            right: -8,
+                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                            color: 'white',
+                            '&:hover': {
+                                backgroundColor: 'rgba(0, 0, 0, 0.7)'
+                            }
+                        }}
+                    >
+                        <EditIcon fontSize="small" />
+                    </IconButton>
                 </Box>
 
                 <Box sx={{ marginTop: "-43px" }}>

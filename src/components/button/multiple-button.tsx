@@ -1,6 +1,6 @@
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 
-export function TabButton({ providersList, tabValue, onChange, tabLabels, filtersApplied }: any) {
+export function TabButton({ providersList, tabValue, onChange, tabLabels }: any) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <Tabs
@@ -33,12 +33,11 @@ export function TabButton({ providersList, tabValue, onChange, tabLabels, filter
                       color: tabValue === index ? 'white' : 'black'
                     }}
                   >
-                    ({filtersApplied ? providersList?.length || 0 : '-'})
+                    ({providersList?.length || 0})
                   </Typography>
                 )}
               </Box>
             }
-            disabled={index === 1 && !filtersApplied}
             sx={{
               px: { xs: 1, sm: 3 },
               margin: "0px 5px",

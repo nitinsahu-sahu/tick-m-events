@@ -13,7 +13,7 @@ export function MessagingAndClientRelationshipTable({
     headers: string[];
     type: string;
     data: any[];
-     handleOpenModal: (row: any) => void; // Add proper typing
+    handleOpenModal: (row: any) => void; // Add proper typing
 }) {
     const theme = useTheme();
 
@@ -55,7 +55,7 @@ export function MessagingAndClientRelationshipTable({
                             return (
                                 <TableRow key={row._id} sx={{ backgroundColor }}>
                                     {/* Conditional cells based on type */}
-                                    {(type === "1" || type === "2" || type === "5") && (
+                                    {(type === "2" || type === "5") && (
                                         <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }}>
                                             {row.service || row?.organizerId?.name || row.file}
                                         </TableCell>
@@ -68,12 +68,6 @@ export function MessagingAndClientRelationshipTable({
                                     <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }}>
                                         {row.datetime || `-` || row.type}
                                     </TableCell>
-
-                                    {type === "1" && (
-                                        <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }}>
-                                            {row.payment}
-                                        </TableCell>
-                                    )}
 
 
                                     {type !== "5" && (
@@ -116,7 +110,7 @@ export function MessagingAndClientRelationshipTable({
                                             </Button>
                                         </TableCell> : null
                                     }
-                                    {(type === "1" || type === "5") && (
+                                    {(type === "5") && (
                                         <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }} width="36%">
                                             {row.actions?.map((action: any, actionIndex: any) => (
                                                 <Button

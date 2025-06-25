@@ -7,8 +7,8 @@ import { Outlet } from 'react-router-dom';
 
 // Lazy load dashboard components
 const HomePage = lazy(() => import('../pages/home'));
-const StatisticsAndPerformancePage = lazy(() => import('../pages/statistics-&-performance'));
 const HomeAndRecommendationsPage = lazy(() => import('../pages/home-and-recommendations'));
+const HomeAndGlobalPage = lazy(() => import('../pages/home-and-global-view'));
 const MarketplaceAndServiceProviderSupervisionPage = lazy(() => import('../pages/marketplace-&-service-provider-supervision'));
 
 const renderFallback = (
@@ -44,7 +44,7 @@ export function MultipleDashboard() {
                         case 'organizer':
                             return <HomePage />;
                         case 'provider':
-                            return <StatisticsAndPerformancePage />;
+                            return <HomeAndGlobalPage />;
                         default:
                             return <HomeAndRecommendationsPage />;
                     }

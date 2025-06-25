@@ -6,7 +6,7 @@ const initialState = {
     message: '',
 };
 
-const promotionReducer = (state, action) => {
+const profileServiceReducer = (state, action) => {
     if (state === undefined) {
         state = initialState; // Assign initial state here
     }
@@ -34,4 +34,4 @@ const promotionReducer = (state, action) => {
 };
 
 
-export default promotionReducer;
+export default profileServiceReducer;

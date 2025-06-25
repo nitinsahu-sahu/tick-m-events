@@ -9,11 +9,9 @@ import "react-image-crop/dist/ReactCrop.css";
 
 import { PageTitleSection } from "src/components/page-title-section";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
-import { SearchBar } from "../search-bar";
 import "react-quill/dist/quill.snow.css";
 import { EventInformation } from "../event-information";
 import { SecurityAndConfirmation } from "../security-&-confirm";
-import { canvasPreview } from "../canvasPreview";
 
 function centerAspectCrop(
   mediaWidth: number,

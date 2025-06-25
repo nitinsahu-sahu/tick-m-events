@@ -44,8 +44,6 @@ profile menu
  
 10.Service category field-> drop down should be their it is in the pdf
  
-
- 
 12.Edit profile btn-> after clicking it this section should disappear and informtin should reflect on profile after overall rating section
 more info… then name email etc.
 If not provide it should not included do not include empty space
@@ -60,13 +58,7 @@ If not provide it should not included do not include empty space
 15.After add to service btn clk-> also disappear this section bcz  it is added, appear ony add service btn above
  
 16.Reviews-> reply review btn not working, smthing should happen
- 
-17.Manage availability-> three options select available on days and  option to available 24h and to choose time range that which hour to whci hhour we are available, if 24 hours checked no need to enter time range ,if unchecked time range option should enable to enter time range
--add a service btn heading -> add availability
- 
- 
-18.Availability setting-> if toggle on means edit the manage availabilty , if off they are not able to edit this section
- 
+  
 19.Complete my verification btn-> give checklist to verify options
 -email otp for verification
 -phone for sms otp(leave tht for now)remove and whatsapp otp add to verify
@@ -74,9 +66,9 @@ If not provide it should not included do not include empty space
  
 20.Share profile-> give option to share evrywhere in social media options fb, whatsapp etc.
 ---------------------------------------------
-statistic page menu
 
 Today Done
-Completed user cover image icon and functionality
-Completed user avatar image icon and functionality
-11.Number-> need dropdown with country codes then number field
+Enhanced Phone Number Field by adding a Country Dropdown Selector on signup form 
+Implemented Availability setting toggle functionality
+Developed provider manage availabliley according to requiremnt
+

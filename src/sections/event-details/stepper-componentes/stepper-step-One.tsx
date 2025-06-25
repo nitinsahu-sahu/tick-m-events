@@ -166,8 +166,6 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
                                     name='coverImage'
                                     inputRef={fileInputRef}
                                     onChange={handleEventThemeLogo}
-
-                                    // onChange={handleEventBanner}
                                     InputProps={{
                                         sx: {
                                             borderRadius: '10px',

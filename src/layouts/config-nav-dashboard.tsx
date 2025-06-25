@@ -177,18 +177,6 @@ export const navData: NavItem[] = [
     icon: icon('ic_client_relation'),
     roles: ['provider'],
   },
-  // {
-  //   title: 'Service Request & Negotiation',
-  //   path: '/service-request-&-negotiation',
-  //   icon: icon('ic_request'),
-  //   roles: ['provider'],
-  // },
-  // {
-  //   title: 'Tracking of Booked Services & Providers',
-  //   path: '/tracking-of-booked-services-&-providers',
-  //   icon: icon('ic_book_service'),
-  //   roles: ['provider'],
-  // },
   {
     title: 'Global Overview & General Statistics',
     path: '/global-overview-&-general-statistics',

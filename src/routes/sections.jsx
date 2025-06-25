@@ -10,7 +10,6 @@ import { DashboardLayout } from 'src/layouts/dashboard';
 import { isUserLoggedIn } from 'src/redux/actions';
 import Protected from 'src/redux/helper/HOC';
 import { RoleProtectedRoute } from 'src/redux/helper/RoleWise';
-import { TrackingBookedServicesAndProvidersView } from 'src/sections/tracking-of-booked-services-&-providers/view';
 import { MultipleDashboard } from 'src/hooks/common-dashbord';
 
 // ----------------------------Organizer Routes------------------------------------------
@@ -51,8 +50,6 @@ export const TicketValidationAtEntryPage = lazy(() => import('src/pages/ticket-v
 export const TransactionAndPaymentManagementPage = lazy(() => import('src/pages/transaction-&-payment-management'));
 export const MessagingAndClientRelationshipPage = lazy(() => import('src/pages/messaging-&-client-relationship'));
 export const StatisticsAndPerformancePage = lazy(() => import('src/pages/statistics-&-performance'));
-export const ServiceRequestAndNegotiationPage = lazy(() => import('src/pages/service-request-&-negotiation'));
-export const trackingOfBookedServicesAndProvidersPage = lazy(() => import('src/pages/tracking-of-booked-services-&-providers'));
 export const GlobalOverviewAndGeneralStatisticsPage = lazy(() => import('src/pages/global-overview-&-general-statistics'));
 export const UserManagementPage = lazy(() => import('src/pages/user-management'));
 export const TicketingAndTransactionsSupervisionPage = lazy(() => import('src/pages/ticketing-&-transactions-supervision'));
@@ -175,10 +172,6 @@ export function Router() {
           path: '/statistics-&-performance',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><StatisticsAndPerformancePage /> </RoleProtectedRoute>
         },
-        {
-          path: '/tracking-of-booked-services-&-providers',
-          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><TrackingBookedServicesAndProvidersView /></RoleProtectedRoute>
-        },
         
         {
           path: '/profile-&-services-management',
@@ -199,11 +192,6 @@ export function Router() {
         {
           path: '/messaging-&-client-relationship',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><MessagingAndClientRelationshipPage /></RoleProtectedRoute>
-        },
-
-        {
-          path: '/service-request-&-negotiation',
-          element: <RoleProtectedRoute allowedRoles={['organizer', 'provider']} currentRole={currentRole}><ServiceRequestAndNegotiationPage /></RoleProtectedRoute>
         },
         // -----------------------**************-------------------------
         {

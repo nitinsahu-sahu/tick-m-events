@@ -100,17 +100,6 @@ export function SignInView() {
     }
   }, [formRegisterData, navigate, avatar, dispatch, phoneNumber]);
 
-  // const handleSignIn = useCallback(async (event) => {
-  //   event.preventDefault(); // Prevent default form submission behavior
-  //   const result = await dispatch(login(formData));
-
-  //   if (result.status === 200) {
-  //     toast.success(result?.message);
-  //   } else {
-  //     toast.error(result?.message);
-  //   }
-  // }, [formData, dispatch]);
-
   const handleSignIn = useCallback(async (event) => {
     event.preventDefault();
     const result = await dispatch(login(formData));
@@ -253,14 +242,17 @@ export function SignInView() {
           ),
         }}
       /> */}
+      
       <Box sx={{
+        width:'100%',
+        mt:2,
         '& .PhoneInput': {
           width: '100%',
           '& input': {
             width: '100%',
             padding: '16.5px 14px',
             border: '1px solid rgba(0, 0, 0, 0.23)',
-            borderRadius: '4px',
+            borderRadius: "10px",
             fontFamily: 'inherit',
             fontSize: '1rem',
             '&:hover': {
@@ -292,7 +284,6 @@ export function SignInView() {
           value={phoneNumber}
           onChange={handlePhoneChange}
           placeholder="Enter phone number"
-          sx
         />
       </Box>
       {/* Role Select */}

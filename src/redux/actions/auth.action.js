@@ -25,7 +25,7 @@ export const updateProAvatar = (data) => async (dispatch) => {
             type: authConstants.UPDATE_AVATAR_FAILURE,
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },
         });
-         return {
+        return {
             type: authConstants.UPDATE_AVATAR_FAILURE,
             message: error?.response?.data?.message || "Server error",
             status: error.status
@@ -56,7 +56,7 @@ export const updateProCover = (data) => async (dispatch) => {
             type: authConstants.UPDATE_COVER_FAILURE,
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },
         });
-         return {
+        return {
             type: authConstants.UPDATE_COVER_FAILURE,
             message: error?.response?.data?.message || "Server error",
             status: error.status
@@ -67,9 +67,12 @@ export const updateProCover = (data) => async (dispatch) => {
 // Checking SINGUP login or not
 export const signup = (data) => async (dispatch) => {
     dispatch({ type: authConstants.SIGNUP_REQUEST });
-
     try {
-        const response = await axios.post("/auth/signup", data);
+        const response = await axios.post("/auth/signup", data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
 
         dispatch({
             type: authConstants.SIGNUP_SUCCESS,
@@ -83,9 +86,6 @@ export const signup = (data) => async (dispatch) => {
         };
 
     } catch (error) {
-        console.log('====================================');
-        console.log(error.message);
-        console.log('====================================');
         dispatch({
             type: authConstants.SIGNUP_FAILURE,
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },

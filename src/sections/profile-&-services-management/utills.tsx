@@ -1,3 +1,17 @@
+export const FORM_INITIAL_STATE = {
+  serviceType: '',
+  location: '',
+  budget: '',
+  status: ''
+};
+
+export const inputStyles = {
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': { borderColor: 'black' },
+    '&:hover fieldset': { borderColor: 'black' },
+    '&.Mui-focused fieldset': { borderColor: 'black' }
+  }
+};
 
 export const profileFields = [
   {
@@ -80,6 +94,17 @@ export const days = [
   "Sunday",
 ];
 
+export const SERVICE_TYPES = [
+  { value: 'Catering', label: 'Catering' },
+  { value: 'Photography', label: 'Photography' },
+  { value: 'themed birthday setups', label: 'Themed Birthday Setups (Kids/Adults)' },
+  { value: 'balloon garlands & arches', label: 'Balloon Garlands & Arches' },
+  { value: 'candy buffet & dessert table styling', label: 'Candy Buffet & Dessert Table Styling' },
+  { value: 'Branded Stage & Backdrop Design', label: 'Branded Stage & Backdrop Design' },
+  { value: 'Lounge & Networking Area Setup', label: 'Lounge & Networking Area Setup' },
+  { value: 'Festival Stage Backdrops (Diwali, Christmas, Eid)', label: 'Festival Stage Backdrops (Diwali, Christmas, Eid)' },
+  { value: 'Hanging Lights & Lanterns', label: 'Hanging Lights & Lanterns' },
+]
 export const offterTableHeaders = ["Service", "Indicative Price", "Location", "Actions"];
 export const offterTableData = [
   { service: "DJ & Entertainment", indicativePrice: "20000 XAF", location: "America" },

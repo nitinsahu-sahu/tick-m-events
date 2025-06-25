@@ -57,7 +57,7 @@ export function StepperStepThree() {
             const searchParams = new URLSearchParams(window.location.search);
             const eventId = searchParams.get('eventId'); // Get existing eventId
             const ticketConfigId = searchParams.get('ticketConfigId'); // Get existing eventId
-            const res = await dispatch(eventCustomizationCreate({formEventCustomizeData,eventId,ticketConfigId}));
+            const res = await dispatch(eventCustomizationCreate({ formEventCustomizeData, eventId, ticketConfigId }));
             const eventCustomizationId = res?.eventCustomizationId;
 
             // Add event ID to current URL as search param

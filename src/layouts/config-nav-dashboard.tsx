@@ -20,10 +20,11 @@ const EventsInfo = () => <Label color="success" variant="inverted">3</Label>
 
 export const navData: NavItem[] = [
   // All Users Dashboard
-  {
-    title: 'Statistics',
+ 
+   {
+    title: 'Home & Global View',
     path: '/',
-    icon: icon('ic-analytics'),
+    icon: icon('ic_global_view'),
     roles: ['provider'],
   },
   {
@@ -102,6 +103,12 @@ export const navData: NavItem[] = [
     roles: ['organizer'],
   },
   // Provider Sidebar
+   {
+    title: 'Statistics',
+    path: '/statistics-&-performance',
+    icon: icon('ic-analytics'),
+    roles: ['provider'],
+  },
   {
     title: 'Event Settings',
     path: '/visibility-and-access-settings',
@@ -145,12 +152,7 @@ export const navData: NavItem[] = [
     icon: icon('ic_photo_video'),
     roles: ['participant'],
   },
-  {
-    title: 'Home & Global View',
-    path: '/home-and-global-view',
-    icon: icon('ic_global_view'),
-    roles: ['provider'],
-  },
+ 
   {
     title: 'Reservations & Contracts',
     path: '/reservations-and-contracts',
@@ -158,7 +160,7 @@ export const navData: NavItem[] = [
     roles: ['provider'],
   },
   {
-    title: 'Confirmed Service Calendar',
+    title: 'Calendar',
     path: '/confirmed-service-calendar',
     icon: icon('ic_calender'),
     roles: ['provider'],
@@ -175,18 +177,18 @@ export const navData: NavItem[] = [
     icon: icon('ic_client_relation'),
     roles: ['provider'],
   },
-  {
-    title: 'Service Request & Negotiation',
-    path: '/service-request-&-negotiation',
-    icon: icon('ic_request'),
-    roles: ['provider'],
-  },
-  {
-    title: 'Tracking of Booked Services & Providers',
-    path: '/tracking-of-booked-services-&-providers',
-    icon: icon('ic_book_service'),
-    roles: ['provider'],
-  },
+  // {
+  //   title: 'Service Request & Negotiation',
+  //   path: '/service-request-&-negotiation',
+  //   icon: icon('ic_request'),
+  //   roles: ['provider'],
+  // },
+  // {
+  //   title: 'Tracking of Booked Services & Providers',
+  //   path: '/tracking-of-booked-services-&-providers',
+  //   icon: icon('ic_book_service'),
+  //   roles: ['provider'],
+  // },
   {
     title: 'Global Overview & General Statistics',
     path: '/global-overview-&-general-statistics',

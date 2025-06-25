@@ -1,0 +1,82 @@
+3.View detail button shows detail of that event
+4.Fill out form will be hidden only open when provider click to apply button and it will be request to organizer for service.
+5.Home and global view page should be work like freelance, like available project show all the availabe projects
+confirmed service:- show confirmed projects or services
+-contract client:- take service provider take to messaging btwn oragnizer and provider
+-mark as completed:- request will be sent to organizer to confirm it is completed or not
+7.Notification button k pas messgaing icon to directly go on messages that will be open global(like freelancer message system)
+8.Notification icon should show notifications
+9.Message icon should show DMs
+10.One reservation and contract menu:- active contract card should show confirmed projects number that service provider working on
+
+
+video 3rd
+ 
+1.Banking information update-> Remove friend who booked heading  ,instaed
+-need table tht displays banking info of service provider like payment methods number of card or mbl money account and action button displays edits if want to edit payment method
+-form is to add and modify payment method
+ 
+-----------------------------------------------------
+messaging and client relationship menu
+ 
+2.Important messages and conversation history should be removed
+ 
+3.Active conversations & conversation-> table should remove instead message between provider and organizer have to show like messaging system
+ 
+4.Shared files tab->in table files shared with organizer 
+-remove add a file button
+ 
+---------------------------------------------------------------------------
+ 
+Service request and negotiations menu
+ 
+ 
+5.Main menu remove servic request & negotiation form provider should be in organizer dashboard
+ 
+6.Remove tracking of booked services provider from main menu
+ 
+--------------------------------------------------------------------
+profile menu
+ 
+8.Profile view -> give dropdown to slect the profile view by year month or week according to itwill show number of views
+ 
+9.Response time-> calculated automaticaal which is average time when  provider reponded to messages when they are contacted for project
+ 
+10.Service category field-> drop down should be their it is in the pdf
+ 
+
+ 
+12.Edit profile btn-> after clicking it this section should disappear and informtin should reflect on profile after overall rating section
+more info… then name email etc.
+If not provide it should not included do not include empty space
+ 
+13.Offered services-> if they offer services display it otherwise show no active services available
+ 
+14.Add a new service-> dropdown of service category 
+-description of service
+-price range of services 
+-locaton
+ 
+15.After add to service btn clk-> also disappear this section bcz  it is added, appear ony add service btn above
+ 
+16.Reviews-> reply review btn not working, smthing should happen
+ 
+17.Manage availability-> three options select available on days and  option to available 24h and to choose time range that which hour to whci hhour we are available, if 24 hours checked no need to enter time range ,if unchecked time range option should enable to enter time range
+-add a service btn heading -> add availability
+ 
+ 
+18.Availability setting-> if toggle on means edit the manage availabilty , if off they are not able to edit this section
+ 
+19.Complete my verification btn-> give checklist to verify options
+-email otp for verification
+-phone for sms otp(leave tht for now)remove and whatsapp otp add to verify
+-payment verified after identity (passport, any identity or imGE,pdf UPLOAD)and identified by admin
+ 
+20.Share profile-> give option to share evrywhere in social media options fb, whatsapp etc.
+---------------------------------------------
+statistic page menu
+
+Today Done
+Completed user cover image icon and functionality
+Completed user avatar image icon and functionality
+11.Number-> need dropdown with country codes then number field

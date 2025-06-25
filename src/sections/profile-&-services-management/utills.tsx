@@ -32,11 +32,6 @@ export const profileFields = [
     placeholder: 'New York, Los Angeles, Miami'
   },
   {
-    name: 'number',
-    type: 'number',
-    placeholder: '123-456-7890'
-  },
-  {
     name: 'email',
     type: 'email',
     placeholder: 'djmax@example.com'

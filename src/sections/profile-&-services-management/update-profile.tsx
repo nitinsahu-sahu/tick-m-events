@@ -1,18 +1,15 @@
-import {
-    Avatar,
-    Box,
-    Button,
-    TextField,
-} from "@mui/material";
+import { Avatar, Box, Button, TextField } from "@mui/material";
 import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from 'react-toastify';
-
+import type { E164Number } from 'libphonenumber-js';
+import PhoneInput from 'react-phone-number-input'
 import { profileUpdate } from "src/redux/actions";
 import { AppDispatch, RootState } from "src/redux/store";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 import { profileFields, socialMediaFields } from "./utills";
+import 'react-phone-number-input/style.css'
 
 
 
@@ -56,11 +53,17 @@ const FormTextField = ({ name, type = 'text', value, onChange, placeholder, tran
     />
 );
 
-export function UpdateProfile({ profileData, socialLinks, setProfileData, setSocialLinks }: any) {
+export function UpdateProfile({ profileData, socialLinks, setProfileData, setShowUpdateProfile, setSocialLinks }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const { _id, role } = useSelector((state: RootState) => state?.auth?.user);
     const { profile } = useSelector((state: RootState) => state?.profile);
+    const [phoneNumber, setPhoneNumber] = useState(profileData.number || '');
 
+    const handlePhoneChange = (value: E164Number | undefined) => {
+        const phoneValue = value as string; // or String(value)
+        setPhoneNumber(phoneValue);
+        setProfileData((prevData: any) => ({ ...prevData, number: phoneValue }));
+    };
     const handleProfileUpdateChange = (event: any) => {
         event.preventDefault(); // Prevent default form submission behavior
         const { name, value } = event.target;
@@ -83,7 +86,7 @@ export function UpdateProfile({ profileData, socialLinks, setProfileData, setSoc
         formProfileData.append("email", profileData.email);
         formProfileData.append("experience", profileData.experience);
         formProfileData.append("address", profileData.address);
-        formProfileData.append("number", profileData.number);
+        formProfileData.append("number", phoneNumber);
         formProfileData.append("serviceCategory", profileData.serviceCategory);
         formProfileData.append("website", profileData.website);
         formProfileData.append("socialLinks", JSON.stringify(socialLinks))
@@ -106,6 +109,8 @@ export function UpdateProfile({ profileData, socialLinks, setProfileData, setSoc
                     linkedin: "",
                     tiktok: ""
                 })
+                setPhoneNumber('')
+                setShowUpdateProfile(false)
             } else {
                 toast.error(result?.message);
             }
@@ -113,7 +118,7 @@ export function UpdateProfile({ profileData, socialLinks, setProfileData, setSoc
         } catch (error) {
             toast.error("Profile update failed");
         }
-    }, [profileData, setProfileData, setSocialLinks, _id, socialLinks,  dispatch])
+    }, [profileData, phoneNumber, setProfileData, setSocialLinks, _id, socialLinks, setShowUpdateProfile, dispatch])
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} bgcolor="#FFFFFF" p={3}>
@@ -152,7 +157,6 @@ export function UpdateProfile({ profileData, socialLinks, setProfileData, setSoc
                     {/* Profile Fields */}
                     {profileFields.filter(field => !(field.name === 'serviceCategory' && role === 'organizer')).map((field) => (
                         <FormTextField
-
                             key={field.name}
                             name={field.name}
                             type={field.type}
@@ -164,6 +168,50 @@ export function UpdateProfile({ profileData, socialLinks, setProfileData, setSoc
                             minRows={field.minRows}
                         />
                     ))}
+                    {/* Phone Number Input with Country Code */}
+                    <Box sx={{
+                        '& .PhoneInput': {
+                            width: '100%',
+                            '& input': {
+                                width: '100%',
+                                padding: '16.5px 14px',
+                                border: '1px solid rgba(0, 0, 0, 0.23)',
+                                borderRadius: '4px',
+                                fontFamily: 'inherit',
+                                fontSize: '1rem',
+                                '&:hover': {
+                                    borderColor: 'black',
+                                },
+                                '&:focus': {
+                                    borderColor: 'black',
+                                    borderWidth: '2px',
+                                    outline: 'none',
+                                },
+                            },
+                            '& .PhoneInputCountry': {
+                                marginRight: '8px',
+                            },
+                            '& .PhoneInputCountrySelect': {
+                                marginRight: '8px',
+                            },
+                        },
+                        '& .PhoneInput--focus': {
+                            '& input': {
+                                borderColor: 'black',
+                                borderWidth: '2px',
+                            },
+                        },
+                    }}>
+                        <PhoneInput
+                            international
+                            defaultCountry="US"
+                            value={phoneNumber}
+                            onChange={handlePhoneChange}
+                            placeholder="Enter phone number"
+                            sx
+                        />
+                    </Box>
+
                     {/* Social Media Fields */}
                     {socialMediaFields.map((field) => (
                         <FormTextField

@@ -1,8 +1,20 @@
 // Data for metric cards
 export const metrics = [
-    { title: "Active Contracts", value: "5" },
-    { title: "Completed Services", value: "20" },
-    { title: "Total Expected Payments", value: "1,500,000 XAF" },
+    {
+        title: "Active Contracts",
+        value: "12",
+        buttonType: "active"
+    },
+    {
+        title: "Completed Projects",
+        value: "8",
+        buttonType: "completed"
+    },
+    {
+        title: "Total Expected Payments",
+        value: "1,500,000 XAF"
+        
+    }
 ];
 
 export const requestDetails = {
@@ -16,8 +28,8 @@ export const requestDetails = {
 };
 
 export const pendingRequestTableHeaders = ["Organizer", "Requested Service", "Budget", 'Status', "Actions"];
-export const tabLabels = ["Pending Requests", "Signed Contracts", "Ongoing & Completed"];
-
+// export const tabLabels = ["Pending Requests", "Signed Contracts", "Ongoing & Completed"];
+export const tabLabels = ["Active Contracts", "Completed Services"];
 
 export const signedContractTableHeader = ["Service", "Location", "Date", "Amount", "Status", "Actions"];
 export const signedContractTableData = [

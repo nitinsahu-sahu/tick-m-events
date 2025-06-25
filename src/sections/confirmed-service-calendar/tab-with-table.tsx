@@ -6,11 +6,9 @@ import { serviceListTableData, serviceListTableHeader, confirmedServiceListTable
 import { RequestTabSection } from "./request-tab-section";
 import { CalenderView } from "./calender-view";
 
-
-
 export function TabWithTableView() {
     const [tabValue, setTabValue] = useState(0);
-    const tabLabels = ["Calendar View", "Service List", "Reminders & Notifications"];
+    const tabLabels = ["Calendar View", "Reminders & Notifications"];
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
@@ -43,25 +41,6 @@ export function TabWithTableView() {
                 </Paper>
             )}
             {tabValue === 1 && (
-                <Paper elevation={6}
-                    sx={{
-                        mt: 2,
-                        p: 3,
-                        borderRadius: 2,
-                        boxShadow: 3,
-                        overflow: "hidden",
-                    }}
-                >
-                    <RequestTabSection
-                        title="Service List"
-                        headers={serviceListTableHeader}
-                        data={serviceListTableData}
-                        type="1"
-                    />
-                </Paper>
-
-            )}
-            {tabValue === 2 && (
                 <Paper elevation={6}
                     sx={{
                         mt: 2,

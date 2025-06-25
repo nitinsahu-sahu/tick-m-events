@@ -1,9 +1,7 @@
 import { Paper, Typography, Box, Button, TextField, MenuItem, Stack } from "@mui/material";
 import { useState } from "react";
 import DatePicker from "@mui/lab/DatePicker";
-
 import { HomeAndGlobalTable } from "src/components/tables/home-and-global-table";
-
 
 interface RequestSectionProps {
     title: string;
@@ -73,11 +71,10 @@ export function RequestTabSection({
 
     const budgetRanges = [
         { label: "All Budgets", value: "" },
-        { label: "0 - 1000 XAF", value: "0-1000" },
-        { label: "1000 - 2000 XAF", value: "1000-2000" },
-        { label: "2000 - 3000 XAF", value: "2000-3000" },
-        { label: "3000 - 4000 XAF", value: "3000-4000" },
-        { label: "4000+ XAF", value: "4000-100000" }
+        { label: "0 - 10,000 XAF", value: "0-10000" },
+        { label: "10,000 - 100,000 XAF", value: "10000-100000" },
+        { label: "100,000 - 1,000,000 XAF", value: "100000-1000000" },
+        { label: "1,000,000+ XAF", value: "1000000-10000000" }
     ];
 
     return (
@@ -91,74 +88,75 @@ export function RequestTabSection({
 
             {/* Filter Controls */}
             {
-                data.length > 0 ? title === 'Available Projects (Organizer Requests)' && <Box sx={{ mb: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
-                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                        <TextField
-                            label="Search Event Name"
-                            variant="outlined"
-                            size="small"
-                            name="eventName"
-                            value={filters.eventName}
-                            onChange={handleFilterChange}
-                            sx={{ minWidth: 200 }}
-                        />
+                data.length > 0 && title === 'Available Projects (Organizer Requests)' && (
+                    <Box sx={{ mb: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                            <TextField
+                                label="Search Event Name"
+                                variant="outlined"
+                                size="small"
+                                name="eventName"
+                                value={filters.eventName}
+                                onChange={handleFilterChange}
+                                sx={{ minWidth: 200 }}
+                            />
 
-                        <TextField
-                            select
-                            label="Budget Range"
-                            variant="outlined"
-                            size="small"
-                            name="budget"
-                            value={filters.budget}
-                            onChange={handleFilterChange}
-                            sx={{ minWidth: 200 }}
-                        >
-                            {budgetRanges.map((option) => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                            <TextField
+                                select
+                                label="Budget Range"
+                                variant="outlined"
+                                size="small"
+                                name="budget"
+                                value={filters.budget}
+                                onChange={handleFilterChange}
+                                sx={{ minWidth: 250 }} // Increased width for better readability
+                            >
+                                {budgetRanges.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
 
-                        <DatePicker
-                            label="Filter by Date"
-                            value={filters.date}
-                            onChange={handleDateChange}
-                            renderInput={(params: any) => (
-                                <TextField
-                                    {...params}
-                                    size="small"
-                                    sx={{ minWidth: 200 }}
-                                />
-                            )}
-                        />
+                            <DatePicker
+                                label="Filter by Date"
+                                value={filters.date}
+                                onChange={handleDateChange}
+                                renderInput={(params: any) => (
+                                    <TextField
+                                        {...params}
+                                        size="small"
+                                        sx={{ minWidth: 200 }}
+                                    />
+                                )}
+                            />
 
-                        <Button
-                            variant="outlined"
-                            onClick={() => setFilters({
-                                eventName: '',
-                                budget: '',
-                                date: null
-                            })}
-                            sx={{ height: 40 }}
-                        >
-                            Clear Filters
-                        </Button>
-                    </Stack>
-                </Box> : null
-
+                            <Button
+                                variant="outlined"
+                                onClick={() => setFilters({
+                                    eventName: '',
+                                    budget: '',
+                                    date: null
+                                })}
+                                sx={{ height: 40 }}
+                            >
+                                Clear Filters
+                            </Button>
+                        </Stack>
+                    </Box>
+                )
             }
-
 
             <HomeAndGlobalTable headers={headers} data={filteredData} type={type} />
             {
-                filteredData.length > 0 ? <Box display="flex" justifyContent="flex-end" mt={2}>
-                    <Typography variant="body2" fontStyle="italic" color="text.secondary">
-                        NB: Negotiable Budget
-                    </Typography>
-                </Box> : null
+                filteredData.length > 0 && (
+                    <Box display="flex" justifyContent="flex-end" mt={2}>
+                        <Typography variant="body2" fontStyle="italic" color="text.secondary">
+                            NB: Negotiable Budget
+                        </Typography>
+                    </Box>
+                )
             }
-
         </>
     );
 };

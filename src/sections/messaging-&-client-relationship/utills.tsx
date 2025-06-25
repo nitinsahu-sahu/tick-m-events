@@ -1,11 +1,3 @@
-import { action } from "src/theme/core";
-
-export const ActiveConversationsTableHeaders = ["Service", "Location", "Date & Time", "Payment", "Status", "Actions"];
-export const ActiveConversationsTableData = [
-  { service: "DJ Entertainment", location: "Douala", datetime: "10/02/2025 - 8 PM", payment: "250,000 XAF", status: "Confirmed", actions: ["Replay", "Cancel", "Generate Contract"] },
-  { service: "DJ Entertainment", location: "Douala", datetime: "10/02/2025 - 8 PM", payment: "250,000 XAF", status: "Confirmed", actions: ["Replay", "Cancel", "Generate Contract"] },
-];
-
 export const GeneralConversationsTableHeaders = ["Organizer", "Service Concerned", "Last Message", "Status", "Action"];
 
 export const ChatOrganizerTableHeaders = ["Location", "Date & Time", "Budget", "Description"];

@@ -2,8 +2,71 @@ import { authConstants } from "./constants";
 import axios from "../helper/axios";
 
 // Checking SINGUP login or not
+export const updateProAvatar = (data) => async (dispatch) => {
+    dispatch({ type: authConstants.UPDATE_AVATAR_REQUEST });
+
+    try {
+        const response = await axios.put("/auth/avatar", data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        dispatch({
+            type: authConstants.UPDATE_AVATAR_SUCCESS,
+            payload: { message: response?.data?.message },
+        });
+        return {
+            type: authConstants.UPDATE_AVATAR_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
+    } catch (error) {
+        dispatch({
+            type: authConstants.UPDATE_AVATAR_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+         return {
+            type: authConstants.UPDATE_AVATAR_FAILURE,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status
+        };
+    }
+};
+
+export const updateProCover = (data) => async (dispatch) => {
+    dispatch({ type: authConstants.UPDATE_COVER_REQUEST });
+
+    try {
+        const response = await axios.put("/auth/cover", data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        dispatch({
+            type: authConstants.UPDATE_COVER_SUCCESS,
+            payload: { message: response?.data?.message },
+        });
+        return {
+            type: authConstants.UPDATE_COVER_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
+    } catch (error) {
+        dispatch({
+            type: authConstants.UPDATE_COVER_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+         return {
+            type: authConstants.UPDATE_COVER_FAILURE,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status
+        };
+    }
+};
+
+// Checking SINGUP login or not
 export const signup = (data) => async (dispatch) => {
-    dispatch({ type: authConstants.SIGNUP_REQUEST});
+    dispatch({ type: authConstants.SIGNUP_REQUEST });
 
     try {
         const response = await axios.post("/auth/signup", data);
@@ -20,6 +83,9 @@ export const signup = (data) => async (dispatch) => {
         };
 
     } catch (error) {
+        console.log('====================================');
+        console.log(error.message);
+        console.log('====================================');
         dispatch({
             type: authConstants.SIGNUP_FAILURE,
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },

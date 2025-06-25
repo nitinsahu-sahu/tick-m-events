@@ -7,13 +7,13 @@ import { getRequestsByProvider } from "src/redux/actions/service-request";
 import { AppDispatch, RootState } from "src/redux/store";
 
 import { RequestTabSection } from "./request-tab-section";
-import { metrics, MessagingNegotiationsTableData, MessagingNegotiationsTableHeader, availableProjectsTableHeaders, confirmedServicesTableData, confirmedServicesTableHeader, PaymentTrackingTableData, PaymentTrackingTableHeader } from "./utills";
+import { metrics, availableProjectsTableHeaders, confirmedServicesTableData, confirmedServicesTableHeader } from "./utills";
 
 export function TabWithTableView() {
     const [tabValue, setTabValue] = useState(0);
     const { requests } = useSelector((state: RootState) => state?.serviceRequest);
 
-    const tabLabels = ["Available Projects", "Confirmed Services", "Messaging", "Payments"];
+    const tabLabels = ["Available Projects", "Confirmed Services"];
     const dispatch = useDispatch<AppDispatch>()
     useEffect(() => {
         dispatch(getRequestsByProvider());
@@ -179,67 +179,6 @@ export function TabWithTableView() {
                         data={confirmedServicesTableData}
                         type="2"
                     />
-                )}
-                {tabValue === 2 && (
-                    <RequestTabSection
-                        title="Messaging & Negotiations"
-                        description="Integrated messaging system for communication with organizers."
-                        headers={MessagingNegotiationsTableHeader}
-                        data={MessagingNegotiationsTableData}
-                        type="3"
-                    />
-                )}
-                {tabValue === 3 && (
-                    <>
-                        <RequestTabSection
-                            title="Payments & Commissions Tracking"
-                            description="Displays received and pending payments."
-                            headers={PaymentTrackingTableHeader}
-                            data={PaymentTrackingTableData}
-                            type="4"
-                        />
-                        <Grid item xs={12} sm={12} md={12} mt={4}>
-                            <Card sx={{
-                                height: "50%",
-                                borderRadius: 2,
-                                padding: 1,
-                                backgroundColor: "#fff",
-                                color: "#333",
-                                textAlign: "left",
-                                boxShadow: "0px 4px 14px rgba(0, 0, 0, 0.25)", // custom shadow
-                            }}>
-                                <CardContent>
-                                    <Typography
-                                        variant="h6"
-                                        fontWeight={700}
-                                        color="#000"
-                                        gutterBottom
-                                    >
-                                        TICK-M Commission Breakdown
-                                    </Typography>
-                                    <Typography
-                                        variant="body1"
-                                        fontWeight={400}
-                                        color="#000"
-                                    >
-                                        10% commission is deducted upon project assignment, paid by the organizer.
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                        <Button variant="outlined" sx={{
-                            mt: 2,
-                            fontFamily: "Poppins",
-                            fontWeight: 500,
-                            fontSize: "16px",
-                            lineHeight: "100%",
-                            letterSpacing: "0%",
-                            color: "#000000",
-                            borderColor: "#000000",
-                            textTransform: "none",
-                            p: 2
-                        }}>Update My Payment Method</Button>
-                    </>
                 )}
             </Paper>
         </>

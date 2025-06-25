@@ -1,9 +1,6 @@
-import { action } from "src/theme/core";
-import { ServiceRequestAndNegotiationView } from "../service-request-&-negotiation/view";
-
 // Data for metric cards
 export const metrics = [
-    { title: "Wallet Balance", value: "$100.00", topUp: "+ $50 (Top-up)", tickCommission: "- $10 (TICK-M Commission)" },
+    { title: "Wallet Balance", value: "100.00 XAF", topUp: "+ 50 XAF (Top-up)", tickCommission: "- 10 XAF(TICK-M Commission)" },
 ];
 
 export const requestDetails = {
@@ -22,22 +19,10 @@ export const availableProjectsTableData = [
     { service: "DJ & Entertainment", organizer: "Jean M.", datePosted: "02/02/2025", budget: "200,000 - 300,000 XAF", actions: ["View Details", "Apply"] },
 ];
 
-export const confirmedServicesTableHeader = ["Service", "Location", "Date & Time", "Final Budget", "Actions"];
+export const confirmedServicesTableHeader = ["Service", "Location", "Date & Time",  "Actions"];
 export const confirmedServicesTableData = [
-    { service: "DJ Entertainment", location: "Douala", dateTime: "10/02/2025 - 8 PM", finalBudget: "250,000 XAF", actions: ["View Contract", "Contact Client", "Mark as Completed"] },
-    { service: "Wedding Catering", location: "Douala", dateTime: "10/02/2025 - 8 PM", finalBudget: "250,000 XAF", actions: ["View Contract", "Contact Client", "Mark as Completed"] },
-];
-
-export const MessagingNegotiationsTableHeader = ["Service", "Client", "Last Message", "Actions"];
-export const MessagingNegotiationsTableData = [
-    { service: "DJ Entertainment", client: "Jean M.", lastMessage: "Can you send a quote?", actions: ["View Conversation"] },
-    { service: "DJ Entertainment", client: "EventPro", lastMessage: "We’d like to finalize the agreement.", actions: ["View Conversation"] },
-];
-
-export const PaymentTrackingTableHeader = ["Service", "Location", "Amount Due", "Payment Method", "Status", "Actions"];
-export const PaymentTrackingTableData = [
-    { service: "DJ Entertainment", location: "Douala", amountDue: "225,000 XAF", method: "Mobile Money", status: "Pending", actions: ["View Transaction"] },
-    { service: "DJ Entertainment", location: "Douala", amountDue: "225,000 XAF", method: "Mobile Money", status: "Confirmed", actions: ["View Transaction"] },
+    { service: "DJ Entertainment", location: "Douala", dateTime: "10/02/2025 - 8 PM", finalBudget: "250,000 XAF", actions: [ "Contact Client", "Mark as Completed"] },
+    { service: "Wedding Catering", location: "Douala", dateTime: "10/02/2025 - 8 PM", finalBudget: "250,000 XAF", actions: [ "Contact Client", "Mark as Completed"] },
 ];
 
 export const tansation = [{

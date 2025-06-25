@@ -4,10 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { InputAdornment, Typography, IconButton, TextField, Button, Divider, Grid, Avatar, Box, Link } from '@mui/material';
 import { toast } from 'react-toastify';
 import LoadingButton from '@mui/lab/LoadingButton';
-
+import PhoneInput from 'react-phone-number-input'
 import { Iconify } from 'src/components/iconify';
 import { login, signup } from 'src/redux/actions';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import 'react-phone-number-input/style.css'
 
 // ----------------------------------------------------------------------
 
@@ -18,7 +19,10 @@ export function SignInView() {
   const [showSignup, setShowSignup] = useState(false);
   const [transition, setTransition] = useState(false);
   const [avatar, setAvatar] = useState(null); // Correct initialization
-
+  console.log('====================================');
+  console.log(avatar);
+  console.log('====================================');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const getWidth = (key) => (active === key ? "50%" : "10%");
   const auth = useSelector(state => state.auth);
   const [formData, setFormData] = useState({ email: 'organizer.William1@gmail.com', password: 'Manoj@123' });
@@ -27,9 +31,14 @@ export function SignInView() {
     email: "",
     password: "",
     gender: "Male",
-    number: "",
     role: "",
   });
+
+  const handlePhoneChange = (value) => {
+    const phoneValue = value; // or String(value)
+    setPhoneNumber(phoneValue);
+    setRegisterData((prevData) => ({ ...prevData, number: phoneValue }));
+  };
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -59,7 +68,7 @@ export function SignInView() {
     formSignData.append("name", formRegisterData.name);
     formSignData.append("email", formRegisterData.email);
     formSignData.append("password", formRegisterData.password);
-    formSignData.append("number", formRegisterData.number);
+    formSignData.append("number", phoneNumber);
     formSignData.append("role", formRegisterData.role);
     formSignData.append("gender", formRegisterData.gender);
 
@@ -78,7 +87,6 @@ export function SignInView() {
           name: '',
           email: '',
           password: '',
-          number: '',
           role: '',
           gender: 'Male'
         });
@@ -90,7 +98,7 @@ export function SignInView() {
     } catch (error) {
       toast.error("Registration failed");
     }
-  }, [formRegisterData, navigate, avatar, dispatch]);
+  }, [formRegisterData, navigate, avatar, dispatch, phoneNumber]);
 
   // const handleSignIn = useCallback(async (event) => {
   //   event.preventDefault(); // Prevent default form submission behavior
@@ -108,20 +116,20 @@ export function SignInView() {
     const result = await dispatch(login(formData));
 
     if (result.status === 200) {
-        toast.success(result?.message);
-        
-        // Check for pending purchase
-        const pendingPurchase = sessionStorage.getItem('pendingPurchase');
-        if (pendingPurchase) {
-            const purchaseData = JSON.parse(pendingPurchase);
-            navigate(purchaseData.redirectTo);
-        } else {
-            navigate("/");
-        }
+      toast.success(result?.message);
+
+      // Check for pending purchase
+      const pendingPurchase = sessionStorage.getItem('pendingPurchase');
+      if (pendingPurchase) {
+        const purchaseData = JSON.parse(pendingPurchase);
+        navigate(purchaseData.redirectTo);
+      } else {
+        navigate("/");
+      }
     } else {
-        toast.error(result?.message);
+      toast.error(result?.message);
     }
-}, [formData, dispatch,navigate]);
+  }, [formData, dispatch, navigate]);
 
   useEffect(() => {
     if (auth?.authenticate) {
@@ -226,7 +234,7 @@ export function SignInView() {
       />
 
       {/* Phone Number */}
-      <TextField
+      {/* <TextField
         fullWidth
         required
         name="number"
@@ -244,8 +252,49 @@ export function SignInView() {
             </InputAdornment>
           ),
         }}
-      />
-
+      /> */}
+      <Box sx={{
+        '& .PhoneInput': {
+          width: '100%',
+          '& input': {
+            width: '100%',
+            padding: '16.5px 14px',
+            border: '1px solid rgba(0, 0, 0, 0.23)',
+            borderRadius: '4px',
+            fontFamily: 'inherit',
+            fontSize: '1rem',
+            '&:hover': {
+              borderColor: 'black',
+            },
+            '&:focus': {
+              borderColor: 'black',
+              borderWidth: '2px',
+              outline: 'none',
+            },
+          },
+          '& .PhoneInputCountry': {
+            marginRight: '8px',
+          },
+          '& .PhoneInputCountrySelect': {
+            marginRight: '8px',
+          },
+        },
+        '& .PhoneInput--focus': {
+          '& input': {
+            borderColor: 'black',
+            borderWidth: '2px',
+          },
+        },
+      }}>
+        <PhoneInput
+          international
+          defaultCountry="US"
+          value={phoneNumber}
+          onChange={handlePhoneChange}
+          placeholder="Enter phone number"
+          sx
+        />
+      </Box>
       {/* Role Select */}
       <TextField
         fullWidth

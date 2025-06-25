@@ -101,33 +101,32 @@ export function Router() {
       ),
       children: [
         // Participant Route
-
         {
-          path: 'home-and-recommendations',
+          path: '/home-and-recommendations',
           element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><HomeAndRecommendationsPage /></RoleProtectedRoute>
         },
         {
-          path: 'event-search-and-details',
+          path: '/event-search-and-details',
           element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><EventSearchAndDetailsPage /></RoleProtectedRoute>
         },
         {
-          path: 'ticket-purchase-process',
+          path: '/ticket-purchase-process',
           element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><TicketPurchaseProcessPage /></RoleProtectedRoute>
         },
         {
-          path: 'ticket-management',
+          path: '/ticket-management',
           element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><TicketManagementViewPage /></RoleProtectedRoute>
         },
         {
-          path: 'ticket-validation-at-entry',
+          path: '/ticket-validation-at-entry',
           element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><TicketValidationAtEntryPage /></RoleProtectedRoute>
         },
         {
-          path: 'loyalty-program',
+          path: '/loyalty-program',
           element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><LoyaltyProgramPage /></RoleProtectedRoute>
         },
         {
-          path: 'custom-photo-or-video-filters-for-events',
+          path: '/custom-photo-or-video-filters-for-events',
           element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><CustomPhotoAndVideoFiltersforEventsPage /></RoleProtectedRoute>
         },
 
@@ -139,7 +138,7 @@ export function Router() {
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><HomePage /></RoleProtectedRoute>
         },
         {
-          path: 'statistics-&-reports',
+          path: '/statistics-&-reports',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><StatisticsAndReportsPage /></RoleProtectedRoute>
         },
         {
@@ -147,70 +146,63 @@ export function Router() {
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><EventDetailsPage /></RoleProtectedRoute>
         },
         {
-          path: 'ticket-and-reservation-management',
+          path: '/ticket-and-reservation-management',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><TicketAndReservationManagementPage /></RoleProtectedRoute>
         },
         {
-          path: 'marketing-engagenment',
+          path: '/marketing-engagenment',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><MarketingEngagenmentPage /></RoleProtectedRoute>
         },
         {
-          path: 'transection-and-payment',
+          path: '/transection-and-payment',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><TransectionAndPaymentPage /></RoleProtectedRoute>
         },
         {
-          path: 'entry-validation',
+          path: '/entry-validation',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><EntryValidationPage /></RoleProtectedRoute>
         },
         {
-          path: 'search-&-select-service-providers',
+          path: '/search-&-select-service-providers',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><SearchAndSelectServiceProvidersPage /></RoleProtectedRoute>
         },
         {
-          path: 'visibility-and-access-settings',
+          path: '/visibility-and-access-settings',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><VisibilityAndAccessSettingsPage /></RoleProtectedRoute>
         },
 
         // -----------------------**************-------------------------
-
-        
         {
           path: '/statistics-&-performance',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><StatisticsAndPerformancePage /> </RoleProtectedRoute>
         },
         {
-          path: 'tracking-of-booked-services-&-providers',
+          path: '/tracking-of-booked-services-&-providers',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><TrackingBookedServicesAndProvidersView /></RoleProtectedRoute>
         },
         
-
         {
-          path: 'home-and-global-view',
-          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><HomeAndGlobalPage /></RoleProtectedRoute>
-        },
-        {
-          path: 'profile-&-services-management',
+          path: '/profile-&-services-management',
           element: <RoleProtectedRoute allowedRoles={['provider', 'admin', 'organizer', 'participant']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
         },
         {
-          path: 'confirmed-service-calendar',
+          path: '/confirmed-service-calendar',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><ConfirmedServiceCalendarPage /></RoleProtectedRoute>
         },
         {
-          path: 'reservations-and-contracts',
+          path: '/reservations-and-contracts',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><ReservationsAndContractsPage /></RoleProtectedRoute>
         },
         {
-          path: 'transaction-&-payment-management',
+          path: '/transaction-&-payment-management',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><TransactionAndPaymentManagementPage /></RoleProtectedRoute>
         },
         {
-          path: 'messaging-&-client-relationship',
+          path: '/messaging-&-client-relationship',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><MessagingAndClientRelationshipPage /></RoleProtectedRoute>
         },
 
         {
-          path: 'service-request-&-negotiation',
+          path: '/service-request-&-negotiation',
           element: <RoleProtectedRoute allowedRoles={['organizer', 'provider']} currentRole={currentRole}><ServiceRequestAndNegotiationPage /></RoleProtectedRoute>
         },
         // -----------------------**************-------------------------
@@ -219,15 +211,15 @@ export function Router() {
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><MarketplaceAndServiceProviderSupervisionPage /></RoleProtectedRoute>
         },
         {
-          path: 'global-overview-&-general-statistics',
+          path: '/global-overview-&-general-statistics',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><GlobalOverviewAndGeneralStatisticsPage /></RoleProtectedRoute>
         },
         {
-          path: 'user-management',
+          path: '/user-management',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><UserManagementPage /></RoleProtectedRoute>
         },
         {
-          path: 'ticketing-&-transactions-supervision',
+          path: '/ticketing-&-transactions-supervision',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><TicketingAndTransactionsSupervisionPage /></RoleProtectedRoute>
         },
         

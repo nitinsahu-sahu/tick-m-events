@@ -1,14 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import {
-    Box,
-    Typography,
-    Button,
-    useMediaQuery,
-    Popover,
-    Stack
-} from "@mui/material";
+import { Box, Typography, Button, useMediaQuery, Popover, Stack } from "@mui/material";
 import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
@@ -90,7 +83,7 @@ export const CalenderView = () => {
                 bgcolor="#1F8FCD"
                 p={2}
             >
-                <HeadingCommon baseSize="26px" variant="h6" weight={600} title="Service Calendar View" color="white"/>
+                <HeadingCommon baseSize="26px" variant="h6" weight={600} title="Service Calendar View" color="white" />
 
                 <Box display="flex" alignItems="center" gap={2}>
                     <Button onClick={handlePrev} sx={{ borderRadius: 3, color: "black", backgroundColor: "white", p: "5px", minWidth: "38px" }}>

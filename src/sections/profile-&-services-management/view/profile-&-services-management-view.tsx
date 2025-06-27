@@ -1,6 +1,5 @@
 import { Box, Button, Grid, Typography, useMediaQuery, Stack } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
+
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -13,8 +12,8 @@ import { MainProfile } from '../main-profile';
 import { UpdateProfile } from '../update-profile';
 import { OfferAndService } from '../offer-and-service';
 import { ClientReview } from '../client-review';
-import { verifications } from '../utills';
 import { ProviderAvailability } from '../provider-availability';
+import { ProfileVerification } from '../verification';
 
 export function ProfileAndServicesManagementView() {
   const { user } = useSelector((state: RootState) => state?.auth);
@@ -143,71 +142,9 @@ export function ProfileAndServicesManagementView() {
           <ProviderAvailability />
         </>
       )}
-
-
-
-
       {/* Profile verification section */}
+      <ProfileVerification />
 
-      <Box
-        sx={{
-          borderRadius: '20px',
-          background: '#FFFFFF',
-          boxShadow: '0px 0px 14px 0px #00000040',
-          p: { xs: 2, md: 4 },
-          // maxWidth: 700,
-          // mx: "auto",
-          mt: 4,
-        }}
-      >
-        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, fontSize: isMobile ? 16 : 20 }}>
-          Profile Trust & Verification
-        </Typography>
-
-        <Typography sx={{ mb: 3, color: '#555', fontSize: isMobile ? 13 : 15 }}>
-          Boost your credibility by completing all verification steps.
-        </Typography>
-
-        <Stack spacing={1.5} mb={4}>
-          {verifications.map((item, index) => (
-            <Grid
-              container
-              alignItems="center"
-              spacing={1}
-              key={index}
-              sx={{ fontSize: isMobile ? 14 : 16 }}
-            >
-              <Grid item>
-                {item.status ? (
-                  <CheckCircleIcon sx={{ color: 'green', fontSize: 20 }} />
-                ) : (
-                  <CancelIcon sx={{ color: 'red', fontSize: 20 }} />
-                )}
-              </Grid>
-              <Grid item>
-                <Typography sx={{ fontSize: isMobile ? 14 : 16 }}>{item.label}</Typography>
-              </Grid>
-            </Grid>
-          ))}
-        </Stack>
-
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            borderRadius: '20px',
-            backgroundColor: '#0B2E4C',
-            textTransform: 'none',
-            fontSize: isMobile ? 14 : 16,
-            py: 1.2,
-            '&:hover': {
-              backgroundColor: '#0B2E4C',
-            },
-          }}
-        >
-          Complete My Verification
-        </Button>
-      </Box>
     </DashboardContent>
   );
 }

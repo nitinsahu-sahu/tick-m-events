@@ -50,24 +50,19 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
   const hiddenTicketManagement = ["/ticket-management"];
   const hiddenSearchSelect = ['/search-&-select-service-providers'];
   const hiddenProfileService = ['/profile-&-services-management'];
-  const hiddenMarketting = ['/marketplace-&-service-provider-supervision'];
   const hiddenTicketingAndTransection = ['/ticketing-&-transactions-supervision'];
   const hiddenUsrMange = ['/user-management'];
   const hiddenGlobalOverview = ['/global-overview-&-general-statistics'];
-  const hiddenTraackingBooked = ['/tracking-of-booked-services-&-providers'];
-  const hiddenServiceReq = ['/service-request-&-negotiation'];
   const hiddenStatisticsPerform = ['/statistics-&-performance'];
   const hiddenMessageClientRel = ['/messaging-&-client-relationship'];
   const hiddenTransectionPayment = ['/transaction-&-payment-management'];
   const hiddenServiceCal = ['/confirmed-service-calendar'];
   const hiddenReserContracts = ['/reservations-and-contracts'];
-  const hiddenHomeGlobal = ['/home-and-global-view'];
   const hiddenLoyaltyProgram = ['/loyalty-program'];
   const hiddenTicketPurchasePro = ['/ticket-purchase-process'];
   const hiddenEventSearchDetails = ['/event-search-and-details'];
   const hiddenEventDetails = ['/events/add-new'];
   const hiddenCustomPhotoVideo = ['/custom-photo-or-video-filters-for-events'];
-  const hiddenHomeRecommadation = ['/home-and-recommendations'];
   const hiddenTranPaymet = ['/transection-and-payment'];
   const hiddenVisibilityAccess = ['/visibility-and-access-settings'];
   const hiddenDashboard = ['/'];
@@ -111,7 +106,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   open={navOpen}
                   onClose={() => setNavOpen(false)}
                 />
-                 {
+                {
                   (
                     hiddenReserContracts.some(path => pathname.includes(path))) &&
                   !isMobileOrTablet && (
@@ -126,7 +121,10 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   )
                 }
                 {
-                  hiddenHomeGlobal.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Home & Global View" />
+                  role === 'provider' &&
+                  hiddenDashboard.some(path => pathname === path) &&
+                  !isMobileOrTablet &&
+                  <HeadingCommon weight={600} baseSize="30px" title="Home & Global View" />
                 }
                 {
                   hiddenTransectionPayment.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Transaction & Payment Management" />
@@ -138,19 +136,15 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   hiddenStatisticsPerform.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title={name} />
                 }
                 {
-                  hiddenServiceReq.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Service Request & Negotiation" />
-                }
-                {
                   hiddenGlobalOverview.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Global Overview & General Statistics" />
-                }
-                {
-                  hiddenTraackingBooked.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Tracking of Booked Services & Providers" />
                 }
                 {
                   hiddenUsrMange.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Admin Panel" />
                 }
                 {
-                  hiddenMarketting.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="TICK-M EVENTS" />
+                  role === 'admin' &&
+                  hiddenDashboard.some(path => pathname === path) &&
+                  !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="TICK-M EVENTS" />
                 }
                 {
                   hiddenTicketingAndTransection.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Ticketing & Transactions Supervision" />
@@ -175,7 +169,6 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   <>
                     {
                       !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
-                      !hiddenServiceReq.some(path => pathname.includes(path)) &&
                       !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
                       !hiddenPaths.some(path => pathname.includes(path)) &&
                       !hiddenLoyaltyProgram.some(path => pathname.includes(path)) &&
@@ -184,12 +177,13 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
 
                         <NotificationsPopover data={_notifications} />
                         {
-                          !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
                           !hiddenTicketManagement.some(path => pathname.includes(path)) &&
-                          !hiddenHomeGlobal.some(path => pathname.includes(path)) &&
+                          role !== 'provider' &&
+                          role !== 'participant' &&
                           !hiddenServiceCal.some(path => pathname.includes(path)) &&
                           !hiddenTransectionPayment.some(path => pathname.includes(path)) &&
-                          !hiddenMarketting.some(path => pathname.includes(path)) &&
+                          role !== 'admin' &&
+                          !hiddenDashboard.some(path => pathname.includes(path)) &&
                           !hiddenSearchSelect.some(path => pathname.includes(path)) &&
                           !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
                           !hiddenProfileService.some(path => pathname.includes(path)) &&
@@ -198,8 +192,8 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                           !hiddenMessageClientRel.some(path => pathname.includes(path)) &&
                           <>
                             {
+
                               !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
-                              !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
                               <>
                                 <MessagePopover data={_messages} />
                                 {
@@ -261,13 +255,13 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                     {
                       !hiddenDashboard.some(path => pathname.includes(path)) &&
                       !hiddenTranPaymet.some(path => pathname.includes(path)) &&
-                      !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
+                      role !== 'participant' &&
                       !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
                       !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
                       !hiddenTicketManagement.some(path => pathname.includes(path)) &&
                       !hiddenLoyaltyProgram.some(path => pathname.includes(path)) &&
                       !hiddenCustomPhotoVideo.some(path => pathname.includes(path)) &&
-                      !hiddenHomeGlobal.some(path => pathname.includes(path)) &&
+                      role !== 'provider' &&
                       !hiddenServiceCal.some(path => pathname.includes(path)) &&
                       !hiddenReserContracts.some(path => pathname.includes(path)) &&
                       !hiddenPaths.some(path => pathname.includes(path)) &&
@@ -276,12 +270,10 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                       !hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
                       !hiddenSearchSelect.some(path => pathname.includes(path)) &&
                       !hiddenProfileService.some(path => pathname.includes(path)) &&
-                      !hiddenMarketting.some(path => pathname.includes(path)) &&
+                      role !== 'admin' &&
+                      !hiddenDashboard.some(path => pathname.includes(path)) &&
                       !hiddenUsrMange.some(path => pathname.includes(path)) &&
                       !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
-                      !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
-                      !hiddenServiceReq.some(path => pathname.includes(path)) &&
-
                       !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
                       <>
                         <Button
@@ -405,22 +397,6 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                         }}
                       >
                         My Tickets
-                      </Button>
-                    )}
-                    {hiddenServiceReq.some(path => pathname.includes(path)) && (
-                      <Button
-                        variant="contained"
-                        size='small'
-                        sx={{
-                          backgroundColor: "#0C2340",
-                          color: "white",
-                          borderRadius: 1,
-                          p: 1,
-                          fontSize: 16,
-                          fontWeight: 500
-                        }}
-                      >
-                        Submission
                       </Button>
                     )}
                     {hiddenCustomPhotoVideo.some(path => pathname.includes(path)) && (

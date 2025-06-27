@@ -60,15 +60,13 @@ If not provide it should not included do not include empty space
 16.Reviews-> reply review btn not working, smthing should happen
   
 19.Complete my verification btn-> give checklist to verify options
--email otp for verification
--phone for sms otp(leave tht for now)remove and whatsapp otp add to verify
+
 -payment verified after identity (passport, any identity or imGE,pdf UPLOAD)and identified by admin
  
 20.Share profile-> give option to share evrywhere in social media options fb, whatsapp etc.
 ---------------------------------------------
 
 Today Done
-Enhanced Phone Number Field by adding a Country Dropdown Selector on signup form 
-Implemented Availability setting toggle functionality
-Developed provider manage availabliley according to requiremnt
+some changes on routes pannels
+Worked on the remove phone verification and add whatsapp verification
 

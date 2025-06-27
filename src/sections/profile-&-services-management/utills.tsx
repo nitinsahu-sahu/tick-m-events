@@ -78,10 +78,9 @@ export const socialMediaFields = [
 
 export const verifications = [
   { label: "Email Verified", status: true },
-  { label: "Phone Verified", status: false },
-  { label: "Payment Verified", status: true },
+  { label: "WhatsApp Verified", status: false },
   { label: "Identity Verified", status: false },
-  { label: "Facebook Verified", status: true },
+  { label: "Payment Verified", status: true },
 ];
 
 export const days = [

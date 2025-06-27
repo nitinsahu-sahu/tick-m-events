@@ -6,9 +6,9 @@ const instance = axios.create({
     // baseURL: 'http://localhost:8000/api/v1',
     withCredentials: true,
     headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
 });
 
 // Add request interceptor to handle token dynamically

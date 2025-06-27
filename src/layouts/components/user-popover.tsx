@@ -24,21 +24,16 @@ export function UserPopover() {
 
     const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program'];
     const hiddenProfileService = ['/profile-&-services-management'];
-    const hiddenMarketting = ['/marketplace-&-service-provider-supervision'];
     const hiddenTicketingAndTransection = ['/ticketing-&-transactions-supervision'];
     const hiddenUsrMange = ['/user-management'];
     const hiddenGlobalOverview = ['/global-overview-&-general-statistics'];
-    const hiddenTraackingBooked = ['/tracking-of-booked-services-&-providers'];
-    const hiddenServiceReq = ['/service-request-&-negotiation'];
     const hiddenStatisticsPerform = ['/statistics-&-performance'];
     const hiddenMessageClientRel = ['/messaging-&-client-relationship'];
     const hiddenTransectionPayment = ['/transaction-&-payment-management'];
     const hiddenServiceCal = ['/confirmed-service-calendar'];
     const hiddenReserContracts = ['/reservations-and-contracts'];
-    const hiddenHomeGlobal = ['/home-and-global-view'];
     const hiddenCustomPhotoVideo = ['/custom-photo-or-video-filters-for-events'];
     const hiddenEventSearchDetails = ['/event-search-and-details'];
-    const hiddenHomeRecommadation = ['/home-and-recommendations'];
     const hiddenTranPaymet = ['/transection-and-payment'];
     const hiddenDashboard = ['/'];
     const hiddenEventDetails = ['/events/add-new'];
@@ -132,26 +127,25 @@ export function UserPopover() {
                         !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
                         !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
                         !hiddenPaths.some(path => pathname.includes(path)) &&
-                        !hiddenServiceReq.some(path => pathname.includes(path)) &&
                         !hiddenCustomPhotoVideo.some(path => pathname.includes(path)) &&
                         <Box display="flex" gap={1} alignItems="center" justifyContent="center">
                             <NotificationsPopover data={_notifications} />
                             {
-                                !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
+                                role !== 'participant' &&
                                 !hiddenTicketManagement.some(path => pathname.includes(path)) &&
-                                !hiddenHomeGlobal.some(path => pathname.includes(path)) &&
+                                role !== 'provider' &&
+                                role !== 'admin' &&
+                                !hiddenDashboard.some(path => pathname.includes(path)) &&
                                 !hiddenServiceCal.some(path => pathname.includes(path)) &&
                                 !hiddenTransectionPayment.some(path => pathname.includes(path)) &&
                                 !hiddenUsrMange.some(path => pathname.includes(path)) &&
                                 !hiddenSearchSelect.some(path => pathname.includes(path)) &&
                                 !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
                                 !hiddenProfileService.some(path => pathname.includes(path)) &&
-                                !hiddenMarketting.some(path => pathname.includes(path)) &&
                                 !hiddenMessageClientRel.some(path => pathname.includes(path)) &&
                                 !hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
                                 <>
                                     {
-                                        !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
                                         !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
                                         <>
                                             <MessagePopover data={_messages} />
@@ -173,23 +167,23 @@ export function UserPopover() {
                     {
                         !hiddenDashboard.some(path => pathname.includes(path)) &&
                         !hiddenTranPaymet.some(path => pathname.includes(path)) &&
-                        !hiddenHomeRecommadation.some(path => pathname.includes(path)) &&
+                       role !== 'participant' &&
                         !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
                         !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
                         !hiddenTicketManagement.some(path => pathname.includes(path)) &&
-                        !hiddenPaths.some(path => pathname.includes(path)) && !hiddenSearchSelect.some(path => pathname.includes(path)) &&
+                        !hiddenPaths.some(path => pathname.includes(path)) && 
+                        !hiddenSearchSelect.some(path => pathname.includes(path)) &&
                         !hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
-                        !hiddenTraackingBooked.some(path => pathname.includes(path)) &&
                         !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
-                        !hiddenMarketting.some(path => pathname.includes(path)) &&
                         !hiddenUsrMange.some(path => pathname.includes(path)) &&
                         !hiddenTransectionPayment.some(path => pathname.includes(path)) &&
-                        !hiddenServiceReq.some(path => pathname.includes(path)) &&
                         !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
                         !hiddenMessageClientRel.some(path => pathname.includes(path)) &&
                         !hiddenProfileService.some(path => pathname.includes(path)) &&
                         !hiddenServiceCal.some(path => pathname.includes(path)) &&
-                        !hiddenHomeGlobal.some(path => pathname.includes(path)) &&
+                        role !== 'provider' &&
+                        role !== 'admin' &&
+                        
                         !hiddenCustomPhotoVideo.some(path => pathname.includes(path)) &&
                         !hiddenReserContracts.some(path => pathname.includes(path)) &&
                         <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
@@ -323,25 +317,6 @@ export function UserPopover() {
                                 }}
                             >
                                 My Tickets
-                            </Button>
-                        </Box>
-                    )}
-                    {hiddenServiceReq.some(path => pathname.includes(path)) && (
-                        <Box sx={{ px: 1, display: 'flex', justifyContent: 'center' }}>
-                            <Button
-                                variant="contained"
-                                size='small'
-                                sx={{
-                                    backgroundColor: "#0C2340",
-                                    color: "white",
-                                    borderRadius: 1,
-                                    p: 1,
-                                    fontSize: 14,
-                                    width: "100%",
-                                    fontWeight: 500
-                                }}
-                            >
-                                Submission
                             </Button>
                         </Box>
                     )}

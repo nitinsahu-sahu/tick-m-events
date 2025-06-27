@@ -17,7 +17,6 @@ export function RequestTabSection({
     return (
         <>
             <HeadingCommon variant="h5" weight={600} title={title} baseSize="26px"/>
-
             <ConfirmedServiceCalenderTable headers={headers} data={data} type={type} />
         </>
     );

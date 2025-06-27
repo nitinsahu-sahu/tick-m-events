@@ -1,53 +1,89 @@
-import { Box } from "@mui/material";
-import { useCallback, useState } from "react";
-
-import { useSelector } from "react-redux";
+import { Box, Button } from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import ProfileAndServiceTable from "src/components/tables/profile-and-service-table";
-import { RootState } from "src/redux/store";
+import { AppDispatch, RootState } from "src/redux/store";
+import { fetchServiceReqUserId } from "src/redux/actions";
 
-import { offterTableHeaders, offterTableData } from "./utills";
+import { offterTableHeaders } from "./utills";
 import { AddServices } from "./add-service";
 import { UpdateServices } from "./update-service";
 
 export function OfferAndService() {
     const { services } = useSelector((state: RootState) => state?.profile);
+    const dispatch = useDispatch<AppDispatch>();
 
     const [activeSection, setActiveSection] = useState<'add' | 'update'>('add');
     const [serviceOfferRowData, setServiceOfferRowData] = useState({
         _id: "",
-        serviceName: "",
-        location: "",
+        serviceType: "",
+        eventLocation: "",
         description: "",
-        budget: ""
+        budget: "",
+        additionalOptions: ""
     });
     const handleModify = useCallback((rowData: any) => {
         setServiceOfferRowData(prev => {
             // Only update if values actually changed
             if (prev._id === rowData._id &&
-                prev.serviceName === rowData.serviceName &&
-                prev.location === rowData.location &&
+                prev.serviceType === rowData.serviceType &&
+                prev.eventLocation === rowData.eventLocation &&
                 prev.description === rowData.description &&
-                prev.budget === rowData.budget) {
+                prev.budget === rowData.budget &&
+                prev.additionalOptions === rowData.additionalOptions
+            ) {
                 return prev;
             }
             return {
                 _id: rowData._id,
-                serviceName: rowData.serviceName,
+                serviceType: rowData.serviceType,
                 description: rowData.description,
-                location: rowData.location,
-                budget: rowData.budget
+                eventLocation: rowData.eventLocation,
+                budget: rowData.budget,
+                additionalOptions: rowData.additionalOptions
             };
         });
     }, []);
 
+    useEffect(() => {
+        dispatch(fetchServiceReqUserId())
+    }, [dispatch])
 
     return (
         <Box boxShadow={3} borderRadius={3} bgcolor="#FFFFFF" mt={3} p={3}>
             {/* Title */}
-            <HeadingCommon variant="h6" title="Offered Services" weight={600} />
-
+            <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                mb={2}
+            >
+                <HeadingCommon variant="h6" title="Offered Services" weight={600} />
+                <Button
+                    variant="outlined"
+                    size="small"
+                    disabled={activeSection === "add"}
+                    onClick={() => setActiveSection("add")}
+                    sx={{
+                        marginX: 0.5,
+                        color: "white",
+                        borderColor: "gray",
+                        backgroundColor: "#0B2E4C",
+                        '&:hover': {
+                            color: "black", // Text turns black on hover
+                            borderColor: "gray",
+                        },
+                        '&:disabled': {
+                            backgroundColor: "#f5f5f5",
+                            color: "#9e9e9e"
+                        }
+                    }}
+                >
+                    Add Service
+                </Button>
+            </Box>
             {/* Table */}
             <ProfileAndServiceTable
                 setActiveSection={setActiveSection}
@@ -68,10 +104,10 @@ export function OfferAndService() {
                 }}
             >
                 <HeadingCommon variant="h6" title={activeSection === 'add' ? 'Add a New Service' : 'Update a Service'} weight={600} />
-                {activeSection === 'add' ? 
-                <AddServices /> 
-                : 
-                <UpdateServices setServiceOfferRowData={setServiceOfferRowData} updateData={serviceOfferRowData}/>}
+                {activeSection === 'add' ?
+                    <AddServices />
+                    :
+                    <UpdateServices setServiceOfferRowData={setServiceOfferRowData} updateData={serviceOfferRowData} />}
             </Box>
         </Box>
     )

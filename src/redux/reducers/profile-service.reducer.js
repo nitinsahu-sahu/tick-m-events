@@ -1,4 +1,4 @@
-import { authConstants } from "../actions/constants";
+import { authConstants, serviceReqConstants } from "../actions/constants";
 
 const initialState = {
     profile: {},
@@ -11,6 +11,22 @@ const profileServiceReducer = (state, action) => {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
+        case serviceReqConstants.GET_SERVICE_USERID_REQUEST:
+            return { ...state };
+
+        case serviceReqConstants.GET_SERVICE_USERID_SUCCESS:
+            return {
+                ...state,
+                message: action.payload.message,
+                services: action.payload.serviceRequests
+            };
+
+        case serviceReqConstants.GET_SERVICE_USERID_FAILURE:
+            return {
+                ...state,
+                message: action.payload.message,
+            };
+
         case authConstants.GET_REQUEST:
             return { ...state };
 
@@ -19,7 +35,6 @@ const profileServiceReducer = (state, action) => {
                 ...state,
                 message: action.payload.message,
                 profile: action.payload.profile,
-                services: action.payload.services
             };
 
         case authConstants.GET_FAILURE:

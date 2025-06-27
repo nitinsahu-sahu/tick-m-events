@@ -27,15 +27,6 @@ messaging and client relationship menu
 -remove add a file button
  
 ---------------------------------------------------------------------------
- 
-Service request and negotiations menu
- 
- 
-5.Main menu remove servic request & negotiation form provider should be in organizer dashboard
- 
-6.Remove tracking of booked services provider from main menu
- 
---------------------------------------------------------------------
 profile menu
  
 8.Profile view -> give dropdown to slect the profile view by year month or week according to itwill show number of views
@@ -59,14 +50,12 @@ If not provide it should not included do not include empty space
  
 16.Reviews-> reply review btn not working, smthing should happen
   
-19.Complete my verification btn-> give checklist to verify options
-
--payment verified after identity (passport, any identity or imGE,pdf UPLOAD)and identified by admin
- 
 20.Share profile-> give option to share evrywhere in social media options fb, whatsapp etc.
 ---------------------------------------------
 
 Today Done
-some changes on routes pannels
-Worked on the remove phone verification and add whatsapp verification
+Create get service req api for show offerd servcie list
+
+Remaining Task
+Admin verified identity
 

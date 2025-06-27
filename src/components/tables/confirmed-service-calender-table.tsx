@@ -79,7 +79,7 @@ export function ConfirmedServiceCalenderTable({
                             {/* Conditionally rendered reminders column */}
                             {type === "2" && (
                                 <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                    <ReminderList reminders={row.reminders} theme={theme} />
+                                     {row.reminders}
                                 </TableCell>
                             )}
 
@@ -107,42 +107,47 @@ export function ConfirmedServiceCalenderTable({
 }
 
 // ReminderList.tsx
-const ReminderList = ({ reminders, theme }: { reminders: string[], theme: any }) => (
-    <Box display="flex" flexDirection="column" alignItems="flex-start">
-      {reminders.map((reminder, idx) => (
-        <Box key={idx} display="flex" alignItems="center">
-          <Checkbox
-            checked
-            sx={{
-              padding: '4px',
-              color: theme.palette.primary.main,
-              '&.Mui-checked': { color: theme.palette.primary.main },
-            }}
-          />
-          <Typography variant="body2">{reminder}</Typography>
+const ReminderList = ({ reminders, theme }: { reminders: string[] | undefined, theme: any }) => {
+    if (!Array.isArray(reminders)) return null;
+
+    return (
+          <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
+            {reminders.map((reminder, idx) => (
+                <Box key={idx} display="flex" alignItems="center">
+                    <Checkbox
+                        checked
+                        sx={{
+                            padding: '4px',
+                            color: theme.palette.primary.main,
+                            '&.Mui-checked': { color: theme.palette.primary.main },
+                        }}
+                    />
+                    <Typography variant="body2">{reminder}</Typography>
+                </Box>
+            ))}
         </Box>
-      ))}
-    </Box>
-  );
-  
-  // ActionButtons.tsx
-  const ActionButtons = ({ actions }: { actions: string[] }) => (
+    );
+};
+
+
+// ActionButtons.tsx
+const ActionButtons = ({ actions }: { actions: string[] }) => (
     <>
-      {actions?.map((action) => (
-        <Button
-          key={action}
-          variant="outlined"
-          size="small"
-          sx={{
-            marginX: 0.5,
-            color: action !== "View Contract" ? "black" : "white",
-            borderColor: "gray",
-            m: 0.2,
-            backgroundColor: action !== "View Contract" ? "white" : "#0B2E4C"
-          }}
-        >
-          {action}
-        </Button>
-      ))}
+        {actions?.map((action) => (
+            <Button
+                key={action}
+                variant="outlined"
+                size="small"
+                sx={{
+                    marginX: 0.5,
+                    color: action !== "View Contract" ? "black" : "white",
+                    borderColor: "gray",
+                    m: 0.2,
+                    backgroundColor: action !== "View Contract" ? "white" : "#0B2E4C"
+                }}
+            >
+                {action}
+            </Button>
+        ))}
     </>
-  );
+);

@@ -11,8 +11,9 @@ export const serviceReqCreate = (formServiceData) => async (dispatch) => {
         dispatch({
             type: serviceReqConstants.CREATE_SUCCESS,
             payload: { message: response?.data?.message },
-            
+
         });
+        dispatch(fetchServiceReqUserId())
         return {
             type: serviceReqConstants.CREATE_SUCCESS,
             status: response.status,
@@ -29,5 +30,25 @@ export const serviceReqCreate = (formServiceData) => async (dispatch) => {
             message: error?.response?.data?.message || "Server error",
             status: error.status
         };
+    }
+};
+
+export const fetchServiceReqUserId = () => async (dispatch) => {
+    dispatch({ type: serviceReqConstants.GET_SERVICE_USERID_REQUEST });
+
+    try {
+        const response = await axios.get(`/service-request/userId`);
+        dispatch({
+            type: serviceReqConstants.GET_SERVICE_USERID_SUCCESS,
+            payload: {
+                message: "Fetch service successfully...",
+                serviceRequests: response?.data?.serviceRequests,
+            },
+        });
+    } catch (error) {
+        dispatch({
+            type: serviceReqConstants.GET_SERVICE_USERID_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
     }
 };

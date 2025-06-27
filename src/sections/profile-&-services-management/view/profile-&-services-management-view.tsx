@@ -1,5 +1,3 @@
-import { Box, Button, Grid, Typography, useMediaQuery, Stack } from '@mui/material';
-
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -17,6 +15,7 @@ import { ProfileVerification } from '../verification';
 
 export function ProfileAndServicesManagementView() {
   const { user } = useSelector((state: RootState) => state?.auth);
+  const dispatch = useDispatch<AppDispatch>();
 
   const [showUpdateProfile, setShowUpdateProfile] = useState(false); // Toggle for edit mode
   const [showService, setShowService] = useState(false); // Toggle for edit mode
@@ -42,13 +41,10 @@ export function ProfileAndServicesManagementView() {
     serviceCategory: ''
   });
 
-  const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     dispatch(profileGet(user?._id));
   }, [dispatch, user?._id]);
 
-  // const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isMobile = useMediaQuery('(max-width:600px)');
   const handleServiece = () => {
     setShowService(!showService)
     setShowUpdateProfile(false);

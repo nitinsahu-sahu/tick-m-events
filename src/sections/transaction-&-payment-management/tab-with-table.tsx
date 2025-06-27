@@ -3,13 +3,13 @@ import { useState } from "react";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 
 import { MatrixThreeCard } from "src/components/matrix-three-cards/matrix-three-cards";
-import { metrics, paymentSettings, InvoicesAndReceiptsTableData, InvoicesAndReceiptsTableHeader, transactionsPaymentHistoryTableData, transactionsPaymentHistoryTableHeaders, tickCommissionsDeductionsTableData, tickCommissionsDeductionsTableHeader } from "./utills";
+import { metrics, paymentSettings, transactionsPaymentHistoryTableData, transactionsPaymentHistoryTableHeaders } from "./utills";
 import { RequestTabSection } from "./request-tab-section";
 
 export function TabWithTableView() {
     const [tabValue, setTabValue] = useState(0);
-    const tabLabels = ["Transactions", "Payment & Commisions", "Invoices & Receipts", "Payment Settings"];
-
+    // const tabLabels = ["Transactions", "Payment & Commisions", "Invoices & Receipts", "Payment Settings"];
+     const tabLabels = ["Transactions", "Payment Settings"];
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
     };
@@ -166,35 +166,7 @@ export function TabWithTableView() {
                         />
                     </>
                 )}
-
-                {tabValue === 1 && (
-                    <RequestTabSection
-                        title="TICK-M Commissions & Deductions"
-                        headers={tickCommissionsDeductionsTableHeader}
-                        data={tickCommissionsDeductionsTableData}
-                        type="2"
-                    />
-                )}
-                {tabValue === 2 && (
-                    <>
-                        <RequestTabSection
-                            title="Invoices & Receipts"
-                            headers={InvoicesAndReceiptsTableHeader}
-                            data={InvoicesAndReceiptsTableData}
-                            type="3"
-                        />
-                        <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 2, mt: 2 }}>
-                            <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white", "&:hover": { backgroundColor: "#002244" } }}>
-                                Generate an Invoice
-                            </Button>
-                            <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white", "&:hover": { backgroundColor: "#002244" } }}>
-                                Download All My Invoices
-                            </Button>
-                        </Box>
-                    </>
-
-                )}
-                {tabValue === 3 && (
+                 {tabValue === 1 && (
                     <>
                         <Typography variant="h6" fontWeight="bold" mb={1}>
                             Payment Settings
@@ -206,7 +178,7 @@ export function TabWithTableView() {
                         {[
                             "Mobile Money (MTN MoMo, Orange Money)",
                             "Bank Transfer",
-                            "Cash"
+                            "Visa or Master Card"
                         ].map((method) => (
                             <Typography key={method} variant="body2" sx={{ ml: 2 }}>
                                 • {method}
@@ -277,6 +249,35 @@ export function TabWithTableView() {
                     </>
 
                 )}
+
+                {/* {tabValue === 1 && (
+                    <RequestTabSection
+                        title="TICK-M Commissions & Deductions"
+                        headers={tickCommissionsDeductionsTableHeader}
+                        data={tickCommissionsDeductionsTableData}
+                        type="2"
+                    />
+                )}
+                {tabValue === 2 && (
+                    <>
+                        <RequestTabSection
+                            title="Invoices & Receipts"
+                            headers={InvoicesAndReceiptsTableHeader}
+                            data={InvoicesAndReceiptsTableData}
+                            type="3"
+                        />
+                        <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 2, mt: 2 }}>
+                            <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white", "&:hover": { backgroundColor: "#002244" } }}>
+                                Generate an Invoice
+                            </Button>
+                            <Button variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "white", "&:hover": { backgroundColor: "#002244" } }}>
+                                Download All My Invoices
+                            </Button>
+                        </Box>
+                    </>
+
+                )}
+                */}
             </Paper>
         </>
     )

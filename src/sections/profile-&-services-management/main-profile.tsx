@@ -27,9 +27,7 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
         onModify(rowData);  // Call the callback with row data
     };
 
-    useEffect(() => {
-        dispatch(profileGet(profile?._id));
-    }, [dispatch, profile?._id])
+    
     const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];

@@ -78,10 +78,9 @@ export const socialMediaFields = [
 
 export const verifications = [
   { label: "Email Verified", status: true },
-  { label: "Phone Verified", status: false },
-  { label: "Payment Verified", status: true },
+  { label: "WhatsApp Verified", status: false },
   { label: "Identity Verified", status: false },
-  { label: "Facebook Verified", status: true },
+  { label: "Payment Verified", status: true },
 ];
 
 export const days = [
@@ -106,10 +105,6 @@ export const SERVICE_TYPES = [
   { value: 'Hanging Lights & Lanterns', label: 'Hanging Lights & Lanterns' },
 ]
 export const offterTableHeaders = ["Service", "Indicative Price", "Location", "Actions"];
-export const offterTableData = [
-  { service: "DJ & Entertainment", indicativePrice: "20000 XAF", location: "America" },
-  { service: "DJ & Entertainment", indicativePrice: "20000 XAF", location: "America" },
-];
 
 type AddServiceForm = {
   serviceName: string;

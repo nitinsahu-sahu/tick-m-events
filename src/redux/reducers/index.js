@@ -10,8 +10,10 @@ import ticketTypeReducer from './ticket-reservation.reducer'
 import transactionPaymentReducer from './transactionPayment.reducer'
 import eventServiceReqReducer from './event-service-request.reducer'
 import { activityReducer } from "./activity.reducer";
+import reminderReducer from './reminder.reducer'
 
 const rootReducer = combineReducers({
+    reminder: reminderReducer,
     auth: authReducer,
     event: eventReducer,
     activities: activityReducer,

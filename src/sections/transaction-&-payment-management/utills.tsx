@@ -1,14 +1,20 @@
 // Data for metric cards
+const currentBalance = 2500;
+const commissionRate = 0.1;
+
 export const metrics = [
-    { title: "Current Balance", value: "2,500 XAF" },
-    { title: "Pending Payments", value: "500 XAF" },
-    { title: "Deducted Commissions", value: "200 XAF" },
+  { title: "Current Balance", value: `${currentBalance} XAF` },
+  { title: "Pending Payments", value: `500 XAF` }, // Keep as-is or calculate if needed
+  {
+    title: "Deducted Commissions",
+    value: `${currentBalance * commissionRate} XAF`
+  }
 ];
 
-export const transactionsPaymentHistoryTableHeaders = ["Date","Service","Location","Amount (XAF)","Payment Method","Status","Actions"];
+export const transactionsPaymentHistoryTableHeaders = ["Date","Service","Location","Total Amount (XAF)","Commision","Received Amount","Payment Method","Status","Actions"];
 export const transactionsPaymentHistoryTableData = [
-    { date: "10/02/2025", requestedService: "DJ Animation", location: "Douala",amount: "225,000",paymentMethod:"Mobile Money",status:"Received", actions: ["View Details","Download Receipt",] },
-    { date: "10/02/2025", requestedService: "Wedding Catering",location: "Yaoundé", amount: "540,000",paymentMethod:"Bank Transfer",status:"Pending", actions: ["View Details","Download Receipt"] },
+    { date: "10/02/2025", requestedService: "DJ Animation", location: "Douala",amount: "225,000",commision: "10%",receivedAmount:"2500",paymentMethod:"Mobile Money",status:"Received", actions: ["View Details","Download Receipt",] },
+    { date: "10/02/2025", requestedService: "Wedding Catering",location: "Yaoundé", amount: "540,000",commision: "10%",receivedAmount:"2500",paymentMethod:"Bank Transfer",status:"Pending", actions: ["View Details","Download Receipt"] },
 ];
 
 export const tickCommissionsDeductionsTableHeader = ["Date","Service","Total Amount (XAF)","Commission (10%)","Final Amount Received","Actions"];
@@ -41,7 +47,8 @@ export const paymentSettings = {
     configurableMethods: [
       "Mobile Money (MTN MoMo, Orange Money)",
       "Bank Transfer",
-      "Cash"
+      // "Cash"
+      "Visa or master card"
     ],
     formTitle: "Friends Who Booked",
     bankingFields: [

@@ -1,10 +1,9 @@
-import { Box, Button, TextField, Typography, MenuItem, Select, FormControl, Stack, Grid } from "@mui/material";
+import { Box, Button, TextField, Typography, MenuItem, Select, FormControl, Grid } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { personalUserServiceReqCreate } from "src/redux/actions/user-personal-service-req.action";
 import { fetchAllCategories } from "src/redux/actions/event.action";
 import { serviceReqCreate } from "src/redux/actions";
 import { AppDispatch, RootState } from "src/redux/store";
@@ -23,7 +22,7 @@ export function AddServices() {
     const dispatch = useDispatch<AppDispatch>();
     const [eventBanner, setEventBanner] = useState<File | null>(null);
     const [formData, setFormData] = useState(FORM_INITIAL_STATE);
-    
+
     const { categories } = useSelector((state: RootState) => state?.event);
     useEffect(() => {
         dispatch(fetchAllCategories());

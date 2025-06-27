@@ -10,6 +10,7 @@ import {
     Button,
 } from "@mui/material";
 import { memo, useState } from "react";
+import { HeadingCommon } from "../multiple-responsive-heading/heading";
 
 const ProfileAndServiceTable = ({
     headers,
@@ -63,15 +64,13 @@ const ProfileAndServiceTable = ({
                     {!data || data.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={headers.length} align="center" sx={{ py: 4 }}>
-                                <Typography variant="body1" color="textSecondary">
-                                    No active promotions available
-                                </Typography>
+                                <HeadingCommon weight={400} baseSize="15px" title="No Active services available" variant="body1" color="textSecondary" />
                             </TableCell>
                         </TableRow>
                     ) : (
                         data.map((row, index) => (
                             <TableRow
-                                key={index}
+                                key={row._id}
                                 sx={{
                                     backgroundColor: "#EEEEEE",
                                     position: "relative",
@@ -88,46 +87,30 @@ const ProfileAndServiceTable = ({
                                     },
                                 }}
                             >
-                                <TableCell align="center" sx={{ fontWeight: "bold", textTransform: "capitalize" }}>
-                                    {row.serviceName}
+                                <TableCell align="center" sx={{ fontWeight: "bold", textTransform: "capitalize", width: "35%" }}>
+                                    {row.serviceType}
                                 </TableCell>
-                                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                                <TableCell align="center" sx={{ textTransform: "capitalize" }}>
                                     {row.budget}
                                 </TableCell>
-                                <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                                    {row.location}
+                                <TableCell align="center" sx={{ textTransform: "capitalize" }}>
+                                    {row.eventLocation}
                                 </TableCell>
                                 {/* Table cells remain the same */}
                                 <TableCell align="center">
-                                    {editingRowId === row._id ? (
-                                        <Button
-                                            variant="outlined"
-                                            size="small"
-                                            sx={{
-                                                marginX: 0.5,
-                                                color: "white",
-                                                borderColor: "gray",
-                                                backgroundColor: "#0B2E4C"
-                                            }}
-                                            onClick={handleAddClick}
-                                        >
-                                            Add
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            variant="outlined"
-                                            size="small"
-                                            sx={{
-                                                marginX: 0.5,
-                                                color: "white",
-                                                borderColor: "gray",
-                                                backgroundColor: "#0B2E4C"
-                                            }}
-                                            onClick={() => handleModifyClick(row)}
-                                        >
-                                            Edit
-                                        </Button>
-                                    )}
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        sx={{
+                                            marginX: 0.5,
+                                            color: "white",
+                                            borderColor: "gray",
+                                            backgroundColor: "#0B2E4C"
+                                        }}
+                                        onClick={() => handleModifyClick(row)}
+                                    >
+                                        Edit
+                                    </Button>
                                     <Button
                                         variant="outlined"
                                         size="small"

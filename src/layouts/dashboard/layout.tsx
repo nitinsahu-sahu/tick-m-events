@@ -129,6 +129,8 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 {
                   hiddenTransectionPayment.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Transaction & Payment Management" />
                 }
+
+                
                 {
                   hiddenMessageClientRel.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Messaging & Client Relationship" />
                 }

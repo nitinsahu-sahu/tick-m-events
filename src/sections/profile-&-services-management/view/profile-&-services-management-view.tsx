@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { profileGet } from 'src/redux/actions';
 import { AppDispatch, RootState } from 'src/redux/store';
-import { PageTitleSection } from 'src/components/page-title-section';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
 import { MainProfile } from '../main-profile';
 import { UpdateProfile } from '../update-profile';
@@ -112,8 +112,7 @@ export function ProfileAndServicesManagementView() {
 
   return (
     <DashboardContent>
-      <PageTitleSection title="Profile & Service Manangement" />
-
+      <HeadingCommon weight={600} baseSize="30px" title="Profile & Service Manangement" />
       <MainProfile onModify={handleModify} handleAvalibility={handleAvalibility} setShowService={handleServiece} />
       {/* DJ light setion */}
 

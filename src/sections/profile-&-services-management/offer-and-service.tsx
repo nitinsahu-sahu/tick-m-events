@@ -15,7 +15,7 @@ export function OfferAndService() {
     const { services } = useSelector((state: RootState) => state?.profile);
     const dispatch = useDispatch<AppDispatch>();
 
-    const [activeSection, setActiveSection] = useState<'add' | 'update'>('add');
+    const [activeSection, setActiveSection] = useState<'add' | 'update' | null>(null);
     const [serviceOfferRowData, setServiceOfferRowData] = useState({
         _id: "",
         serviceType: "",
@@ -24,9 +24,9 @@ export function OfferAndService() {
         budget: "",
         additionalOptions: ""
     });
+
     const handleModify = useCallback((rowData: any) => {
         setServiceOfferRowData(prev => {
-            // Only update if values actually changed
             if (prev._id === rowData._id &&
                 prev.serviceType === rowData.serviceType &&
                 prev.eventLocation === rowData.eventLocation &&
@@ -44,6 +44,20 @@ export function OfferAndService() {
                 budget: rowData.budget,
                 additionalOptions: rowData.additionalOptions
             };
+        });
+        setActiveSection('update');
+    }, []);
+
+    const handleAddServiceClick = useCallback(() => {
+        setActiveSection('add');
+        // Reset form data when switching to add mode
+        setServiceOfferRowData({
+            _id: "",
+            serviceType: "",
+            eventLocation: "",
+            description: "",
+            budget: "",
+            additionalOptions: ""
         });
     }, []);
 
@@ -65,14 +79,14 @@ export function OfferAndService() {
                     variant="outlined"
                     size="small"
                     disabled={activeSection === "add"}
-                    onClick={() => setActiveSection("add")}
+                    onClick={handleAddServiceClick}
                     sx={{
                         marginX: 0.5,
                         color: "white",
                         borderColor: "gray",
                         backgroundColor: "#0B2E4C",
                         '&:hover': {
-                            color: "black", // Text turns black on hover
+                            color: "black",
                             borderColor: "gray",
                         },
                         '&:disabled': {
@@ -93,22 +107,32 @@ export function OfferAndService() {
                 onModify={handleModify}
             />
 
-            {/* Add New Service Section */}
-            <Box
-                mt={4}
-                sx={{
-                    borderRadius: "20px",
-                    border: "1px solid #00000066",
-                    background: "#FFFFFF",
-                    p: 3,
-                }}
-            >
-                <HeadingCommon variant="h6" title={activeSection === 'add' ? 'Add a New Service' : 'Update a Service'} weight={600} />
-                {activeSection === 'add' ?
-                    <AddServices />
-                    :
-                    <UpdateServices setServiceOfferRowData={setServiceOfferRowData} updateData={serviceOfferRowData} />}
-            </Box>
+            {/* Form Section - Only appears when activeSection is set */}
+            {activeSection && (
+                <Box
+                    mt={4}
+                    sx={{
+                        borderRadius: "20px",
+                        border: "1px solid #00000066",
+                        background: "#FFFFFF",
+                        p: 3,
+                    }}
+                >
+                    <HeadingCommon 
+                        variant="h6" 
+                        title={activeSection === 'add' ? 'Add a New Service' : 'Update a Service'} 
+                        weight={600} 
+                    />
+                    {activeSection === 'add' ? (
+                        <AddServices setActiveSection={setActiveSection}/>
+                    ) : (
+                        <UpdateServices 
+                            setServiceOfferRowData={setServiceOfferRowData} 
+                            updateData={serviceOfferRowData} 
+                        />
+                    )}
+                </Box>
+            )}
         </Box>
     )
 }

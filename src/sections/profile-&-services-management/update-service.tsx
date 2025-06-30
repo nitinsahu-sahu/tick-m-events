@@ -1,11 +1,11 @@
-import { Button, Grid, TextField, Box } from "@mui/material";
+import { Button, Grid, TextField } from "@mui/material";
 import { useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { userServiceUpdate } from "src/redux/actions";
-import { AppDispatch, RootState } from "src/redux/store";
+import { serviceReqUpdate } from "src/redux/actions";
+import { AppDispatch } from "src/redux/store";
 
 interface ApiResult {
     status: number;
@@ -18,34 +18,24 @@ export function UpdateServices({ updateData, setServiceOfferRowData }: any) {
     const fullDesRef = useRef<ReactQuill>(null);
     const addOptionRef = useRef<ReactQuill>(null);
 
-    const { _id } = useSelector((state: RootState) => state?.auth?.user);
-
     const dispatch = useDispatch<AppDispatch>();
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setServiceOfferRowData((prev: any) => ({ ...prev, [name]: value }));
     };
-
     const handleServiceUpdate = useCallback(async (event: any) => {
         event.preventDefault();
         const serviceUpdateData = new FormData();
-        serviceUpdateData.append("serviceType", updateData.serviceName);
+        serviceUpdateData.append("serviceType", updateData.serviceType);
         serviceUpdateData.append("budget", updateData.budget);
-        serviceUpdateData.append("description", updateData.description);
-        serviceUpdateData.append("location", updateData.location)
+        serviceUpdateData.append("eventLocation", updateData.eventLocation)
         serviceUpdateData.append("description", fullDesRef.current?.value as string);
         serviceUpdateData.append("additionalOptions", addOptionRef.current?.value as string);
         try {
-            const result = await dispatch(userServiceUpdate({ serviceUpdateData, userId: _id, serviceId: updateData?._id }));
+            const result = await dispatch(serviceReqUpdate({ serviceUpdateData, serviceId: updateData?._id }));
             if ((result as ApiResult)?.status === 200) {
                 toast.success(result?.message);
-                setServiceOfferRowData({
-                    _id: "",
-                    serviceName: "",
-                    location: "",
-                    description: "",
-                    budget: ""
-                })
+        
             } else {
                 toast.error(result?.message);
             }
@@ -53,14 +43,14 @@ export function UpdateServices({ updateData, setServiceOfferRowData }: any) {
         } catch (error) {
             toast.error("Profile update failed");
         }
-    }, [dispatch, updateData, _id, setServiceOfferRowData])
+    }, [dispatch, updateData])
 
     return (
         <form onSubmit={handleServiceUpdate}>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
                     <TextField
-                        name="serviceName"
+                        name="serviceType"
                         value={updateData.serviceType}
                         onChange={handleChange}
                         fullWidth
@@ -81,34 +71,13 @@ export function UpdateServices({ updateData, setServiceOfferRowData }: any) {
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField
-                        fullWidth
-                        multiline
-                        name="description"
-                        value={updateData.description}
-                        onChange={handleChange}
-                        minRows={3}
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: 'black', // Default border color
-                                },
-                                '&:hover fieldset': {
-                                    borderColor: 'black', // Border color on hover
-                                },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: 'black', // Border color when focused
-                                },
-                            },
-                        }}
-                    />
-                </Grid>
-                <Grid item xs={12} >
                     <ReactQuill
                         placeholder="Description..."
                         theme="snow"
                         className="custom-quill"
                         ref={fullDesRef}
+                        value={updateData.description || ''}
+                        onChange={(value) => setServiceOfferRowData((prev: any) => ({ ...prev, description: value }))}
                     />
                 </Grid>
                 <Grid item xs={12}>
@@ -135,7 +104,7 @@ export function UpdateServices({ updateData, setServiceOfferRowData }: any) {
                 </Grid>
                 <Grid item xs={12}>
                     <TextField fullWidth
-                        name="location"
+                        name="eventLocation"
                         value={updateData.eventLocation}
                         onChange={handleChange}
                         sx={{
@@ -155,34 +124,13 @@ export function UpdateServices({ updateData, setServiceOfferRowData }: any) {
 
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField
-                        fullWidth
-                        multiline
-                        name="additionalOptions"
-                        value={updateData.additionalOptions}
-                        onChange={handleChange}
-                        minRows={3}
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: 'black', // Default border color
-                                },
-                                '&:hover fieldset': {
-                                    borderColor: 'black', // Border color on hover
-                                },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: 'black', // Border color when focused
-                                },
-                            },
-                        }}
-                    />
-                </Grid>
-                <Grid item xs={12} >
                     <ReactQuill
                         placeholder="Additional Options..."
                         theme="snow"
                         className="custom-quill"
                         ref={addOptionRef}
+                        value={updateData.additionalOptions || ''}
+                        onChange={(value) => setServiceOfferRowData((prev: any) => ({ ...prev, additionalOptions: value }))}
                     />
                 </Grid>
                 <Grid item xs={12}>
@@ -201,7 +149,7 @@ export function UpdateServices({ updateData, setServiceOfferRowData }: any) {
                             },
                         }}
                     >
-                        Edit a Service
+                        Update a Service
                     </Button>
                 </Grid>
             </Grid>

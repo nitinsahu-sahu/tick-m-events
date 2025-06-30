@@ -1,14 +1,13 @@
-import { Box, Button, TextField, Typography, MenuItem, Select, FormControl, Grid } from "@mui/material";
+import { Box, Button, TextField, Typography, MenuItem, Select, FormControl, Grid, ListSubheader } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { fetchAllCategories } from "src/redux/actions/event.action";
-import { serviceReqCreate } from "src/redux/actions";
+import { fetchAllServiceCategories, serviceReqCreate } from "src/redux/actions";
 import { AppDispatch, RootState } from "src/redux/store";
 
-import { FORM_INITIAL_STATE, inputStyles, SERVICE_TYPES } from "./utills";
+import { FORM_INITIAL_STATE, inputStyles } from "./utills";
 
 
 interface ApiResult {
@@ -18,14 +17,17 @@ interface ApiResult {
     // Add other properties if needed
 }
 
-export function AddServices() {
+export function AddServices({ setActiveSection }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const [eventBanner, setEventBanner] = useState<File | null>(null);
     const [formData, setFormData] = useState(FORM_INITIAL_STATE);
 
-    const { categories } = useSelector((state: RootState) => state?.event);
+    const { categories } = useSelector((state: RootState) => state?.serviceReqCategories);
+    console.log('==========ss==============cat============');
+    console.log(categories);
+    console.log('====================================');
     useEffect(() => {
-        dispatch(fetchAllCategories());
+        dispatch(fetchAllServiceCategories());
     }, [dispatch]);
     const fullDesRef = useRef<ReactQuill>(null);
     const addOptionRef = useRef<ReactQuill>(null);
@@ -73,6 +75,7 @@ export function AddServices() {
 
             if (result?.status === 201) {
                 toast.success("Requested Successfully...");
+                setActiveSection(null)
                 resetForm();
             } else {
                 toast.error(result?.message || "Service creation failed");
@@ -80,37 +83,72 @@ export function AddServices() {
         } catch (error) {
             toast.error("An unexpected error occurred");
         }
-    }, [dispatch, formData, eventBanner]);
+    }, [dispatch, formData, eventBanner,setActiveSection]);
+    
     // Form sections
     const renderServiceTypeField = () => (
         <Box mt={2}>
-            <Typography fontWeight={600} color="text.primary" mb={1}>
-                Type of Service Needed
-            </Typography>
-            <FormControl fullWidth sx={inputStyles}>
-                <Select
-                    required
-                    value={formData.serviceType}
-                    onChange={handleSelectChange}
-                    displayEmpty
-                >
-                    <MenuItem value="">Select Services</MenuItem>
-                    {SERVICE_TYPES.map((service) => (
-                        <MenuItem key={service.value} value={service.value}>
-                            {service.label}
+                <Typography fontWeight={600} color="text.primary" mb={1}>
+                    Type of Service Needed
+                </Typography>
+                <FormControl fullWidth sx={inputStyles}>
+                    <Select
+                        required
+                        value={formData.serviceType}
+                        onChange={handleSelectChange}
+                        displayEmpty
+                        MenuProps={{
+                            PaperProps: {
+                                style: {
+                                    maxHeight: 400,
+                                },
+                            },
+                        }}
+                    >
+                        <MenuItem value="" disabled>
+                            Select a Service
                         </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-        </Box>
-    );
+                        {categories?.map((category: any) => (
+                            [
+                                // Parent category as header (not selectable)
+                                <ListSubheader
+                                    key={`header-${category._id}`}
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        backgroundColor: '#f5f5f5',
+                                        pointerEvents: 'none' // Makes it non-interactive
+                                    }}
+                                >
+                                    {category.name}
+                                </ListSubheader>,
+                                // Child categories as selectable items
+                                ...category.subcategories.map((subcategory: any) => (
+                                    <MenuItem
+                                        key={subcategory._id}
+                                        value={subcategory.name}
+                                        sx={{
+                                            pl: 4, // Indent child items
+                                            ml: 2, // Additional margin
+                                            borderLeft: '2px solid #ddd' // Visual indicator
+                                        }}
+                                    >
+                                        {subcategory.name}
+                                    </MenuItem>
+                                ))
+                            ]
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
+    )
 
-    const renderTextField = (label: string, name: string, type = 'text') => (
+    const renderTextField = (label: string, name: string,placeholder:string, type = 'text') => (
         <Box mt={2}>
             <Typography fontWeight={600} color="text.primary" mb={1}>
                 {label}
             </Typography>
             <TextField
+                placeholder={placeholder}
                 required={name !== 'coverImage'}
                 name={name}
                 type={type}
@@ -188,8 +226,8 @@ export function AddServices() {
     return (
         <form encType="multipart/form-data">
             {renderServiceTypeField()}
-            {renderTextField('Event Location', 'location')}
-            {renderTextField('Estimated Budget', 'budget')}
+            {renderTextField('Event Location', 'location', 'eg.. London')}
+            {renderTextField('Estimated Budget', 'budget', "eg.. 100 XAF - 200 XAF")}
             {renderRichTextEditor('Full Description of Requirements', fullDesRef)}
 
             <Grid item xs={12} mt={2}>

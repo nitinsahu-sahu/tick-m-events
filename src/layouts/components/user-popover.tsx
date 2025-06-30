@@ -21,7 +21,6 @@ export function UserPopover() {
     const navigate = useNavigate();
     const hiddenTicketManagement = ["/ticket-management"];
     const hiddenTicketPurchasePro = ['/ticket-purchase-process'];
-
     const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program'];
     const hiddenProfileService = ['/profile-&-services-management'];
     const hiddenTicketingAndTransection = ['/ticketing-&-transactions-supervision'];

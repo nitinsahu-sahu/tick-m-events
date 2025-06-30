@@ -23,7 +23,7 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
     const navigate = useNavigate();
     const quillRef = useRef<ReactQuill>(null);
     const dispatch = useDispatch<AppDispatch>();
-    // ye dala hai
+    const today = new Date().toISOString().split('T')[0];
     const { categories } = useSelector((state: RootState) => state.event);
     
     useEffect(() => {
@@ -141,6 +141,7 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
                                     type="date"
                                     label="Select Date"
                                     InputLabelProps={{ shrink: true }}
+                                    inputProps={{ min: today }}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={3}>

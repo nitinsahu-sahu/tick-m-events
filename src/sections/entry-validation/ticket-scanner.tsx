@@ -9,10 +9,6 @@ import { verifyTicketCode, confirmTicketEntry } from "src/redux/actions/eventOrd
 import { AppDispatch } from "src/redux/store";
 import { formatTimeToAMPM } from "src/hooks/formate-time";
 
-interface QRScanResult {
-    text: string;
-    // Add other properties if the QR scanner returns more data
-}
 interface Ticket {
     _id: string;
     eventId: string;
@@ -44,33 +40,30 @@ export function TicketScanner() {
     }>({ status: '', message: '' });
     const [isScanning, setIsScanning] = useState(false);
     const [scanMessage, setScanMessage] = useState<string | null>(null);
+    const [hasScanned, setHasScanned] = useState(false);
 
+    const handleScan = (data: any) => {
+        if (data && !hasScanned) {
+            let scannedText = "";
 
-    const handleScan = (data: string | null) => {
-        if (data) {
-            // Parse the string into your custom interface
-            const scanResult: QRScanResult = {
-                text: data,
-                // other properties if needed
-            };
+            // Handle both string or object form of data
+            if (typeof data === "string") {
+                scannedText = data;
+            } else if (typeof data === "object" && data?.text) {
+                scannedText = data.text;
+            } else {
+                console.error("Unexpected scan data:", data);
+                return;
+            }
 
-            setResult(scanResult.text);
+            setResult(scannedText);
+            setScanMessage("✅ QR Code scanned successfully!");
+            setHasScanned(true);
             setShowScanner(false);
             setIsScanning(false);
-            setScanMessage("✅ QR Code scanned successfully!");
             setTimeout(() => setScanMessage(null), 3000);
         }
     };
-    // pulkit
-    // const handleScan = (data: QRScanResult | null) => {
-    //     if (data) {
-    //         setResult(data.text);
-    //         setShowScanner(false);
-    //         setIsScanning(false);
-    //         setScanMessage("✅ QR Code scanned successfully!");
-    //         setTimeout(() => setScanMessage(null), 3000); // auto-clear message
-    //     }
-    // };
 
     const handleError = (err: Error) => {
         setIsScanning(false);
@@ -96,18 +89,20 @@ export function TicketScanner() {
             console.log("Action Result:", res);
 
             if (res.type === "VERIFY_TICKET_SUCCESS") {
-                // Use flag to determine ticket state
+                // Check ticket status
                 if (res.flag === "granted") {
                     setFlag({ status: "granted", message: res.message, ticket: res.ticket });
                 } else if (res.flag === "already") {
                     setFlag({ status: "already", message: "Ticket already used.", ticket: res.ticket });
+                } else if (res.flag === "expired") {
+                    setFlag({ status: "expired", message: "Ticket has expired.", ticket: res.ticket });
                 } else {
                     setFlag({ status: "invalid", message: "Invalid or expired ticket.", ticket: null });
                 }
             } else {
-                // Failure case
                 setFlag({ status: res.flag || "invalid", message: res.message, ticket: null });
             }
+
         } catch (error) {
             setFlag({ status: "error", message: "Verification failed. Try again." });
         }
@@ -148,16 +143,10 @@ export function TicketScanner() {
         }
     };
 
-    const previewStyle: React.CSSProperties = {
-        height: 240,
-        width: 320,
-    };
-
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
             <HeadingCommon title="Ticket Scanner" color="#0B2E4C" weight={600} baseSize="33px" />
-
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
                 <Button
                     variant="contained"
@@ -204,11 +193,7 @@ export function TicketScanner() {
 
                 </Button>
             </Box>
-
-
             <Box display="flex" mt={2} gap={1}>
-
-
                 <Button
                     variant="contained"
                     sx={{
@@ -375,10 +360,6 @@ export function TicketScanner() {
                     </Grid>
                 </Grid>
             )}
-
-
-
-
         </Box>
     )
 }

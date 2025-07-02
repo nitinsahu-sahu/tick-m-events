@@ -4,11 +4,8 @@
 confirmed service:- show confirmed projects or services
 -contract client:- take service provider take to messaging btwn oragnizer and provider
 -mark as completed:- request will be sent to organizer to confirm it is completed or not
-7.Notification button k pas messgaing icon to directly go on messages that will be open global(like freelancer message system)[Pulkit ko diya hai]
-8.Notification icon should show notifications[Pulkit ko diya hai]
 9.Message icon should show DMs[Pulkit ko diya hai]
 10.One reservation and contract menu:- active contract card should show confirmed projects number that service provider working on[Pulkit ko diya hai]
-
 -----------
 video 3rd |
 -----------
@@ -20,7 +17,6 @@ messaging and client relationship menu
 3.Active conversations & conversation-> table should remove instead message between provider and organizer have to show 
 like messaging system
 4.Shared files tab->in table files shared with organizer 
- 
 ---------------------------------------------------------------------------
 Profile & Service Page
 8.Profile view -> give dropdown to slect the profile view by year month or week according to itwill show number of views
@@ -32,6 +28,8 @@ contacted for project
 Daily Work Report
 Date: 30 June 2025
 Completed Tasks:
+7.Notification button k pas messgaing icon to directly go on messages that will be open global(like freelancer message system)[Pulkit ko diya hai]
+8.Notification icon should show notifications[Pulkit ko diya hai]
 ✅ Worked on the Important messages, conversation history and add a file button 
 ✅ Completed delete and update a Offer services 
 ✅ Developed Service Category APIs: Add / Update / Get / Delete

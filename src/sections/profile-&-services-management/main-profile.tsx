@@ -7,24 +7,25 @@ import { useDispatch, useSelector } from "react-redux";
 import EditIcon from '@mui/icons-material/Edit';
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
-import {
-    WhatsApp,
-    Facebook,
-    Twitter,
-    LinkedIn,
-    Instagram,
-    Link as LinkIcon,
-    ExpandMore, ExpandLess
-} from '@mui/icons-material';
+import { WhatsApp, Facebook, Twitter, LinkedIn, Instagram, Link as LinkIcon, ExpandMore, ExpandLess } from '@mui/icons-material';
+import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
+import flags from 'react-phone-number-input/flags';
+
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { AppDispatch, RootState } from "src/redux/store";
 import { profileGet, updateProAvatar, updateProCover } from "src/redux/actions";
 import { TikTokIcon } from "./utills";
+import 'react-phone-number-input/style.css'
 
 interface ApiResult {
     status: number;
     type: string;
     message: any;
+}
+
+interface PhoneNumberDisplayProps {
+    phoneNumber: string;
+    defaultCountry?: CountryCode;
 }
 
 export function MainProfile({ handleAvalibility, setShowService, onModify }: any) {
@@ -39,7 +40,7 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
     const [copySuccess, setCopySuccess] = useState(false);
     const openShareMenu = Boolean(shareAnchorEl);
     const [showDetails, setShowDetails] = useState(false);
-
+    const [phoneNumber, setPhoneNumber] = useState(profile?.number || '');
     const handleShareClick = (event: React.MouseEvent<HTMLElement>) => {
         setShareAnchorEl(event.currentTarget);
     };
@@ -272,8 +273,13 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                             <Grid item xs={12} md={6}>
                                 <Typography variant="subtitle2" color="textSecondary">Contact</Typography>
                                 <Typography>{profile?.email}</Typography>
-                                <Typography>{profile?.number}</Typography>
-                                <Typography>{profile?.address}</Typography>
+                                {profile?.number && (
+                                    <PhoneNumberDisplay
+                                        phoneNumber={profile.number}
+                                        defaultCountry="US" // You can detect this dynamically
+                                    />
+                                )}
+                                <Typography textTransform="capitalize">{profile?.address}</Typography>
                             </Grid>
 
                             {/* Social Links */}
@@ -296,6 +302,24 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                                             target="_blank"
                                         >
                                             <TikTokIcon />
+                                        </IconButton>
+                                    )}
+                                    {profile?.socialLinks?.facebook && (
+                                        <IconButton
+                                            size="small"
+                                            href={profile.socialLinks.facebook}
+                                            target="_blank"
+                                        >
+                                            <Facebook />
+                                        </IconButton>
+                                    )}
+                                    {profile?.socialLinks?.instagram && (
+                                        <IconButton
+                                            size="small"
+                                            href={profile.socialLinks.instagram}
+                                            target="_blank"
+                                        >
+                                            <Instagram />
                                         </IconButton>
                                     )}
                                 </Box>
@@ -558,4 +582,26 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
             </Box>
         </Box>
     )
+}
+
+
+export function PhoneNumberDisplay({ phoneNumber, defaultCountry = 'US' }: PhoneNumberDisplayProps) {
+    // Parse the phone number to get country information
+    const parsedNumber = parsePhoneNumber(phoneNumber, defaultCountry);
+    const country = parsedNumber?.country || defaultCountry;
+    const formattedNumber = parsedNumber?.formatInternational() || phoneNumber;
+
+    // Get the flag component for the country
+    const FlagComponent = flags[country as CountryCode];
+
+    return (
+        <Box display="flex" alignItems="center" gap={1}>
+            {FlagComponent && (
+                <Box width={24} height={24} display="flex" alignItems="center" justifyContent="center">
+                    <FlagComponent title={country} />
+                </Box>
+            )}
+            <Typography variant="body1">{formattedNumber}</Typography>
+        </Box>
+    );
 }

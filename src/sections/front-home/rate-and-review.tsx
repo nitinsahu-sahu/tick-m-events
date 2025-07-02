@@ -114,7 +114,7 @@ const ReviewCard = ({ name, rating, comment, createdAt }: any) => {
     );
 };
 
-export function RateAndReview({ reviews, reviewCount,rating }: any) {
+export function RateAndReview({ reviews, reviewCount, rating }: any) {
     const [filter, setFilter] = useState("date");
     const dispatch = useDispatch<AppDispatch>()
     const { eventId } = useParams();
@@ -171,7 +171,7 @@ export function RateAndReview({ reviews, reviewCount,rating }: any) {
     };
 
     // Function to render interactive stars
-    function renderInteractiveStars (averageRating: any){
+    function renderInteractiveStars(averageRating: any) {
         return (
             <Box display="flex">
                 {[1, 2, 3, 4, 5].map((star) => (

@@ -5,8 +5,6 @@ import {
   Paper,
   Typography,
   Button,
-  Tabs,
-  Tab,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -19,43 +17,14 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from 'recharts';
-import { TrendingUp, MonetizationOn, Star, Description } from '@mui/icons-material';
-
-const chartData = [
-  { name: 'April', value: 100000 },
-  { name: 'May', value: 200000 },
-  { name: 'June', value: 400000 },
-  { name: 'July', value: 700000 },
-  { name: 'August', value: 500000 },
-  { name: 'September', value: 450000 },
-  { name: 'October', value: 300000 },
-  { name: 'November', value: 600000 },
-];
+import { TrendingUp } from '@mui/icons-material';
 
 const statCards = [
-  {
-    icon: <Description sx={{ fontSize: 40, color: '#007BBA' }} />,
-    title: 'Contracts Obtained',
-    value: '15',
-    subtitle: 'in the last 3 months',
-  },
   {
     icon: <TrendingUp sx={{ fontSize: 40, color: '#007BBA' }} />,
     title: 'Offer Conversion Rate',
     value: '45%',
     subtitle: 'of sent proposals accepted',
-  },
-  {
-    icon: <MonetizationOn sx={{ fontSize: 40, color: '#007BBA' }} />,
-    title: 'Total Revenue',
-    value: '3,500,000 XAF',
-    subtitle: 'earned this year',
-  },
-  {
-    icon: <Star sx={{ fontSize: 40, color: '#007BBA' }} />,
-    title: 'Customer Rating',
-    value: '4.7/5',
-    subtitle: 'based on 30 reviews',
   },
 ];
 
@@ -71,19 +40,14 @@ const monthlyData = [
 ];
 
 export default function DashboardSummary() {
-  const [tab, setTab] = React.useState(0);
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
   const cardHeight = isMobile ? 'auto' : 400;
+
   return (
     <Box
       mt={3}
-      p={{
-        xs: 2,
-        md: 4,
-      }}
+      p={{ xs: 2, md: 4 }}
       sx={{
         borderRadius: '20px',
         border: '1px solid #E0E0E0',
@@ -91,45 +55,16 @@ export default function DashboardSummary() {
       }}
     >
       <Grid container spacing={3}>
-        {/* First 3 Cards */}
-        {statCards.slice(0, 3).map((card, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Paper
-              elevation={2}
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-                border: '1px solid #E0E0E0',
-                boxShadow: '0 0 10px rgba(0,0,0,0.15)',
-                height: '100%',
-              }}
-            >
-              {card.icon}
-              <Typography fontWeight={700} mt={2}>
-                {card.title}
-              </Typography>
-              <Typography color="#007BBA" fontSize={22} fontWeight={700}>
-                {card.value}
-              </Typography>
-              <Typography fontSize={13}>{card.subtitle}</Typography>
-            </Paper>
-          </Grid>
-        ))}    
-
         <Grid item xs={12} sm={6} md={4}>
           <Paper
-            elevation={0} // Remove Paper shadow if desired
+            elevation={0}
             sx={{
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              backgroundColor: '#F9FAFB', // Fixed color code
+              backgroundColor: '#F9FAFB',
               height: '100%',
-              boxShadow: 'none', // Removes border effect
+              boxShadow: 'none',
             }}
           >
             <Box
@@ -143,25 +78,19 @@ export default function DashboardSummary() {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
-                alignItems: 'center', // Center icon horizontally
+                alignItems: 'center',
               }}
             >
-              {statCards[3].icon}
+              {statCards[0].icon}
               <Typography fontWeight={700} mt={2}>
-                {statCards[3].title}
+                {statCards[0].title}
               </Typography>
               <Typography color="#007BBA" fontSize={22} fontWeight={700}>
-                {statCards[3].value}
+                {statCards[0].value}
               </Typography>
-              <Typography fontSize={13}>{statCards[3].subtitle}</Typography>
+              <Typography fontSize={13}>{statCards[0].subtitle}</Typography>
             </Box>
-
-            {/* Buttons inside the card */}
-            <Box mt={3} display="flex" flexDirection="column" gap={2}>
-              <DarkRoundedButton>View Contract Details</DarkRoundedButton>
-              <DarkRoundedButton>Improve My Profile</DarkRoundedButton>
-            </Box>
-          </Paper>
+            </Paper>
         </Grid>
 
         <Grid item xs={12} md={8}>
@@ -183,7 +112,6 @@ export default function DashboardSummary() {
               </Typography>
             </Box>
 
-            {/* Chart container */}
             <Box sx={{ flexGrow: 1, mt: 3 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={monthlyData}>

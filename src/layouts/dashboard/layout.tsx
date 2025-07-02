@@ -180,12 +180,12 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                         <NotificationsPopover data={_notifications} />
                         {
                           !hiddenTicketManagement.some(path => pathname.includes(path)) &&
-                          role !== 'provider' &&
+                          role === 'provider' &&
                           role !== 'participant' &&
                           !hiddenServiceCal.some(path => pathname.includes(path)) &&
                           !hiddenTransectionPayment.some(path => pathname.includes(path)) &&
                           role !== 'admin' &&
-                          !hiddenDashboard.some(path => pathname.includes(path)) &&
+                          hiddenDashboard.some(path => pathname.includes(path)) &&
                           !hiddenSearchSelect.some(path => pathname.includes(path)) &&
                           !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
                           !hiddenProfileService.some(path => pathname.includes(path)) &&

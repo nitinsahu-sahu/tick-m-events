@@ -9,6 +9,8 @@ interface RequestSectionProps {
     headers: any[];
     data: any[];
     type: string;
+    onApply?: (row: any) => void;
+    onViewDetails?: (row: any) => void;
 }
 
 export function RequestTabSection({
@@ -16,7 +18,9 @@ export function RequestTabSection({
     description,
     headers,
     data,
-    type
+    type,
+    onApply,
+    onViewDetails
 }: RequestSectionProps) {
     const [filters, setFilters] = useState({
         eventName: '',
@@ -147,7 +151,7 @@ export function RequestTabSection({
                 )
             }
 
-            <HomeAndGlobalTable headers={headers} data={filteredData} type={type} />
+            <HomeAndGlobalTable headers={headers} data={filteredData} type={type} onApply={onApply} onViewDetails={onViewDetails} />
             {
                 filteredData.length > 0 && (
                     <Box display="flex" justifyContent="flex-end" mt={2}>

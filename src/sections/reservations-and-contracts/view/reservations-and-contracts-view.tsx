@@ -11,13 +11,12 @@ import { metrics, pendingRequestTableHeaders, signedContractTableHeader, onServi
 
 export function ReservationsAndContractsView() {
     const { requests } = useSelector((state: RootState) => state?.serviceRequest);
-    console.log("get", requests);
     const dispatch = useDispatch<AppDispatch>();
 
     const [viewType, setViewType] = useState<null | "active" | "completed">('active');
 
     useEffect(() => {
-        dispatch(getRequestsByProvider());
+        dispatch(getRequestsByProvider({ status: "accepted-by-provider" }));
     }, [dispatch]);
 
     const handleCardButtonClick = (type: "active" | "completed") => {

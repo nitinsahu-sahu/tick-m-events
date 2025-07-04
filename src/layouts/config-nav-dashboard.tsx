@@ -103,12 +103,7 @@ export const navData: NavItem[] = [
     roles: ['organizer'],
   },
   // Provider Sidebar
-   {
-    title: 'Statistics',
-    path: '/statistics-&-performance',
-    icon: icon('ic-analytics'),
-    roles: ['provider'],
-  },
+  
   {
     title: 'Event Settings',
     path: '/visibility-and-access-settings',
@@ -177,6 +172,7 @@ export const navData: NavItem[] = [
     icon: icon('ic_client_relation'),
     roles: ['provider'],
   },
+  
   {
     title: 'Global Overview & General Statistics',
     path: '/global-overview-&-general-statistics',
@@ -209,5 +205,10 @@ export const navData: NavItem[] = [
     icon: icon('ic_profile_service'),
     roles: ['provider', 'admin', 'organizer', 'organizer', 'participant'],
   },
-
+ {
+    title: 'Statistics',
+    path: '/statistics-&-performance',
+    icon: icon('ic-analytics'),
+    roles: ['provider'],
+  },
 ];

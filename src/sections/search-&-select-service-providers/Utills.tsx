@@ -21,3 +21,11 @@ export const eventTickets = [
        
     },
 ];
+
+export const serviceRequestTableHeaders = [
+  { label: "Event Name", key: "eventName" },
+  { label: "Organizer", key: "organizerName" },
+  { label: "Budget", key: "budget" },
+  { label: "Date", key: "date" },
+  { label: "Action", key: "action" },
+];

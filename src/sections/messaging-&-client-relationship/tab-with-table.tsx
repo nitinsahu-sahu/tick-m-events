@@ -21,7 +21,6 @@ export function TabWithTableView() {
     const tabLabels = ["Inbox", "Shared Files"];
     const [openModal, setOpenModal] = useState(false);
     const [selectedRow, setSelectedRow] = useState<any>(null);
-    console.log('selectedRow>>', selectedRow);
 
     useEffect(() => {
         dispatch(getRequestsByProvider());
@@ -140,13 +139,11 @@ export function TabWithTableView() {
                                 type="3"
                                 handleOpenModal=""
                             />
-                            <ChatBox handleCloseModal={handleCloseModal} conv={selectedRow} />
+                            <ChatBox handleCloseModal={handleCloseModal}  conv={selectedRow} />
 
 
                         </Paper>
                     }
-
-
                 </>
 
             )}

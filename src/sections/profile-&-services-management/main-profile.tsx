@@ -40,7 +40,6 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
     const [copySuccess, setCopySuccess] = useState(false);
     const openShareMenu = Boolean(shareAnchorEl);
     const [showDetails, setShowDetails] = useState(false);
-    const [phoneNumber, setPhoneNumber] = useState(profile?.number || '');
     const handleShareClick = (event: React.MouseEvent<HTMLElement>) => {
         setShareAnchorEl(event.currentTarget);
     };
@@ -460,32 +459,6 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                             </Grid>
                         </>
                     )}
-
-                    {/* <Grid item xs={12} sm={6} md={profile?.role === 'provider' ? 3 : 6} >
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            onClick={() => {
-                                const profileUrl = `${import.meta.env.VITE_Live_URL}/pro/${profile?._id}`;
-                                const whatsappMessage = `Check out my profile: ${profileUrl}`;
-                                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`;
-                                window.open(whatsappUrl, '_blank');
-                            }}
-                            sx={{
-                                backgroundColor: "#032D4F",
-                                textTransform: "none",
-                                borderRadius: "8px",
-                                fontWeight: 500,
-                                fontSize: "14px",
-                                py: 1.5,
-                                "&:hover": {
-                                    backgroundColor: "#021f37",
-                                },
-                            }}
-                        >
-                            Share Profile
-                        </Button>
-                    </Grid> */}
                     {/* Share Button - Replace your existing one with this */}
                     <Grid item xs={12} sm={6} md={user?.role === 'provider' ? 3 : 6}>
                         <Button

@@ -1,7 +1,12 @@
+import React, { useState } from 'react';
 import { Modal, Box, Typography, Button, Avatar, Divider, Chip } from "@mui/material";
 import { styled } from "@mui/material/styles";
-
+import { toast } from 'react-toastify';
+import { useSelector, useDispatch } from "react-redux";
+import { AppDispatch, RootState } from 'src/redux/store';
 import { HeadingCommon } from "../multiple-responsive-heading/heading";
+import { updateOrganizerDecision } from '../../redux/actions/service-request';
+
 
 const ModalContainer = styled(Box)(({ theme }) => ({
   position: 'absolute',
@@ -69,6 +74,26 @@ interface DetailsModalProps {
 }
 
 export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) => {
+  const { user: loggedInUser } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>()
+  const [loading, setLoading] = useState(false);
+
+  const handleDecision = async (decision: 'accept' | 'reject') => {
+    const status = decision === 'accept' ? 'accepted-by-organizer' : 'rejected-by-organizer';
+    const contractStatus = decision === 'accept' ? 'ongoing' : 'pending';
+
+    setLoading(true);
+    try {
+      await dispatch(updateOrganizerDecision(data._id, status, contractStatus));
+      toast.success(`Proposal ${decision === 'accept' ? 'accepted' : 'rejected'} successfully`);
+      onClose();
+    } catch (error) {
+      toast.error('Failed to update decision. Please try again.');
+    } finally {
+      setLoading(false); // Ensure loading ends
+    }
+  };
+
   if (!data) return null;
 
   return (
@@ -79,11 +104,11 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
       aria-describedby="event-details-description"
     >
       <ModalContainer>
-         <Box display="flex" justifyContent="flex-end" gap={2}>
-          <Button 
-            variant="outlined" 
+        <Box display="flex" justifyContent="flex-end" gap={2}>
+          <Button
+            variant="outlined"
             onClick={onClose}
-            sx={{ 
+            sx={{
               color: 'text.secondary',
               borderColor: 'divider',
               '&:hover': {
@@ -93,16 +118,16 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
           >
             Close
           </Button>
-          </Box>
+        </Box>
         <Box display="flex" alignItems="center" mb={3}>
           {data.organizerId?.avatar?.url && (
-            <Avatar 
-              src={data.organizerId.avatar.url} 
+            <Avatar
+              src={data.organizerId.avatar.url}
               sx={{ width: 60, height: 60, mr: 2 }}
             />
           )}
           <Box>
-            <HeadingCommon variant="h4" title={data.eventId?.eventName || 'Event Details'}/>
+            <HeadingCommon variant="h4" title={data.eventId?.eventName || 'Event Details'} />
             <Typography variant="subtitle2" color="text.secondary">
               Organized by {data.organizerId?.name}
             </Typography>
@@ -121,7 +146,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                 {new Date(data.eventId?.date).toLocaleDateString()} at {data.eventId?.time}
               </DetailValue>
             </DetailItem>
-            
+
             <DetailItem>
               <DetailLabel variant="body2">Location:</DetailLabel>
               <DetailValue variant="body2">
@@ -133,22 +158,22 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
             <DetailItem>
               <DetailLabel variant="body2">Service Type:</DetailLabel>
               <DetailValue variant="body2">
-                <Chip 
-                  label={data.serviceRequestId?.serviceType} 
-                  color="primary" 
-                  size="small" 
-                  sx={{ fontWeight: 500, textTransform:"capitalize" }}
+                <Chip
+                  label={data.serviceRequestId?.serviceType}
+                  color="primary"
+                  size="small"
+                  sx={{ fontWeight: 500, textTransform: "capitalize" }}
                 />
               </DetailValue>
             </DetailItem>
-            
+
             <DetailItem>
               <DetailLabel variant="body2">Budget:</DetailLabel>
               <DetailValue variant="body2">
                 {data.serviceRequestId?.budget}
               </DetailValue>
             </DetailItem>
-            
+
             <DetailItem>
               <DetailLabel variant="body2">Req. by Organizer:</DetailLabel>
               <DetailValue variant="body2" textTransform="capitalize">
@@ -159,27 +184,53 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
             <DetailItem>
               <DetailLabel variant="body2">Negotiable:</DetailLabel>
               <DetailValue variant="body2">
-                <Chip 
-                  label={`${data.orgBudget} XAF` || 'NA'} 
-                  color={data.orgBudget ? "success" : "default"} 
+                <Chip
+                  label={`${data.orgBudget} XAF` || 'NA'}
+                  color={data.orgBudget ? "success" : "default"}
                   size="small"
                   variant="outlined"
                 />
               </DetailValue>
             </DetailItem>
-            
+
             <DetailItem>
               <DetailLabel variant="body2">Status:</DetailLabel>
               <DetailValue variant="body2">
-                <Chip 
-                  label={data.status} 
+                <Chip
+                  label={data.status}
                   color={
-                    data.status === 'accepted' ? 'success' : 
-                    data.status === 'rejected' ? 'error' : 'info'
-                  } 
+                    data.status === 'accepted' ? 'success' :
+                      data.status === 'rejected' ? 'error' : 'info'
+                  }
                 />
               </DetailValue>
             </DetailItem>
+            {data.providerHasProposed && (
+              <>
+                <Divider sx={{ my: 4 }} />
+                <SectionHeader variant="h6">Proposal from Provider</SectionHeader>
+
+                <DetailItem>
+                  <DetailLabel variant="body2">Proposed Amount:</DetailLabel>
+                  <DetailValue variant="body2">
+                    <Chip
+                      label={`${data.providerProposal?.amount} XAF` || 'NA'}
+                      color={data.providerProposal?.amount ? "success" : "default"}
+                      size="small"
+                      variant="outlined"
+                    />
+                  </DetailValue>
+                </DetailItem>
+
+                <DetailItem>
+                  <DetailLabel variant="body2">Estimated Duration:</DetailLabel>
+                  <DetailValue variant="body2">
+                    {data.providerProposal?.days} days
+                  </DetailValue>
+                </DetailItem>
+              </>
+            )}
+
           </Box>
 
           {/* Right Column */}
@@ -191,7 +242,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                 {data.organizerId?.name}
               </DetailValue>
             </DetailItem>
-            
+
             <DetailItem>
               <DetailLabel variant="body2">Email:</DetailLabel>
               <DetailValue variant="body2">
@@ -206,6 +257,14 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
 
             <SectionHeader variant="h6" sx={{ mt: 3 }}>Service Details</SectionHeader>
             <HtmlContent dangerouslySetInnerHTML={{ __html: data.serviceRequestId?.description || '' }} />
+            {data.providerHasProposed && (
+              <>
+                <Divider sx={{ my: 4 }} />
+                <SectionHeader variant="h6" sx={{ mt: 3 }}>Provider Message</SectionHeader>
+                <HtmlContent dangerouslySetInnerHTML={{ __html: data.providerProposal?.message || '' }} />
+              </>
+            )}
+
           </Box>
         </Box>
 
@@ -223,6 +282,41 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
             Contact Organizer
           </Button>
         </Box> */}
+        {loggedInUser?.role === "organizer" &&
+          data.providerHasProposed &&
+          data.status !== 'rejected-by-organizer' && (
+            <Box display="flex" justifyContent="flex-end" mt={4} gap={2}>
+              <Button
+                variant="contained"
+                onClick={() => handleDecision('reject')}
+                disabled={loading}
+                sx={{
+                  backgroundColor: '#d32f2f',
+                  '&:hover': {
+                    backgroundColor: '#b71c1c',
+                  },
+                }}
+              >
+                Reject
+              </Button>
+              {data.status !== 'accepted-by-organizer' && (
+                <Button
+                  variant="contained"
+                  onClick={() => handleDecision('accept')}
+                  disabled={loading}
+                  sx={{
+                    backgroundColor: '#4CAF50',
+                    '&:hover': {
+                      backgroundColor: '#388e3c',
+                    },
+                  }}
+                >
+                  Accept Proposal
+                </Button>
+              )}
+
+            </Box>
+          )}
       </ModalContainer>
     </Modal>
   );

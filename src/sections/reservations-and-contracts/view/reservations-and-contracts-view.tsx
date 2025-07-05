@@ -7,7 +7,7 @@ import { AppDispatch, RootState } from "src/redux/store";
 import { getRequestsByProvider } from "src/redux/actions/service-request";
 
 import { RequestTabSection } from "../request-tab-section";
-import { metrics, pendingRequestTableHeaders, signedContractTableHeader, onServiceTableHeader } from "../utills";
+import { pendingRequestTableHeaders, onServiceTableHeader } from "../utills";
 
 export function ReservationsAndContractsView() {
     const { requests } = useSelector((state: RootState) => state?.serviceRequest);
@@ -16,7 +16,7 @@ export function ReservationsAndContractsView() {
     const [viewType, setViewType] = useState<null | "active" | "completed">('active');
 
     useEffect(() => {
-        dispatch(getRequestsByProvider({ status: "accepted-by-provider" }));
+        dispatch(getRequestsByProvider({ status: "accepted-by-organizer" }));
     }, [dispatch]);
 
     const handleCardButtonClick = (type: "active" | "completed") => {

@@ -6,13 +6,14 @@ import { useTheme } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { io, Socket } from 'socket.io-client'
 import { useDispatch, useSelector } from 'react-redux';
+
 import { AppDispatch, RootState } from 'src/redux/store';
 import { formatTimeToAMPM } from 'src/hooks/formate-time';
-import { Conv } from "../modal/conv";
-import axios from '../../redux/helper/axios'
 import { fetchMessagesbyConvId } from 'src/redux/actions/message.action';
 
-interface Avatar {
+import axios from '../../redux/helper/axios'
+
+interface avatar {
     public_id: string;
     url: string;
 }
@@ -21,7 +22,7 @@ interface Organizer {
     _id: string;
     name: string;
     email: string;
-    avatar: Avatar;
+    avatar: avatar;
 }
 
 interface Event {
@@ -98,13 +99,15 @@ interface MessagesState {
 
 export function MessagingAndClientRelationshipTable({
     headers,
-    data,
+    tableData,
     type,
-    handleOpenModal
+    handleOpenModal,
+    selectedOption
 }: {
     headers: string[];
     type: string;
-    data: any[];
+    tableData: any[];
+    selectedOption: string,
     handleOpenModal: (row: any) => void; // Add proper typing
 }) {
     const dispatch = useDispatch<AppDispatch>();
@@ -112,6 +115,7 @@ export function MessagingAndClientRelationshipTable({
     const theme = useTheme();
     const [openChat, setOpenChat] = useState(false);
     const [convUser, setConvUser] = useState<ConversationUser | null>(null);
+    
     const [messages, setMessages] = useState<MessagesState>({
         messages: []
     });
@@ -122,10 +126,9 @@ export function MessagingAndClientRelationshipTable({
     const [socket, setSocket] = useState<Socket | null>(null);
     const [online, setOnline] = useState<User[]>([]);
     const [message, setMessage] = useState<string>('');
-console.log('====================================');
-console.log(conversations);
-console.log(convUser);
-console.log('====================================');
+    console.log('==messages==================================');
+    console.log(messages);
+    console.log('====================================');
     useEffect(() => {
         setSocket(io(import.meta.env.VITE_SOCKET_URL))
     }, [])
@@ -182,10 +185,17 @@ console.log('====================================');
             receiverId: messages?.receiver?.receiverId,
             type: "text"
         }
-        await axios.post(`/conv/message`, msginfo).then(
+        console.log('====================================');
+        console.log('msgIngo',msginfo);
+        console.log('====================================');
+        await axios.post(`/conv/message`, msginfo).then((info)=>{
+console.log('=========ss===========================');
+console.log(info);
+console.log('====================================');
+        }
 
         ).catch((error) => {
-            console.log("Server error");
+            console.log("Server error",error.message);
         })
     }
 
@@ -246,7 +256,7 @@ console.log('====================================');
                 </TableHead>
 
                 <TableBody>
-                    {!data || data.length === 0 ? (
+                    {!tableData || tableData.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={headers.length} align="center" sx={{ py: 4 }}>
                                 <Typography variant="body1" color="textSecondary">
@@ -255,19 +265,19 @@ console.log('====================================');
                             </TableCell>
                         </TableRow>
                     ) : (
-                        data.map((row, index) => {
+                        tableData.map((row, index) => {
                             const backgroundColor = index % 2 === 0 ? "#f5f5f5" : "#e0e0e0";
 
                             return (
                                 <TableRow key={row._id} sx={{ backgroundColor }}>
                                     {/* Conditional cells based on type */}
                                     {(type === "2" || type === "5") && (
-                                        <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }}>
+                                        <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center", textTransform: "capitalize" }}>
                                             {row.service || row?.organizerId?.name || row.file}
                                         </TableCell>
                                     )}
 
-                                    <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center" }}>
+                                    <TableCell sx={{ verticalAlign: 'middle', textAlign: 'center', fontWeight: 600, align: "center", textTransform: "capitalize" }}>
                                         {row.location || row?.serviceRequestId?.serviceType || row.sdate}
                                     </TableCell>
 
@@ -449,7 +459,7 @@ console.log('====================================');
                                 size="small"
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
-                                onKeyPress={(e: any) => e.key === 'Enter' && sendMessage()}
+                                onKeyPress={(e: any) => e.key === 'Enter' && sendMessage}
                                 sx={{
                                     '& .MuiOutlinedInput-root': {
                                         borderRadius: '20px',

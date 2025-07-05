@@ -19,7 +19,6 @@ import RequestService from '../RequestService';
 export function SearchAndSelectServiceProvidersView() {
   const { providersList } = useSelector((state: RootState) => state?.providers);
   const { organizerRequests, orgLoading } = useSelector((state: RootState) => state?.serviceRequest);
-  console.log("req",organizerRequests);
   const [select, setSelected] = useState({})
   const [filtersApplied, setFiltersApplied] = useState(false);
   const dispatch = useDispatch<AppDispatch>();

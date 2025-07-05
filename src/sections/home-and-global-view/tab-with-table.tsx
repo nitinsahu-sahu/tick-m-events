@@ -72,9 +72,9 @@ export function TabWithTableView() {
         if (tabValue === 0) {
             dispatch(getRequestsByProvider({ status: "requested-by-organizer" }));
         } else if (tabValue === 1) {
-            dispatch(getRequestsByProvider({ status: "accepted-by-provider" }));
+            dispatch(getRequestsByProvider({ status: "accepted-by-organizer" }));
         }
-    }, [dispatch, tabValue]);
+    }, [tabValue, dispatch]);
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
@@ -159,7 +159,7 @@ export function TabWithTableView() {
                                         setAmount(String(proposalAmount));
                                         setDays(String(proposalDays));
                                         setDescription(message);
-                                        
+
                                     }
                                 } else {
                                     setAmount('');

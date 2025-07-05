@@ -115,7 +115,7 @@ export function MessagingAndClientRelationshipTable({
     const theme = useTheme();
     const [openChat, setOpenChat] = useState(false);
     const [convUser, setConvUser] = useState<ConversationUser | null>(null);
-    
+
     const [messages, setMessages] = useState<MessagesState>({
         messages: []
     });
@@ -170,33 +170,37 @@ export function MessagingAndClientRelationshipTable({
     }, [socket, user?._id, openChat])
 
     const sendMessage = async (e: React.FormEvent) => {
-        setMessage('')
-        socket?.emit('sendMessage', {
-            conversationId: messages?.conversationId,
-            senderId: user?._id,
-            message,
-            receiverId: messages?.receiver?.receiverId,
-            type: "text"
-        });
-        const msginfo = {
-            conversationId: messages?.conversationId,
-            senderId: user?._id,
-            message,
-            receiverId: messages?.receiver?.receiverId,
-            type: "text"
-        }
-        console.log('====================================');
-        console.log('msgIngo',msginfo);
-        console.log('====================================');
-        await axios.post(`/conv/message`, msginfo).then((info)=>{
-console.log('=========ss===========================');
-console.log(info);
-console.log('====================================');
+        e.preventDefault();
+        setMessage('');
+
+        // Get receiverId correctly for both new and existing conversations
+        const receiverId = typeof messages?.receiver === 'string'
+            ? messages?.receiver
+            : messages?.receiver?.receiverId;
+
+        if (!receiverId && messages?.conversationId === 'new') {
+            console.error('Receiver ID is required for new conversation');
+            return;
         }
 
-        ).catch((error) => {
-            console.log("Server error",error.message);
-        })
+        const messageData = {
+            conversationId: messages?.conversationId,
+            senderId: user?._id,
+            message,
+            receiverId, // Use the properly extracted receiverId
+            type: "text"
+        };
+
+        try {
+            // Emit socket event
+            socket?.emit('sendMessage', messageData);
+
+            // Send HTTP request
+            const response = await axios.post(`/conv/message`, messageData);
+            console.log('Message sent successfully:', response.data);
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
     }
 
     useEffect(() => {

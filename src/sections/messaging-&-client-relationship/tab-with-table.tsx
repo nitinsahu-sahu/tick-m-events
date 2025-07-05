@@ -101,7 +101,6 @@ export function TabWithTableView() {
 
             {tabValue === 0 && (
                 <>
-
                     <Paper elevation={6}
                         sx={{
                             mt: 3,
@@ -139,9 +138,7 @@ export function TabWithTableView() {
                                 type="3"
                                 handleOpenModal=""
                             />
-                            <ChatBox handleCloseModal={handleCloseModal}  conv={selectedRow} />
-
-
+                            <ChatBox handleCloseModal={handleCloseModal} conv={selectedRow} />
                         </Paper>
                     }
                 </>

@@ -7,7 +7,7 @@ import {
 import { io, Socket } from 'socket.io-client'
 import { toast } from "react-toastify";
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { WhatsApp, Facebook, Twitter, LinkedIn, Instagram, Link as LinkIcon, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
@@ -79,10 +79,23 @@ export function ProfileCard({ selectedProvider, onRequestService }: any) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [online, setOnline] = useState<User[]>([]);
   const [message, setMessage] = useState<string>('');
-console.log('====================================');
-console.log(conversations);
-console.log(selectedProvider);
-console.log('====================================');
+  console.log('==messages==================================');
+  console.log(messages);
+  console.log('====================================');
+  // ✅ Top-level useEffect with a guard clause inside
+  useEffect(() => {
+    const fetchConversations = async () => {
+      try {
+        const response = await axios.get(`/conv/conversations?userId=${selectedProvider?._id}`);
+
+        setConversations(response?.data);
+      } catch (error) {
+        console.log("Conversation not found");
+      }
+    };
+    fetchConversations();
+  }, [messages, selectedProvider?._id]);
+
   useEffect(() => {
     setSocket(io(import.meta.env.VITE_SOCKET_URL))
   }, [])
@@ -124,26 +137,37 @@ console.log('====================================');
   }, [socket, user?._id, openChat])
 
   const sendMessage = async (e: React.FormEvent) => {
-    setMessage('')
-    socket?.emit('sendMessage', {
-      conversationId: messages?.conversationId,
-      senderId: user?._id,
-      message,
-      receiverId: messages?.receiver?.receiverId,
-      type: "text"
-    });
-    const msginfo = {
-      conversationId: messages?.conversationId,
-      senderId: user?._id,
-      message,
-      receiverId: messages?.receiver?.receiverId,
-      type: "text"
-    }
-    await axios.post(`/conv/message`, msginfo).then(
+    e.preventDefault();
+    setMessage('');
 
-    ).catch((error) => {
-      console.log("Server error");
-    })
+    // Get receiverId correctly for both new and existing conversations
+    const receiverId = typeof messages?.receiver === 'string'
+      ? messages?.receiver
+      : messages?.receiver?.receiverId;
+
+    if (!receiverId && messages?.conversationId === 'new') {
+      console.error('Receiver ID is required for new conversation');
+      return;
+    }
+
+    const messageData = {
+      conversationId: messages?.conversationId,
+      senderId: user?._id,
+      message,
+      receiverId, // Use the properly extracted receiverId
+      type: "text"
+    };
+
+    try {
+      // Emit socket event
+      socket?.emit('sendMessage', messageData);
+
+      // Send HTTP request
+      const response = await axios.post(`/conv/message`, messageData);
+      console.log('Message sent successfully:', response.data);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   }
 
   useEffect(() => {
@@ -246,22 +270,6 @@ console.log('====================================');
     };
     setIsConvId(covData);
   };
-
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const response = await axios.get(`/conv/conversations?userId=${selectedProvider?._id}`);
-        setConversations(response?.data);
-      } catch (error) {
-        console.log("Conversation not found");
-      }
-    };
-
-    fetchConversations();
-  }, [messages, selectedProvider?._id]); // Make sure messages is properly defined in the component scope
-
-  // let filterConv = conversations.filter(item => item?.user?.fullname.toLowerCase().includes(searchConv.toLocaleLowerCase()))		//
-
 
   return (
     <Paper
@@ -630,7 +638,7 @@ console.log('====================================');
                 size="small"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={(e:any) => e.key === 'Enter' && sendMessage()}
+                onKeyPress={(e: any) => e.key === 'Enter' && sendMessage}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '20px',

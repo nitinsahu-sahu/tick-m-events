@@ -205,4 +205,27 @@ export const getRequestsByOrganizer = () => async (dispatch) => {
   }
 };
 
-
+export const updateOrganizerDecision = (id, status, contractStatus) => async (dispatch) => {
+  dispatch({ type: serviceRequestConstants.UPDATE_ORGANIZER_DECISION_REQUEST });
+  try {
+    const res = await axios.put(`/event-requests/${id}/status`, {
+      status,
+      contractStatus,
+    });
+ 
+    dispatch({
+      type: serviceRequestConstants.UPDATE_ORGANIZER_DECISION_SUCCESS,
+      payload: {
+        message: res.data.message,
+        updatedRequest: res.data.data,
+      },
+    });
+  } catch (error) {
+    dispatch({
+      type: serviceRequestConstants.UPDATE_ORGANIZER_DECISION_FAILURE,
+      payload: {
+        message: error.response?.data?.message || 'Something went wrong',
+      },
+    });
+  }
+};

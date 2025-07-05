@@ -8,8 +8,8 @@ const initialState = {
     currentPage: 1,
     error: '',
     loading: false,
-     organizerRequests: [],
-  orgLoading: false,
+    organizerRequests: [],
+    orgLoading: false,
 };
 
 const eventServiceRequestReducer = (state, action) => {
@@ -125,12 +125,35 @@ const eventServiceRequestReducer = (state, action) => {
             return {
                 ...state,
                 loading: false,
-                 organizerRequests: action.payload.requests,
+                organizerRequests: action.payload.requests,
                 total: action.payload.total,
                 currentPage: action.payload.currentPage,
             };
 
         case serviceRequestConstants.GET_ORGANIZER_REQUESTS_FAILURE:
+            return {
+                ...state,
+                loading: false,
+                error: action.payload.message,
+            };
+
+        case serviceRequestConstants.UPDATE_ORGANIZER_DECISION_REQUEST:
+            return { ...state, loading: true };
+
+        case serviceRequestConstants.UPDATE_ORGANIZER_DECISION_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                message: action.payload.message,
+                requests: state.requests.map((req) =>
+                    req._id === action.payload.updatedRequest._id ? action.payload.updatedRequest : req
+                ),
+                organizerRequests: state.organizerRequests.map((req) =>
+                    req._id === action.payload.updatedRequest._id ? action.payload.updatedRequest : req
+                ),
+            };
+
+        case serviceRequestConstants.UPDATE_ORGANIZER_DECISION_FAILURE:
             return {
                 ...state,
                 loading: false,

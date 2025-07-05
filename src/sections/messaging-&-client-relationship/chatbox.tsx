@@ -33,7 +33,6 @@ export function ChatBox({ handleCloseModal, conv }: any) {
   const [error, setError] = useState<string | null>(null);
   const currentUser = useSelector((state: RootState) => state.auth.user?._id);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  console.log(messages);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {

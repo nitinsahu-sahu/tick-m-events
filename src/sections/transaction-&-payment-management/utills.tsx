@@ -50,7 +50,6 @@ export const paymentSettings = {
       // "Cash"
       "Visa or master card"
     ],
-    formTitle: "Friends Who Booked",
     bankingFields: [
       "Account Holder Name",
       "Mobile Money Number",
@@ -64,3 +63,25 @@ export const paymentSettings = {
     ]
   };
   
+
+ export const bankingHeaders = [
+  "Account Holder Name",
+  "Account Number",
+  "Bank",
+  "CIF Number",
+  "Actions",
+];
+
+export const mobileMoneyHeaders = [
+  "Mobile Money Number",
+  "Provider",
+  "Actions",
+];
+
+export const cardHeaders = [
+  "Cardholder Name",
+  "Card Number",
+  "Expiry Date",
+  "CVV",
+  "Actions",
+];

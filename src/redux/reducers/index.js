@@ -12,8 +12,12 @@ import eventServiceReqReducer from './event-service-request.reducer'
 import { activityReducer } from "./activity.reducer";
 import reminderReducer from './reminder.reducer'
 import serveiceRequestReducer from './serviceRequest.Reducer'
+import fetchMessagesReducers from './message.reducer'
+import { paymentSettingsReducer } from './payment-setting.reducer';
 
 const rootReducer = combineReducers({
+    paymentSettings: paymentSettingsReducer,
+    allMessages: fetchMessagesReducers,
     serviceReqCategories: serveiceRequestReducer,
     reminder: reminderReducer,
     auth: authReducer,

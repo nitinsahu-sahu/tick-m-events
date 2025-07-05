@@ -5,7 +5,7 @@ interface TopNavButtonsProps {
   onChange: (value: string) => void;
 }
 
-const options = ['Performance Summary', 'Financial Analysis', 'Client Feedback', 'Recommendations'];
+const options = ['Performance Summary', 'Financial Analysis'];
 
 export function TopNavButtons({ active, onChange }: TopNavButtonsProps) {
   const theme = useTheme();

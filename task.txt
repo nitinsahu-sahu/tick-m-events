@@ -4,15 +4,10 @@
 confirmed service:- show confirmed projects or services
 -contract client:- take service provider take to messaging btwn oragnizer and provider
 -mark as completed:- request will be sent to organizer to confirm it is completed or not
-9.Message icon should show DMs[Pulkit ko diya hai]
 10.One reservation and contract menu:- active contract card should show confirmed projects number that service provider working on[Pulkit ko diya hai]
 -----------
 video 3rd |
 -----------
-1.Banking information update-> Remove friend who booked heading  ,instaed
--need table tht displays banking info of service provider like payment methods number of card or mbl money account and action button displays edits if want to edit payment method
--form is to add and modify payment method[Pulkit ko diya hai]
------------------------------------------------------
 messaging and client relationship menu
 3.Active conversations & conversation-> table should remove instead message between provider and organizer have to show 
 like messaging system
@@ -22,7 +17,6 @@ Profile & Service Page
 8.Profile view -> give dropdown to slect the profile view by year month or week according to itwill show number of views
 9.Response time-> calculated automaticaal which is average time when  provider reponded to messages when they are 
 contacted for project
-16.Reviews-> reply review btn not working, smthing should happen
 ---------------------------------------------
 
 Daily Work Report

@@ -10,16 +10,29 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
+type TransactionAndPaymentManagementTableProps = {
+  headers: string[];
+  type: string;
+  data: any[];
+  onEdit?: (id: string) => void;
+};
+
 export function TransactionAndPaymentManagementTable({
   headers,
   data,
   type,
-}: {
-  headers: string[];
-  type: string;
-  data: any[];
-}) {
+  onEdit,
+}: TransactionAndPaymentManagementTableProps) {
+
   const theme = useTheme();
+  const handleClick = (action: string, rowId: string, index: number) => () => {
+    if (action === "Update" && onEdit && rowId) {
+      onEdit(rowId); // <-- Call parent edit handler with ID
+    } else {
+      console.log(`${action} clicked for row ${index + 1}`);
+    }
+  };
+
 
   return (
     <TableContainer component={Paper}>
@@ -100,27 +113,128 @@ export function TransactionAndPaymentManagementTable({
                     {row.actions?.map((action: string, idx: number) => (
                       <Button
                         key={idx}
-                        variant={
-                          action.trim() === "View Details" ||
-                          action.trim() === "Download"
-                            ? "contained"
-                            : "outlined"
-                        }
+                        variant={action === "Remove" ? "outlined" : "contained"}
                         size="small"
+                        color={action === "Remove" ? "error" : "primary"}
                         sx={{
-                          marginX: 0.5,
-                          color:
-                            action.trim() === "View Details" ||
-                            action.trim() === "Download"
-                              ? "white"
-                              : "black",
-                          borderColor: "gray",
-                          backgroundColor:
-                            action.trim() === "View Details" ||
-                            action.trim() === "Download"
-                              ? "#0B2E4C"
-                              : "white",
+                          mx: 0.5,
+                          textTransform: "none",
+                          color: action === "Remove" ? "#d32f2f" : "white",
+                          borderColor: action === "Remove" ? "#d32f2f" : "transparent",
+                          backgroundColor: action === "Remove" ? "white" : "#0B2E4C",
+                          "&:hover": {
+                            backgroundColor: action === "Remove" ? "#ffebee" : "#002244"
+                          }
                         }}
+                        onClick={() => {
+                          if (action === "Update" && onEdit && row.id) {
+                            onEdit(row.id); // <-- Call parent edit handler with ID
+                          } else {
+                            console.log(`${action} clicked for row ${index + 1}`);
+                          }
+                        }}
+                      >
+                        {action}
+                      </Button>
+                    ))}
+
+                  </TableCell>
+                </>
+              )}
+              {type === "banking" && (
+                <>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>{row.accountHolder}</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>{row.accountNumber}</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>{row.bankName}</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>{row.cifNumber}</TableCell>
+                  <TableCell align="center">
+                    {row.actions?.map((action: string, idx: number) => (
+                      <Button
+                        key={idx}
+                        variant={action === "Remove" ? "outlined" : "contained"}
+                        size="small"
+                        color={action === "Remove" ? "error" : "primary"}
+                        sx={{
+                          mx: 0.5,
+                          textTransform: "none",
+                          color: action === "Remove" ? "#d32f2f" : "white",
+                          borderColor: action === "Remove" ? "#d32f2f" : "transparent",
+                          backgroundColor: action === "Remove" ? "white" : "#0B2E4C",
+                          "&:hover": {
+                            backgroundColor: action === "Remove" ? "#ffebee" : "#002244"
+                          }
+                        }}
+                        onClick={handleClick(action, row.id, index)}
+                      >
+                        {action}
+                      </Button>
+
+                    ))}
+                  </TableCell>
+                </>
+              )}
+              {type === "mobileMoney" && (
+                <>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>{row.momoNumber}</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>{row.provider}</TableCell>
+                  <TableCell align="center">
+                    {row.actions?.map((action: string, idx: number) => (
+                      <Button
+                        key={idx}
+                        variant={action === "Remove" ? "outlined" : "contained"}
+                        size="small"
+                        color={action === "Remove" ? "error" : "primary"}
+                        sx={{
+                          mx: 0.5,
+                          textTransform: "none",
+                          color: action === "Remove" ? "#d32f2f" : "white",
+                          borderColor: action === "Remove" ? "#d32f2f" : "transparent",
+                          backgroundColor: action === "Remove" ? "white" : "#0B2E4C",
+                          "&:hover": {
+                            backgroundColor: action === "Remove" ? "#ffebee" : "#002244"
+                          }
+                        }}
+                        onClick={handleClick(action, row.id, index)}
+                      >
+                        {action}
+                      </Button>
+                    ))}
+                  </TableCell>
+                </>
+              )}
+              {type === "card" && (
+                <>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    {row.details["Cardholder Name"]}
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    {row.details["Card Number"]}
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    {row.details["Expiry Date"]}
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                    {/* You usually don't show CVV, so optional */}
+                    ****
+                  </TableCell>
+                  <TableCell align="center">
+                    {row.actions?.map((action: string, idx: number) => (
+                      <Button
+                        key={idx}
+                        variant={action === "Remove" ? "outlined" : "contained"}
+                        size="small"
+                        color={action === "Remove" ? "error" : "primary"}
+                        sx={{
+                          mx: 0.5,
+                          textTransform: "none",
+                          color: action === "Remove" ? "#d32f2f" : "white",
+                          borderColor: action === "Remove" ? "#d32f2f" : "transparent",
+                          backgroundColor: action === "Remove" ? "white" : "#0B2E4C",
+                          "&:hover": {
+                            backgroundColor: action === "Remove" ? "#ffebee" : "#002244",
+                          },
+                        }}
+                        onClick={handleClick(action, row.id, index)}
                       >
                         {action}
                       </Button>

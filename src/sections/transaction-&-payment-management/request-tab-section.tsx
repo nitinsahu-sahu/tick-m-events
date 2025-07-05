@@ -1,18 +1,6 @@
-import { Paper, Typography, Box, Button } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 
 import { TransactionAndPaymentManagementTable } from "src/components/tables/transaction-&-payment-management-table";
-
-
-function Detail({ label, value }: { label: string; value: string }) {
-    return (
-        <Box display="flex" mb={1}>
-            <Typography fontWeight="bold" minWidth={145}>
-                {label}:
-            </Typography>
-            <Typography sx={{ fontSize: "15px", fontWeight: "600", marginLeft: 2, }}>{value}</Typography>
-        </Box>
-    );
-}
 
 interface RequestSectionProps {
     title: string;

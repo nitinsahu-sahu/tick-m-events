@@ -11,6 +11,7 @@ interface RequestSectionProps {
     type: string;
     onApply?: (row: any) => void;
     onViewDetails?: (row: any) => void;
+    onMarkCompleted?: (row: any) => void; 
 }
 
 export function RequestTabSection({
@@ -20,7 +21,8 @@ export function RequestTabSection({
     data,
     type,
     onApply,
-    onViewDetails
+    onViewDetails,
+    onMarkCompleted,
 }: RequestSectionProps) {
     const [filters, setFilters] = useState({
         eventName: '',
@@ -151,7 +153,7 @@ export function RequestTabSection({
                 )
             }
 
-            <HomeAndGlobalTable headers={headers} data={filteredData} type={type} onApply={onApply} onViewDetails={onViewDetails} />
+            <HomeAndGlobalTable headers={headers} data={filteredData} type={type} onApply={onApply} onViewDetails={onViewDetails} onMarkCompleted={onMarkCompleted}  />
             {
                 filteredData.length > 0 && (
                     <Box display="flex" justifyContent="flex-end" mt={2}>

@@ -160,6 +160,33 @@ const eventServiceRequestReducer = (state, action) => {
                 error: action.payload.message,
             };
 
+            case serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_REQUEST:
+            return { ...state, loading: true };
+ 
+        case serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                message: action.payload.message,
+                requests: state.requests.map((req) =>
+                    req._id === action.payload.updatedRequest._id
+                        ? action.payload.updatedRequest
+                        : req
+                ),
+                organizerRequests: state.organizerRequests.map((req) =>
+                    req._id === action.payload.updatedRequest._id
+                        ? action.payload.updatedRequest
+                        : req
+                ),
+            };
+ 
+        case serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_FAILURE:
+            return {
+                ...state,
+                loading: false,
+                error: action.payload.message,
+            };
+            
         default:
             return state;
     }

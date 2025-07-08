@@ -1,19 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "src/redux/store";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import {
-    Box,
-    Typography,
-    Button,
-    useMediaQuery,
-    Popover,
-    Stack
-} from "@mui/material";
+import { Box, Typography, Button, useMediaQuery, Popover, Stack } from "@mui/material";
 import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
+import { AppDispatch, RootState } from "src/redux/store";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+import { getRequestsByProvider } from "src/redux/actions/service-request";
+
 import { ServiceRequestModal } from "../../components/modal/service-request-modal";
 import "./index.css"
 
@@ -21,21 +16,23 @@ const options = ["View Details", "Contact Organizer", "Modify Availability"];
 
 export const CalenderView = () => {
     const { requests } = useSelector((state: RootState) => state?.serviceRequest);
-    console.log("get", requests);
     const dispatch = useDispatch<AppDispatch>();
+    useEffect(() => {
+        dispatch(getRequestsByProvider({ status: "accepted-by-organizer" }));
+    }, [ dispatch]);
     const [selectedRequest, setSelectedRequest] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const eventDays: { [key: string]: string } = {};
     requests.forEach((r: any) => {
-        const updatedKey = new Date(r.updatedAt).toISOString().split("T")[0];
-
+        const eventDateKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
         if (r.contractStatus === "completed") {
-            eventDays[updatedKey] = "red";
-        } else if (["ongoing", "requested-by-organizer"].includes(r.status)) {
-            eventDays[updatedKey] = "gold";
+            eventDays[eventDateKey] = "gold";
+        } else if (r.status === "accepted-by-organizer" && r.contractStatus === "ongoing") {
+            eventDays[eventDateKey] = "red";
         }
     });
+
 
     // Returns the start of the week (Sunday)
     const getWeekStart = (date: Date): Date => {
@@ -73,18 +70,23 @@ export const CalenderView = () => {
     const [popupDate, setPopupDate] = useState("");
 
     const handleTileClick = (date: Date, event: any) => {
-        const key = date.toISOString().split("T")[0];
+        const key = date.toLocaleDateString("en-CA");
 
         const matchedRequest = requests.find((r: any) => {
-            const createdKey = new Date(r.createdAt).toISOString().split("T")[0];
-            return createdKey === key;
+            const eventKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
+            return eventKey === key;
         });
 
         if (matchedRequest) {
             setSelectedRequest(matchedRequest);
-            setAnchorEl(event.currentTarget); // open the Popover here
+            setPopupDate(key);
+            setAnchorEl(event.currentTarget);
+        } else {
+            setSelectedRequest(null);
+            setAnchorEl(null);
         }
     };
+
 
     const handleClose = () => setAnchorEl(null);
     const open = Boolean(anchorEl);
@@ -200,11 +202,43 @@ export const CalenderView = () => {
                     <Calendar
                         onClickDay={handleTileClick}
                         value={value}
-                        tileContent={tileContent}
+                        tileClassName={({ date }) => {
+                            const key = date.toLocaleDateString("en-CA");
+                            if (eventDays[key] === "red") return "tile-red";
+                            if (eventDays[key] === "gold") return "tile-gold";
+                            return "";
+                        }}
                         prevLabel={null}
                         nextLabel={null}
-                        tileClassName="custom-tile"
                     />
+                    <Popover
+                        open={Boolean(anchorEl)}
+                        anchorEl={anchorEl}
+                        onClose={() => setAnchorEl(null)}
+                        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                    >
+                        {selectedRequest ? (
+                            <Box sx={{ p: 2, maxWidth: 300 }}>
+                                <Typography variant="subtitle1" fontWeight={600}>
+                                    {selectedRequest.eventId?.name || "No Title"}
+                                </Typography>
+                                <Typography variant="body2">
+                                    Date: {new Date(selectedRequest.eventId?.date).toLocaleDateString()}
+                                </Typography>
+                                <Typography variant="body2">
+                                    Time: {new Date(selectedRequest.eventId?.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </Typography>
+                                <Typography variant="body2">
+                                    Status: {selectedRequest.contractStatus}
+                                </Typography>
+                            </Box>
+                        ) : (
+                            <Box sx={{ p: 2 }}>
+                                <Typography>No event</Typography>
+                            </Box>
+                        )}
+                    </Popover>
+
                 </Box>
             )}
 
@@ -318,10 +352,10 @@ export const CalenderView = () => {
                                 fullWidth
                                 onClick={() => {
                                     if (option === "View Details") {
-                                        setIsModalOpen(true);     
-                                        handleClose();             
+                                        setIsModalOpen(true);
+                                        handleClose();
                                     }
-                                    
+
                                 }}
                             >
                                 {option}

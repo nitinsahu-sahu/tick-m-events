@@ -229,3 +229,39 @@ export const updateOrganizerDecision = (id, status, contractStatus) => async (di
     });
   }
 };
+
+export const markRequestAsCompleted = (eventRequestId) => async (dispatch) => {
+  dispatch({ type: serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_REQUEST });
+ 
+  try {
+    const res = await axios.patch(`/event-requests/mark-completed/${eventRequestId}`);
+ 
+    dispatch({
+      type: serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_SUCCESS,
+      payload: {
+        message: res.data.message,
+        updatedRequest: res.data.data,
+      },
+    });
+ 
+    return {
+      type: serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_SUCCESS,
+      message: res.data.message,
+      status: res.status,
+    };
+  } catch (error) {
+    dispatch({
+      type: serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_FAILURE,
+      payload: {
+        message: error?.response?.data?.message || "Failed to mark request as completed",
+        error: error?.response?.status,
+      },
+    });
+ 
+    return {
+      type: serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_FAILURE,
+      message: error?.response?.data?.message,
+      status: error?.response?.status,
+    };
+  }
+};

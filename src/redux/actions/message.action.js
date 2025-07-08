@@ -40,3 +40,41 @@ export const deleteMsgEveryOne = (_id, isConvId) => async (dispatch) => {
         });
     }
 };
+
+export const fetchConversation = () => async (dispatch) => {
+    dispatch({ type: messageConstants.FETCH_CONV_REQUEST });
+    try {
+        const response = await axios.get(`/conv/conversations-list`);
+        dispatch({
+            type: messageConstants.FETCH_CONV_SUCCESS,
+            payload: {
+                conv: response.data,
+                message: "Get conversations successfully..."
+            }
+        });
+    } catch (error) {
+        dispatch({
+            type: messageConstants.FETCH_CONV_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+    }
+};
+
+export const fetchConversationUserList = () => async (dispatch) => {
+    dispatch({ type: messageConstants.FETCH_CONV_USER_REQUEST });
+    try {
+        const response = await axios.get(`/conv/user-lists`);
+        dispatch({
+            type: messageConstants.FETCH_CONV_USER_SUCCESS,
+            payload: {
+                userList: response.data,
+                message: "Get user lists successfully..."
+            }
+        });
+    } catch (error) {
+        dispatch({
+            type: messageConstants.FETCH_CONV_USER_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+    }
+};

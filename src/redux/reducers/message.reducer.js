@@ -2,23 +2,58 @@ import { messageConstants } from '../actions/constants'
 
 const initialState = {
     messages: {},
+    conv: [],
+    userList: [],
     loading: true,
     error: null,
     message: ''
 };
 const fetchMessagesReducers = (state, action) => {
-     if (state === undefined) {
+    if (state === undefined) {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
-        case messageConstants.FETCH_MESSAGES_REQUEST:
-            state = {
+        case messageConstants.FETCH_CONV_USER_REQUEST:
+            return {
                 ...state,
-                loading: true
+                error: null,
+            };
+        case messageConstants.FETCH_CONV_USER_SUCCESS:
+            return {
+                ...state,
+                userList: action.payload.userList,
+            };
+        case messageConstants.FETCH_CONV_USER_FAILURE:
+            return {
+                ...state,
+                error: action.payload.error,
+            };
+
+        case messageConstants.FETCH_CONV_REQUEST:
+            return {
+                ...state,
+                error: null,
+            };
+        case messageConstants.FETCH_CONV_SUCCESS:
+            return {
+                ...state,
+                conv: action.payload.conv,
+            };
+        case messageConstants.FETCH_CONV_FAILURE:
+            return {
+                ...state,
+                error: action.payload.error,
+            };
+
+        case messageConstants.FETCH_MESSAGES_REQUEST:
+            return {
+                ...state,
+                loading: true,
+                error: null,
             }
-            break;
         case messageConstants.FETCH_MESSAGES_SUCCESS:
-            state = {
+            return {
+                ...state,
                 messages: {
                     messages: action.payload.userMessages,
                     receiver: action.payload.receiver,
@@ -27,14 +62,12 @@ const fetchMessagesReducers = (state, action) => {
                 message: action.payload.message,
                 loading: false
             }
-            break;
         case messageConstants.FETCH_MESSAGES_FAILURE:
-            state = {
+            return {
                 ...state,
-                errors: action.payload.error,
-                loading: true
+                loading: true,
+                error: action.payload.error,
             }
-            break;
         default: state = {
             ...state,
         }

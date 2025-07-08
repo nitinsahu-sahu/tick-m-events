@@ -33,6 +33,7 @@ interface User {
 }
 
 interface Message {
+  msgId?: string;
   user: {
     _id: string;
     name: string;
@@ -42,6 +43,9 @@ interface Message {
   message: string;
   updatedAt?: string;
   type: string;
+  senderDeleteStatus?: string;
+  receiverDeleteStatus?: string;
+  tempId?: string; // Make this optional
 }
 
 interface ConversationData {
@@ -79,9 +83,6 @@ export function ProfileCard({ selectedProvider, onRequestService }: any) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [online, setOnline] = useState<User[]>([]);
   const [message, setMessage] = useState<string>('');
-  console.log('==messages==================================');
-  console.log(messages);
-  console.log('====================================');
   // ✅ Top-level useEffect with a guard clause inside
   useEffect(() => {
     const fetchConversations = async () => {
@@ -96,51 +97,65 @@ export function ProfileCard({ selectedProvider, onRequestService }: any) {
     fetchConversations();
   }, [messages, selectedProvider?._id]);
 
+  // Initialize socket connection
   useEffect(() => {
-    setSocket(io(import.meta.env.VITE_SOCKET_URL))
-  }, [])
+    const newSocket = io(import.meta.env.VITE_SOCKET_URL);
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
-    socket?.emit('addUser', user?._id);
-    socket?.on('getUsers', (users: User[]) => {
-      setOnline(users);
-    })
-    socket?.on('getMessage', (data: {
-      senderId: string;
-      message: string;
-      conversationId: string;
-      receiverId: string;
-      user: {
-        _id: string;
-        name: string;
-        email: string;
-        profile: string;
+    if (socket) {
+      socket.emit('addUser', user?._id);
+
+      const handleGetMessage = (data: {
+        senderId: string;
+        message: string;
+        conversationId: string;
+        receiverId: string;
+        user: {
+          _id: string;
+          name: string;
+          email: string;
+          profile: string;
+        };
+        type: string;
+        updatedAt?: string;
+      }) => {
+        if (data.conversationId === messages.conversationId) {
+          setMessages(prev => ({
+            ...prev,
+            messages: [
+              ...prev.messages,
+              {
+                user: data.user,
+                message: data.message,
+                updatedAt: data.updatedAt,
+                type: data.type,
+              }
+            ]
+          }));
+        }
       };
-      type: string;
-      updatedAt?: string;
-    }) => {
 
-      setMessages(prev => ({
-        ...prev,
-        messages: [
-          ...prev.messages,
-          {
-            user: data.user,
-            message: data.message,
-            updatedAt: data.updatedAt,
-            type: data.type,
-          },
+      socket.on('getMessage', handleGetMessage);
+      socket.on('getUsers', (users: User[]) => setOnline(users));
 
-        ]
-      }))
-    })
-  }, [socket, user?._id, openChat])
+      return () => {
+        socket.off('getMessage', handleGetMessage);
+        socket.off('getUsers');
+      };
+    }
+    return undefined; // Explicit return to satisfy ESLint
+  }, [socket, messages.conversationId, user?._id]);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage('');
+    if (!message.trim()) return;
 
-    // Get receiverId correctly for both new and existing conversations
     const receiverId = typeof messages?.receiver === 'string'
       ? messages?.receiver
       : messages?.receiver?.receiverId;
@@ -150,25 +165,62 @@ export function ProfileCard({ selectedProvider, onRequestService }: any) {
       return;
     }
 
+    const tempMessageId = Date.now().toString(); // Temporary ID for optimistic update
     const messageData = {
       conversationId: messages?.conversationId,
       senderId: user?._id,
       message,
-      receiverId, // Use the properly extracted receiverId
+      receiverId,
       type: "text"
     };
 
-    try {
-      // Emit socket event
-      socket?.emit('sendMessage', messageData);
+    // Optimistic update
+    setMessages(prev => ({
+      ...prev,
+      messages: [
+        ...prev.messages,
+        {
+          user: {
+            _id: user?._id,
+            name: user?.name,
+            email: user?.email,
+            profile: user?.profile
+          },
+          message,
+          updatedAt: new Date().toISOString(),
+          type: "text",
+          tempId: tempMessageId
+        }
+      ]
+    }));
 
-      // Send HTTP request
-      const response = await axios.post(`/conv/message`, messageData);
-      console.log('Message sent successfully:', response.data);
+    setMessage('');
+
+    try {
+      // Emit socket event first
+      socket?.emit('sendMessage', {
+        ...messageData,
+        user: {
+          _id: user?._id,
+          name: user?.name,
+          email: user?.email,
+          profile: user?.profile
+        },
+        updatedAt: new Date().toISOString()
+      });
+
+      // Then send to server
+      await axios.post(`/conv/message`, messageData);
+
     } catch (error) {
       console.error('Error sending message:', error);
+      // Rollback optimistic update on error
+      setMessages(prev => ({
+        ...prev,
+        messages: prev.messages.filter(msg => msg.tempId !== tempMessageId)
+      }));
     }
-  }
+  };
 
   useEffect(() => {
     setMessages(individualMsgList)

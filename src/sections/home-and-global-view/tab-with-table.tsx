@@ -1,9 +1,9 @@
 import { Box, Button, Paper, Tab, Tabs, Typography, Grid, TextField, CardContent, Card } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
+import { toast } from 'react-toastify';
 import { MatrixOneCard } from "src/components/matrix-three-cards/matrix-one-cards";
-import { getRequestsByProvider, sendProviderProposal, getProposalById, updateProviderProposal } from "src/redux/actions/service-request";
+import { getRequestsByProvider, sendProviderProposal, getProposalById, updateProviderProposal, markRequestAsCompleted } from "src/redux/actions/service-request";
 import { AppDispatch, RootState } from "src/redux/store";
 
 import { RequestTabSection } from "./request-tab-section";
@@ -43,8 +43,6 @@ interface Project {
     orgRequirement: string;
     createdAt: string;
     updatedAt: string;
-
-    // ✅ Add these two:
     providerHasProposed?: boolean;
     providerProposal?: {
         amount: number;
@@ -56,7 +54,6 @@ interface Project {
 export function TabWithTableView() {
     const [tabValue, setTabValue] = useState(0);
     const { requests } = useSelector((state: RootState) => state?.serviceRequest);
-    console.log(requests);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const tabLabels = ["Available Projects", "Confirmed Services"];
     const [amount, setAmount] = useState('');
@@ -80,6 +77,19 @@ export function TabWithTableView() {
         setTabValue(newValue);
         setSelectedProject(null);
     };
+    
+    const handleMarkCompleted = async (project: Project) => {
+      
+        const res = await dispatch(markRequestAsCompleted(project._id) as any);
+
+        if (res?.type?.includes("SUCCESS")) {
+              toast.success("Marked as completed successfully.");
+            dispatch(getRequestsByProvider({ status: "accepted-by-organizer" }));
+        } else {
+              toast.error(res?.message || "Something went wrong.");
+        }
+    };
+
 
     return (
         <>
@@ -316,6 +326,8 @@ export function TabWithTableView() {
                         // data={confirmedServicesTableData}
                         data={requests}
                         type="2"
+                        onViewDetails={() => { }}
+                        onMarkCompleted={handleMarkCompleted}
                     />
                 )}
             </Paper>

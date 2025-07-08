@@ -18,13 +18,15 @@ export function HomeAndGlobalTable({
     data,
     type,
     onApply,
-    onViewDetails
+    onViewDetails,
+    onMarkCompleted,
 }: {
     headers: string[];
     type: string;
     data: any[];
     onApply?: (row: any) => void;
     onViewDetails?: (row: any) => void;
+    onMarkCompleted?: (row: any) => void;
 }) {
 
     const theme = useTheme();
@@ -195,7 +197,8 @@ export function HomeAndGlobalTable({
                                             <Button
                                                 variant="outlined"
                                                 size="small"
-                                                onClick={() => console.log("Mark as Completed", row)}
+                                                // ye 
+                                                onClick={() => onMarkCompleted?.(row)} 
                                                 sx={{
                                                     marginX: 0.5,
                                                     color: "white",
@@ -207,6 +210,8 @@ export function HomeAndGlobalTable({
                                             </Button>
                                         </TableCell>
                                     )}
+
+
                                 </TableRow>
                             ))
                         )

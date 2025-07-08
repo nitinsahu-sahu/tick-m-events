@@ -36,7 +36,6 @@ export function RequestTabSection({
     const [selectedOption, setSelectedOption] = useState<string>('');
     const [filteredData, setFilteredData] = useState<any[]>(data || []);
     const [uniqueOrganizers, setUniqueOrganizers] = useState<any[]>([]);
-console.log('unize',uniqueOrganizers);
 
     useEffect(() => {
         if (data) {

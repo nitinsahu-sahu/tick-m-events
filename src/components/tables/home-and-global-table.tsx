@@ -197,13 +197,15 @@ export function HomeAndGlobalTable({
                                             <Button
                                                 variant="outlined"
                                                 size="small"
-                                                // ye 
-                                                onClick={() => onMarkCompleted?.(row)} 
+                                                onClick={() => onMarkCompleted?.(row)}
+                                                disabled={new Date(row.eventId?.date) > new Date()}
                                                 sx={{
                                                     marginX: 0.5,
                                                     color: "white",
                                                     borderColor: "gray",
-                                                    backgroundColor: "#0B2E4C"
+                                                    backgroundColor: "#0B2E4C",
+                                                    opacity: new Date(row.eventId?.date) > new Date() ? 0.5 : 1,
+                                                    pointerEvents: new Date(row.eventId?.date) > new Date() ? "none" : "auto",
                                                 }}
                                             >
                                                 Mark as Completed

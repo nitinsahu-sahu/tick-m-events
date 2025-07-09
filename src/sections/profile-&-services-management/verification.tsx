@@ -23,12 +23,12 @@ export function ProfileVerification() {
         { label: "Identity Verified", status: false, verify: '', type: "identity", disabled: true },
         // { label: "Payment Verified", status: false, verify: '', type: "payment", disabled: true },
     ]);
-
+    const [documentType, setDocumentType] = useState('');
+    const [identityFile, setIdentityFile] = useState<File | null>(null);
     const [openModal, setOpenModal] = useState(false);
     const [currentVerification, setCurrentVerification] = useState<VerificationItem | null>(null);
     const [otp, setOtp] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [identityFile, setIdentityFile] = useState<File | null>(null);
     const [country, setCountry] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
 
@@ -156,11 +156,11 @@ export function ProfileVerification() {
     };
 
     const handleIdentityUpload = async () => {
-        if (!identityFile) return;
+        if (!identityFile || !documentType) return;
 
         const formData = new FormData();
         formData.append('identity', identityFile);
-
+        formData.append('type', documentType);
         try {
             const response = await axios.post('/verification/verify-identity', formData, {
                 headers: {
@@ -361,8 +361,23 @@ export function ProfileVerification() {
                         <>
                             <Typography variant="h6" gutterBottom>Identity Verification</Typography>
                             <Typography variant="body2" gutterBottom>
-                                Upload a clear photo of your government-issued ID (Passport, Driver&apos;s License, etc.)
+                                Select the type of identity document and upload a clear photo or scan.
                             </Typography>
+
+                            <FormControl fullWidth margin="normal">
+                                <InputLabel id="document-type-label">Document Type</InputLabel>
+                                <Select
+                                    labelId="document-type-label"
+                                    value={documentType}
+                                    onChange={(e) => setDocumentType(e.target.value)}
+                                    label="Document Type"
+                                >
+                                    <MenuItem value="passport">Passport</MenuItem>
+                                    <MenuItem value="driving_license">Driving License</MenuItem>
+                                    <MenuItem value="national_id">National ID</MenuItem>
+                                </Select>
+                            </FormControl>
+
                             <input
                                 type="file"
                                 accept="image/*,.pdf"
@@ -370,13 +385,14 @@ export function ProfileVerification() {
                                 style={{ marginTop: '16px' }}
                             />
                             <Typography variant="body2" color="red" mb="16px" fontSize={10}>
-                                Please ensure the system accepts both PDF and image file formats.
+                                Supported formats: PDF or image (JPEG, PNG).
                             </Typography>
+
                             <Button
                                 variant="contained"
                                 onClick={handleIdentityUpload}
                                 fullWidth
-                                disabled={!identityFile}
+                                disabled={!identityFile || !documentType}
                             >
                                 Submit for Verification
                             </Button>

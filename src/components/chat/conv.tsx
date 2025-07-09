@@ -3,128 +3,26 @@ import { useEffect, useState } from 'react';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useDispatch, useSelector } from 'react-redux';
 import { io, Socket } from 'socket.io-client'
-import { fetchConversation, fetchConversationUserList, fetchMessagesbyConvId } from 'src/redux/actions/message.action';
+import SearchIcon from '@mui/icons-material/Search';
 
+import { fetchConversation, fetchConversationUserList, fetchMessagesbyConvId } from 'src/redux/actions/message.action';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { formatTimeToAMPM } from 'src/hooks/formate-time';
 import axios from '../../redux/helper/axios'
+import { HeadingCommon } from '../multiple-responsive-heading/heading';
+import { SelectedUser, ConversationUser, UnreadCounts, MessagesState, ConversationData,SocketUser } from './utills';
 
-interface UnreadCounts {
-  [conversationId: string]: number;
-}
 
-interface avatar {
-  public_id: string;
-  url: string;
-}
-
-interface Organizer {
-  _id: string;
-  name: string;
-  email: string;
-  avatar: avatar;
-}
-
-interface Event {
-  _id: string;
-  eventName: string;
-  date: string;
-  time: string;
-  location: string;
-  description: string;
-  averageRating: number;
-}
-
-interface ServiceRequest {
-  _id: string;
-  serviceType: string;
-  budget: string;
-  description: string;
-  additionalOptions: string;
-}
-
-interface ProviderProposal {
-  amount: number | null;
-  days: number;
-  message: string;
-}
-
-interface ConversationUser {
-  _id: string;
-  eventId: Event;
-  organizerId: Organizer;
-  serviceRequestId: ServiceRequest;
-  providerId: string;
-  status: string;
-  contractStatus: string;
-  orgBudget: number;
-  orgRequirement: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-  providerHasProposed: boolean;
-  providerProposal: ProviderProposal;
-}
-
-interface User {
-  userId: string;
-  socketId: string;
-}
-
-interface Message {
-  msgId?: string;
-  user: {
-    _id: string;
-    name: string;
-    email: string;
-    profile: string;
-  };
-  message: string;
-  updatedAt?: string;
-  type: string;
-  senderDeleteStatus?: string;
-  receiverDeleteStatus?: string;
-  tempId?: string; // Make this optional
-}
-
-interface ConversationData {
-  convId: any;
-  userData: any;
-  _id: string;
-}
-
-interface MessagesState {
-  conversationId?: string;
-  receiver?: {
-    receiverId: string;
-  };
-  messages: Message[];
-}
-
-interface User {
-  _id: string;
-  receiverId: string;
-  email: string;
-  name: string;
-  avatar: string;
-}
-
-interface SelectedUser {
-  user: User;
-  conversationId: string;
-}
 
 export function ChatPanel() {
   const [selectedOption, setSelectedOption] = useState<SelectedUser>();
+  console.log(selectedOption,'selectedOption');
+  
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state?.auth);
   const [convUser, setConvUser] = useState<ConversationUser | null>(null);
   const { conv, userList } = useSelector((state: RootState) => state.allMessages);
   const [unreadCounts, setUnreadCounts] = useState<UnreadCounts>({});
-  console.log('====================================');
-  console.log('selectedOption', selectedOption);
-  console.log('conv', conv);
-  console.log('====================================');
   const [messages, setMessages] = useState<MessagesState>({
     messages: []
   });
@@ -133,14 +31,48 @@ export function ChatPanel() {
   const [conversations, setConversations] = useState<any>({});
   const [isConvId, setIsConvId] = useState<ConversationData | undefined>();
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [online, setOnline] = useState<User[]>([]);
+  const [online, setOnline] = useState([]);
   const [message, setMessage] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
   useEffect(() => {
     dispatch(fetchConversation());
     dispatch(fetchConversationUserList());
 
-  }, [dispatch]);
+  }, [dispatch,messages]);
+
+  // Filter users based on search query
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredUsers(conv || []);
+      setSearchResults([]);
+      return;
+    }
+
+    // Filter existing conversations
+    const filteredConv = conv?.filter((item: any) =>
+      item.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // Filter potential new users from userList
+    const filteredNewUsers = userList?.filter((item: any) => {
+      const isNotInConv = !conv?.some((convItem: any) =>
+        convItem.user._id === item._id ||
+        convItem.user.userId === item._id
+      );
+      return (
+        isNotInConv &&
+        (item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.email.toLowerCase().includes(searchQuery.toLowerCase())
+        ))
+    });
+
+    setFilteredUsers(filteredConv || []);
+    setSearchResults(filteredNewUsers || []);
+  }, [searchQuery, conv, userList]);
 
   // Initialize socket connection
   useEffect(() => {
@@ -194,7 +126,7 @@ export function ChatPanel() {
       };
 
       socket.on('getMessage', handleGetMessage);
-      socket.on('getUsers', (users: User[]) => setOnline(users));
+      socket.on('getUsers', (users) => setOnline(users));
 
       return () => {
         socket.off('getMessage', handleGetMessage);
@@ -213,7 +145,6 @@ export function ChatPanel() {
       : messages?.receiver?.receiverId;
 
     if (!receiverId && messages?.conversationId === 'new') {
-      console.error('Receiver ID is required for new conversation');
       return;
     }
 
@@ -314,6 +245,10 @@ export function ChatPanel() {
     fetchConversations();
   }, [messages, convUser?.organizerId?._id, selectedOption]);
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   return (
     <Box sx={{
       display: 'flex',
@@ -324,16 +259,101 @@ export function ChatPanel() {
     }}>
       {/* Users List */}
       <Box sx={{
-        width: 300,
-        borderRight: '1px solid #e0e0e0',
-        overflowY: 'auto'
+        width: { xs: '100%', sm: 2700, md: 300 }, // Responsive width
+        borderRight: { xs: 'none', sm: '1px solid #e0e0e0' }, // Hide border on mobile
+        borderLeft: '1px solid #e0e0e0', // Hide border on mobile
+        overflowY: 'auto',
+        height: { xs: 'auto', sm: 'calc(100vh - 105px)' }, // Full height on desktop
+        borderRadius: 2,
+        position: { xs: 'absolute', sm: 'relative' }, // Absolute positioning on mobile
+        zIndex: { xs: 1000, sm: 'auto' }, // Ensure it's above other content on mobile
+        backgroundColor: 'background.paper',
+        display: { xs: selectedOption ? 'none' : 'block', sm: 'block' }, // Hide on mobile when chat is open
       }}>
-        <Typography variant="h6" sx={{ p: 2, borderBottom: '1px solid #e0e0e0' }}>
-          Chats
-        </Typography>
-        {conv?.length > 0 ? (
-          <List sx={{ flex: 1 }}>
-            {conv?.map((item: any, index: any) => (
+        <HeadingCommon
+          variant="h6"
+          color="#000080"
+          baseSize="18px"
+          title="Tick-m Events"
+          css={{
+            p: 2,
+            borderBottom: '1px solid #e0e0e0',
+            position: { xs: 'sticky', sm: 'static' }, // Sticky on mobile
+            top: 0,
+            backgroundColor: 'background.paper',
+            zIndex: 1
+          }}
+        />
+
+        {/* Search Box */}
+        <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0' }}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search users..."
+            size="small"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            InputProps={{
+              startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} />
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '20px',
+              }
+            }}
+          />
+        </Box>
+
+        {/* Search Results for New Users */}
+        {searchQuery && searchResults.length > 0 && (
+          <Box sx={{ p: 1, borderBottom: '1px solid #e0e0e0' }}>
+            <Typography variant="subtitle2" sx={{ px: 1, py: 0.5, color: 'text.secondary' }}>
+              New Conversations
+            </Typography>
+            {searchResults.map((row) => (
+              <ListItem
+                key={row._id}
+                button
+                onClick={() => {
+                  const item = {
+                    user: {
+                      receiverId: row._id,
+                      name: row.name,
+                      email: row.email,
+                      avatar: row.avatar.url
+                    },
+                    conversationId: 'new'
+                  };
+                  setSelectedOption(item);
+                  fetchMessages('new', row._id);
+                }}
+                sx={{
+                  '&:hover': {
+                    backgroundColor: '#f5f5f5'
+                  }
+                }}
+              >
+                <ListItemAvatar>
+                  <Avatar src={row.avatar.url} alt={row.name} />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={row.name}
+                  secondary={row.email}
+                  secondaryTypographyProps={{ noWrap: true }}
+                />
+                <ChatIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+              </ListItem>
+            ))}
+          </Box>
+        )}
+
+        {filteredUsers?.length > 0 ? (
+          <List sx={{
+            flex: 1,
+            pt: { xs: 0, sm: 0 } // Adjust padding
+          }}>
+            {filteredUsers?.map((item: any, index: any) => (
               <ListItem
                 key={item._id || index}
                 button
@@ -354,19 +374,24 @@ export function ChatPanel() {
                     backgroundColor: item.user.isOrganizer
                       ? '#e3f2fd'
                       : '#fafafa'
-                  }
+                  },
+                  px: { xs: 1, sm: 2 }, // Responsive padding
+                  py: { xs: 1, sm: 1.5 } // Responsive padding
                 }}
                 selected={selectedOption?.conversationId === item.conversationId}
               >
-                <ListItemAvatar>
-                  <Avatar src={item.user.avatar} alt={item.user.name} />
+                <ListItemAvatar sx={{ minWidth: { xs: 40, sm: 56 } }}>
+                  <Avatar
+                    src={item.user.avatar}
+                    alt={item.user.name}
+                    sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }}
+                  />
                 </ListItemAvatar>
                 <ListItemText
                   primary={
-                    <Box >
-                      <Typography>{item.user.name}</Typography>
-
-                    </Box>
+                    <Typography variant="body1" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                      {item.user.name}
+                    </Typography>
                   }
                   secondary={
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -377,7 +402,8 @@ export function ChatPanel() {
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
-                          maxWidth: '180px'
+                          maxWidth: { xs: 120, sm: 180 },
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' }
                         }}
                       >
                         {item.user.email}
@@ -385,19 +411,20 @@ export function ChatPanel() {
                     </Box>
                   }
                   secondaryTypographyProps={{ noWrap: true }}
+                  sx={{ my: 0 }} // Remove default margin
                 />
-                <Box>
+                <Box sx={{ ml: { xs: 0.5, sm: 1 } }}>
                   {unreadCounts[item.conversationId] > 0 && (
                     <Box sx={{
                       backgroundColor: '#032D4F',
                       color: 'white',
                       borderRadius: '50%',
-                      width: 20,
-                      height: 20,
+                      width: { xs: 18, sm: 20 },
+                      height: { xs: 18, sm: 20 },
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: 12
+                      fontSize: { xs: 10, sm: 12 }
                     }}>
                       {unreadCounts[item.conversationId]}
                     </Box>
@@ -414,19 +441,26 @@ export function ChatPanel() {
             alignItems: 'center',
             justifyContent: 'center',
             textAlign: 'center',
-            p: 4
+            p: { xs: 2, sm: 4 },
+            height: 'calc(100% - 64px)' // Account for header height
           }}>
             <ChatIcon sx={{
-              fontSize: 60,
+              fontSize: { xs: 48, sm: 60 },
               color: '#bdbdbd',
               mb: 2
             }} />
-            <Typography variant="h6" sx={{ mb: 1 }}>
-              No conversations found
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              You don&apos;t have any active conversations
-            </Typography>
+            <HeadingCommon
+              variant="h6"
+              mb={1}
+              baseSize={{ xs: '16px', sm: '18px' }}
+              title="No conversations found"
+            />
+            <HeadingCommon
+              variant="body2"
+              color="text.secondary"
+              baseSize={{ xs: '14px', sm: '16px' }}
+              title="You don't have any active conversations"
+            />
           </Box>
         )}
       </Box>
@@ -448,8 +482,11 @@ export function ChatPanel() {
               gap: 2,
               backgroundColor: '#f5f5f5'
             }}>
-              <Avatar src={selectedOption.user.avatar} alt={selectedOption.user.name} />
-              <Typography variant="h6">{selectedOption.user.name}</Typography>
+              <Avatar
+                src={selectedOption?.user?.avatar}
+                alt={selectedOption?.user?.name}
+              />
+              <Typography variant="h6">{selectedOption?.user?.name}</Typography>
             </Box>
 
             {/* Messages */}
@@ -483,37 +520,6 @@ export function ChatPanel() {
                 <Typography sx={{ textAlign: 'center', mt: 2 }}>No Messages</Typography>
               )}
             </Box>
-            {/* <Box sx={{
-              flex: 1,
-              p: 2,
-              overflowY: 'auto',
-              backgroundColor: '#fafafa'
-            }}>
-              {messages.map((msg) => (
-                <Box key={msg.id} sx={{
-                  mb: 2,
-                  display: 'flex',
-                  justifyContent: msg.isCurrentUser ? 'flex-end' : 'flex-start'
-                }}>
-                  <Box sx={{
-                    p: 1.5,
-                    borderRadius: 2,
-                    maxWidth: '70%',
-                    backgroundColor: msg.isCurrentUser ? '#032D4F' : '#e0e0e0',
-                    color: msg.isCurrentUser ? 'white' : 'black'
-                  }}>
-                    <Typography variant="body1">{msg.text}</Typography>
-                    <Typography variant="caption" sx={{
-                      display: 'block',
-                      textAlign: 'right',
-                      color: msg.isCurrentUser ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)'
-                    }}>
-                      {msg.sender}
-                    </Typography>
-                  </Box>
-                </Box>
-              ))}
-            </Box> */}
 
             {/* Message input */}
             <Box sx={{

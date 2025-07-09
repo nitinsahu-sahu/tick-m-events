@@ -14,8 +14,11 @@ import reminderReducer from './reminder.reducer'
 import serveiceRequestReducer from './serviceRequest.Reducer'
 import fetchMessagesReducers from './message.reducer'
 import { paymentSettingsReducer } from './payment-setting.reducer';
+import { adminVerificationListReducer } from './verificationReducers'
+import { userReducer } from './userReducer';
 
 const rootReducer = combineReducers({
+    adminVerificationList: adminVerificationListReducer,
     paymentSettings: paymentSettingsReducer,
     allMessages: fetchMessagesReducers,
     serviceReqCategories: serveiceRequestReducer,
@@ -30,7 +33,8 @@ const rootReducer = combineReducers({
     homeRecom: homeAndRecommandationReducer,
     ticketReservationMang: ticketTypeReducer,
     transactions: transactionPaymentReducer,
-    serviceRequest: eventServiceReqReducer
+    serviceRequest: eventServiceReqReducer,
+     user: userReducer,
 })
 
 export default rootReducer

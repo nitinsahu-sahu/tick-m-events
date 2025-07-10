@@ -56,6 +56,7 @@ export const TicketingAndTransactionsSupervisionPage = lazy(() => import('src/pa
 export const MarketplaceAndServiceProviderSupervisionPage = lazy(() => import('src/pages/marketplace-&-service-provider-supervision'));
 export const PasswordRecoveryPage = lazy(() => import('src/pages/password-recovery'));
 export const ProfileAndServicesManagementPage = lazy(() => import('src/pages/profile-&-services-management'));
+export const MessageingRelationshipPage = lazy(() => import('src/pages/messageing-relationship'));
 
 
 // ----------------------------------------------------------------------
@@ -101,6 +102,10 @@ export function Router() {
         {
           path: '/home-and-recommendations',
           element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><HomeAndRecommendationsPage /></RoleProtectedRoute>
+        },
+        {
+          path: '/messaging-relationship',
+          element: <RoleProtectedRoute allowedRoles={['admin', 'organizer']} currentRole={currentRole}><MessageingRelationshipPage /></RoleProtectedRoute>
         },
         {
           path: '/event-search-and-details',
@@ -172,7 +177,7 @@ export function Router() {
           path: '/statistics-&-performance',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><StatisticsAndPerformancePage /> </RoleProtectedRoute>
         },
-        
+
         {
           path: '/profile-&-services-management',
           element: <RoleProtectedRoute allowedRoles={['provider', 'admin', 'organizer', 'participant']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
@@ -210,7 +215,7 @@ export function Router() {
           path: '/ticketing-&-transactions-supervision',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><TicketingAndTransactionsSupervisionPage /></RoleProtectedRoute>
         },
-        
+
         // -----------------------**************-------------------------
 
         {

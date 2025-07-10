@@ -73,6 +73,12 @@ export const navData: NavItem[] = [
     ],
   },
   {
+    title: 'Messaging',
+    path: '/messaging-relationship',
+    icon: icon('ic_chat'),
+    roles: ['admin', 'organizer'],
+  },
+  {
     title: 'Ticket & Reservation Management',
     path: '/ticket-and-reservation-management',
     icon: icon('ic-analytics'),

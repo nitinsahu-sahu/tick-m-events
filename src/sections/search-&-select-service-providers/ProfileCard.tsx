@@ -2,12 +2,11 @@ import {
   Collapse, Box, Select, MenuItem, InputLabel, FormControl, Typography,
   Button, Avatar, Grid, Paper, Divider, SelectChangeEvent, IconButton,
   Menu, ListItemIcon, Dialog, DialogTitle,
-  DialogContent, DialogActions, TextField
+  DialogContent, DialogActions
 } from '@mui/material';
-import { io, Socket } from 'socket.io-client'
 import { toast } from "react-toastify";
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { WhatsApp, Facebook, Twitter, LinkedIn, Instagram, Link as LinkIcon, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
@@ -15,216 +14,25 @@ import flags from 'react-phone-number-input/flags';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { AppDispatch, RootState } from 'src/redux/store';
-import { fetchMessagesbyConvId } from 'src/redux/actions/message.action';
 import { formatTimeToAMPM } from 'src/hooks/formate-time';
 
 import { ServiceCard } from './ServiceCard';
 import { TikTokIcon } from '../profile-&-services-management/utills';
-import axios from '../../redux/helper/axios'
 
 interface PhoneNumberDisplayProps {
   phoneNumber: string;
   defaultCountry?: CountryCode;
 }
 
-interface User {
-  userId: string;
-  socketId: string;
-}
-
-interface Message {
-  msgId?: string;
-  user: {
-    _id: string;
-    name: string;
-    email: string;
-    profile: string;
-  };
-  message: string;
-  updatedAt?: string;
-  type: string;
-  senderDeleteStatus?: string;
-  receiverDeleteStatus?: string;
-  tempId?: string; // Make this optional
-}
-
-interface ConversationData {
-  convId: any;
-  userData: any;
-  _id: string;
-}
-
-interface MessagesState {
-  conversationId?: string;
-  receiver?: {
-    receiverId: string;
-  };
-  messages: Message[];
-}
-
 export function ProfileCard({ selectedProvider, onRequestService }: any) {
-  const dispatch = useDispatch<AppDispatch>();
   const [showDetails, setShowDetails] = useState(false);
   const { services } = selectedProvider
   const { fullData } = useSelector((state: RootState) => state?.event);
-  const { user } = useSelector((state: RootState) => state?.auth);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
   const openShareMenu = Boolean(shareAnchorEl);
   const [copySuccess, setCopySuccess] = useState(false);
-  const [openChat, setOpenChat] = useState(false);
-  const [messages, setMessages] = useState<MessagesState>({
-    messages: []
-  });
-  const individualMsgList = useSelector((state: RootState) => state.allMessages.messages);
 
-  const [conversations, setConversations] = useState<any>({});
-  const [isConvId, setIsConvId] = useState<ConversationData | undefined>();
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [online, setOnline] = useState<User[]>([]);
-  const [message, setMessage] = useState<string>('');
-  // ✅ Top-level useEffect with a guard clause inside
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const response = await axios.get(`/conv/conversations?userId=${selectedProvider?._id}`);
-
-        setConversations(response?.data);
-      } catch (error) {
-        console.log("Conversation not found");
-      }
-    };
-    fetchConversations();
-  }, [messages, selectedProvider?._id]);
-
-  // Initialize socket connection
-  useEffect(() => {
-    const newSocket = io(import.meta.env.VITE_SOCKET_URL);
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (socket) {
-      socket.emit('addUser', user?._id);
-
-      const handleGetMessage = (data: {
-        senderId: string;
-        message: string;
-        conversationId: string;
-        receiverId: string;
-        user: {
-          _id: string;
-          name: string;
-          email: string;
-          profile: string;
-        };
-        type: string;
-        updatedAt?: string;
-      }) => {
-        if (data.conversationId === messages.conversationId) {
-          setMessages(prev => ({
-            ...prev,
-            messages: [
-              ...prev.messages,
-              {
-                user: data.user,
-                message: data.message,
-                updatedAt: data.updatedAt,
-                type: data.type,
-              }
-            ]
-          }));
-        }
-      };
-
-      socket.on('getMessage', handleGetMessage);
-      socket.on('getUsers', (users: User[]) => setOnline(users));
-
-      return () => {
-        socket.off('getMessage', handleGetMessage);
-        socket.off('getUsers');
-      };
-    }
-    return undefined; // Explicit return to satisfy ESLint
-  }, [socket, messages.conversationId, user?._id]);
-
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!message.trim()) return;
-
-    const receiverId = typeof messages?.receiver === 'string'
-      ? messages?.receiver
-      : messages?.receiver?.receiverId;
-
-    if (!receiverId && messages?.conversationId === 'new') {
-      console.error('Receiver ID is required for new conversation');
-      return;
-    }
-
-    const tempMessageId = Date.now().toString(); // Temporary ID for optimistic update
-    const messageData = {
-      conversationId: messages?.conversationId,
-      senderId: user?._id,
-      message,
-      receiverId,
-      type: "text"
-    };
-
-    // Optimistic update
-    setMessages(prev => ({
-      ...prev,
-      messages: [
-        ...prev.messages,
-        {
-          user: {
-            _id: user?._id,
-            name: user?.name,
-            email: user?.email,
-            profile: user?.profile
-          },
-          message,
-          updatedAt: new Date().toISOString(),
-          type: "text",
-          tempId: tempMessageId
-        }
-      ]
-    }));
-
-    setMessage('');
-
-    try {
-      // Emit socket event first
-      socket?.emit('sendMessage', {
-        ...messageData,
-        user: {
-          _id: user?._id,
-          name: user?.name,
-          email: user?.email,
-          profile: user?.profile
-        },
-        updatedAt: new Date().toISOString()
-      });
-
-      // Then send to server
-      await axios.post(`/conv/message`, messageData);
-
-    } catch (error) {
-      console.error('Error sending message:', error);
-      // Rollback optimistic update on error
-      setMessages(prev => ({
-        ...prev,
-        messages: prev.messages.filter(msg => msg.tempId !== tempMessageId)
-      }));
-    }
-  };
-
-  useEffect(() => {
-    setMessages(individualMsgList)
-  }, [individualMsgList])
 
   const handleEventChange = (event: SelectChangeEvent<string>) => {
     setSelectedEventId(event.target.value);
@@ -302,25 +110,6 @@ export function ProfileCard({ selectedProvider, onRequestService }: any) {
 
     window.open(url, '_blank', 'noopener,noreferrer');
     handleShareClose();
-  };
-
-  // Chat system
-
-  const fetchMessages = async (conversationId: any, receiver: any) => {
-    dispatch(fetchMessagesbyConvId(conversationId, receiver, user?._id));
-  };
-
-  const fetchMsgData = (convId: string | undefined, userData: any) => {
-
-    // If convId is undefined or null, it will default to "new"
-    fetchMessages(convId, userData);
-
-    const covData = {
-      convId: convId || "new",
-      userData,
-      _id: user?._id
-    };
-    setIsConvId(covData);
   };
 
   return (
@@ -567,155 +356,7 @@ export function ProfileCard({ selectedProvider, onRequestService }: any) {
               </MenuItem>
             </Menu>
           </Grid>
-          <Grid item xs={12} sm={6} md={6} mt={3} width="100%">
-            {
-              conversations?.conversationId ? <Button
-                fullWidth
-                variant="contained"
-                onClick={() => {
-                  fetchMsgData(conversations.conversationId, conversations.user)
-                  setOpenChat(true);
-                }}
-                sx={{
-                  backgroundColor: "#032D4F",
-                  textTransform: "none",
-                  borderRadius: "8px",
-                  fontWeight: 500,
-                  fontSize: "14px",
-                  py: 1.5,
-                  "&:hover": {
-                    backgroundColor: "#021f37",
-                  },
-                }}
-              >
-                Continue Conversation
-              </Button> :
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={() => {
-                    fetchMessages('new', selectedProvider?._id);
-                    setOpenChat(true);
-                  }}
-                  sx={{
-                    backgroundColor: "#032D4F",
-                    textTransform: "none",
-                    borderRadius: "8px",
-                    fontWeight: 500,
-                    fontSize: "14px",
-                    py: 1.5,
-                    "&:hover": {
-                      backgroundColor: "#021f37",
-                    },
-                  }}
-                >
-                  Conversation
-                </Button>
-            }
-          </Grid>
         </Box>
-
-        {/* Chat Dialog */}
-        <Dialog
-          open={openChat}
-          onClose={() => setOpenChat(false)}
-          fullWidth
-          maxWidth="sm"
-        >
-          <DialogTitle sx={{
-            backgroundColor: '#032D4F',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2
-          }}>
-            <Avatar
-              src={selectedProvider?.avatar?.url}
-              alt={selectedProvider?.name}
-              sx={{ width: 40, height: 40 }}
-            />
-            <Typography variant="h6">{selectedProvider?.name}</Typography>
-          </DialogTitle>
-
-          <DialogContent sx={{
-            height: '400px',
-            display: 'flex',
-            flexDirection: 'column',
-            p: 0
-          }}>
-            {/* Messages Container with auto-scroll */}
-            <Box
-              flex={1}
-              p={2}
-              sx={{
-                overflowY: 'auto',
-                backgroundColor: '#f5f5f5',
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-              ref={(el: any) => {
-                if (el) {
-                  // Auto-scroll to bottom when messages change
-                  el.scrollTop = el.scrollHeight;
-                }
-              }}
-            >
-              {messages?.messages?.length > 0 ? (
-                messages.messages.map((msg: any, index) => (
-                  <>
-                    <MessageBubble
-                      key={msg.msgId || index}
-                      message={msg}
-                      isCurrentUser={msg.user._id === user?._id}
-                    />
-                  </>
-
-                ))
-              ) : (
-                <Typography sx={{ textAlign: 'center', mt: 2 }}>No Messages</Typography>
-              )}
-            </Box>
-
-            {/* Message Input */}
-            <Box sx={{
-              p: 2,
-              borderTop: '1px solid #e0e0e0',
-              display: 'flex',
-              gap: 1
-            }}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                placeholder="Type your message..."
-                size="small"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={(e: any) => e.key === 'Enter' && sendMessage}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '20px',
-                  }
-                }}
-              />
-              <Button
-                onClick={sendMessage}
-                variant="contained"
-                disabled={!message}
-                sx={{
-                  backgroundColor: "#032D4F",
-                  borderRadius: '20px',
-                  minWidth: 'auto',
-                  px: 3,
-                  "&:hover": {
-                    backgroundColor: "#021f37",
-                  },
-                }}
-              >
-                Send
-              </Button>
-            </Box>
-          </DialogContent>
-        </Dialog>
 
         {/* Copy Success Dialog */}
         <Dialog open={copySuccess} onClose={() => setCopySuccess(false)}>

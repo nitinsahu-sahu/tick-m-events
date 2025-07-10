@@ -1,23 +1,24 @@
-import { Box, Avatar, Typography, TextField, Button, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
+import {
+  Box, Avatar, Typography, TextField, Button, List, ListItem, ListItemAvatar, ListItemText,
+  InputAdornment, IconButton, MenuItem, Menu
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useDispatch, useSelector } from 'react-redux';
 import { io, Socket } from 'socket.io-client'
 import SearchIcon from '@mui/icons-material/Search';
+import { AttachFile, CameraAlt, InsertPhoto, InsertDriveFile } from '@mui/icons-material';
 
 import { fetchConversation, fetchConversationUserList, fetchMessagesbyConvId } from 'src/redux/actions/message.action';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { formatTimeToAMPM } from 'src/hooks/formate-time';
+
 import axios from '../../redux/helper/axios'
 import { HeadingCommon } from '../multiple-responsive-heading/heading';
-import { SelectedUser, ConversationUser, UnreadCounts, MessagesState, ConversationData,SocketUser } from './utills';
-
-
+import { SelectedUser, ConversationUser, UnreadCounts, MessagesState, ConversationData } from './utills';
 
 export function ChatPanel() {
   const [selectedOption, setSelectedOption] = useState<SelectedUser>();
-  console.log(selectedOption,'selectedOption');
-  
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state?.auth);
   const [convUser, setConvUser] = useState<ConversationUser | null>(null);
@@ -28,20 +29,28 @@ export function ChatPanel() {
   });
   const individualMsgList = useSelector((state: RootState) => state.allMessages.messages);
 
-  const [conversations, setConversations] = useState<any>({});
-  const [isConvId, setIsConvId] = useState<ConversationData | undefined>();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [online, setOnline] = useState([]);
   const [message, setMessage] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   useEffect(() => {
     dispatch(fetchConversation());
     dispatch(fetchConversationUserList());
 
-  }, [dispatch,messages]);
+  }, [dispatch, messages]);
 
   // Filter users based on search query
   useEffect(() => {
@@ -229,14 +238,12 @@ export function ChatPanel() {
       userData,
       _id: user?._id
     };
-    setIsConvId(covData);
   };
 
   useEffect(() => {
     const fetchConversations = async () => {
       try {
-        const response = await axios.get(`/conv/conversations?userId=${convUser?.organizerId?._id || selectedOption}`);
-        setConversations(response?.data);
+        await axios.get(`/conv/conversations?userId=${convUser?.organizerId?._id || selectedOption}`);
       } catch (error) {
         console.log("Conversation not found");
       }
@@ -528,6 +535,7 @@ export function ChatPanel() {
               display: 'flex',
               gap: 1
             }}>
+
               <TextField
                 fullWidth
                 variant="outlined"
@@ -539,9 +547,62 @@ export function ChatPanel() {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '20px',
+                    paddingRight: '40px', // Make space for icons
                   }
                 }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => console.log('Camera clicked')}>
+                        <CameraAlt fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        onClick={handleClick}
+                        aria-controls={open ? 'attachment-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                      >
+                        <AttachFile fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
+
+              {/* Attachment menu */}
+              <Menu
+                id="attachment-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                  'aria-labelledby': 'attachment-button',
+                }}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+              >
+                <MenuItem onClick={() => {
+                  console.log('Gallery selected');
+                  handleClose();
+                }}>
+                  <InsertPhoto fontSize="small" sx={{ mr: 1 }} />
+                  Gallery
+                </MenuItem>
+                <MenuItem onClick={() => {
+                  console.log('Document selected');
+                  handleClose();
+                }}>
+                  <InsertDriveFile fontSize="small" sx={{ mr: 1 }} />
+                  Document
+                </MenuItem>
+              </Menu>
+
               <Button
                 onClick={sendMessage}
                 variant="contained"

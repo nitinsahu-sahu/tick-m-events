@@ -2,7 +2,6 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { EventSearchAndDetailsView } from 'src/sections/event-search-and-details/view';
 import { MarketplaceAndServiceProviderSupervisionView } from 'src/sections/marketplace-&-service-provider-supervision/view';
 
 // ----------------------------------------------------------------------

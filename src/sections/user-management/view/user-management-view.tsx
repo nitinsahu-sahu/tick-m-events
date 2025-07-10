@@ -8,32 +8,32 @@ import { OverviewTableCard } from '../OverviewTableCard';
 import { KycDocumentTableCard } from '../KycDocumentTableCard';
 import { ActionAndSectionTable } from '../ActionAndSectionTable';
 import UserActivityCard from '../UserActivityCard';
- 
+
 export function UserManagementView() {
   const [activeTab, setActiveTab] = useState('User List');
- 
+
   return (
     <DashboardContent>
       <PageTitleSection />
       <TopNavButtons active={activeTab} onChange={setActiveTab} />
- 
+
       {activeTab === 'User List' && (
         <>
           <SearchCard />
-            <OverviewTableCard />
+          <OverviewTableCard />
         </>
       )}
- 
+
       {activeTab === 'KYC Verification' && (
-          <KycDocumentTableCard />
+        <KycDocumentTableCard />
       )}
- 
+
       {activeTab === 'Actions & Sanctions' && (
-          <ActionAndSectionTable />
+        <ActionAndSectionTable />
       )}
- 
+
       {activeTab === 'Activity History' && (
-          <UserActivityCard />
+        <UserActivityCard />
       )}
     </DashboardContent>
   );

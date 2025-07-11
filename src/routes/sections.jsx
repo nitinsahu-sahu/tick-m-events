@@ -57,6 +57,7 @@ export const MarketplaceAndServiceProviderSupervisionPage = lazy(() => import('s
 export const PasswordRecoveryPage = lazy(() => import('src/pages/password-recovery'));
 export const ProfileAndServicesManagementPage = lazy(() => import('src/pages/profile-&-services-management'));
 export const MessageingRelationshipPage = lazy(() => import('src/pages/messageing-relationship'));
+export const EventEditPage = lazy(() => import('src/pages/evets-edit'));
 
 
 // ----------------------------------------------------------------------
@@ -148,6 +149,10 @@ export function Router() {
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><EventDetailsPage /></RoleProtectedRoute>
         },
         {
+          path: '/events/edit',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><EventEditPage /></RoleProtectedRoute>
+        },
+        {
           path: '/ticket-and-reservation-management',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><TicketAndReservationManagementPage /></RoleProtectedRoute>
         },
@@ -180,7 +185,7 @@ export function Router() {
 
         {
           path: '/profile-&-services-management',
-          element: <RoleProtectedRoute allowedRoles={['provider', 'admin', 'organizer', 'participant']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
+          element: <RoleProtectedRoute allowedRoles={['provider', 'admin', 'participant']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
         },
         {
           path: '/confirmed-service-calendar',

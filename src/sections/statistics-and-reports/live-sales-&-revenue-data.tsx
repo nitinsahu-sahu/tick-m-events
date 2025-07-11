@@ -44,7 +44,7 @@ export function LiveSalesRevenueData() {
     yaxis: { show: false },
     colors: ["#FFFFFF", "#0B2E4C"],
     legend: { show: false }
-    
+
   }), []);
 
   const lineChartOptions = useMemo<ApexOptions>(() => ({
@@ -126,36 +126,7 @@ export function LiveSalesRevenueData() {
       </Grid>
 
       {/* Download Buttons */}
-      <Grid container spacing={2} mt={1} justifyContent="center">
-        <Grid item xs={12}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: { md: "center" },
-              flexWrap: { xs: "nowrap", sm: "wrap" },
-              overflowX: { xs: "auto", sm: "visible" },
-              gap: 2,
-              pb: 1,
-              "&::-webkit-scrollbar": { height: 4 },
-              "&::-webkit-scrollbar-thumb": { background: "#868686", borderRadius: 3 },
-            }}
-          >
-            {downloadButtons.map((button) => (
-              <Button
-                key={button.label}
-                variant="contained"
-                sx={{
-                  backgroundColor: button.color,
-                  minWidth: "150px",
-                  "&:hover": { backgroundColor: `${button.color}CC` }
-                }}
-              >
-                {button.label}
-              </Button>
-            ))}
-          </Box>
-        </Grid>
-      </Grid>
+      
     </Box>
   );
 }

@@ -76,13 +76,6 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
                             ))}
                         </Select>
                     </FormControl>
-
-                    {/* Status Chips */}
-                    <Stack direction="row" spacing={1} alignItems="center" ml={4}>
-                        <StatusChip label="Open" color="green" />
-                        <StatusChip label="Pending" color="orange" />
-                        <StatusChip label="Closed" color="red" />
-                    </Stack>
                 </Box>
             )}
 
@@ -92,12 +85,7 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
                     <Typography color="text.secondary" fontSize={13}>/</Typography>
                     <Typography color="text.secondary" fontSize={13}>{eventInformation?.eventName || "select code"}</Typography>
 
-                    {/* Status Chips */}
-                    <Stack direction="row" spacing={1} alignItems="center" ml={4}>
-                        <StatusChip label="Open" color="green" />
-                        <StatusChip label="Pending" color="orange" />
-                        <StatusChip label="Closed" color="red" />
-                    </Stack>
+                    
                 </Box>
             )}
 

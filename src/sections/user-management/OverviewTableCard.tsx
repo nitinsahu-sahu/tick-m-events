@@ -8,37 +8,148 @@ import { useDispatch, useSelector } from 'react-redux';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
-
+import { useTheme } from '@mui/material/styles';
 import { AppDispatch, RootState } from "src/redux/store";
-import { getAllUsers } from '../../redux/actions/userActions';
+import { toast } from 'react-toastify';
+import ConfirmActionModal from 'src/components/modal/confirm-action-modal';
+import { getAllUsers, validateUser, blockUser } from '../../redux/actions/userActions';
+import UserDetailsModal from '../../components/modal/user-details-modal';
+
+
+interface Verification {
+  emailVerified: boolean;
+  whatsappVerified: boolean;
+  paymentVerified: boolean;
+  identityVerified: boolean;
+  identityDocuments?: {
+    status: string;
+  }[];
+}
 
 interface User {
-  id: string;
+  _id: string;
   name: string;
+  email: string;
+  number: string;
+  gender: string;
   role: string;
+  status: string;
   createdAt: string;
-  status: 'Pending' | 'Suspended' | 'Active' | string;
-  email?: string;
+  updatedAt: string;
+  avatar?: {
+    url?: string;
+  };
+  isVerified: boolean;
+  isAdmin: boolean;
+  address?: string;
+  verification?: Verification | null;
 }
 
 export function OverviewTableCard() {
   const dispatch = useDispatch<AppDispatch>();
+  const theme = useTheme();
   const { loading, users, error } = useSelector((state: RootState) => state.user);
   const [searchText, setSearchText] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
   const [roleFilter, setRoleFilter] = useState<string[]>([]);
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<() => void>(() => { });
+  const [confirmTitle, setConfirmTitle] = useState('');
+  const [confirmDesc, setConfirmDesc] = useState('');
 
   useEffect(() => {
     dispatch(getAllUsers());
   }, [dispatch]);
+
+  const getActionButtons = (row: any) => {
+    const buttons = [
+      <Button
+        key="view"
+        variant="outlined"
+        size="small"
+        sx={{ textTransform: 'none', flexShrink: 0 }}
+        onClick={() => handleViewDetails(row)}
+      >
+        View Profile
+      </Button>
+    ];
+
+    if (row.status === 'pending' || row.status === 'block') {
+      buttons.push(
+        <Button
+          key="validate"
+          variant="contained"
+          color="success"
+          size="small"
+          sx={{ flexShrink: 0 }}
+          onClick={() =>
+            handleConfirmAction(
+              () => dispatch(validateUser(row.id)),
+              "Validate User",
+              "Are you sure you want to validate this user?"
+            )
+          }
+        >
+          Validate
+        </Button>
+      );
+    }
+
+    if (row.status === 'pending' || row.status === 'active') {
+      buttons.push(
+        <Button
+          key="block"
+          variant="contained"
+          color="error"
+          size="small"
+          sx={{ flexShrink: 0 }}
+          onClick={() =>
+            handleConfirmAction(
+              () => dispatch(blockUser(row.id)),
+              "Block User",
+              "Are you sure you want to block this user?"
+            )
+          }
+        >
+          Block
+        </Button>
+      );
+    }
+
+    if (row.status === 'inActive') {
+      buttons.push(
+        <Button
+          key="reactivate"
+          variant="contained"
+          color="success"
+          size="small"
+          sx={{ flexShrink: 0 }}
+          onClick={() =>
+            handleConfirmAction(
+              () => dispatch(validateUser(row.id)),
+              "Reactivate User",
+              "Are you sure you want to reactivate this user?"
+            )
+          }
+        >
+          Reactivate
+        </Button>
+      );
+    }
+
+
+    return buttons;
+  };
 
   // Transform users data for DataGrid
   const transformedUsers = users?.map((user: any) => ({
     id: user._id || Math.random().toString(36).substr(2, 9),
     name: user.name,
     role: user.role,
-    email: user.email,
+    // email: user.email,
     createdAt: new Date(user.createdAt).toLocaleDateString(),
     status: user.status,
   })) || [];
@@ -81,13 +192,13 @@ export function OverviewTableCard() {
         </Typography>
       )
     },
-    {
-      field: 'email',
-      headerName: 'Email',
-      flex: 1.5,
-      align: 'center',
-      headerAlign: 'center',
-    },
+    // {
+    //   field: 'email',
+    //   headerName: 'Email',
+    //   flex: 1.5,
+    //   align: 'center',
+    //   headerAlign: 'center',
+    // },
     {
       field: 'createdAt',
       headerName: 'Registration Date',
@@ -122,80 +233,106 @@ export function OverviewTableCard() {
       flex: 1.5,
       align: 'center',
       headerAlign: 'center',
-      renderCell: (params) => {
-        const status = params.row.status;
-        return (
-          <Box sx={{
+      renderCell: (params) => (
+        <Box
+          sx={{
             width: '100%',
             overflowX: 'auto',
             '&::-webkit-scrollbar': {
               height: '2px',
             },
-            '&::-webkit-scrollbar-track': {
-              background: '#f1f1f1',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              background: '#888',
-              borderRadius: '3px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              background: '#555',
-            }
-          }}>
-            <Stack
-              direction="row"
-              spacing={1}
-              justifyContent="center"
-              alignItems="center"
-              sx={{
-                width: 'max-content', // This ensures the Stack takes only the space it needs
-                minWidth: '100%',    // This ensures it takes at least the full width
-                py: 1,               // Add some vertical padding
-                px: 0.5,             // Add some horizontal padding
-              }}
-            >
-              <Button
-                variant="outlined"
-                size="small"
-                sx={{ textTransform: 'none', flexShrink: 0 }}
-              >
-                View Profile
-              </Button>
-              {status === 'pending' && (
-                <>
-                  <Button variant="contained" color="success" size="small" sx={{ flexShrink: 0 }}>
-                    Validate
-                  </Button>
-                  <Button variant="contained" color="error" size="small" sx={{ flexShrink: 0 }}>
-                    Block
-                  </Button>
-                </>
-              )}
-              {status === 'suspended' && (
-                <>
-                  <Button variant="contained" color="success" size="small" sx={{ flexShrink: 0 }}>
-                    Reactivate
-                  </Button>
-                  <Button variant="contained" color="error" size="small" sx={{ flexShrink: 0 }}>
-                    Block
-                  </Button>
-                </>
-              )}
-              {status === 'active' && (
-                <Button variant="contained" color="error" size="small" sx={{ flexShrink: 0 }}>
-                  Block
-                </Button>
-              )}
-            </Stack>
-          </Box>
-        );
-      }
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={1}
+            justifyContent="center"
+            alignItems="center"
+            sx={{ minWidth: '100%', py: 1, px: 0.5 }}
+          >
+            {getActionButtons(params.row)}
+
+            <UserDetailsModal
+              open={detailsOpen}
+              onClose={handleCloseDetails}
+              user={selectedUser}
+            />
+
+            <ConfirmActionModal
+              open={confirmOpen}
+              onClose={() => setConfirmOpen(false)}
+              onConfirm={handleConfirm}
+              title={confirmTitle}
+              description={confirmDesc}
+            />
+          </Stack>
+        </Box>
+      )
+
     }
   ];
 
   // Extract unique roles and statuses for filter options
   const uniqueRoles = Array.from(new Set(transformedUsers.map((user: User) => user.role)));
   const uniqueStatuses = Array.from(new Set(transformedUsers.map((user: User) => user.status)));
+
+  const exportToCSV = (data: any[], filename: string = 'export.csv') => {
+    if (!data.length) return;
+
+    const filteredData = data.map((user: any, index: number) => ({
+      id: user._id || index.toString(),
+      name: user.name,
+      role: user.role,
+      createdAt: user.createdAt,
+      status: user.status,
+    }));
+
+    const header = Object.keys(filteredData[0]).join(',');
+    const rows = filteredData.map(obj => Object.values(obj).join(','));
+    const csvContent = [header, ...rows].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+
+  // Profile details modal
+  const handleViewDetails = (row: any) => {
+    const fullUser = users.find((user: any) => user._id === row.id);
+    setSelectedUser(fullUser || null);
+    setDetailsOpen(true);
+  };
+
+
+  const handleCloseDetails = () => {
+    setSelectedUser(null);
+    setDetailsOpen(false);
+  };
+
+  // block and validation
+  const handleConfirmAction = (action: () => void, title: string, description: string) => {
+    setConfirmTitle(title);
+    setConfirmDesc(description);
+    setConfirmAction(() => action);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirm = async () => {
+    try {
+      await confirmAction();
+      toast.success("Action completed successfully!");
+    } catch (err) {
+      toast.error("Something went wrong.");
+    }
+    setConfirmOpen(false);
+  };
 
   return (
     <Paper
@@ -356,7 +493,7 @@ export function OverviewTableCard() {
             }}
             sx={{
               '& .MuiDataGrid-columnHeaders': {
-                backgroundColor: '#2395D4 !important', // Changed to the requested color
+                backgroundColor: '#1976d2',
                 color: '#2395D4', // Changed to white for better contrast
                 fontSize: '1rem',
               },
@@ -382,6 +519,38 @@ export function OverviewTableCard() {
           />
         </Box>
       )}
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mt={4}>
+        <ResponsiveActionButton>View Account Details</ResponsiveActionButton>
+        <ResponsiveActionButton onClick={() => exportToCSV(filteredUsers, 'users.csv')}>
+          Export Data
+        </ResponsiveActionButton>
+      </Stack>
     </Paper>
+  );
+}
+function ResponsiveActionButton({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
+  return (
+    <Button
+      onClick={onClick}
+      fullWidth
+      sx={{
+        borderRadius: '20px',
+        backgroundColor: '#0B2E4C',
+        color: 'white',
+        height: 45,
+        textTransform: 'none',
+        '&:hover': {
+          backgroundColor: '#071E33',
+        },
+      }}
+    >
+      {children}
+    </Button>
   );
 }

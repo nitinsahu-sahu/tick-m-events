@@ -223,24 +223,6 @@ export function MarketingEngagenmentView() {
               </Box>
             </Box>
 
-            {/* Real-Time Campaign Statistics */}
-            <Typography fontWeight="bold" mb={1}>
-              Real-Time Campaign Statistics
-            </Typography>
-
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 4 }}>
-              {[
-                { label: "Open Rate: 0%" },
-                { label: "Link Clicks: 0" },
-                { label: "Conversions: 0" },
-              ].map((item, index) => (
-                <Box key={index}>
-                  <Typography variant="body2" mb={0.5}>{item.label}</Typography>
-                  <Box sx={{ height: "8px", background: "#E5E7EB", borderRadius: "5px" }} />
-                </Box>
-              ))}
-            </Box>
-
 
             {/* Send Notifications Button */}
             <Button

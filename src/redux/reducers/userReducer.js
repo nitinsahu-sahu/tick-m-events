@@ -20,6 +20,39 @@ export const userReducer = (state, action) => {
 
         case userConstants.GET_USERS_FAIL:
             return { ...state, loading: false, error: action.payload };
+        // Validate User
+        case userConstants.VALIDATE_USER_REQUEST:
+            return { ...state, loading: true, error: null };
+
+        case userConstants.VALIDATE_USER_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                users: state.users.map(user =>
+                    user._id === action.payload._id ? action.payload : user
+                ),
+                error: null,
+            };
+
+        case userConstants.VALIDATE_USER_FAIL:
+            return { ...state, loading: false, error: action.payload };
+
+        // Block User
+        case userConstants.BLOCK_USER_REQUEST:
+            return { ...state, loading: true, error: null };
+
+        case userConstants.BLOCK_USER_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                users: state.users.map(user =>
+                    user._id === action.payload._id ? action.payload : user
+                ),
+                error: null,
+            };
+
+        case userConstants.BLOCK_USER_FAIL:
+            return { ...state, loading: false, error: action.payload };
 
         default:
             return state;

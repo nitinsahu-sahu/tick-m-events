@@ -20,8 +20,8 @@ const EventsInfo = () => <Label color="success" variant="inverted">3</Label>
 
 export const navData: NavItem[] = [
   // All Users Dashboard
- 
-   {
+
+  {
     title: 'Home & Global View',
     path: '/',
     icon: icon('ic_global_view'),
@@ -67,7 +67,7 @@ export const navData: NavItem[] = [
       },
       {
         title: 'Edit an Event',
-        path: '/events/check-schedule',
+        path: '/events/edit',
         icon: icon('ic_event_edit'),
       },
     ],
@@ -109,7 +109,7 @@ export const navData: NavItem[] = [
     roles: ['organizer'],
   },
   // Provider Sidebar
-  
+
   {
     title: 'Event Settings',
     path: '/visibility-and-access-settings',
@@ -153,7 +153,7 @@ export const navData: NavItem[] = [
     icon: icon('ic_photo_video'),
     roles: ['participant'],
   },
- 
+
   {
     title: 'Reservations & Contracts',
     path: '/reservations-and-contracts',
@@ -178,7 +178,7 @@ export const navData: NavItem[] = [
     icon: icon('ic_client_relation'),
     roles: ['provider'],
   },
-  
+
   {
     title: 'Global Overview & General Statistics',
     path: '/global-overview-&-general-statistics',
@@ -209,9 +209,9 @@ export const navData: NavItem[] = [
     title: 'Profile & Services Management',
     path: '/profile-&-services-management',
     icon: icon('ic_profile_service'),
-    roles: ['provider', 'admin', 'organizer', 'organizer', 'participant'],
+    roles: ['provider', 'admin', 'participant'],
   },
- {
+  {
     title: 'Statistics',
     path: '/statistics-&-performance',
     icon: icon('ic-analytics'),

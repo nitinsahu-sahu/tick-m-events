@@ -102,7 +102,7 @@ export function TransactionAndPaymentTable({ headers, data, type }: any) {
                                             ))}
                                         </Box>
                                     ) : key === "action" && type === "3" ? (
-                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                        <Box sx={{ gap: 1 }}>
                                             {row[key].map((action: string, actionIdx: number) => (
                                                 <Button
                                                     key={actionIdx}

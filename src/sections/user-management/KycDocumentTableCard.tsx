@@ -86,6 +86,7 @@ export function KycDocumentTableCard() {
               py: 1.5,
               px: 2,
               fontWeight: 600,
+               textAlign: 'center',
             }}
           >
             <div>User</div>
@@ -127,6 +128,7 @@ export function KycDocumentTableCard() {
                       ? '1px solid rgba(195, 195, 195, 1)'
                       : 'none',
                   backgroundColor: '#f5f5f5',
+                   textAlign: 'center',
                 }}
               >
                 <div>{item?.user?.name || 'N/A'}</div>

@@ -304,7 +304,7 @@ export function SignInView() {
         <option value="">Select your role</option>
         <option value="participant">Participant</option>
         <option value="organizer">Organizer</option>
-        <option value="admin">Admin</option>
+        <option value="provider">Provider</option>
       </TextField>
 
       {/* Password */}

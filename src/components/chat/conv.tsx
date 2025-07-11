@@ -1,23 +1,24 @@
-import { Box, Avatar, Typography, TextField, Button, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
-import { useEffect, useState } from 'react';
+import {
+  Box, Avatar, Typography, TextField, Button, List, ListItem, ListItemAvatar, ListItemText,
+  InputAdornment, IconButton, MenuItem, Menu
+} from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useDispatch, useSelector } from 'react-redux';
 import { io, Socket } from 'socket.io-client'
 import SearchIcon from '@mui/icons-material/Search';
+import { AttachFile, CameraAlt, InsertPhoto, InsertDriveFile } from '@mui/icons-material';
 
 import { fetchConversation, fetchConversationUserList, fetchMessagesbyConvId } from 'src/redux/actions/message.action';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { formatTimeToAMPM } from 'src/hooks/formate-time';
+
 import axios from '../../redux/helper/axios'
 import { HeadingCommon } from '../multiple-responsive-heading/heading';
-import { SelectedUser, ConversationUser, UnreadCounts, MessagesState, ConversationData,SocketUser } from './utills';
-
-
+import { SelectedUser, ConversationUser, UnreadCounts, MessagesState, ConversationData } from './utills';
 
 export function ChatPanel() {
   const [selectedOption, setSelectedOption] = useState<SelectedUser>();
-  console.log(selectedOption,'selectedOption');
-  
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state?.auth);
   const [convUser, setConvUser] = useState<ConversationUser | null>(null);
@@ -28,20 +29,30 @@ export function ChatPanel() {
   });
   const individualMsgList = useSelector((state: RootState) => state.allMessages.messages);
 
-  const [conversations, setConversations] = useState<any>({});
-  const [isConvId, setIsConvId] = useState<ConversationData | undefined>();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [online, setOnline] = useState([]);
   const [message, setMessage] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   useEffect(() => {
     dispatch(fetchConversation());
     dispatch(fetchConversationUserList());
 
-  }, [dispatch,messages]);
+  }, [dispatch, messages]);
 
   // Filter users based on search query
   useEffect(() => {
@@ -229,14 +240,12 @@ export function ChatPanel() {
       userData,
       _id: user?._id
     };
-    setIsConvId(covData);
   };
 
   useEffect(() => {
     const fetchConversations = async () => {
       try {
-        const response = await axios.get(`/conv/conversations?userId=${convUser?.organizerId?._id || selectedOption}`);
-        setConversations(response?.data);
+        await axios.get(`/conv/conversations?userId=${convUser?.organizerId?._id || selectedOption}`);
       } catch (error) {
         console.log("Conversation not found");
       }
@@ -247,6 +256,126 @@ export function ChatPanel() {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+  };
+
+  // Trigger file input click
+  const triggerFileInput = (type: 'image' | 'document') => {
+    if (fileInputRef.current) {
+      fileInputRef.current.accept = type === 'image'
+        ? 'image/jpeg,image/png,image/gif'
+        : 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      fileInputRef.current.click();
+    }
+  };
+
+  // File input handler
+  const handleFileInputChange = (type: 'image' | 'document') => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    const validDocumentTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+    if (type === 'image' && !validImageTypes.includes(file.type)) {
+      alert('Please select a valid image file (JPEG, PNG, GIF)');
+      return;
+    }
+
+    if (type === 'document' && !validDocumentTypes.includes(file.type)) {
+      alert('Please select a valid document file (PDF, DOC, DOCX)');
+      return;
+    }
+
+    handleUpload(file, type);
+    e.target.value = ''; // Reset input
+  };
+
+  // Upload file to Cloudinary
+  const handleUpload = async (file: File, type: 'image' | 'document' | 'video') => {
+    if (!selectedOption) {
+      alert('Please select a conversation first');
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      };
+      const result = await axios.post(`/conv/upload-file`, formData, config);
+
+      if (result.data.status === 200) {
+        // Send the URL via chat
+        const receiverId = typeof messages?.receiver === 'string'
+          ? messages?.receiver
+          : messages?.receiver?.receiverId;
+        const tempMessageId = Date.now().toString(); // Temporary ID for optimistic update
+
+        const messageData = {
+          conversationId: messages?.conversationId,
+          senderId: user?._id,
+          message,
+          file: {
+            public_id: result.data.public_id,
+            url: result.data.secure_url
+          },
+          receiverId,
+          type: "file"
+        };
+        // // Optimistic update
+        // setMessages(prev => ({
+        //   ...prev,
+        //   messages: [
+        //     ...prev.messages,
+        //     {
+        //       user: {
+        //         _id: user?._id,
+        //         name: user?.name,
+        //         email: user?.email,
+        //         profile: user?.profile
+        //       },
+        //       file: {
+        //         public_id: data.public_id,
+        //         url: data.secure_url
+        //       },
+        //       message,
+        //       updatedAt: new Date().toISOString(),
+        //       type,
+        //       tempId: tempMessageId
+        //     }
+        //   ]
+        // }));
+
+        // // Emit socket event
+        // socket?.emit('sendMessage', {
+        //   ...messageData,
+        //   user: {
+        //     _id: user?._id,
+        //     name: user?.name,
+        //     email: user?.email,
+        //     profile: user?.profile
+        //   },
+        //   updatedAt: new Date().toISOString()
+        // });
+
+        // Send to server
+        const res = await axios.post(`/conv/message`, messageData);
+        console.log('====================================');
+        console.log('res',res);
+        console.log('====================================');
+      }
+    } catch (error) {
+      console.error('Upload failed:', error.message);
+      alert('File upload failed. Please try again.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -528,6 +657,7 @@ export function ChatPanel() {
               display: 'flex',
               gap: 1
             }}>
+
               <TextField
                 fullWidth
                 variant="outlined"
@@ -539,9 +669,68 @@ export function ChatPanel() {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '20px',
+                    paddingRight: '40px', // Make space for icons
                   }
                 }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => console.log('Camera clicked')}>
+                        <CameraAlt fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        onClick={handleClick}
+                        aria-controls={open ? 'attachment-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                      >
+                        <AttachFile fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
+              {/* Hidden file inputs */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileInputChange('image')}
+                style={{ display: 'none' }}
+              />
+              {/* Attachment menu */}
+              <Menu
+                id="attachment-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                  'aria-labelledby': 'attachment-button',
+                }}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+              >
+                <MenuItem onClick={() => {
+                  triggerFileInput('image');
+                  handleClose();
+                }}>
+                  <InsertPhoto fontSize="small" sx={{ mr: 1 }} />
+                  Gallery
+                </MenuItem>
+                <MenuItem onClick={() => {
+                  console.log('Document selected');
+                  handleClose();
+                }}>
+                  <InsertDriveFile fontSize="small" sx={{ mr: 1 }} />
+                  Document
+                </MenuItem>
+              </Menu>
+
               <Button
                 onClick={sendMessage}
                 variant="contained"
@@ -590,29 +779,111 @@ export function ChatPanel() {
   );
 };
 
+
 const MessageBubble = ({ message, isCurrentUser }: any) => {
-  const { type, message: text, updatedAt } = message;
+  const { type, message: content, updatedAt } = message;
+  const bubbleStyle = {
+    display: 'flex',
+    justifyContent: isCurrentUser ? 'flex-end' : 'flex-start',
+    mb: 1
+  };
 
+  const contentBoxStyle = {
+    backgroundColor: isCurrentUser ? '#032D4F' : '#e0e0e0',
+    borderRadius: isCurrentUser ? '18px 18px 0 18px' : '18px 18px 18px 0',
+    overflow: 'hidden',
+    maxWidth: '70%'
+  };
+
+  const captionStyle = {
+    display: 'block',
+    textAlign: 'right',
+    color: isCurrentUser ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)',
+    p: 1
+  };
+
+  const textContentStyle = {
+    ...contentBoxStyle,
+    color: isCurrentUser ? 'white' : 'black',
+    px: 2,
+    py: 1,
+  };
+
+  if (type === 'image') {
+    return (
+      <Box sx={bubbleStyle}>
+        <Box sx={contentBoxStyle}>
+          <img
+            src={content}
+            alt="Uploaded content"
+            style={{
+              maxWidth: '100%',
+              maxHeight: '300px',
+              display: 'block'
+            }}
+          />
+          <Typography variant="caption" fontSize={10} sx={captionStyle}>
+            {formatTimeToAMPM(updatedAt)}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (type === 'document') {
+    return (
+      <Box sx={bubbleStyle}>
+        <Box sx={textContentStyle}>
+          <a
+            href={content}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: isCurrentUser ? 'white' : '#032D4F',
+              textDecoration: 'underline'
+            }}
+          >
+            View Document
+          </a>
+          <Typography variant="caption" fontSize={10} sx={captionStyle}>
+            {formatTimeToAMPM(updatedAt)}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (type === 'video') {
+    return (
+      <Box sx={bubbleStyle}>
+        <Box sx={contentBoxStyle}>
+          <video
+            controls
+            style={{
+              maxWidth: '100%',
+              maxHeight: '300px',
+              display: 'block'
+            }}
+            aria-label="Video message"
+          >
+            <source src={content} type="video/mp4" />
+            <track kind="captions" src="" srcLang="en" label="English" />
+            Your browser does not support the video tag.
+          </video>
+          <Typography variant="caption" fontSize={10} sx={captionStyle}>
+            {formatTimeToAMPM(updatedAt)}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
+
+  // Default text message
   return (
-    <Box sx={{
-      display: 'flex',
-      justifyContent: isCurrentUser ? 'flex-end' : 'flex-start',
-      mb: 1
-    }}>
-      <Box sx={{
-        backgroundColor: isCurrentUser ? '#032D4F' : '#e0e0e0',
-        color: isCurrentUser ? 'white' : 'black',
-        borderRadius: isCurrentUser ? '18px 18px 0 18px' : '18px 18px 18px 0',
-        px: 2, py: 1,
-        maxWidth: '70%'
-      }}>
-        <Typography fontSize={14}>{text}</Typography>
-        <Typography variant="caption" fontSize={10} sx={{
-          display: 'block',
-
-          textAlign: 'right',
-          color: isCurrentUser ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)'
-        }}>
+    <Box sx={bubbleStyle}>
+      <Box sx={textContentStyle}>
+        <Typography fontSize={14}>{content}</Typography>
+        <Typography variant="caption" fontSize={10} sx={captionStyle}>
           {formatTimeToAMPM(updatedAt)}
         </Typography>
       </Box>

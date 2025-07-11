@@ -43,9 +43,9 @@ export const RefundTableData = [
 export const InvoiceTableHeaders = ["Invoice ID", "Date", "Amount", "Method", "Status", "Action"];
 
 export const InvoiceTableData = [
-    { invoiceId: "#001247", date: "12-12-25", amount: "20,000 XAF", method: "Credit Card", status: "Approved", action: ["Download PDF", "Download Excel"] },
-    { invoiceId: "#001244", date: "12-12-25", amount: "20,000 XAF", method: "Credit Card", status: "Pending", action: ["Download PDF", "Download Excel"] },
-    { invoiceId: "#001242", date: "12-12-25", amount: "20,000 XAF", method: "Credit Card", status: "Approved", action: ["Download PDF", "Download Excel"] },
+    { invoiceId: "#001247", date: "12-12-25", amount: "20,000 XAF", method: "Credit Card", status: "Approved", action: ["Download PDF"] },
+    { invoiceId: "#001244", date: "12-12-25", amount: "20,000 XAF", method: "Credit Card", status: "Pending", action: ["Download PDF"] },
+    { invoiceId: "#001242", date: "12-12-25", amount: "20,000 XAF", method: "Credit Card", status: "Approved", action: ["Download PDF"] },
 ];
 
 // Payment Settings & Prefrences

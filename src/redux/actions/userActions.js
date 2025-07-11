@@ -19,3 +19,42 @@ export const getAllUsers = () => async (dispatch) => {
         });
     }
 };
+
+export const validateUser = (userId) => async (dispatch) => {
+  try {
+    dispatch({ type: userConstants.VALIDATE_USER_REQUEST });
+
+    const { data } = await axios.put(`/admin/validate/${userId}`);
+
+    dispatch({
+      type: userConstants.VALIDATE_USER_SUCCESS,
+      payload: data.data,
+    });
+
+    dispatch(getAllUsers());
+  } catch (error) {
+    dispatch({
+      type: userConstants.VALIDATE_USER_FAIL,
+      payload: error.response?.data?.message || error.message,
+    });
+  }
+};
+
+export const blockUser = (userId) => async (dispatch) => {
+  try {
+    dispatch({ type: userConstants.BLOCK_USER_REQUEST });
+
+    const { data } = await axios.put(`/admin/block/${userId}`);
+
+    dispatch({
+      type: userConstants.BLOCK_USER_SUCCESS,
+      payload: data.data,
+    });
+    dispatch(getAllUsers());
+  } catch (error) {
+    dispatch({
+      type: userConstants.BLOCK_USER_FAIL,
+      payload: error.response?.data?.message || error.message,
+    });
+  }
+};

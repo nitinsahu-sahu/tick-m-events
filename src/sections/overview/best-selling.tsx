@@ -1,19 +1,18 @@
-import { Card, Grid ,Typography,Box, MenuItem, Select, Stack, Tab, Tabs } from "@mui/material";
+import { Card, Grid, Typography, Box, MenuItem, Select, Stack, Tab, Tabs } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 
 import { Chart } from "src/components/chart";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 export function BestSelling(
-    { 
-        selectedTicket, 
-        setSelectedTicket, 
-        selectedTab, 
-        setSelectedTab,
+    {
+        selectedTicket,
+        setSelectedTicket,
         donutBestSellingChartOptions,
         donutBestSellingChartSeries,
         chartOptions
     }: any) {
-  const theme = useTheme();
+    const theme = useTheme();
 
     return (
         <Grid container spacing={3} alignItems="stretch">
@@ -32,13 +31,6 @@ export function BestSelling(
                                 <MenuItem value="Early Bird">Early Bird</MenuItem>
                             </Select>
                         </Stack>
-
-                        {/* Tabs */}
-                        <Tabs value={selectedTab} onChange={(e, newVal) => setSelectedTab(newVal)} textColor="primary" variant="scrollable" scrollButtons="auto">
-                            <Tab label="Monthly" />
-                            <Tab label="Weekly" />
-                            <Tab label="Daily" />
-                        </Tabs>
                     </Stack>
 
                     {/* Chart & Info */}
@@ -46,10 +38,13 @@ export function BestSelling(
                         <Chart options={donutBestSellingChartOptions} series={donutBestSellingChartSeries} type="donut" height={150} width={150} />
 
                         <Stack spacing={2} flex={1}>
-                            <Typography variant="body2" color="primary" fontSize={12}>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                            </Typography>
-
+                            <HeadingCommon
+                                title="Visualize your ticket performance."
+                                variant="body2"
+                                baseSize="14px"
+                                weight={400}
+                                color="primary"
+                            />
                             <Stack direction="row" justifyContent="space-between" spacing={2}>
                                 {[
                                     { color: "#12263F", value: "21,512", label: "Ticket Left" },
@@ -75,6 +70,7 @@ export function BestSelling(
                         {/* Ticket Sold Info */}
                         <Box>
                             <Typography variant="h6">Ticket Sold Today</Typography>
+
                             <Typography variant="h3" fontWeight="bold">
                                 456,502 <span style={{ fontSize: "16px" }}>pcs</span>
                             </Typography>
@@ -103,11 +99,14 @@ export function BestSelling(
                             <Box sx={{ width: "80%", height: "100%", backgroundColor: theme.palette.common.white }} />
                         </Box>
                     </Stack>
-
-                    <Typography variant="body2" mt={1}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                    </Typography>
-                    <Typography variant="body2" sx={{ mt: 1 }}>View Detail →</Typography>
+                    <HeadingCommon
+                        title="Track daily ticket sales performance and the number of tickets still available here."
+                        variant="body2"
+                        mt={1}
+                        baseSize="14px"
+                        weight={400}
+                        color="white"
+                    />
                 </Card>
             </Grid>
         </Grid>

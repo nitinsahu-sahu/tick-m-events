@@ -47,7 +47,6 @@ export function OverviewAnalyticsView() {
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedTicket, setSelectedTicket] = useState("VIP");
-  const [selectedTab, setSelectedTab] = useState(0);
   const [ticketType, setTicketType] = useState("VIP");
   const [timeframe, setTimeframe] = useState("monthly");
   const theme = useTheme();
@@ -104,7 +103,7 @@ export function OverviewAnalyticsView() {
           }}
         >
           <Typography variant="h6">Wallet Balance</Typography>
-          <Typography variant="h4" fontWeight="bold">$100.00</Typography>
+          <Typography variant="h4" fontWeight="bold">100.00 XAF</Typography>
 
           {/* Buttons */}
           <Box display="flex" gap={2} mt={1}>
@@ -114,8 +113,8 @@ export function OverviewAnalyticsView() {
 
           {/* Transaction History */}
           <Typography variant="body2" mt={1}>Transaction History:</Typography>
-          <Typography variant="body2">• +$50 (Top-up)</Typography>
-          <Typography variant="body2">• -$10 (TXN+4% Commission)</Typography>
+          <Typography variant="body2">• +50 XAF(Top-up)</Typography>
+          <Typography variant="body2">• -10 XAF (TXN+4% Commission)</Typography>
         </CardContent>
 
         {/* Right Section - Sales Chart */}
@@ -144,8 +143,6 @@ export function OverviewAnalyticsView() {
       <BestSelling
         selectedTicket={selectedTicket}
         setSelectedTicket={setSelectedTicket}
-        selectedTab={selectedTab}
-        setSelectedTab={setSelectedTab}
         donutBestSellingChartOptions={donutBestSellingChartOptions}
         donutBestSellingChartSeries={donutBestSellingChartSeries}
         chartOptions={chartOptions}

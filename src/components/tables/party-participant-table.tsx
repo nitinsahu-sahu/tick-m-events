@@ -6,10 +6,6 @@ import RemoveIcon from '@mui/icons-material/Remove';
 export function ParticipantTable({ headers, data, ticketQuantities, handleDecrement, handleIncrement }: any) {
     const theme = useTheme();
 
-    console.log('===data=================================');
-    console.log(data);
-    console.log('====================================');
-
     return (
         <TableContainer component={Paper}>
             <Table>

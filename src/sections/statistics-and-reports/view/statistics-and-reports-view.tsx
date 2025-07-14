@@ -37,7 +37,6 @@ export function StatisticsAndReportsView() {
     "Ticket Details",
     "Participant Engagement",
     "Comparisons",
-    "Reports",
   ];
 
   return (
@@ -101,16 +100,16 @@ export function StatisticsAndReportsView() {
         <>
           <LiveSalesRevenueData />
           <MainDashboardStatistics />
+          <TicketDetails events={fullData} />
         </>
       )}
 
-      {activeTab === "Ticket Details" && <TicketDetails events={fullData} />}
+      {activeTab === "Ticket Details" && <TicketDetailsAndCategories />}
 
-      {activeTab === "Participant Engagement" && <TicketDetailsAndCategories />}
+      {activeTab === "Participant Engagement" && <MainChartComponents />}
 
-      {activeTab === "Comparisons" && <MainChartComponents />}
+      {activeTab === "Comparisons" && <ReportDataExport />}
 
-      {activeTab === "Reports" && <ReportDataExport />}
     </DashboardContent>
   );
 }

@@ -84,7 +84,7 @@ export default function ProviderCardList({ handleSelct, providersList }: any) {
                         handleSelct(provider);
                       }}
                     >
-                      View Details
+                       View Profile
                     </Button>
                     <Button
                       variant="contained"

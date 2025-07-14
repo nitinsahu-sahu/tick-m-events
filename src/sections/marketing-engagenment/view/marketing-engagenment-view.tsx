@@ -20,7 +20,6 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { promotionGet } from 'src/redux/actions';
 import { AppDispatch } from 'src/redux/store';
 
-import { BookingTrends } from "../graph";
 import { PromotionsAndOffers } from '../promotion-&-offer';
 import { ActivePromotion } from '../active-promotion';
 
@@ -456,7 +455,6 @@ export function MarketingEngagenmentView() {
         {/* Responsive Graph Section */}
 
 
-        <BookingTrends />
 
         {/* Follow-up Section */}
 

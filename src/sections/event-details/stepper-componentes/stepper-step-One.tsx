@@ -19,13 +19,23 @@ import { HeadingCommon } from 'src/components/multiple-responsive-heading/headin
 import { eventCreate, fetchAllCategories } from 'src/redux/actions/event.action';
 import { AppDispatch, RootState } from 'src/redux/store';
 
-export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
+export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortraitImage }: any) {
     const navigate = useNavigate();
     const quillRef = useRef<ReactQuill>(null);
     const dispatch = useDispatch<AppDispatch>();
     const today = new Date().toISOString().split('T')[0];
     const { categories } = useSelector((state: RootState) => state.event);
-    
+
+    // yha se
+    const portraitFileInputRef = useRef<HTMLInputElement>(null);
+    const [portraitPreview, setPortraitPreview] = useState<string | null>(null);
+    const handlePortraitChange = () => {
+        const file = portraitFileInputRef.current?.files?.[0];
+        if (file) setPortraitPreview(URL.createObjectURL(file));
+    };
+
+    // yha tak
+
     useEffect(() => {
         dispatch(fetchAllCategories());
     }, [dispatch]);
@@ -62,6 +72,8 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
         event.preventDefault();
         const formEventData = new FormData();
         const files = fileInputRef.current?.files;
+        const portraitFiles = portraitFileInputRef.current?.files;
+
         // Append all form data
         formEventData.append("name", eventFormData.name);
         formEventData.append("email", eventFormData.email);
@@ -84,6 +96,7 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
             const selectedFile = files[0];
             formEventData.append("coverImage", selectedFile);
         }
+        if (portraitFiles?.[0]) formEventData.append("portraitImage", portraitFiles[0]);
         try {
             const res = await dispatch(eventCreate(formEventData));
             const eventId = res?.eventId; // Adjust based on your response structure
@@ -178,6 +191,32 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef }: any) {
                                         },
                                     }}
                                 />
+                            </Grid>
+
+                            {/** ye dala */}
+                            <Grid item xs={12} sm={6} md={3}>
+                                <TextField
+                                    label="Portrait Image (Square)"
+                                    type="file"
+                                    inputRef={portraitFileInputRef}
+                                    onChange={handlePortraitImage}
+
+                                    InputProps={{
+                                        inputProps: { accept: "image/*" },
+                                        sx: { backgroundColor: "#F9F9F9", border: "1px solid #ccc" }
+                                    }}
+                                    fullWidth
+                                />
+                                {portraitPreview && (
+                                    <Box mt={1}>
+                                        <Typography variant="caption">Preview:</Typography>
+                                        <img
+                                            src={portraitPreview}
+                                            alt="Portrait preview"
+                                            style={{ width: 150, height: 150, objectFit: "cover", borderRadius: 4 }}
+                                        />
+                                    </Box>
+                                )}
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
                                 <FormControl fullWidth>

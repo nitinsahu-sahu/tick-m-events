@@ -112,7 +112,6 @@ export function TicketCreationAndConfiguration() {
                 {/* Section Title */}
                 <HeadingCommon baseSize="33px" weight={600} variant="h5" color='#0B2E4C' title="Ticket Creation & Configuration" />
 
-
                 {/* Table Header */}
                 <Box
                     sx={{
@@ -278,28 +277,6 @@ export function TicketCreationAndConfiguration() {
                                 />
                             }
                             label="Transferable Ticket (Can be resold or given to another person)"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    name="personalizedTicket"
-                                    checked={ticketTypeOption.personalizedTicket}
-                                    onChange={handleOptionChange}
-                                    sx={{ color: "blue", "&.Mui-checked": { color: "#0B2E4C" } }}
-                                />
-                            }
-                            label="Personalized Ticket (Participant's name and account ID required for validation)"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    name="activationCode"
-                                    checked={ticketTypeOption.activationCode}
-                                    onChange={handleOptionChange}
-                                    sx={{ color: "blue", "&.Mui-checked": { color: "#0B2E4C" } }}
-                                />
-                            }
-                            label="Activation Code (Unique QR Code or manual code for entrance validation)"
                         />
                     </Box>
 

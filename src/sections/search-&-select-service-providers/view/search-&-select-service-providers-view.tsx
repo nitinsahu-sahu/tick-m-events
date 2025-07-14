@@ -11,7 +11,6 @@ import { eventFetch } from 'src/redux/actions/event.action';
 import { getRequestsByOrganizer } from 'src/redux/actions/service-request';
 import { SearchAndAdvanceFilter } from '../SearchAndAdvanceFilter';
 import ProviderCardList from '../ProviderCardList';
-import { CompareProviders } from '../CompareProviders';
 import { ProfileCard } from '../ProfileCard';
 import RequestService from '../RequestService';
  
@@ -83,7 +82,6 @@ export function SearchAndSelectServiceProvidersView() {
       {tabValue === 1 && (
         <>
           <ProviderCardList handleSelct={handleSelct} providersList={providersList} />
-          <CompareProviders />
         </>
       )}
       {tabValue === 2 && (

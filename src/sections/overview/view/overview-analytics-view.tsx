@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useMediaQuery, ToggleButtonGroup, List, Avatar, ListItemText, IconButton, ListItem, MenuItem, Box, Grid, Button, Card, CardContent, Typography, Select, Stack, ListItemAvatar, Divider, CardMedia, ToggleButton, LinearProgress, CircularProgress } from '@mui/material';
+import { useMediaQuery, ToggleButtonGroup, List, Avatar, ListItemText, IconButton, ListItem, MenuItem, Box, Grid, Button, Card, CardContent, Typography, Select, Stack, ListItemAvatar, Divider, CardMedia, ToggleButton, LinearProgress, CircularProgress, SelectChangeEvent } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import Calendar from "react-calendar";
 import ReactHtmlParser from 'react-html-parser';
 import { Link } from 'react-router-dom';
+import { ApexOptions } from 'apexcharts';
 
 import "react-calendar/dist/Calendar.css";
 import "../CustomCalendar.css"; // Custom styling for event indicators
@@ -13,15 +14,22 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { Chart } from "src/components/chart";
 import { Iconify } from 'src/components/iconify';
 import { PageTitleSection } from 'src/components/page-title-section';
-import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { truncateText } from 'src/hooks/description-cutting';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { EventBreadCrum } from 'src/sections/entry-validation/event-status';
+import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
 
 import { CountDownView } from '../count-down';
-import { latestSales, salesRevenuChartSeries, salesRevenuChartOptions, donutBestSellingChartSeries, donutBestSellingChartOptions, chartrevenuOptions, chartrevenuSeries, chartOptions, donutChartOptions } from "../utils";
+import {
+  latestSales, salesRevenuChartSeries, donutBestSellingChartSeries, donutBestSellingChartOptions,
+  chartrevenuOptions, chartrevenuSeries, chartOptions, donutChartOptions, getChartOptions,
+  TicketTypes,
+  TimePeriod, ChartData, ticketSalesData
+} from "../utils";
 import { AnalyticsFourCards } from '../analytics-four-card';
 import { BestSelling } from '../best-selling';
+import { WalletBalance } from '../wallet-revenue';
 
 function getDayNumber(dateString: any) {
   // Method 1: Fastest (string manipulation)
@@ -42,12 +50,17 @@ function getDayName(dateString: string): string {
 
 export function OverviewAnalyticsView() {
   const { upcomingEvents, latestEvents } = useSelector((state: RootState) => state?.homeRecom);
-  const dispatch = useDispatch<AppDispatch>();
   const eventDates = latestEvents?.map((event: any) => new Date(event.date).toDateString());
-
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const [ticketType, setTicketType] = useState<TicketTypes>('VIP');
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>('monthly');
+  const [chartData, setChartData] = useState<ChartData>({
+    series: [{ name: 'Sales', data: [] }],
+    options: getChartOptions([])
+  });
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedTicket, setSelectedTicket] = useState("VIP");
-  const [ticketType, setTicketType] = useState("VIP");
   const [timeframe, setTimeframe] = useState("monthly");
   const theme = useTheme();
   const isMobileTablet = useMediaQuery(theme.breakpoints.down("sm")); // Show mobile/tablet view
@@ -55,19 +68,59 @@ export function OverviewAnalyticsView() {
   const up = true;
   const percentage = 75;
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     dispatch(recommTrandingPopularEventFetch());
-  //   }, 6000);
+  const handleEventSelect = (event: Event | null) => {
+    setSelectedEvent(event);
+    // Do something with the selected event data
+  };
 
-  //   return () => clearInterval(interval);
-  // }, [dispatch]);
+  useEffect(() => {
+    dispatch(recommTrandingPopularEventFetch());
+  }, [dispatch]);
+
+  // Mock data - replace with your actual data fetching logic
+
+
+  // Generate appropriate x-axis categories based on time period
+  const getCategories = (period: TimePeriod): string[] => {
+    switch (period) {
+      case 'daily':
+        return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      case 'weekly':
+        return ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7'];
+      case 'monthly':
+        return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+      default:
+        return [];
+    }
+  };
+
+  // Update chart when filters change
+  useEffect(() => {
+    const data = ticketSalesData[ticketType][timePeriod];
+    const categories = getCategories(timePeriod);
+
+    setChartData({
+      series: [{ name: 'Sales', data }],
+      options: getChartOptions(categories)
+    });
+  }, [ticketType, timePeriod]);
+
+  // Event handlers with proper typing
+  const handleTicketTypeChange = (event: SelectChangeEvent<TicketTypes>) => {
+    setTicketType(event.target.value as TicketTypes);
+  };
+
+  const handleTimePeriodChange = (event: SelectChangeEvent<TimePeriod>) => {
+    setTimePeriod(event.target.value as TimePeriod);
+  };
 
   return (
     <DashboardContent>
+      <EventBreadCrum events={upcomingEvents} onEventSelect={handleEventSelect} />
+
       <PageTitleSection
         title="Dashboard"
-        rightCom={<CountDownView />} // Passing SearchBar component as a prop
+        rightCom={<CountDownView selectedEvent={selectedEvent} />} // Passing SearchBar component as a prop
       />
 
       <AnalyticsFourCards
@@ -77,67 +130,7 @@ export function OverviewAnalyticsView() {
         donutChartOptions={donutChartOptions}
       />
 
-      <Card
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" }, // Stack on mobile, row on larger screens
-          p: 2,
-          borderRadius: 3,
-          boxShadow: 3,
-          my: 4, // Adds top and bottom margin
-        }}
-      >
-        {/* Left Section - Wallet Balance */}
-        <CardContent
-          sx={{
-            flex: 1, // 50% width for both sections
-            backgroundColor: theme.palette.primary.main,
-            color: "#fff",
-            borderRadius: 2,
-            px: 2,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center", // Center content vertically
-            justifyContent: "center", // Center content horizontally
-            textAlign: "center", // Center text
-          }}
-        >
-          <Typography variant="h6">Wallet Balance</Typography>
-          <Typography variant="h4" fontWeight="bold">100.00 XAF</Typography>
-
-          {/* Buttons */}
-          <Box display="flex" gap={2} mt={1}>
-            <Button variant="contained" color="secondary">Withdraw</Button>
-            <Button variant="contained" color="warning">Top Up</Button>
-          </Box>
-
-          {/* Transaction History */}
-          <Typography variant="body2" mt={1}>Transaction History:</Typography>
-          <Typography variant="body2">• +50 XAF(Top-up)</Typography>
-          <Typography variant="body2">• -10 XAF (TXN+4% Commission)</Typography>
-        </CardContent>
-
-        {/* Right Section - Sales Chart */}
-        <CardContent
-          sx={{
-            flex: 1, // 50% width for both sections
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center", // Center chart in column
-            // textAlign: "center",
-          }}
-        >
-          <Typography variant="h6">Sales Revenue</Typography>
-          <Chart options={chartrevenuOptions} series={chartrevenuSeries} type="line" height={200} />
-          <Button variant="contained" sx={{
-            mt: 1,
-            backgroundColor: '#0B2E4E', // No need for template literals
-
-          }}>Boost Sales</Button>
-        </CardContent>
-      </Card>
-
+      <WalletBalance />
 
       {/* Best Selling */}
       <BestSelling
@@ -160,11 +153,7 @@ export function OverviewAnalyticsView() {
                 <CardContent>
                   <HeadingCommon variant="h5" color="text.secondary" baseSize="20px" title="Recent Event List" />
                   {/* Loading/Empty State */}
-                  {!upcomingEvents && (
-                    <Box textAlign="center" py={4}>
-                      <CircularProgress size={24} />
-                    </Box>
-                  )}
+
                   {upcomingEvents?.length === 0 && (
                     <Typography
                       variant="body1"
@@ -172,59 +161,61 @@ export function OverviewAnalyticsView() {
                       color="text.secondary"
                       sx={{ py: 3 }}
                     >
-                      No events found
+                      No upcoming events found
                     </Typography>
                   )}
                   <Grid container spacing={3}>
-                    {upcomingEvents?.slice(0, 3).map((event: any) => (
-                      <Grid item xs={12} key={event._id}>
-                        <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
-                          <HeadingCommon variant="h6" color={theme.palette.primary.main} baseSize="20px" title={event.eventName} />
+                    {
+                      upcomingEvents?.slice(0, 3).map((event: any) => (
+                        <Grid item xs={12} key={event._id}>
+                          <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
+                            <HeadingCommon variant="h6" color={theme.palette.primary.main} baseSize="20px" title={event.eventName} />
 
-                          <Box display="flex" mt={1}>
-                            <CardMedia component="img" image={event?.coverImage?.url} alt={event.eventName} sx={{ width: 150, height: 85, borderRadius: 2 }} />
-                            <CardContent sx={{ flex: 1, pt: 0 }}>
-                              <Typography variant="body2" color={theme.palette.common.black}>
-                                {event.location}
-                              </Typography>
-                              <Typography variant="body2" color="textSecondary" >
-                                {ReactHtmlParser(truncateText(event?.description))}
-                              </Typography>
-                            </CardContent>
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                              <Stack alignItems="center" spacing={0.5}>
-                                <Avatar sx={{ bgcolor: "#f0f8ff" }}>
-                                  <IconButton color="primary">
-                                    <Iconify width={20} icon="ep:sold-out" />
-                                  </IconButton>
-                                </Avatar>
-                                <Typography color="primary" fontSize={12}>{event.soldTicket || 0} Sold</Typography>
-                              </Stack>
-                              <Stack alignItems="center" spacing={0.5}>
-                                <Avatar sx={{ bgcolor: "#f0f8ff" }}>
-                                  <IconButton sx={{ color: "primary" }}>
-                                    <Iconify width={20} icon="ix:ticket-filled" />
-                                  </IconButton>
-                                </Avatar>
-                                <Typography fontSize={12} color="primary">
-                                  {event.ticketQuantity === "0"
-                                    ? "Unlimited"
-                                    : `${Number(event.ticketQuantity)} pcs`}
+                            <Box display="flex" mt={1}>
+                              <CardMedia component="img" image={event?.coverImage?.url} alt={event.eventName} sx={{ width: 150, height: 85, borderRadius: 2 }} />
+                              <CardContent sx={{ flex: 1, pt: 0 }}>
+                                <Typography variant="body2" color={theme.palette.common.black}>
+                                  {event.location}
                                 </Typography>
-                              </Stack>
-                              <Stack alignItems="center" spacing={0.5}>
-                                <Avatar sx={{ bgcolor: "#f0f8ff" }}>
-                                  <IconButton color="primary">
-                                    <Iconify width={20} icon="simple-line-icons:calender" />
-                                  </IconButton>
-                                </Avatar>
-                                <Typography fontSize={12} color="primary">{event.date}</Typography>
-                              </Stack>
+                                <Typography variant="body2" color="textSecondary" >
+                                  {ReactHtmlParser(truncateText(event?.description))}
+                                </Typography>
+                              </CardContent>
+                              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                <Stack alignItems="center" spacing={0.5}>
+                                  <Avatar sx={{ bgcolor: "#f0f8ff" }}>
+                                    <IconButton color="primary">
+                                      <Iconify width={20} icon="ep:sold-out" />
+                                    </IconButton>
+                                  </Avatar>
+                                  <Typography color="primary" fontSize={12}>{event.soldTicket || 0} Sold</Typography>
+                                </Stack>
+                                <Stack alignItems="center" spacing={0.5}>
+                                  <Avatar sx={{ bgcolor: "#f0f8ff" }}>
+                                    <IconButton sx={{ color: "primary" }}>
+                                      <Iconify width={20} icon="ix:ticket-filled" />
+                                    </IconButton>
+                                  </Avatar>
+                                  <Typography fontSize={12} color="primary">
+                                    {event.ticketQuantity === "0"
+                                      ? "Unlimited"
+                                      : `${Number(event.ticketQuantity)} pcs`}
+                                  </Typography>
+                                </Stack>
+                                <Stack alignItems="center" spacing={0.5}>
+                                  <Avatar sx={{ bgcolor: "#f0f8ff" }}>
+                                    <IconButton color="primary">
+                                      <Iconify width={20} icon="simple-line-icons:calender" />
+                                    </IconButton>
+                                  </Avatar>
+                                  <Typography fontSize={12} color="primary">{event.date}</Typography>
+                                </Stack>
+                              </Box>
                             </Box>
-                          </Box>
-                        </Card>
-                      </Grid>
-                    ))}
+                          </Card>
+                        </Grid>
+                      ))
+                    }
                   </Grid>
                   {/* Conditionally show "Load More" only if 4+ events exist */}
                   {upcomingEvents?.length >= 4 && (
@@ -247,7 +238,7 @@ export function OverviewAnalyticsView() {
                     Recent Event List
                   </Typography>
                   <Grid container spacing={3}>
-                    {upcomingEvents.slice(0, 3).map((event: any) => (
+                    {upcomingEvents?.slice(0, 3)?.map((event: any) => (
                       <Grid item xs={12} key={event._id}>
                         <Card sx={{ display: "flex", flexDirection: "column", padding: 2, boxShadow: 3, borderRadius: 2 }}>
 
@@ -311,97 +302,86 @@ export function OverviewAnalyticsView() {
                 </CardContent>
               </Card>
             )}
+            <Card sx={{ mt: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Latest Sales
+                </Typography>
+                {latestSales.map((sales, index) => (
+                  <List key={index} sx={{ paddingTop: "0px", paddingX: 0 }}>
+                    <ListItem>
+                      <ListItemAvatar>
+                        <Avatar
+                          src={sales.img}
+                          sx={{ width: 40, height: 40 }}
+                        />
+                      </ListItemAvatar>
+                      <ListItemText primary={sales.name} secondary="Purchased event tickets" />
+                    </ListItem>
+                    <Divider />
+                  </List>
+                ))}
+              </CardContent>
+            </Card>
+            <Card sx={{ mt: 3 }}>
+              <CardContent>
+                <Stack
+                  direction={{ xs: "column", md: "row" }}
+                  alignItems={{ xs: "center", md: "center" }}
+                  justifyContent="space-between"
+                  spacing={2}
+                  sx={{ textAlign: { xs: "center", md: "left" }, flexWrap: "wrap" }}
+                >
+                  <Typography variant="h6" color="primary">Sales Revenue</Typography>
 
-            <Box display="flex" gap={2} flexWrap="wrap" sx={{ py: 3 }}>
-              {/* Latest Sales */}
-              <Card sx={{ flex: 1, minWidth: 300 }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Latest Sales
-                  </Typography>
-                  {latestSales.map((sales, index) => (
-                    <List key={index} sx={{ paddingTop: "0px", paddingX: 0 }}>
-                      <ListItem>
-                        <ListItemAvatar>
-                          <Avatar
-                            src={sales.img}
-                            sx={{ width: 40, height: 40 }}
-                          />
-                        </ListItemAvatar>
-                        <ListItemText primary={sales.name} secondary="Purchased event tickets" />
-                      </ListItem>
-                      <Divider />
-                    </List>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* Sales Revenue Chart */}
-              <Card sx={{ flex: 1, minWidth: 300, p: 2 }}>
-                <CardContent>
+                  {/* Ticket Type Selector */}
                   <Stack
-                    direction={{ xs: "column", md: "row" }}
-                    alignItems={{ xs: "center", md: "center" }}
-                    justifyContent="space-between"
-                    spacing={2}
-                    sx={{ textAlign: { xs: "center", md: "left" }, flexWrap: "wrap" }}
+                    direction="row"
+                    alignItems="center"
+                    spacing={1}
+                    sx={{ flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-start" } }}
                   >
-                    <Typography variant="h6" color="primary">Sales Revenue</Typography>
-
-                    {/* Ticket Type Selector */}
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      spacing={1}
-                      sx={{ flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-start" } }}
+                    <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>Ticket Type:</Typography>
+                    <Select
+                      value={ticketType}
+                      onChange={handleTicketTypeChange}
+                      size="small"
+                      sx={{ minWidth: 120 }}
                     >
-                      <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>Ticket Type:</Typography>
-                      <Select
-                        value={ticketType}
-                        onChange={(e) => setTicketType(e.target.value)}
-                        size="small"
-                        sx={{ minWidth: 100, maxWidth: "100%" }}
-                      >
-                        <MenuItem value="VIP">VIP</MenuItem>
-                        <MenuItem value="Standard">Standard</MenuItem>
-                        <MenuItem value="Early Bird">Early Bird</MenuItem>
-                      </Select>
-                    </Stack>
+                      {Object.keys(ticketSalesData).map((type) => (
+                        <MenuItem key={type} value={type}>
+                          {type}
+                        </MenuItem>
+                      ))}
+                    </Select>
                   </Stack>
-
-                  {/* Timeframe Toggle Buttons */}
-                  <Box
-                    display="flex"
-                    justifyContent={{ xs: "center", md: "space-between" }}
-                    sx={{ width: "100%", mt: 1, mb: 2 }}
+                   <Stack direction="row" alignItems="center" mt={3} spacing={1}>
+                  <Typography variant="body2">Time Period:</Typography>
+                  <Select
+                    value={timePeriod}
+                    onChange={handleTimePeriodChange}
+                    size="small"
+                    sx={{ minWidth: 120 }}
                   >
-                    <ToggleButtonGroup
-                      value={timeframe}
-                      exclusive
-                      onChange={(e, newValue) => setTimeframe(newValue)}
-                      sx={{ flexWrap: "wrap", justifyContent: "center" }}
-                    >
-                      <ToggleButton value="monthly">Monthly</ToggleButton>
-                      <ToggleButton value="weekly">Weekly</ToggleButton>
-                      <ToggleButton value="daily">Daily</ToggleButton>
-                    </ToggleButtonGroup>
-                  </Box>
-
-                  {/* Chart */}
-                  <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
-                    <Chart
-                      options={salesRevenuChartOptions}
-                      series={salesRevenuChartSeries}
-                      type="line"
-                      height={250}
-                      width="100%"
-                    />
-                  </Box>
-                </CardContent>
-              </Card>
-
-            </Box>
-
+                    <MenuItem value="daily">Daily</MenuItem>
+                    <MenuItem value="weekly">Weekly</MenuItem>
+                    <MenuItem value="monthly">Monthly</MenuItem>
+                  </Select>
+                </Stack>
+                </Stack>
+               
+                {/* Chart */}
+                <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
+                  <Chart
+                    options={chartData.options}
+                    series={chartData.series}
+                    type="line"
+                    height={250}
+                    width="100%"
+                  />
+                </Box>
+              </CardContent>
+            </Card>
           </Grid>
 
           {/* Calendar & Upcoming Events */}

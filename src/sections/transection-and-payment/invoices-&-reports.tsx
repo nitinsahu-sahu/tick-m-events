@@ -15,19 +15,6 @@ export function InvoiceHistory() {
                     data={InvoiceTableData}
                     type="3"
                 />
-
-                <Box textAlign="center" mt={3} p={3} sx={{ border: "1px solid #0B2E4C" }} borderRadius={3}>
-   
-                    <HeadingCommon title="Financial Reports" variant="h5" weight={600}/>
-
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, backgroundColor: "#1C8BC8", color: "white", py: 1.5 }}
-                    >
-                        Download Full Financial Report
-                    </Button>
-                </Box>
             </Paper>
         </Box>
     )

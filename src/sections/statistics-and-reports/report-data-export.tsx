@@ -120,22 +120,6 @@ export function ReportDataExport() {
                     </Card>
                 </Grid>
             </Grid>
-
-            {/* Report Buttons */}
-            <Box mt={4}>
-                <Typography variant="h6" fontWeight="bold" mb={2}>
-                    Reports & Data Export
-                </Typography>
-                <Grid container spacing={2}>
-                    {["PDF", "Excel", "CSV", "Send via Email"].map((label, index) => (
-                        <Grid item xs={12} md={6} key={index}>
-                            <Button fullWidth variant="contained" sx={{ backgroundColor: "#0B2E4C", color: "#fff", "&:hover": { backgroundColor: "#333" } }}>
-                                Download Full Report ({label})
-                            </Button>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
         </Box>
     )
 }

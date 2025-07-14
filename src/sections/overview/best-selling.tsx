@@ -12,7 +12,7 @@ export function BestSelling(
         donutBestSellingChartSeries,
         chartOptions
     }: any) {
-    const theme = useTheme();
+
 
     return (
         <Grid container spacing={3} alignItems="stretch">
@@ -65,7 +65,7 @@ export function BestSelling(
 
             {/* Right Card - Ticket Sold Today */}
             <Grid item xs={12} md={6}>
-                <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3, backgroundColor: theme.palette.primary.main, color: "#fff", height: "100%", display: "flex", flexDirection: "column" }}>
+                <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3, backgroundColor: "#2395D4", color: "#fff", height: "100%", display: "flex", flexDirection: "column" }}>
                     <Box display="flex" alignItems="center" justifyContent="space-between" flexWrap="wrap" mt={1}>
                         {/* Ticket Sold Info */}
                         <Box>
@@ -79,7 +79,7 @@ export function BestSelling(
                         {/* Growth Chart */}
                         <Box display="flex" alignItems="center">
                             <Chart
-                                options={{ ...chartOptions, colors: [theme.palette.common.white] }}
+                                options={{ ...chartOptions, colors: ["#FFF"] }}
                                 series={[{ name: "Tickets", data: [10, 20, 15, 25, 2, 34, 50] }]}
                                 type="line"
                                 height={110}
@@ -94,9 +94,17 @@ export function BestSelling(
 
                     {/* Progress Bar */}
                     <Stack direction={{ xs: "column", sm: "row" }} alignItems="center" mt={1} spacing={1}>
-                        <Typography sx={{ backgroundColor: theme.palette.common.white, color: theme.palette.primary.main, px: 1, borderRadius: 1 }} fontSize="12px">986 pcs left</Typography>
+                        <HeadingCommon
+                            title="986 pcs left"
+                            variant="body2"
+                            baseSize="12px"
+                            weight={400}
+                            color="#2395D4"
+                            css={{backgroundColor: "#FFF",px: 1, borderRadius: 1}}
+                        />
+                       
                         <Box sx={{ width: "100%", height: 8, backgroundColor: "#64B5F6", borderRadius: 4, overflow: "hidden" }}>
-                            <Box sx={{ width: "80%", height: "100%", backgroundColor: theme.palette.common.white }} />
+                            <Box sx={{ width: "80%", height: "100%", backgroundColor: "#FFF" }} />
                         </Box>
                     </Stack>
                     <HeadingCommon

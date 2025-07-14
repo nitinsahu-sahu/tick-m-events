@@ -1,7 +1,7 @@
 import { Box, Button,Select, MenuItem,Typography, Stack,FormControl } from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import { useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Event {
   _id: string;
@@ -24,6 +24,14 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     // Define the specific URL path where the section should appear
     const showSection = location.pathname === '/entry-validation';
+     useEffect(() => {
+        if (events && events.length > 0 && !selectedEvent) {
+            const firstEvent = events[0];
+            setSelectedEvent(firstEvent);
+            onEventSelect(firstEvent);
+        }
+    }, [events, selectedEvent, onEventSelect]);
+
     const handleChange = (e: any) => {
         const selectedId = e.target.value;
         const event = events.find((ev: any) => ev._id === selectedId) || null;
@@ -61,7 +69,7 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
                             <MenuItem value="" disabled>
                                 Select an event
                             </MenuItem>
-                            {events.map((event:any) => (
+                            {events?.map((event:any) => (
                                 <MenuItem
                                     key={event._id}
                                     value={event._id}
@@ -84,8 +92,6 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
                     <Typography fontWeight={600} fontSize={13}>Event</Typography>
                     <Typography color="text.secondary" fontSize={13}>/</Typography>
                     <Typography color="text.secondary" fontSize={13}>{eventInformation?.eventName || "select code"}</Typography>
-
-                    
                 </Box>
             )}
 

@@ -72,34 +72,42 @@ export function AnalyticsFourCards({ up, chartOptions, percentage, donutChartOpt
                                     fill: theme.palette.success.main
                                 }}
                             />
-                            <HeadingCommon title="Total number of tickets sold:" weight={300} baseSize="10px" />
+                            <HeadingCommon title="Total number of tickets sold:" weight={300} baseSize="12px" />
+                            <Box >
+                                <Chart
+                                    options={donutChartOptions}
+                                    series={[percentage, 100 - percentage]}
+                                    type="donut"
+                                    height={100}
+                                />
+                                <Typography
+                                    sx={{
+                                        fontSize: "11px",
+                                        fontWeight: "bold",
+                                        color: "black",
+                                        textAlign: "center",
+                                        mt: -7,
+                                    }}
+                                >
+                                    {percentage}%
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        fontSize: "11px",
+                                        fontWeight: "bold",
+                                        color: "black",
+                                        textAlign: "center",
+                                        mt: 4,
+                                    }}
+                                >
+                                    Attendee Engagement
+                                </Typography>
+                            </Box>
                         </Box>
-                        <HeadingCommon title="215 vs. Number of tickets scanned at the entrance: 100" weight={700} baseSize="14px" />
+                        <HeadingCommon title="215 vs. Number of tickets scanned at the entrance: 100" weight={600} baseSize="13px" />
 
                     </Box>
 
-                    {/* Right Section - Donut Chart */}
-                    <Box sx={{ width: 90 }}>
-                        <Chart
-                            options={donutChartOptions}
-                            series={[percentage, 100 - percentage]}
-                            type="donut"
-                            height={100}
-                        />
-
-                        <Typography
-                            sx={{
-                                fontSize: "11px",
-                                fontWeight: "bold",
-                                color: "black",
-                                textAlign: "center",
-                                mt: -6,
-                            }}
-                        >
-                            {percentage}% <br />
-                            Attendee Engagement
-                        </Typography>
-                    </Box>
                 </Paper>
             </Grid>
         </Grid>

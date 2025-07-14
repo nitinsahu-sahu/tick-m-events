@@ -71,7 +71,7 @@ export const PopularEvent = ({ ticket }: any) => (
       </Typography>
 
       <Grid container spacing={2} mt={2} justifyContent="center">
-        {['View Details', 'Chat Now'].map((text) => (
+        {[' View Profile', 'Chat Now'].map((text) => (
           <Grid item key={text}>
             <Button
               variant="contained"
@@ -94,7 +94,7 @@ export const PopularEvent = ({ ticket }: any) => (
   </Card>
 );
 
-export function ProviderListView({ providers,handleSelct }: any) {
+export function ProviderListView({ providers, handleSelct }: any) {
   const handleViewDetails = useCallback(() => {
     handleSelct(providers); // Now passing the object directly
   }, [handleSelct, providers]);
@@ -154,7 +154,7 @@ export function ProviderListView({ providers,handleSelct }: any) {
               onClick={handleViewDetails}
               sx={{ /* existing styles */ }}
             >
-              View Details
+              View Profile
             </Button>
           </Grid>
           <Grid item>

@@ -63,7 +63,8 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
                                 height: '25px',
                                 '& .MuiSelect-select': {
                                     padding: '6px 12px'
-                                }
+                                },
+                                textTransform: "capitalize"
                             }}
                         >
                             <MenuItem value="" disabled>

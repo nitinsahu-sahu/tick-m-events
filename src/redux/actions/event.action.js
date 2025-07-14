@@ -195,7 +195,11 @@ export const eventCustomizationCreate = ({ formEventCustomizeData, eventId, tick
     dispatch({ type: eventConstants.EVENT_CUSTOMIZTION_CREATE_REQUEST });
 
     try {
-        const response = await axios.post(`/event/tickets/ec/${eventId}/${ticketConfigId}`, formEventCustomizeData);
+        const response = await axios.post(`/event/tickets/ec/${eventId}/${ticketConfigId}`, formEventCustomizeData,{
+             headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         dispatch({
             type: eventConstants.EVENT_CUSTOMIZTION_CREATE_SUCCESS,
             payload: {
@@ -223,7 +227,11 @@ export const eventCreate = (data) => async (dispatch) => {
     dispatch({ type: eventConstants.EVENT_CREATE_REQUEST });
 
     try {
-        const response = await axios.post("/event", data);
+        const response = await axios.post("/event", data ,{
+             headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }); 
         dispatch({
             type: eventConstants.EVENT_CREATE_SUCCESS,
             payload: {

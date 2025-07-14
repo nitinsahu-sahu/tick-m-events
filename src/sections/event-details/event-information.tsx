@@ -11,8 +11,8 @@ import { StepperStepThree } from "./stepper-componentes/stepper-step-three";
 import { StepperSuccessful } from "./stepper-componentes/event-created-succesfull";
 
 
-export function EventInformation({handleEventThemeLogo, fileInputRef}:any) {
-  const stepComponents = [<StepperStepOne fileInputRef={fileInputRef} handleEventThemeLogo={handleEventThemeLogo}/>, <StepperStepTwo />, <StepperStepThree />, <StepperStepFour />];
+export function EventInformation({handleEventThemeLogo, fileInputRef, handlePortraitImage}:any) {
+  const stepComponents = [<StepperStepOne handlePortraitImage={handlePortraitImage} fileInputRef={fileInputRef} handleEventThemeLogo={handleEventThemeLogo}/>, <StepperStepTwo />, <StepperStepThree />, <StepperStepFour />];
   const steps = ['0', '1', '2', '3'];
   const { stepper } = useSelector((state: RootState) => state?.event);
   const [activeStep, setActiveStep] = useState(3);
@@ -21,15 +21,7 @@ export function EventInformation({handleEventThemeLogo, fileInputRef}:any) {
     setActiveStep(stepper);
   }, [stepper]);
 
-  // useEffect(() => {
-  //   if (stepper === 3) {
-  //     const timer = setTimeout(() => {
-  //       setActiveStep(0);
-  //     }, 10000);
-  //     return () => clearTimeout(timer);
-  //   }
-  //   return undefined; // Explicit return for other cases
-  // }, [stepper]);
+ 
 
   return (
     <Box

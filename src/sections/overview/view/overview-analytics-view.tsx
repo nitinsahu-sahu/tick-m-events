@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useMediaQuery, ToggleButtonGroup, List, Avatar, ListItemText, IconButton, ListItem, MenuItem, Box, Grid, Button, Card, CardContent, Typography, Select, Stack, ListItemAvatar, Divider, CardMedia, ToggleButton, LinearProgress, CircularProgress, SelectChangeEvent } from '@mui/material';
+import {
+  useMediaQuery, List, Avatar, ListItemText, IconButton, ListItem, MenuItem, Box,
+  Grid, Button, Card, CardContent, Typography, Select, Stack, ListItemAvatar,
+  Divider, CardMedia, ToggleButton, LinearProgress, CircularProgress, SelectChangeEvent
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import Calendar from "react-calendar";
 import ReactHtmlParser from 'react-html-parser';
 import { Link } from 'react-router-dom';
-import { ApexOptions } from 'apexcharts';
 
 import "react-calendar/dist/Calendar.css";
 import "../CustomCalendar.css"; // Custom styling for event indicators
@@ -18,13 +21,12 @@ import { AppDispatch, RootState } from 'src/redux/store';
 import { truncateText } from 'src/hooks/description-cutting';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { EventBreadCrum } from 'src/sections/entry-validation/event-status';
-import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
+import { fetchLatestSales, recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
 
 import { CountDownView } from '../count-down';
 import {
-  latestSales, salesRevenuChartSeries, donutBestSellingChartSeries, donutBestSellingChartOptions,
-  chartrevenuOptions, chartrevenuSeries, chartOptions, donutChartOptions, getChartOptions,
-  TicketTypes,
+  donutBestSellingChartSeries, donutBestSellingChartOptions, chartrevenuSeries,
+  chartOptions, donutChartOptions, getChartOptions, TicketTypes,
   TimePeriod, ChartData, ticketSalesData
 } from "../utils";
 import { AnalyticsFourCards } from '../analytics-four-card';
@@ -49,7 +51,7 @@ function getDayName(dateString: string): string {
 }
 
 export function OverviewAnalyticsView() {
-  const { upcomingEvents, latestEvents } = useSelector((state: RootState) => state?.homeRecom);
+  const { upcomingEvents, latestEvents, latestSales } = useSelector((state: RootState) => state?.homeRecom);
   const eventDates = latestEvents?.map((event: any) => new Date(event.date).toDateString());
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const dispatch = useDispatch<AppDispatch>();
@@ -61,7 +63,6 @@ export function OverviewAnalyticsView() {
   });
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedTicket, setSelectedTicket] = useState("VIP");
-  const [timeframe, setTimeframe] = useState("monthly");
   const theme = useTheme();
   const isMobileTablet = useMediaQuery(theme.breakpoints.down("sm")); // Show mobile/tablet view
   const isDesktop = useMediaQuery(theme.breakpoints.up("md")); // Show desktop view
@@ -75,9 +76,9 @@ export function OverviewAnalyticsView() {
 
   useEffect(() => {
     dispatch(recommTrandingPopularEventFetch());
+    dispatch(fetchLatestSales());
   }, [dispatch]);
 
-  // Mock data - replace with your actual data fetching logic
 
 
   // Generate appropriate x-axis categories based on time period
@@ -113,7 +114,6 @@ export function OverviewAnalyticsView() {
   const handleTimePeriodChange = (event: SelectChangeEvent<TimePeriod>) => {
     setTimePeriod(event.target.value as TimePeriod);
   };
-
   return (
     <DashboardContent>
       <EventBreadCrum events={upcomingEvents} onEventSelect={handleEventSelect} />
@@ -168,51 +168,55 @@ export function OverviewAnalyticsView() {
                     {
                       upcomingEvents?.slice(0, 3).map((event: any) => (
                         <Grid item xs={12} key={event._id}>
-                          <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
-                            <HeadingCommon variant="h6" color={theme.palette.primary.main} baseSize="20px" title={event.eventName} />
+                          <Link to={`/our-event/${event._id}`} target='__blank' style={{textDecoration:"none"}}>
 
-                            <Box display="flex" mt={1}>
-                              <CardMedia component="img" image={event?.coverImage?.url} alt={event.eventName} sx={{ width: 150, height: 85, borderRadius: 2 }} />
-                              <CardContent sx={{ flex: 1, pt: 0 }}>
-                                <Typography variant="body2" color={theme.palette.common.black}>
-                                  {event.location}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary" >
-                                  {ReactHtmlParser(truncateText(event?.description))}
-                                </Typography>
-                              </CardContent>
-                              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                <Stack alignItems="center" spacing={0.5}>
-                                  <Avatar sx={{ bgcolor: "#f0f8ff" }}>
-                                    <IconButton color="primary">
-                                      <Iconify width={20} icon="ep:sold-out" />
-                                    </IconButton>
-                                  </Avatar>
-                                  <Typography color="primary" fontSize={12}>{event.soldTicket || 0} Sold</Typography>
-                                </Stack>
-                                <Stack alignItems="center" spacing={0.5}>
-                                  <Avatar sx={{ bgcolor: "#f0f8ff" }}>
-                                    <IconButton sx={{ color: "primary" }}>
-                                      <Iconify width={20} icon="ix:ticket-filled" />
-                                    </IconButton>
-                                  </Avatar>
-                                  <Typography fontSize={12} color="primary">
-                                    {event.ticketQuantity === "0"
-                                      ? "Unlimited"
-                                      : `${Number(event.ticketQuantity)} pcs`}
+                            <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
+                              <HeadingCommon variant="h6" color={theme.palette.primary.main} baseSize="20px" title={event.eventName} />
+
+                              <Box display="flex" mt={1}>
+                                <CardMedia component="img" image={event?.coverImage?.url} alt={event.eventName} sx={{ width: 150, height: 85, borderRadius: 2 }} />
+                                <CardContent sx={{ flex: 1, pt: 0 }}>
+                                  <Typography variant="body2" color={theme.palette.common.black}>
+                                    {event.location}
                                   </Typography>
-                                </Stack>
-                                <Stack alignItems="center" spacing={0.5}>
-                                  <Avatar sx={{ bgcolor: "#f0f8ff" }}>
-                                    <IconButton color="primary">
-                                      <Iconify width={20} icon="simple-line-icons:calender" />
-                                    </IconButton>
-                                  </Avatar>
-                                  <Typography fontSize={12} color="primary">{event.date}</Typography>
-                                </Stack>
+                                  <Typography variant="body2" color="textSecondary" >
+                                    {ReactHtmlParser(truncateText(event?.description))}
+                                  </Typography>
+                                </CardContent>
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                  <Stack alignItems="center" spacing={0.5}>
+                                    <Avatar sx={{ bgcolor: "#f0f8ff" }}>
+                                      <IconButton color="primary">
+                                        <Iconify width={20} icon="ep:sold-out" />
+                                      </IconButton>
+                                    </Avatar>
+                                    <Typography color="primary" fontSize={12}>{event.soldTicket || 0} Sold</Typography>
+                                  </Stack>
+                                  <Stack alignItems="center" spacing={0.5}>
+                                    <Avatar sx={{ bgcolor: "#f0f8ff" }}>
+                                      <IconButton sx={{ color: "primary" }}>
+                                        <Iconify width={20} icon="ix:ticket-filled" />
+                                      </IconButton>
+                                    </Avatar>
+                                    <Typography fontSize={12} color="primary">
+                                      {event.ticketQuantity === "0"
+                                        ? "Unlimited"
+                                        : `${Number(event.ticketQuantity)} pcs`}
+                                    </Typography>
+                                  </Stack>
+                                  <Stack alignItems="center" spacing={0.5}>
+                                    <Avatar sx={{ bgcolor: "#f0f8ff" }}>
+                                      <IconButton color="primary">
+                                        <Iconify width={20} icon="simple-line-icons:calender" />
+                                      </IconButton>
+                                    </Avatar>
+                                    <Typography fontSize={12} color="primary">{event.date}</Typography>
+                                  </Stack>
+                                </Box>
                               </Box>
-                            </Box>
-                          </Card>
+                            </Card>
+                          </Link>
+
                         </Grid>
                       ))
                     }
@@ -307,20 +311,37 @@ export function OverviewAnalyticsView() {
                 <Typography variant="h6" gutterBottom>
                   Latest Sales
                 </Typography>
-                {latestSales.map((sales, index) => (
-                  <List key={index} sx={{ paddingTop: "0px", paddingX: 0 }}>
-                    <ListItem>
-                      <ListItemAvatar>
-                        <Avatar
-                          src={sales.img}
-                          sx={{ width: 40, height: 40 }}
+                {latestSales?.length > 0 ? (
+                  latestSales?.slice(0, 4)?.map((list: any, index: any) => (
+                    <List key={index} sx={{ pt: "0px", px: 0 }}>
+                      <ListItem>
+                        <ListItemAvatar>
+                          <Avatar
+                            src={list.user.avatar?.url}
+                            sx={{ width: 40, height: 40 }}
+                          />
+                        </ListItemAvatar>
+                        <ListItemText
+                          sx={{ textTransform: "capitalize" }}
+                          primary={list.user.name}
+                          secondary={`Purchased ${list.eventName} tickets`}
                         />
-                      </ListItemAvatar>
-                      <ListItemText primary={sales.name} secondary="Purchased event tickets" />
-                    </ListItem>
-                    <Divider />
-                  </List>
-                ))}
+                      </ListItem>
+                      <Divider />
+                    </List>
+                  ))
+                ) : (
+                  <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    minHeight: 100
+                  }}>
+                    <Typography variant="body1" color="textSecondary">
+                      No ticket purchases yet
+                    </Typography>
+                  </Box>
+                )}
               </CardContent>
             </Card>
             <Card sx={{ mt: 3 }}>
@@ -355,21 +376,21 @@ export function OverviewAnalyticsView() {
                       ))}
                     </Select>
                   </Stack>
-                   <Stack direction="row" alignItems="center" mt={3} spacing={1}>
-                  <Typography variant="body2">Time Period:</Typography>
-                  <Select
-                    value={timePeriod}
-                    onChange={handleTimePeriodChange}
-                    size="small"
-                    sx={{ minWidth: 120 }}
-                  >
-                    <MenuItem value="daily">Daily</MenuItem>
-                    <MenuItem value="weekly">Weekly</MenuItem>
-                    <MenuItem value="monthly">Monthly</MenuItem>
-                  </Select>
+                  <Stack direction="row" alignItems="center" mt={3} spacing={1}>
+                    <Typography variant="body2">Time Period:</Typography>
+                    <Select
+                      value={timePeriod}
+                      onChange={handleTimePeriodChange}
+                      size="small"
+                      sx={{ minWidth: 120 }}
+                    >
+                      <MenuItem value="daily">Daily</MenuItem>
+                      <MenuItem value="weekly">Weekly</MenuItem>
+                      <MenuItem value="monthly">Monthly</MenuItem>
+                    </Select>
+                  </Stack>
                 </Stack>
-                </Stack>
-               
+
                 {/* Chart */}
                 <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
                   <Chart

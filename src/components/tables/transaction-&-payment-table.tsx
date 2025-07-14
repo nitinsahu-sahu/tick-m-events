@@ -134,7 +134,7 @@ export function TransactionAndPaymentTable({ headers, data, type }: any) {
                                             ))}
                                         </Box>
                                     ) : key === "action" && type === "5" ? (
-                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                        <Box sx={{ display: 'flex', gap: 1, justifyContent:"center"}}>
                                              {row.status !== 'Approved' && row[key].map((action: string, actionIdx: number) => (
                                                 <Button
                                                     key={actionIdx}

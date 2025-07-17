@@ -18,7 +18,7 @@ export function VisibilityType() {
 
   const [error, setError] = useState<string | null>(null);
 
-  const link = eventType === "private" ? `${import.meta.env.VITE_FRONT_URL}/our-event/${selectedEventId}` : `${import.meta.env.VITE_FRONT_URL}`
+  const link = eventType === "private" ? `${import.meta.env.VITE_Live_URL}/our-event/${selectedEventId}` : `${import.meta.env.VITE_Live_URL}`
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {

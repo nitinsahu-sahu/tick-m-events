@@ -16,8 +16,10 @@ import fetchMessagesReducers from './message.reducer'
 import { paymentSettingsReducer } from './payment-setting.reducer';
 import { adminVerificationListReducer } from './verificationReducers'
 import { userReducer } from './userReducer';
+import editEventReducer from './editEventReducer'
 
 const rootReducer = combineReducers({
+    editEvent: editEventReducer,
     adminVerificationList: adminVerificationListReducer,
     paymentSettings: paymentSettingsReducer,
     allMessages: fetchMessagesReducers,

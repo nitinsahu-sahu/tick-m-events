@@ -160,7 +160,10 @@ export function TicketReservationManagementTable({
                                             )}
                                         </TableCell>
                                 }
-
+                                {/* totalAmount */}
+                                {
+                                    type === '4' ? <TableCell align="center">{`${row.totalAmount} XAF`}</TableCell> : null
+                                }
 
                                 {
 

@@ -21,6 +21,29 @@ const eventReducer = (state, action) => {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
+        case eventConstants.UPDATE_VALIDATION_VIEW_REQUEST:
+            return {
+                ...state,
+                error: null,
+            };
+
+        case eventConstants.UPDATE_VALIDATION_VIEW_SUCCESS:
+            return {
+                ...state,
+                message: action.payload.message,
+                eventWithDetails: {
+                    ...state.eventWithDetails,
+                    validationView: action.payload.validationView,
+                }
+            };
+
+        case eventConstants.UPDATE_VALIDATION_VIEW_FAILURE:
+            return {
+                ...state,
+                message: action.payload.message,
+                error: action.payload.error,
+            };
+
         case eventConstants.GET_TODAY_EVENT_REQUEST:
             return {
                 ...state,

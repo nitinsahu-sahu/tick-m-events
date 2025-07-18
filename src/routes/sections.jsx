@@ -58,6 +58,7 @@ export const PasswordRecoveryPage = lazy(() => import('src/pages/password-recove
 export const ProfileAndServicesManagementPage = lazy(() => import('src/pages/profile-&-services-management'));
 export const MessageingRelationshipPage = lazy(() => import('src/pages/messageing-relationship'));
 export const EventEditPage = lazy(() => import('src/pages/evets-edit'));
+export const ContactPage = lazy(() => import('src/pages/contact'));
 
 
 // ----------------------------------------------------------------------
@@ -243,6 +244,12 @@ export function Router() {
         <AuthLayout>
           <SignInPage />
         </AuthLayout>
+      ),
+    },
+    {
+      path: '/contact-us',
+      element: (
+        <ContactPage />
       ),
     },
     {

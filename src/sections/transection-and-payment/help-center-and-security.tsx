@@ -1,5 +1,6 @@
 import { Box, Typography, Button, Grid, Paper } from "@mui/material";
-
+import { Link } from "react-router-dom";
+ 
 export function HelpCenterAndSecurity() {
     return (
         <>
@@ -24,17 +25,18 @@ export function HelpCenterAndSecurity() {
                             </Grid>
                         ))}
                 </Grid>
-
+ 
                 {/* Quick Access to Support Section */}
                 <Typography variant="h6" fontWeight="bold" sx={{ mt: 3, mb: 1 }}>
                     Quick Access to Support
                 </Typography>
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
-                        <Button fullWidth variant="contained" sx={{ backgroundColor: "#0a2940", borderRadius: 2 }}
-                            href={`https://wa.me/${import.meta.env.VITE_SUPPORT_EMAIL}`} target="_blank">
-                            Contact a TICK-M EVENTS Advisor
-                        </Button>
+                        <Link to="/contact-us" target="__blank">
+                            <Button fullWidth variant="contained" sx={{ backgroundColor: "#0a2940", borderRadius: 3 }}>
+                                Contact a TICK-M EVENTS Advisor
+                            </Button>
+                        </Link>
                     </Grid>
                     <Grid item xs={12}>
                         <Button fullWidth variant="contained" sx={{ backgroundColor: "#D32F2F", borderRadius: 2 }}
@@ -45,6 +47,6 @@ export function HelpCenterAndSecurity() {
                 </Grid>
             </Box>
         </>
-
+ 
     )
 }

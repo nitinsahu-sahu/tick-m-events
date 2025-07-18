@@ -22,6 +22,8 @@ export function TicketReservationManagementTable({
     type: string;
     data: any[];
 }) {
+    console.log(data);
+    
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editedData, setEditedData] = useState<any>({});
     const dispatch = useDispatch<AppDispatch>();
@@ -94,13 +96,21 @@ export function TicketReservationManagementTable({
                     ) : (
                         data?.map((row, index) => (
                             <TableRow key={row._id} sx={{ backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#e0e0e0" }}>
-                                <TableCell align="center" sx={{ fontWeight: "bold", textTransform: 'capitalize' }}>
+                                {
+                                    type==='4'?<TableCell align="center" sx={{ fontWeight: "bold", textTransform: 'capitalize' }}>
+                                    {row.transactionId}
+                                </TableCell>
+                                :<TableCell align="center" sx={{ fontWeight: "bold", textTransform: 'capitalize' }}>
                                     {row.name || row.userId.name}
                                 </TableCell>
+                                }
+                                
                                 {
-                                    type === "3" || type === "4" ? <TableCell align="center">
+                                    type === "3" ? <TableCell align="center">
                                         {row.userId.email}
-                                    </TableCell> : <TableCell align="center" >
+                                    </TableCell> : type === "4"?<TableCell align="center">
+                                        {row.userId.name}
+                                    </TableCell>:<TableCell align="center" >
                                         {editingId === row._id ? (
                                             <TextField
                                                 value={editedData.price}

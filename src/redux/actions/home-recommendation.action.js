@@ -30,7 +30,6 @@ export const fetchLatestSales = () => async (dispatch) => {
 
     try {
         const response = await axios.get('/event-order/event-ticket-purchase-user');
-      console.log(response,'ls');
       
         dispatch({
             type: homeAndRecomConstants.GET_LATEST_SALES_SUCCESS,

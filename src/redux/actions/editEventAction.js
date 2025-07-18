@@ -17,6 +17,31 @@ export const editEventsFetch = () => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: editeventConstants.GET_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
+            },
+        });
+    }
+};
+
+export const deleteEvent = (selectedEventId) => async (dispatch) => {
+    dispatch({ type: editeventConstants.DELETE_REQUEST });
+
+    try {
+        const response = await axios.delete(`/o/edit-events/${selectedEventId}`);
+        dispatch({
+            type: editeventConstants.DELETE_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                eventsLists: response?.data?.eventsWithDetails,
+            },
+
+        });
+        dispatch(editEventsFetch())
+    } catch (error) {
+        dispatch({
+            type: editeventConstants.DELETE_FAILURE,
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },
         });
     }

@@ -7,7 +7,7 @@ import {
   FormControlLabel,
   Typography
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
@@ -17,7 +17,7 @@ import { updateRefundPolicy } from "../../redux/actions/ticket-&-reservation-man
 
 export function RefundAndCancellationManangement({ orderList }: any) {
   const { order, tickets } = orderList
-  
+
   const dispatch = useDispatch<AppDispatch>();
   const refundCancelationTableHeaders = ["Transaction", "Participant", "Ticket Type", "Purchase Date", "Amount", "Status", "Actions"];
 
@@ -25,6 +25,8 @@ export function RefundAndCancellationManangement({ orderList }: any) {
   const [daysBeforeEvent, setDaysBeforeEvent] = useState("");
   const [partialRefundPercent, setPartialRefundPercent] = useState("");
   const [cutoffDate, setCutoffDate] = useState("");
+  const [isModified, setIsModified] = useState(false);
+  const initialPolicyRef = useRef<any>(null);
   useEffect(() => {
     if (!tickets || tickets.length === 0) return;
 
@@ -32,24 +34,76 @@ export function RefundAndCancellationManangement({ orderList }: any) {
     const refundPolicy = ticketConfig?.refundPolicy;
     const isEnabled = ticketConfig?.isRefundPolicyEnabled;
 
-    if (!refundPolicy || !isEnabled) {
-      setSelectedPolicy(""); // No selection
-      return;
-    }
+    let initialPolicy = {
+      selectedPolicy: "",
+      daysBeforeEvent: "",
+      partialRefundPercent: "",
+      cutoffDate: ""
+    };
 
-    if (refundPolicy.fullRefund) {
+    if (!refundPolicy || !isEnabled) {
+      setSelectedPolicy("");
+    } else if (refundPolicy.fullRefund) {
       setSelectedPolicy("fullRefund");
       setDaysBeforeEvent(refundPolicy.fullRefundDaysBefore || "");
+      initialPolicy = {
+        selectedPolicy: "fullRefund",
+        daysBeforeEvent: refundPolicy.fullRefundDaysBefore || "",
+        partialRefundPercent: "",
+        cutoffDate: ""
+      };
     } else if (refundPolicy.partialRefund) {
       setSelectedPolicy("partialRefund");
       setPartialRefundPercent(refundPolicy.partialRefundPercent || "");
+      initialPolicy = {
+        selectedPolicy: "partialRefund",
+        daysBeforeEvent: "",
+        partialRefundPercent: refundPolicy.partialRefundPercent || "",
+        cutoffDate: ""
+      };
     } else if (refundPolicy.noRefundAfterDate) {
       setSelectedPolicy("noRefundAfterDate");
-      setCutoffDate(refundPolicy.noRefundDate?.split("T")[0] || "");
+      const date = refundPolicy.noRefundDate?.split("T")[0] || "";
+      setCutoffDate(date);
+      initialPolicy = {
+        selectedPolicy: "noRefundAfterDate",
+        daysBeforeEvent: "",
+        partialRefundPercent: "",
+        cutoffDate: date
+      };
     } else {
       setSelectedPolicy("noRefund");
+      initialPolicy = {
+        selectedPolicy: "noRefund",
+        daysBeforeEvent: "",
+        partialRefundPercent: "",
+        cutoffDate: ""
+      };
     }
+
+    initialPolicyRef.current = initialPolicy;
+    setIsModified(false); // reset on load
   }, [tickets]);
+
+  useEffect(() => {
+    const current = {
+      selectedPolicy,
+      daysBeforeEvent,
+      partialRefundPercent,
+      cutoffDate
+    };
+
+    const initial = initialPolicyRef.current;
+
+    const hasChanges =
+      current.selectedPolicy !== initial?.selectedPolicy ||
+      current.daysBeforeEvent !== initial?.daysBeforeEvent ||
+      current.partialRefundPercent !== initial?.partialRefundPercent ||
+      current.cutoffDate !== initial?.cutoffDate;
+
+    setIsModified(hasChanges);
+  }, [selectedPolicy, daysBeforeEvent, partialRefundPercent, cutoffDate]);
+
 
   const handleSave = async () => {
     const payload = {
@@ -76,7 +130,7 @@ export function RefundAndCancellationManangement({ orderList }: any) {
       toast.error(result.message || "Something went wrong.");
     }
   };
-console.log('order',order);
+  console.log('order', order);
 
   return (
     <Box mt={3} mb={5} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
@@ -162,6 +216,7 @@ console.log('order',order);
         <Button
           variant="contained"
           sx={{ bgcolor: "#0B2E4C", color: "white", mt: 3, width: "200px" }}
+          disabled={!isModified}
           onClick={handleSave}
         >
           Save Changes

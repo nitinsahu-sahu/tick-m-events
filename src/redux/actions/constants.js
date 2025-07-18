@@ -269,6 +269,10 @@ export const eventOrderConstants = {
 }
 
 export const editeventConstants = {
+      DELETE_REQUEST: "DELETE_REQUEST",
+    DELETE_SUCCESS: "DELETE_SUCCESS",
+    DELETE_FAILURE: "DELETE_FAILURE",
+
     GET_REQUEST: "GET_REQUEST",
     GET_SUCCESS: "GET_SUCCESS",
     GET_FAILURE: "GET_FAILURE",

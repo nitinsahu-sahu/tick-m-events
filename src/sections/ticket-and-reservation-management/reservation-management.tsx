@@ -3,16 +3,21 @@ import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
 import { Link } from "react-router-dom";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
-
+import { AppDispatch, RootState } from 'src/redux/store';
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
 import { getUniqueFileName } from "src/hooks/download_unique_name";
 import { useCSVExport, useExcelExport } from "src/hooks/downloadable";
+import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { toast } from 'react-toastify';
+import { validateViewUpdate } from "../../redux/actions/event.action";
 
 export function ReservationManagement({ orderList }: any) {
     const { order } = orderList
-
+    console.log("iii", orderList);
     const exportToExcel = useExcelExport();
     const exportToCSV = useCSVExport();
+    
     const chartRealTimeOptions: ApexOptions = {
         series: [45, 30, 25], // Ticket Sold, Validation, Remaining
         labels: ["Ticket Sold", "Ticket validated", "Remaining Tickets"],
@@ -32,8 +37,6 @@ export function ReservationManagement({ orderList }: any) {
             createdAt: item.createdAt,
             paymentStatus: item.paymentStatus,
             ticketType: item.tickets.map((t: any) => t.ticketType).join(' | '),
-            // For quantity if needed:
-            // quantity: order.tickets.reduce((sum, t) => sum + t.quantity, 0)
         }));
 
     const handleExcelExport = () => {
@@ -53,6 +56,48 @@ export function ReservationManagement({ orderList }: any) {
         });
     };
 
+    const dispatch = useDispatch<AppDispatch>();
+    const [validationTypes, setValidationTypes] = useState<string[]>([]);
+    const [initialValidationTypes, setInitialValidationTypes] = useState<string[]>([]);
+
+    const areArraysEqual = (arr1: string[], arr2: string[]) =>
+        [...arr1].sort().join(',') === [...arr2].sort().join(',');
+
+    useEffect(() => {
+        if (orderList?.validationView) {
+            setValidationTypes(orderList.validationView);
+            setInitialValidationTypes(orderList.validationView);
+        }
+    }, [orderList]);
+
+    const handleValidationTypeChange = (type: string) => {
+        setValidationTypes(prev => {
+            if (type === 'listName') {
+                return prev.includes('listName') ? prev.filter(t => t !== 'listName') : [...prev, 'listName'];
+            }
+             if (type === 'listCode') {
+                return prev.includes('listCode') ? prev.filter(t => t !== 'listCode') : [...prev, 'listCode'];
+            }
+            if (type === 'scan') {
+                return prev.includes('scan') ? prev.filter(t => t !== 'scan') : [...prev, 'scan'];
+            }
+            return prev;
+        });
+    };
+
+    const handleSaveValidationChanges = async () => {
+        if (!orderList?._id) return;
+
+        try {
+            await dispatch(validateViewUpdate(orderList._id, validationTypes));
+            setInitialValidationTypes(validationTypes); // reset comparison baseline
+            toast.success("Changes saved successfully...");
+            
+        } catch (error) {
+            toast.error("Failed to update validation preferences.");
+        }
+    };
+    const isModified = !areArraysEqual(validationTypes, initialValidationTypes);
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
             <HeadingCommon
@@ -87,21 +132,57 @@ export function ReservationManagement({ orderList }: any) {
                     color="#0B2E4E"
                 />
                 <Box display="flex" flexDirection="column" gap={1} mt={1}>
-                    <FormControlLabel control={<Checkbox />} label="QR Code Scan" />
-                    <FormControlLabel control={<Checkbox defaultChecked />} label="Manual Entry of Unique Code" />
-                    <FormControlLabel control={<Checkbox />} label="Validation via Name List & Account ID" />
-
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={validationTypes.includes('scan')}
+                                onChange={() => handleValidationTypeChange('scan')}
+                            />
+                        }
+                        label="QR Code Scan"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={validationTypes.includes('listCode')}
+                                onChange={() => handleValidationTypeChange('listCode')}
+                            />
+                        }
+                        label="Manual Entry of Unique Code"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={validationTypes.includes('listName')}
+                                onChange={() => handleValidationTypeChange('listName')}
+                            />
+                        }
+                        label="Validation via Name List & Account ID"
+                    />
                     <Box display="flex" gap={2} mt={2}>
-                        <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
+                        <Button
+                            onClick={handleSaveValidationChanges}
+                            variant="contained"
+                            sx={{
+                                bgcolor: isModified ? "#0B2E4C" : "grey.500",
+                                color: "white",
+                                cursor: isModified ? 'pointer' : 'not-allowed'
+                            }}
+                            disabled={!isModified}
+                        >
                             Save Changes
                         </Button>
+
                         <Link to='/entry-validation'>
                             <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
                                 Go to Ticket Validation Page
                             </Button>
                         </Link>
                     </Box>
+
                 </Box>
+
+
             </Box>
 
             {/* Real-time Entry Statistics */}

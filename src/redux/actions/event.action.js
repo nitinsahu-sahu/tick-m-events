@@ -424,3 +424,29 @@ export const todayEventFetch = () => async (dispatch) => {
         });
     }
 };
+
+export const validateViewUpdate = (eventId, validationView) => async (dispatch) => {
+    dispatch({ type: eventConstants.UPDATE_VALIDATION_VIEW_REQUEST });
+ 
+    try {
+        const response = await axios.patch(`/event/${eventId}/validation-view`, {
+            validationView,
+        });
+ 
+        dispatch({
+            type: eventConstants.UPDATE_VALIDATION_VIEW_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                validationView: response?.data?.validationView,
+            },
+        });
+    } catch (error) {
+        dispatch({
+            type: eventConstants.UPDATE_VALIDATION_VIEW_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || 'Failed to update validation view',
+                error: error?.response?.status,
+            },
+        });
+    }
+};

@@ -10,6 +10,24 @@ const ticketTypeReducer = (state, action) => {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
+        case ticketTypeConstants.UPDATE_REFUND_POLICY_REQUEST:
+            return { ...state, loading: true };
+
+        case ticketTypeConstants.UPDATE_REFUND_POLICY_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                message: action.payload.message,
+                updatedPolicy: action.payload.data,
+            };
+
+        case ticketTypeConstants.UPDATE_REFUND_POLICY_FAILURE:
+            return {
+                ...state,
+                loading: false,
+                error: action.payload.message,
+            };
+
         // Event bY ID FETCH
         case ticketTypeConstants.GET_REQUEST:
             return { ...state };

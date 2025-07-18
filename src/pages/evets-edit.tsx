@@ -9,7 +9,7 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title> {`Events - ${CONFIG.appName}`}</title>
+        <title> {`Events Update - ${CONFIG.appName}`}</title>
       </Helmet>
       <EditEventsView />
     </>

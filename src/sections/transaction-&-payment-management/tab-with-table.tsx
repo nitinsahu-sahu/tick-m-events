@@ -9,6 +9,7 @@ import { TransactionAndPaymentManagementTable } from "src/components/tables/tran
 import { metrics, paymentSettings, transactionsPaymentHistoryTableData, transactionsPaymentHistoryTableHeaders, bankingHeaders, mobileMoneyHeaders, cardHeaders } from "./utills";
 import { RequestTabSection } from "./request-tab-section";
 import { savePaymentSettings, getPaymentSettings, getPaymentSettingById, updatePaymentSetting } from "../../redux/actions/paymentSettingActions";
+import { PaymentMethodForm } from "./PaymentMethodForm";
 
 interface FormValues {
     currency: string;
@@ -84,7 +85,7 @@ export function TabWithTableView() {
     useEffect(() => {
         dispatch(getPaymentSettings());
     }, [dispatch]);
-    
+
     useEffect(() => {
         if (paymentSettingDetail && editingId) {
             const methodKey = methodValueToLabelMap[paymentSettingDetail.paymentMethod] || "";
@@ -355,205 +356,14 @@ export function TabWithTableView() {
                 )}
                 {tabValue === 1 && (
                     <>
-
-                        <Typography variant="h6" fontWeight="bold" mb={1}>
+                        <Typography variant="h6" fontWeight="bold"  mb={1}>
                             Payment Settings
                         </Typography>
                         <Typography variant="body1" fontWeight="bold" mb={1}>
                             Configurable Payment Methods
                         </Typography>
-
-                        {[
-                            "Mobile Money (MTN MoMo, Orange Money)",
-                            "Bank Transfer",
-                            "Visa or Master Card"
-                        ].map((method) => (
-                            <Typography key={method} variant="body2" sx={{ ml: 2 }}>
-                                • {method}
-                            </Typography>
-                        ))}
-
-                        <Typography variant="h6" fontWeight="bold" mt={3} mb={1}>
-                            Banking Information
-                        </Typography>
-
-                        {bankingData.length > 0 && (
-                            <Box mb={3}>
-                                <TransactionAndPaymentManagementTable
-                                    headers={bankingHeaders}
-                                    data={bankingData}
-                                    type="banking"
-                                    onEdit={(id) => {
-                                        console.log("Editing ID:", id);
-                                        setEditingId(id);
-                                        setShowForm(true);
-                                        setTabValue(1);
-                                        dispatch(getPaymentSettingById(id));
-                                        setTimeout(() => {
-                                            formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                                        }, 300);
-                                    }}
-
-                                />
-                            </Box>
-                        )}
-                        {mobileMoneyData.length > 0 && (
-                            <>
-                                <Box mb={3}>
-                                    <TransactionAndPaymentManagementTable
-                                        headers={mobileMoneyHeaders}
-                                        data={mobileMoneyData}
-                                        type="mobileMoney"
-                                        onEdit={(id) => {
-                                            console.log("Editing ID:", id);
-                                            setEditingId(id);
-                                            setShowForm(true);
-                                            setTabValue(1);
-                                            dispatch(getPaymentSettingById(id));
-                                            setTimeout(() => {
-                                                formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                                            }, 300);
-                                        }}
-                                    />
-                                </Box>
-                            </>
-                        )}
-
-                        {cardData.length > 0 && (
-                            <Box mb={3}>
-                                <TransactionAndPaymentManagementTable
-                                    headers={cardHeaders}
-                                    data={cardData}
-                                    type="card"
-                                    onEdit={(id) => {
-                                        console.log("Editing ID:", id);
-                                        setEditingId(id);
-                                        setShowForm(true);
-                                        setTabValue(1);
-                                        dispatch(getPaymentSettingById(id));
-                                        setTimeout(() => {
-                                            formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                                        }, 300);
-                                    }}
-                                />
-                            </Box>
-                        )}
-
-                        <Typography variant="h6" fontWeight="bold" mt={1}>
-                            Banking Information Update
-                        </Typography>
-
-                        <Box sx={{ backgroundColor: "#F2F2F2", borderRadius: "12px", p: 3 }}>
-                            <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-
-                                {/* Select Payment Method */}
-                                <Select
-                                    value={formValues.paymentMethod}
-                                    onChange={(e) => setFormValues({ ...formValues, paymentMethod: e.target.value, fields: {} })}
-                                    displayEmpty
-                                    IconComponent={ExpandMoreRoundedIcon}
-                                    sx={{
-                                        backgroundColor: "#FFFFFF",
-                                        borderRadius: "12px",
-                                        height: "48px",
-                                        fontWeight: 500,
-                                        fontSize: "15px",
-                                        color: "#000",
-                                        ".MuiOutlinedInput-notchedOutline": { border: "1px solid #C0C0C0" },
-                                        mb: 2,
-                                    }}
-                                >
-                                    <MenuItem value="">Select Payment Method</MenuItem>
-                                    {Object.keys(methodFields).map((method) => (
-                                        <MenuItem key={method} value={method}>{method}</MenuItem>
-                                    ))}
-                                </Select>
-
-                                {/* Render Fields Based on Method */}
-                                {formValues.paymentMethod &&
-                                    methodFields[formValues.paymentMethod]?.map((field) => {
-                                        if (field === "Provider" && formValues.paymentMethod === "Mobile Money (MTN MoMo, Orange Money)") {
-                                            return (
-                                                <Select
-                                                    key={field}
-                                                    value={formValues.fields.Provider || ""}
-                                                    onChange={(e) => handleFieldChange("Provider", e.target.value)}
-                                                    displayEmpty
-                                                    IconComponent={ExpandMoreRoundedIcon}
-                                                    sx={{
-                                                        backgroundColor: "#FFFFFF",
-                                                        borderRadius: "12px",
-                                                        height: "48px",
-                                                        fontWeight: 500,
-                                                        fontSize: "15px",
-                                                        color: "#000",
-                                                        ".MuiOutlinedInput-notchedOutline": { border: "1px solid #C0C0C0" },
-                                                    }}
-                                                >
-                                                    <MenuItem value="">Select Provider</MenuItem>
-                                                    <MenuItem value="MTN MoMo">MTN MoMo</MenuItem>
-                                                    <MenuItem value="Orange Money">Orange Money</MenuItem>
-                                                </Select>
-                                            );
-                                        }
-
-                                        return (
-                                            <TextField
-                                                key={field}
-                                                fullWidth
-                                                label={field}
-                                                placeholder={focusedField === field ? "" : field}
-                                                value={formValues.fields[field] || ""}
-                                                onFocus={() => setFocusedField(field)}
-                                                onBlur={() => setFocusedField(null)}
-                                                onChange={(e) => handleFieldChange(field, e.target.value)}
-                                                variant="outlined"
-                                                required
-                                                InputProps={{
-                                                    sx: {
-                                                        backgroundColor: "#FFFFFF",
-                                                        borderRadius: "12px",
-                                                        height: "48px",
-                                                    },
-                                                }}
-                                            />
-                                        );
-                                    })}
-
-                                {/* Save Button */}
-                                <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-                                    <Button
-                                        type="submit"
-                                        variant="contained"
-                                        sx={{
-                                            backgroundColor: "#0B2E4C",
-                                            color: "white",
-                                            borderRadius: "6px",
-                                            textTransform: "none",
-                                            px: 3,
-                                            "&:hover": { backgroundColor: "#002244" },
-                                        }}
-                                    >
-                                        {showForm && (
-                                            <div ref={formRef}>
-                                                <Typography>
-                                                    {isEditMode ? "Update Payment Details" : "Add Payment Details"}
-                                                </Typography>
-                                            </div>
-                                        )}
-                                        {!showForm && (
-                                            <div ref={formRef}>
-                                                <Typography>
-                                                    Add Payment Details
-                                                </Typography>
-                                            </div>
-                                        )}
-                                    </Button>
-                                </Box>
-                            </Box>
-                        </Box>
+                        < PaymentMethodForm />
                     </>
-
                 )}
             </Paper>
         </>

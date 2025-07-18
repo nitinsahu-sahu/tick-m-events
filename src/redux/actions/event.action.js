@@ -195,7 +195,11 @@ export const eventCustomizationCreate = ({ formEventCustomizeData, eventId, tick
     dispatch({ type: eventConstants.EVENT_CUSTOMIZTION_CREATE_REQUEST });
 
     try {
-        const response = await axios.post(`/event/tickets/ec/${eventId}/${ticketConfigId}`, formEventCustomizeData);
+        const response = await axios.post(`/event/tickets/ec/${eventId}/${ticketConfigId}`, formEventCustomizeData,{
+             headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         dispatch({
             type: eventConstants.EVENT_CUSTOMIZTION_CREATE_SUCCESS,
             payload: {
@@ -223,7 +227,11 @@ export const eventCreate = (data) => async (dispatch) => {
     dispatch({ type: eventConstants.EVENT_CREATE_REQUEST });
 
     try {
-        const response = await axios.post("/event", data);
+        const response = await axios.post("/event", data ,{
+             headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }); 
         dispatch({
             type: eventConstants.EVENT_CREATE_SUCCESS,
             payload: {
@@ -413,6 +421,32 @@ export const todayEventFetch = () => async (dispatch) => {
         dispatch({
             type: eventConstants.GET_TODAY_EVENT_FAILURE,
             payload: { message: "denied", error: error.status },
+        });
+    }
+};
+
+export const validateViewUpdate = (eventId, validationView) => async (dispatch) => {
+    dispatch({ type: eventConstants.UPDATE_VALIDATION_VIEW_REQUEST });
+ 
+    try {
+        const response = await axios.patch(`/event/${eventId}/validation-view`, {
+            validationView,
+        });
+ 
+        dispatch({
+            type: eventConstants.UPDATE_VALIDATION_VIEW_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                validationView: response?.data?.validationView,
+            },
+        });
+    } catch (error) {
+        dispatch({
+            type: eventConstants.UPDATE_VALIDATION_VIEW_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || 'Failed to update validation view',
+                error: error?.response?.status,
+            },
         });
     }
 };

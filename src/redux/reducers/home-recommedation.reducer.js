@@ -5,7 +5,8 @@ const initialState = {
     upcomingEvents: [],
     popularEvents: [],
     recommendedEvents: [],
-    latestEvents:[]
+    latestEvents:[],
+    latestSales:[]
 };
 
 const homeAndRecommandationReducer = (state, action) => {
@@ -14,6 +15,21 @@ const homeAndRecommandationReducer = (state, action) => {
     }
     switch (action.type) {
         // Event bY ID FETCH
+        case homeAndRecomConstants.GET_LATEST_SALES_REQUEST:
+            return { ...state };
+
+        case homeAndRecomConstants.GET_LATEST_SALES_SUCCESS:
+            return {
+                ...state,
+                latestSales: action.payload.latestSales,
+            };
+
+        case homeAndRecomConstants.GET_LATEST_SALES_FAILURE:
+            return {
+                ...state,
+                message: action.payload.message,
+            };
+
         case homeAndRecomConstants.GET_REQUEST:
             return { ...state };
 

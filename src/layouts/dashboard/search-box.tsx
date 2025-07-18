@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, memo } from 'react';
 import { useSelector } from 'react-redux';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { InputBase, Box, IconButton, ListItemText, ListItem, List, Paper, Avatar } from '@mui/material';
 import { Iconify } from 'src/components/iconify';
 import { RootState } from 'src/redux/store';
@@ -38,14 +38,6 @@ const SearchResultsItem = memo(({ event, handleResultClick }: { event: Event; ha
     <ListItemText
       primary={
         <Box
-          component="a"
-          href={`/our-event/${event._id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleResultClick(event);
-          }}
           sx={{
             color: 'text.primary',
             textDecoration: 'none',
@@ -168,11 +160,13 @@ const SearchEventComponent = () => {
           <List>
             {searchResults.length > 0 ? (
               searchResults.map((event) => (
-                <SearchResultsItem
-                  key={event._id}
-                  event={event}
-                  handleResultClick={handleResultClick}
-                />
+                <Link to={`/our-event/${event._id}`} target='__blank' style={{ textDecoration: "none" }}>
+                  <SearchResultsItem
+                    key={event._id}
+                    event={event}
+                    handleResultClick={handleResultClick}
+                  />
+                </Link>
               ))
             ) : (
               <NoResultsFound />

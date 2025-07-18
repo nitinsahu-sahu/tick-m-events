@@ -104,6 +104,7 @@ export function CountDownView({ selectedEvent }: any) {
                     fontSize: { xs: "12px", sm: "13px", md: "14px" },
                     fontFamily: "Poppins, sans-serif",
                     color: "#333",
+                    textTransform: "capitalize"
                 }}
             >
                 {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
@@ -113,7 +114,8 @@ export function CountDownView({ selectedEvent }: any) {
                     fontSize: { xs: "10px", sm: "11px", md: "12px" },
                     fontFamily: "Poppins, sans-serif",
                     color: "#666",
-                    mt: 0.5
+                    mt: 0.5,
+                    textTransform: "capitalize"
                 }}
             >
                 {selectedEvent.eventName}

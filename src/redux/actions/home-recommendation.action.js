@@ -24,3 +24,23 @@ export const recommTrandingPopularEventFetch = () => async (dispatch) => {
         });
     }
 };
+
+export const fetchLatestSales = () => async (dispatch) => {
+    dispatch({ type: homeAndRecomConstants.GET_LATEST_SALES_REQUEST });
+
+    try {
+        const response = await axios.get('/event-order/event-ticket-purchase-user');
+      
+        dispatch({
+            type: homeAndRecomConstants.GET_LATEST_SALES_SUCCESS,
+            payload: {
+                latestSales:response?.data?.result,
+            },
+        });
+    } catch (error) {
+        dispatch({
+            type: homeAndRecomConstants.GET_LATEST_SALES_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+    }
+};

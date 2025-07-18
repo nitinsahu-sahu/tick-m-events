@@ -172,33 +172,3 @@ export const ticketSalesData: Record<TicketTypes, Record<TimePeriod, number[]>> 
       monthly: [1800, 2100, 1950, 2250, 2400, 2550, 2700]
     }
   };
-
-export const salesRevenuChartSeries = [{ name: "Sales", data: [600, 400, 500, 700, 800, 300, 200] }];
-
-export const latestSales = [
-  {
-    _id: "1",
-    img: "/assets/images/avatar/avatar-1.webp",
-    name: "Olivia Johanson",
-    description: "High Performance Conert 2020",
-  },
-  {
-    _id: "2",
-    img: "/assets/images/avatar/avatar-2.webp",
-    name: "Griezerman",
-    description: "Fireworks Show New Year 2020",
-  },
-  {
-    _id: "3",
-    img: "/assets/images/avatar/avatar-3.webp",
-    name: "Uli Trumb",
-    description: "High Performance Conert 2020..",
-  },
-  {
-    _id: "4",
-    img: "/assets/images/avatar/avatar-4.webp",
-    name: "Oconner",
-    description: "High Performance Conert 2020..",
-  }
-
-]

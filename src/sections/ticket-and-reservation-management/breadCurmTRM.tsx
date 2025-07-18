@@ -19,7 +19,7 @@ function StatusChip({ label, color }: { label: string; color: string }) {
     );
 }
 
-export function EventBreadCrum({ view, setView, eventInformation, events, onEventSelect }: any) {
+export function BreadCrumTRM({ view, setView, eventInformation, events, onEventSelect }: any) {
     const location = useLocation();
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     // Define the specific URL path where the section should appear

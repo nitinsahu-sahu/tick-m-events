@@ -32,6 +32,16 @@ interface TicketFormData {
     };
 }
 
+interface RefundPolicyPayload {
+    eventId: string;
+    fullRefund: boolean;
+    fullRefundDaysBefore?: string;
+    partialRefund: boolean;
+    partialRefundPercent?: string;
+    noRefundAfterDate: boolean;
+    noRefundDate?: string | null;
+    isRefundPolicyEnabled: boolean;
+}
 
 // Create ticket type api implementaion
 export const createTicketType = (
@@ -129,6 +139,62 @@ export const updateTicketType = ({editedData}:any): AppThunk<Promise<ApiResponse
             payload: errorResponse,
         });
 
+        return errorResponse;
+    }
+};
+
+// Update Refund Policy
+export const updateRefundPolicy = (
+    payload: RefundPolicyPayload
+): AppThunk<Promise<ApiResponse>> => async (dispatch) => {
+    dispatch({ type: ticketTypeConstants.UPDATE_REFUND_POLICY_REQUEST });
+ 
+    try {
+        const {
+            eventId,
+            fullRefund,
+            fullRefundDaysBefore,
+            partialRefund,
+            partialRefundPercent,
+            noRefundAfterDate,
+            noRefundDate,
+            isRefundPolicyEnabled
+        } = payload;
+ 
+        const response = await axios.patch(`/tickets/refund-policy/${eventId}`, {
+            fullRefund,
+            fullRefundDaysBefore,
+            partialRefund,
+            partialRefundPercent,
+            noRefundAfterDate,
+            noRefundDate,
+            isRefundPolicyEnabled
+        });
+ 
+        const successResponse: ApiResponse = {
+            status: response.status,
+            message: response.data.message,
+            data: response.data.data,
+        };
+ 
+        dispatch({
+            type: ticketTypeConstants.UPDATE_REFUND_POLICY_SUCCESS,
+            payload: successResponse,
+        });
+ 
+        return successResponse;
+ 
+    } catch (error: any) {
+        const errorResponse: ApiResponse = {
+            status: error?.response?.status || 500,
+            message: error?.response?.data?.message || "Server error",
+        };
+ 
+        dispatch({
+            type: ticketTypeConstants.UPDATE_REFUND_POLICY_FAILURE,
+            payload: errorResponse,
+        });
+ 
         return errorResponse;
     }
 };

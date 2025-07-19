@@ -93,3 +93,27 @@ export const promotionGet = (data) => async (dispatch) => {
         };
     }
 };
+
+export const promotionEvents = () => async (dispatch) => {
+    dispatch({ type: promotionConstants.GET_EVENTS_REQUEST });
+
+    try {
+        const response = await axios.get("/home-recommendations/eventListwithorderandparticipant");
+        dispatch({
+            type: promotionConstants.GET_EVENTS_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                eventsWithOrdersAndParticiapnt: response?.data?.eventsWithOrdersAndParticiapnt
+            },
+
+        });
+    } catch (error) {
+        dispatch({
+            type: promotionConstants.GET_EVENTS_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
+            },
+        })
+    }
+};

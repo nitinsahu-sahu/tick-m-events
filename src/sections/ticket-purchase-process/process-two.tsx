@@ -1,10 +1,13 @@
 import { Box, Button, Grid, Paper, TextField } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import PhoneInput from 'react-phone-number-input'
+import type { E164Number } from 'libphonenumber-js';
 
 import { RootState } from "src/redux/store";
 
 import { HeadProcess } from "./head-process";
+import 'react-phone-number-input/style.css'
 
 
 interface FormData {
@@ -32,7 +35,8 @@ interface FormData {
 export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext }: any) {
   // Get user data from Redux store
   const { name, email, number, gender } = useSelector((state: RootState) => state.auth.user);
-
+  const [phoneNumber, setPhoneNumber] = useState(number || '');
+ 
   // Initialize form state with user data
   const [formData, setFormData] = useState<FormData>({
     name: name || '',
@@ -44,7 +48,11 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext }: any) {
     hearAboutEvent: '',
     eventSpecificInfo: ''
   });
-
+ const handlePhoneChange = (value: E164Number | undefined) => {
+    const phoneValue = value as string; // or String(value)
+    setPhoneNumber(phoneValue);
+    setFormData((prevData: any) => ({ ...prevData, number: phoneValue }));
+  };
   // Update form if user data changes
   useEffect(() => {
     setFormData(prev => ({
@@ -102,17 +110,46 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext }: any) {
                 sx={fieldStyles}
               />
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                name="number"
-                value={formData.number}
-                onChange={handleChange}
-                type="text"
-                variant="outlined"
-                required
-                placeholder='Enter your number'
-                sx={fieldStyles}
+            <Grid item xs={12} sx={{
+              '& .PhoneInput': {
+                width: '100%',
+                '& input': {
+                  width: '100%',
+                  padding: '16.5px 14px',
+                  border: '1px solid rgba(0, 0, 0, 0.23)',
+                  borderRadius: '4px',
+                  fontFamily: 'inherit',
+                  fontSize: '1rem',
+                  '&:hover': {
+                    borderColor: 'black',
+                  },
+                  '&:focus': {
+                    borderColor: 'black',
+                    borderWidth: '2px',
+                    outline: 'none',
+                  },
+                },
+                '& .PhoneInputCountry': {
+                  marginRight: '8px',
+                },
+                '& .PhoneInputCountrySelect': {
+                  marginRight: '8px',
+                },
+              },
+              '& .PhoneInput--focus': {
+                '& input': {
+                  borderColor: 'black',
+                  borderWidth: '2px',
+                },
+              },
+            }}>
+              <PhoneInput
+                international
+                defaultCountry="US"
+                value={phoneNumber}
+                onChange={handlePhoneChange}
+                placeholder="Enter phone number"
+                sx
               />
             </Grid>
             <Grid item xs={12}>

@@ -28,7 +28,6 @@ interface SocialPlatforms {
 
 export const CustomPhotoVideoFilter = () => {
   const { fullData } = useSelector((state: RootState) => state?.event);
-  console.log(fullData);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);

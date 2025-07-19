@@ -132,6 +132,8 @@ export function RefundAndCancellationManangement({ orderList }: any) {
   };
   console.log('order', order);
 
+  const isFreeTicket = tickets?.every((ticket: any) => ticket?.payStatus?.toLowerCase() === "free");
+
   return (
     <Box mt={3} mb={5} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
       {/* Title */}
@@ -142,86 +144,96 @@ export function RefundAndCancellationManangement({ orderList }: any) {
         title="Refund & Cancellation Management"
         color="#0B2E4E"
       />
+      {isFreeTicket ? (
+        <Typography mt={2} fontSize="16px" color="text.secondary">
+          This is a free ticket, so refund is not allowed.
+        </Typography>
+      ) : (
+        <>
+          {/* Table */}
+          <TicketReservationManagementTable headers={refundCancelationTableHeaders} data={order} type="4" />
 
-      {/* Table */}
-      <TicketReservationManagementTable headers={refundCancelationTableHeaders} data={order} type="4" />
-
-      {/* Refund Policy Configuration */}
-      <Box mt={4}>
-        <HeadingCommon
-          baseSize="30px"
-          weight={700}
-          variant="h5"
-          title="Refund Policy Configuration"
-          color="#0B2E4E"
-        />
-
-        <RadioGroup
-          value={selectedPolicy}
-          onChange={(e) => setSelectedPolicy(e.target.value)}
-          sx={{ mt: 2 }}
-        >
-          <FormControlLabel
-            value="fullRefund"
-            control={<Radio />}
-            label="Full Refund available up to X days before the event"
-          />
-          {selectedPolicy === "fullRefund" && (
-            <TextField
-              size="small"
-              placeholder="Enter number of days"
-              value={daysBeforeEvent}
-              onChange={(e) => setDaysBeforeEvent(e.target.value)}
-              sx={{ ml: 4, mt: 1, width: "200px" }}
+          {/* Refund Policy Configuration */}
+          <Box mt={4}>
+            <HeadingCommon
+              baseSize="30px"
+              weight={700}
+              variant="h5"
+              title="Refund Policy Configuration"
+              color="#0B2E4E"
             />
-          )}
 
-          <FormControlLabel
-            value="partialRefund"
-            control={<Radio />}
-            label="Partial Refund with Fee (% of ticket price retained)"
-          />
-          {selectedPolicy === "partialRefund" && (
-            <TextField
-              size="small"
-              placeholder="Enter percentage"
-              value={partialRefundPercent}
-              onChange={(e) => setPartialRefundPercent(e.target.value)}
-              sx={{ ml: 4, mt: 1, width: "200px" }}
-            />
-          )}
+            <RadioGroup
+              value={selectedPolicy}
+              onChange={(e) => setSelectedPolicy(e.target.value)}
+              sx={{ mt: 2 }}
+            >
+              <FormControlLabel
+                value="fullRefund"
+                control={<Radio />}
+                label="Full Refund available up to X days before the event"
+              />
+              {selectedPolicy === "fullRefund" && (
+                <TextField
+                  size="small"
+                  placeholder="Enter number of days"
+                  value={daysBeforeEvent}
+                  onChange={(e) => setDaysBeforeEvent(e.target.value)}
+                  sx={{ ml: 4, mt: 1, width: "200px" }}
+                />
+              )}
 
-          <FormControlLabel
-            value="noRefund"
-            control={<Radio />}
-            label="No Refund after purchasing the ticket"
-          />
+              <FormControlLabel
+                value="partialRefund"
+                control={<Radio />}
+                label="Partial Refund with Fee (% of ticket price retained)"
+              />
+              {selectedPolicy === "partialRefund" && (
+                <TextField
+                  size="small"
+                  placeholder="Enter percentage"
+                  value={partialRefundPercent}
+                  onChange={(e) => setPartialRefundPercent(e.target.value)}
+                  sx={{ ml: 4, mt: 1, width: "200px" }}
+                />
+              )}
 
-          <FormControlLabel
-            value="noRefundAfterDate"
-            control={<Radio />}
-            label="No Refunds after a set date"
-          />
-          {selectedPolicy === "noRefundAfterDate" && (
-            <TextField
-              type="date"
-              size="small"
-              value={cutoffDate}
-              onChange={(e) => setCutoffDate(e.target.value)}
-              sx={{ ml: 4, mt: 1, width: "200px" }}
-            />
-          )}
-        </RadioGroup>
+              <FormControlLabel
+                value="noRefund"
+                control={<Radio />}
+                label="No Refund after purchasing the ticket"
+              />
 
-        <Button
-          variant="contained"
-          sx={{ bgcolor: "#0B2E4C", color: "white", mt: 3, width: "200px" }}
-          disabled={!isModified}
-          onClick={handleSave}
-        >
-          Save Changes
-        </Button>
-      </Box>
+              <FormControlLabel
+                value="noRefundAfterDate"
+                control={<Radio />}
+                label="No Refunds after a set date"
+              />
+              {selectedPolicy === "noRefundAfterDate" && (
+                <TextField
+                  type="date"
+                  size="small"
+                  value={cutoffDate}
+                  onChange={(e) => setCutoffDate(e.target.value)}
+                  sx={{ ml: 4, mt: 1, width: "200px" }}
+                />
+              )}
+            </RadioGroup>
+
+            <Button
+              variant="contained"
+              sx={{ bgcolor: "#0B2E4C", color: "white", mt: 3, width: "200px" }}
+              disabled={!isModified}
+              onClick={handleSave}
+            >
+              Save Changes
+            </Button>
+          </Box>
+        </>
+      )
+
+      }
+
     </Box>
   );
 }

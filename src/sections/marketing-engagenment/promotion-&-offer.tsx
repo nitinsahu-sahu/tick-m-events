@@ -1,22 +1,14 @@
 import { LoadingButton } from '@mui/lab';
 import {
-  Button,
-  Typography,
-  Paper,
-  TextField,
-  FormControlLabel,
-  Select,
-  MenuItem,
-  Box,
-  Grid,
-  Radio, RadioGroup
+  Button, SelectChangeEvent, Typography, Paper, TextField, FormControlLabel, FormControl,
+  InputLabel, Select, MenuItem, Box, Grid, Radio, RadioGroup
 } from '@mui/material';
-import { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import { promotionCreate } from 'src/redux/actions/promotionAndOffer';
-import { AppDispatch } from 'src/redux/store';
+import { promotionCreate, promotionEvents } from 'src/redux/actions/promotionAndOffer';
+import { AppDispatch, RootState } from 'src/redux/store';
 
 interface ApiResult {
   status: number;
@@ -27,11 +19,18 @@ interface ApiResult {
 
 export function PromotionsAndOffers() {
   const dispatch = useDispatch<AppDispatch>();
+  const { eventsWithOrdersAndParticiapnt } = useSelector((state: RootState) => state?.promotionList);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null); // Replace 'any' with your Event type if available
+  console.log('========selectedEvent============================');
+  console.log(selectedEvent);
+  console.log('====================================');
   const [selectedDiscounts, setSelectedDiscounts] = useState('');
   const handleDiscountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedDiscounts(event.target.value);
   };
-
+  useEffect(() => {
+    dispatch(promotionEvents())
+  }, [dispatch])
   const [promotionFormData, setPromotionFormData] = useState({
     discountValue: '',
     ticketSelection: 'vip',
@@ -83,15 +82,38 @@ export function PromotionsAndOffers() {
         toast.error('Promotion creation failed');
       }
     },
-    [promotionFormData, selectedDiscounts,promoCode, dispatch]
+    [promotionFormData, selectedDiscounts, promoCode, dispatch]
   );
+
+  const handleEventChange = (event: SelectChangeEvent<string>) => {
+    const eventId = event.target.value;
+    const foundEvent = eventsWithOrdersAndParticiapnt.find((e: any) => e._id === eventId);
+    setSelectedEvent(foundEvent || null);
+  };
 
   return (
     <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: '1px solid black' }}>
-      <Typography variant="h6" fontWeight="bold" mb={2}>
-        Promotions & Special Offers
-      </Typography>
 
+      <Box display="flex" justifyContent="space-between" mb={2}>
+        <Typography variant="h6" fontSize={{ xs: 15, sm: 20, md: 26 }} fontWeight={500}>
+          Promotions & Special Offers
+        </Typography>
+
+        <FormControl fullWidth size="small" sx={{ maxWidth: 300 }}>
+          <InputLabel>Select Event</InputLabel>
+          <Select
+            value={selectedEvent?._id || ''}
+            onChange={handleEventChange}
+            label="Select Event"
+          >
+            {eventsWithOrdersAndParticiapnt.map((event: any) => (
+              <MenuItem key={event._id} value={event._id}>
+                {event.eventName} ({event.date})
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
       <Button
         fullWidth
         sx={{
@@ -121,7 +143,7 @@ export function PromotionsAndOffers() {
               value={selectedDiscounts}
               onChange={handleDiscountChange}
               row
-              
+
             >
               {[
                 { label: 'Percentage Discount', value: 'percentageDiscount' },
@@ -132,7 +154,7 @@ export function PromotionsAndOffers() {
                 <FormControlLabel
                   key={option.value}
                   value={option.value}
-                  control={<Radio required/>}
+                  control={<Radio required />}
                   label={option.label}
                 />
               ))}

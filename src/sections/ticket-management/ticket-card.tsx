@@ -7,9 +7,7 @@ import axios from "../../redux/helper/axios";
 
 
 export function TicketCard({ ticket }: any) {
-    console.log('===effe=================================');
-    console.log(ticket);
-    console.log('====================================');
+
     const navigate = useNavigate();
     const [showQr, setShowQr] = useState(false);
     const today = new Date();
@@ -36,8 +34,6 @@ export function TicketCard({ ticket }: any) {
         : isPartialRefundEligible
             ? 'partial'
             : null;
-
-
 
     const [openRefundModal, setOpenRefundModal] = useState(false);
     const [isRefunding, setIsRefunding] = useState(false);
@@ -327,58 +323,64 @@ export function TicketCard({ ticket }: any) {
                             </Typography>
                         )}
 
-                        {!isPolicyEnabled ? (
-                            <Typography color="error" fontWeight={600} textAlign="center" mb={2}>
-                                ❌Refund not applicable as per event&apos;s policy.
-                            </Typography>
-                        ) : ticket.verifyEntry ? (
-                            <Typography color="error" mb={2} textAlign="center" fontWeight={600}>
-                                ❌ You can&apos;t request a refund after event entry has been verified.
-                            </Typography>
-                        ) : refundType === 'full' ? (
-                            <>
-                                <Typography variant="h6" color="success.main" mb={1}>✨ Full Refund Eligible!</Typography>
-                                <Typography variant="subtitle1" color="text.primary" mb={2} fontWeight={500}>For{' '}
-                                    {ticket.eventDetails?.eventName}
+                        {
+                            ticket?.payStatus === "free" ? (
+                                <Typography color="error" fontWeight={600} textAlign="center" mb={2}>
+                                    🎟️ This is a free ticket. Refund is not applicable.
                                 </Typography>
-                                <Typography variant="body2" mb={2}>This event starts in <strong>{daysBefore}</strong> day(s).</Typography>
-                                <Button
-                                    variant="contained"
-                                    sx={{ backgroundColor: "#0B2E4C", color: "#fff", mb: 1, width: "100%" }}
-                                    disabled={isRefunding}
-                                    onClick={handleRefundRequest}
-                                >
-                                    {isRefunding ? 'Processing...' : 'Confirm Full Refund'}
-                                </Button>
-                            </>
-                        ) : refundType === 'partial' ? (
-                            <>
-                                <Typography variant="h6" color="warning.main" mb={1}>⚠️ Partial Refund Eligible</Typography>
-                                <Typography variant="body2" mb={2}>
-                                    You’ll receive <strong>{partialRefundPercent}%</strong> of your ticket price.
+                            ) : !isPolicyEnabled ? (
+                                <Typography color="error" fontWeight={600} textAlign="center" mb={2}>
+                                    ❌Refund not applicable as per event&apos;s policy.
                                 </Typography>
-                                <Button
-                                    variant="contained"
-                                    sx={{ backgroundColor: "#0B2E4C", color: "#fff", mb: 1, width: "100%" }}
-                                    disabled={isRefunding}
-                                    onClick={handleRefundRequest}
-                                >
-                                    {isRefunding ? 'Processing...' : 'Confirm Partial Refund'}
-                                </Button>
-                            </>
-                        ) : (
-                            <Box textAlign="center" mb={2}>
-                                <Typography color="error" fontWeight={600}>
-                                    ❌ Refund not applicable as per event&apos;s policy.
+                            ) : ticket.verifyEntry ? (
+                                <Typography color="error" mb={2} textAlign="center" fontWeight={600}>
+                                    ❌ You can&apos;t request a refund after event entry has been verified.
                                 </Typography>
-                                <Typography variant="body2" mt={1}>
-                                    Full refunds require at least <strong>{fullRefundDays}</strong> day(s) notice.
-                                </Typography>
-                                <Typography variant="body2">
-                                    You&apos;re currently only <strong>{daysBefore}</strong> day(s) away.
-                                </Typography>
-                            </Box>
-                        )}
+                            ) : refundType === 'full' ? (
+                                <>
+                                    <Typography variant="h6" color="success.main" mb={1}>✨ Full Refund Eligible!</Typography>
+                                    <Typography variant="subtitle1" color="text.primary" mb={2} fontWeight={500}>For{' '}
+                                        {ticket.eventDetails?.eventName}
+                                    </Typography>
+                                    <Typography variant="body2" mb={2}>This event starts in <strong>{daysBefore}</strong> day(s).</Typography>
+                                    <Button
+                                        variant="contained"
+                                        sx={{ backgroundColor: "#0B2E4C", color: "#fff", mb: 1, width: "100%" }}
+                                        disabled={isRefunding}
+                                        onClick={handleRefundRequest}
+                                    >
+                                        {isRefunding ? 'Processing...' : 'Confirm Full Refund'}
+                                    </Button>
+                                </>
+                            ) : refundType === 'partial' ? (
+                                <>
+                                    <Typography variant="h6" color="warning.main" mb={1}>⚠️ Partial Refund Eligible</Typography>
+                                    <Typography variant="body2" mb={2}>
+                                        You’ll receive <strong>{partialRefundPercent}%</strong> of your ticket price.
+                                    </Typography>
+                                    <Button
+                                        variant="contained"
+                                        sx={{ backgroundColor: "#0B2E4C", color: "#fff", mb: 1, width: "100%" }}
+                                        disabled={isRefunding}
+                                        onClick={handleRefundRequest}
+                                    >
+                                        {isRefunding ? 'Processing...' : 'Confirm Partial Refund'}
+                                    </Button>
+                                </>
+                            ) : (
+                                <Box textAlign="center" mb={2}>
+                                    <Typography color="error" fontWeight={600}>
+                                        ❌ Refund not applicable as per event&apos;s policy.
+                                    </Typography>
+                                    <Typography variant="body2" mt={1}>
+                                        Full refunds require at least <strong>{fullRefundDays}</strong> day(s) notice.
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        You&apos;re currently only <strong>{daysBefore}</strong> day(s) away.
+                                    </Typography>
+                                </Box>
+                            )}
+
 
                         <Button
                             onClick={() => setOpenRefundModal(false)}

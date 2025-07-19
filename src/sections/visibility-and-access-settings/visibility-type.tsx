@@ -18,7 +18,9 @@ export function VisibilityType() {
 
   const [error, setError] = useState<string | null>(null);
 
-  const link = eventType === "private" ? `${import.meta.env.VITE_Live_URL}/our-event/${selectedEventId}` : `${import.meta.env.VITE_Live_URL}`
+  const link = eventType === "private" ?
+    `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${selectedEventId}` :
+    `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}`
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -99,10 +101,10 @@ export function VisibilityType() {
               value={selectedEventId}
               onChange={handleEventChange}
               label="Select Event"
-              sx={{minWidth: 200,textTransform:"capitalize"}}
+              sx={{ minWidth: 200, textTransform: "capitalize" }}
             >
               {fullData.map((event: any) => (
-                <MenuItem key={event._id} value={event._id} sx={{textTransform:"capitalize"}}>
+                <MenuItem key={event._id} value={event._id} sx={{ textTransform: "capitalize" }}>
                   {event.eventName} ({event.date})
                 </MenuItem>
               ))}

@@ -1,19 +1,13 @@
 import { useState, useEffect } from 'react';
-import { 
-  TextField, 
-  Button, 
-  Grid, 
-  Select, 
-  MenuItem, 
-  InputLabel, 
-  FormControl,
-  Typography,
-  Checkbox,
-  FormControlLabel,
-  Box,
-  Divider,
-  Chip
+import {
+  TextField, Button, Grid, Select, MenuItem, InputLabel, FormControl, Typography,
+  Checkbox, FormControlLabel, Box, Divider,
 } from '@mui/material';
+import { useDispatch } from 'react-redux';
+
+import { updateEvent } from 'src/redux/actions/editEventAction';
+import { AppDispatch } from 'src/redux/store';
+
 import { EventData } from './utills';
 
 interface EditEventFormProps {
@@ -22,6 +16,10 @@ interface EditEventFormProps {
 }
 
 export function EditEventForm({ eventData, onSuccess }: EditEventFormProps) {
+  const dispatch = useDispatch<AppDispatch>();
+  console.log('====================================');
+  console.log(eventData);
+  console.log('====================================');
   const [formData, setFormData] = useState(eventData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,26 +27,55 @@ export function EditEventForm({ eventData, onSuccess }: EditEventFormProps) {
     setFormData(eventData);
   }, [eventData]);
 
-const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { name, value, type, checked } = e.target;
-  
-  // Handle nested fields (both checkbox and regular inputs)
-  if (name.includes('.')) {
-    const [parent, child] = name.split('.');
-    setFormData((prev: any) => ({
-      ...prev,
-      [parent]: {
-        ...prev[parent],
-        [child]: type === 'checkbox' ? checked : value
-      }
-    }));
-  } else {
-    // Handle non-nested fields
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+
+    if (type === 'checkbox') {
+        // Handle nested checkbox fields
+        if (name.includes('.')) {
+            const [parent, child] = name.split('.');
+            setFormData((prev: any) => ({
+                ...prev,
+                [parent]: {
+                    ...prev[parent],
+                    [child]: checked
+                }
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: checked
+            }));
+        }
+    } else if (name.startsWith('organizer.socialMedia.')) {
+        // Special handling for social media fields
+        const socialMediaField = name.split('.')[2]; // whatsapp, linkedin, etc.
+        setFormData(prev => ({
+            ...prev,
+            organizer: {
+                ...prev.organizer,
+                socialMedia: {
+                    ...prev.organizer.socialMedia,
+                    [socialMediaField]: value
+                }
+            }
+        }));
+    } else if (name.includes('.')) {
+        // Handle other nested fields
+        const [parent, child] = name.split('.');
+        setFormData((prev: any) => ({
+            ...prev,
+            [parent]: {
+                ...prev[parent],
+                [child]: value
+            }
+        }));
+    } else {
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    }
 };
 
   const handleSelectChange = (e: any) => {
@@ -62,7 +89,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   const handleTicketChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     const updatedTickets = [...formData.tickets.tickets];
-    
+
     if (type === 'checkbox') {
       updatedTickets[index] = {
         ...updatedTickets[index],
@@ -101,9 +128,10 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
     try {
       // Call your API to update the event
-      // await updateEvent(formData._id, formData);
+      await dispatch(updateEvent(formData?.event?._id, formData));
       onSuccess();
     } catch (error) {
       console.error('Error updating event:', error);
@@ -591,7 +619,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                   name="organizer.socialMedia.whatsapp"
                   label="WhatsApp"
                   fullWidth
-                  value={formData.organizer.socialMedia.whatsapp}
+                  value={formData.organizer?.socialMedia?.whatsapp}
                   onChange={handleChange}
                 />
               </Grid>
@@ -600,7 +628,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                   name="organizer.socialMedia.linkedin"
                   label="LinkedIn"
                   fullWidth
-                  value={formData.organizer.socialMedia.linkedin}
+                  value={formData.organizer?.socialMedia?.linkedin}
                   onChange={handleChange}
                 />
               </Grid>
@@ -609,7 +637,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                   name="organizer.socialMedia.facebook"
                   label="Facebook"
                   fullWidth
-                  value={formData.organizer.socialMedia.facebook}
+                  value={formData.organizer?.socialMedia?.facebook}
                   onChange={handleChange}
                 />
               </Grid>
@@ -618,7 +646,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                   name="organizer.socialMedia.tiktok"
                   label="TikTok"
                   fullWidth
-                  value={formData.organizer.socialMedia.tiktok}
+                  value={formData.organizer?.socialMedia?.tiktok}
                   onChange={handleChange}
                 />
               </Grid>

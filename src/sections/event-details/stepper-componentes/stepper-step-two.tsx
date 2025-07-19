@@ -310,6 +310,7 @@ export function StepperStepTwo() {
                                 <TextField
                                     fullWidth
                                     required
+                                    sx={{textTransform:"capitalize"}}
                                     label="Price for each ticket"
                                     placeholder="0 XAF"
                                     value={row.price}

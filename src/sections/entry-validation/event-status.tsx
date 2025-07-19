@@ -1,12 +1,12 @@
-import { Box, Button,Select, MenuItem,Typography, Stack,FormControl } from "@mui/material";
+import { Box, Button, Select, MenuItem, Typography, Stack, FormControl } from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 interface Event {
-  _id: string;
-  eventName: string;
-  // Add other event properties as needed
+    _id: string;
+    eventName: string;
+    // Add other event properties as needed
 }
 
 // Custom Status Chip component
@@ -20,11 +20,26 @@ function StatusChip({ label, color }: { label: string; color: string }) {
 }
 
 export function EventBreadCrum({ view, setView, eventInformation, events, onEventSelect }: any) {
+    const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine); // Track online status
+
+    useEffect(() => {
+        const handleOnline = () => setIsOnline(true);
+        const handleOffline = () => setIsOnline(false);
+
+        window.addEventListener("online", handleOnline);
+        window.addEventListener("offline", handleOffline);
+
+        return () => {
+            window.removeEventListener("online", handleOnline);
+            window.removeEventListener("offline", handleOffline);
+        };
+    }, []);
+
     const location = useLocation();
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     // Define the specific URL path where the section should appear
     const showSection = location.pathname === '/entry-validation';
-     useEffect(() => {
+    useEffect(() => {
         if (events && events.length > 0 && !selectedEvent) {
             const firstEvent = events[0];
             setSelectedEvent(firstEvent);
@@ -70,7 +85,7 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
                             <MenuItem value="" disabled>
                                 Select an event
                             </MenuItem>
-                            {events?.map((event:any) => (
+                            {events?.map((event: any) => (
                                 <MenuItem
                                     key={event._id}
                                     value={event._id}
@@ -100,9 +115,12 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
             {showSection && (
                 <Box display="flex" alignItems="center" gap={2}>
                     <Stack direction="row" spacing={1} alignItems="center">
-                        <Typography fontWeight={600} fontSize={13}>Connection Status :</Typography>
-                        <StatusChip label="Online" color="green" />
-                        <StatusChip label="Offline" color="grey" />
+                        <Typography fontWeight={600} fontSize={13}>Connection Status:</Typography>
+                        {isOnline ? (
+                            <StatusChip label="Online" color="green" />
+                        ) : (
+                            <StatusChip label="Offline" color="grey" />
+                        )}
                     </Stack>
 
                     <Box display="flex" gap={1}>

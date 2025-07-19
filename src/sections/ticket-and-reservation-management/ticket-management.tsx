@@ -6,12 +6,14 @@ import { HeadingCommon } from "src/components/multiple-responsive-heading/headin
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
 import { TicketCreationAndConfiguration } from "./ticket-creation-&-onfiguration";
 
-export function TicketManagement({tickets}:any) {
+export function TicketManagement({ tickets }: any) {
     const [showTicketCreation, setShowTicketCreation] = useState(false);
 
     const ticketManagementTableHeaders = ["Ticket Name", "Price", "Quantity Available", "Ticket Description", "Remaining Stock", "Actions"];
 
-
+const handleTicketCreationSuccess = () => {
+        setShowTicketCreation(false);
+    };
     return (
         <Box>
             <HeadingCommon baseSize="33px" weight={600} variant="h5" title="Ticket Management" />
@@ -34,7 +36,7 @@ export function TicketManagement({tickets}:any) {
 
             {showTicketCreation && (
                 <Box mt={4}>
-                    <TicketCreationAndConfiguration />
+                    <TicketCreationAndConfiguration onSuccess={handleTicketCreationSuccess} />
                 </Box>
             )}
         </Box>

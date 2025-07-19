@@ -23,7 +23,7 @@ interface ApiResponse {
     data?: any;
 }
 
-export function TicketCreationAndConfiguration() {
+export function TicketCreationAndConfiguration({ onSuccess }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const [isFree, setIsFree] = useState(false);
     const [isUnlimited, setIsUnlimited] = useState(false);
@@ -98,13 +98,31 @@ export function TicketCreationAndConfiguration() {
             const result = await dispatch(createTicketType(ticketData) as unknown as Promise<ApiResponse>)
             if (result.status === 201) {
                 toast.success("Saved and Published Tickets Successfully...");
+                // Reset form state
+                setTicketTypeData({
+                    name: "",
+                    price: "",
+                    quantity: "",
+                    validity: "",
+                    description: "",
+                });
+                setTicketTypeOption({
+                    transferableTicket: false,
+                    personalizedTicket: false,
+                    activationCode: false,
+                });
+                setIsFree(false);
+                setIsUnlimited(false);
+
+                // Call the success callback if it exists
+                onSuccess?.();
             } else {
                 toast.error(result.message as ToastContent);
             }
         } catch (error) {
             toast.error('An unexpected error occurred' as ToastContent);
         }
-    }, [dispatch, ticketTypeOption, isUnlimited, isFree, ticketTypeData]);
+    }, [dispatch, ticketTypeOption,onSuccess, isUnlimited, isFree, ticketTypeData]);
 
     return (
         <Box boxShadow={3} borderRadius={3} mt={3}>

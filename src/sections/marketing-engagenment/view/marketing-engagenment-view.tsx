@@ -17,7 +17,7 @@ import { useDispatch } from 'react-redux';
 
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { promotionGet } from 'src/redux/actions';
+import { promotionEvents, promotionGet } from 'src/redux/actions';
 import { AppDispatch } from 'src/redux/store';
 
 import { PromotionsAndOffers } from '../promotion-&-offer';
@@ -38,6 +38,7 @@ const promotionsData = [
 
 export function MarketingEngagenmentView() {
   const [selectedPromo, setSelectedPromo] = useState(promotionsData[0]);
+  
   // const [onSave, setOnSave] = useState();
   // const [onCancel, setOnCancel] = useState();
   const dispatch = useDispatch<AppDispatch>();

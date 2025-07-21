@@ -159,7 +159,7 @@ export function NavHomeOne() {
 export function FrontHome() {
     const dispatch = useDispatch<AppDispatch>();
     const { eventId } = useParams();
-    const { _id, eventName, date, time, category, eventType, coverImage, location, formate, description,
+    const { _id, eventName, date, time,portraitImage, category, eventType, coverImage, location, formate, description,
         organizer, customization, tickets, visibility, averageRating,reviewCount,review
     } = useSelector((state: RootState) => state?.event?.eventWithDetails);
     useEffect(() => {
@@ -183,7 +183,7 @@ export function FrontHome() {
                 <Breadcrumb eventName={eventName} />
 
                 {/* Main Event Banner */}
-                <BannerGallery coverImage={coverImage} eventName={eventName} description={description} date={date} time={time} />
+                <BannerGallery portraitImage={portraitImage} coverImage={coverImage} eventName={eventName} description={description} date={date} time={time} />
 
                 {/* Event Description */}
                 <Card sx={{ mt: 3, p: 3, borderRadius: "15px", backgroundColor: "#2296D4", color: "white" }}>

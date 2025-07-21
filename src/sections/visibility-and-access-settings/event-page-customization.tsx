@@ -1,23 +1,23 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Box, Grid, FormControl, InputLabel, Select, MenuItem,
-  Button,
-  Typography,
-  TextField,
-  Input,SelectChangeEvent
+  Button, Typography, TextField, Input, SelectChangeEvent
 } from '@mui/material';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { AppDispatch, RootState } from 'src/redux/store';
-import { eventCustomizationPageUpdate, eventUpdate } from 'src/redux/actions/event.action';
+import {
+  eventCustomizationPageUpdate,
+  eventCustomizationPageFetch
+} from 'src/redux/actions/event.action'; // 👈 Import fetch action
 
 export const EventCustomization = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { fullData } = useSelector((state: RootState) => state?.event);
-  const [selectedEventId, setSelectedEventId] = useState<string>('');
+  const { fullData, customizationData } = useSelector((state: RootState) => state.event);
 
+  const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [primaryColor, setPrimaryColor] = useState('#072F4A');
   const [secondaryColor, setSecondaryColor] = useState('#3F51B5');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -26,38 +26,50 @@ export const EventCustomization = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const eventBannerRef = useRef<HTMLInputElement>(null);
 
-  const handleEventChange = (event: SelectChangeEvent<string>) => {
-    setSelectedEventId(event.target.value);
+  // Fetch existing customization on event change
+  const handleEventChange = async (event: SelectChangeEvent<string>) => {
+    const selectedId = event.target.value;
+    setSelectedEventId(selectedId);
+
+    const result = await dispatch(eventCustomizationPageFetch(selectedId));
+
+    if ('customization' in result && result.status === 200) {
+      const customization = result.customization;
+
+      setPrimaryColor(customization.themeColor || '#072F4A');
+      setSecondaryColor(customization.customColor || '#3F51B5');
+
+      if (customization?.eventLogo?.url) {
+        setEventLogoPreview(customization.eventLogo.url);
+      }
+
+      if (customization?.event?.coverImage?.url) {
+        setPreviewImage(customization.event.coverImage.url);
+      }
+    }
+
   };
 
   const handleEventThemeLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
-      // Create object URL for preview
       const previewUrl = URL.createObjectURL(e.target.files[0]);
       setEventLogoPreview(previewUrl);
     }
   };
 
-  // Clean up object URLs when component unmounts
   useEffect(() => () => {
-    if (eventLogoPreview) {
-      URL.revokeObjectURL(eventLogoPreview);
-    }
+    if (eventLogoPreview) URL.revokeObjectURL(eventLogoPreview);
   }, [eventLogoPreview]);
 
   const handleEventBanner = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
-      // Create object URL for preview
       const previewUrl = URL.createObjectURL(e.target.files[0]);
       setPreviewImage(previewUrl);
     }
   };
 
-  // Clean up object URLs when component unmounts
   useEffect(() => () => {
-    if (previewImage) {
-      URL.revokeObjectURL(previewImage);
-    }
+    if (previewImage) URL.revokeObjectURL(previewImage);
   }, [previewImage]);
 
   const handleSubmit = useCallback(async (event: any) => {
@@ -70,42 +82,27 @@ export const EventCustomization = () => {
     formData.append('themeColor', primaryColor);
     formData.append('customColor', secondaryColor);
     if (eventLogo && eventLogo.length > 0) {
-      const selectedFile = eventLogo[0];
-      formData.append("eventLogo", selectedFile);
+      formData.append('eventLogo', eventLogo[0]);
     }
     if (eventBanner && eventBanner.length > 0) {
-      const selectedFile = eventBanner[0];
-      formData.append("coverImage", selectedFile);
+      formData.append('coverImage', eventBanner[0]);
     }
-    const updatedEvent = {
-      _id: selectedEventId,
-      formData
-    }
+
+    const updatedEvent = { _id: selectedEventId, formData };
     const result = await dispatch(eventCustomizationPageUpdate(updatedEvent));
 
     if (result?.status === 200) {
-      toast.success("Chaanges applied Successfully...");
-      // setTimeout(() => setSelectedEventId('')
-      //   , 2000);
-
+      toast.success("Changes applied successfully!");
     } else {
       toast.error(result?.message);
     }
-  }, [dispatch,primaryColor,secondaryColor,selectedEventId]);
-
+  }, [dispatch, primaryColor, secondaryColor, selectedEventId]);
 
   return (
-    <Box
-      boxShadow={3}
-      borderRadius={3}
-      p={{ xs: 2, sm: 3, md: 4 }}
-      bgcolor="white"
-      mt={3}
-    >
-      <form onSubmit={handleSubmit} encType='multipart/form-data'>
+    <Box boxShadow={3} borderRadius={3} p={{ xs: 2, sm: 3, md: 4 }} bgcolor="white" mt={3}>
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
         <Box display="flex" justifyContent="space-between">
           <HeadingCommon title="Event Page Customization" />
-
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth size="small">
               <InputLabel>Select Event</InputLabel>
@@ -186,18 +183,9 @@ export const EventCustomization = () => {
             }}
           >
             {previewImage ? (
-              <img src={previewImage}
-                alt="Logo Preview"
-                style={{
-                  width: '100%',
-                  borderRadius: 8,
-                  maxHeight: '300px',
-                  objectFit: 'cover'
-                }} />
+              <img src={previewImage} alt="Banner" style={{ width: '100%', borderRadius: 8, maxHeight: '300px', objectFit: 'cover' }} />
             ) : (
-              <Typography variant="body2" color="textSecondary">
-                No Event Banner
-              </Typography>
+              <Typography variant="body2" color="textSecondary">No Event Banner</Typography>
             )}
           </Box>
         </Box>
@@ -208,7 +196,6 @@ export const EventCustomization = () => {
           <TextField
             type="file"
             fullWidth
-            required
             name="eventLogo"
             onChange={handleEventThemeLogo}
             inputRef={fileInputRef}
@@ -239,20 +226,9 @@ export const EventCustomization = () => {
             }}
           >
             {eventLogoPreview ? (
-              <img src={eventLogoPreview}
-                alt="Logo Preview"
-                style={{
-                  width: '100%',
-                  borderRadius: 8,
-                  aspectRatio: '1/1',
-                  objectFit: 'contain',
-                  backgroundColor: '#f5f5f5',
-                  border: '1px solid #eee'
-                }} />
+              <img src={eventLogoPreview} alt="Logo" style={{ width: '100%', borderRadius: 8, objectFit: 'contain' }} />
             ) : (
-              <Typography variant="body2" color="textSecondary">
-                No Logo
-              </Typography>
+              <Typography variant="body2" color="textSecondary">No Logo</Typography>
             )}
           </Box>
         </Box>
@@ -278,5 +254,3 @@ export const EventCustomization = () => {
     </Box>
   );
 };
-
-

@@ -165,7 +165,7 @@ export const eventPublicationCreate = ({ formEventPublicatinData, eventId, ticke
 
     try {
         const response = await axios.post(`/event/tickets/pvo/${eventId}/${ticketCustomId}/${eventCustomizationId}`, formEventPublicatinData);
-        // const response = await axios.post('/event/tickets/pvo/681487601fc496cd15aa9c30/681487bf1fc496cd15aa9c36/681487da1fc496cd15aa9c3a', formEventPublicatinData);
+        // const response = await axios.post('/event/tickets/pvo/6874eda15114ef5b02b58bcf/6874edd55114ef5b02b58be1/6874edef5114ef5b02b58be8', formEventPublicatinData);
         dispatch({
             type: eventConstants.PUBLISH_CREATE_SUCCESS,
             payload: {
@@ -449,4 +449,34 @@ export const validateViewUpdate = (eventId, validationView) => async (dispatch) 
             },
         });
     }
+};
+
+export const eventCustomizationPageFetch = (eventId) => async (dispatch) => {
+  dispatch({ type: eventConstants.EVENT_CUSTOMIZATION_FETCH_REQUEST });
+ 
+  try {
+    const response = await axios.get(`/event/eventPageCustomization/${eventId}`);
+ 
+    dispatch({
+      type: eventConstants.EVENT_CUSTOMIZATION_FETCH_SUCCESS,
+      payload: response.data.customization,
+    });
+ 
+    return {
+      type: eventConstants.EVENT_CUSTOMIZATION_FETCH_SUCCESS,
+      status: response.status,
+      customization: response.data.customization,
+    };
+  } catch (error) {
+    dispatch({
+      type: eventConstants.EVENT_CUSTOMIZATION_FETCH_FAILURE,
+      payload: { message: error?.response?.data?.message || 'Server error', error: error.status },
+    });
+ 
+    return {
+      type: eventConstants.EVENT_CUSTOMIZATION_FETCH_FAILURE,
+      message: error?.response?.data?.message || 'Server error',
+      status: error.status,
+    };
+  }
 };

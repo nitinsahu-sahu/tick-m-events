@@ -28,6 +28,7 @@ interface SocialPlatforms {
 
 export const CustomPhotoVideoFilter = () => {
   const { fullData } = useSelector((state: RootState) => state?.event);
+  console.log(fullData);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -70,23 +71,78 @@ export const CustomPhotoVideoFilter = () => {
     setSelectedFilter(null);
   };
 
+  const checkImageTransparency = (file: File): Promise<boolean> =>
+    new Promise((resolve) => {
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!ctx) {
+          resolve(false);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+        for (let i = 3; i < imageData.length; i += 4) {
+          if (imageData[i] < 255) {
+            resolve(true); // Transparent pixel found
+            return;
+          }
+        }
+
+        resolve(false); // No transparency
+      };
+
+      img.src = URL.createObjectURL(file);
+    });
+
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
 
-    const validPngFiles = Array.from(files).filter((file) => file.type === "image/png");
+    const fileArray = Array.from(files);
 
-    if (validPngFiles.length !== files.length) {
-      toast.warning("Only PNG images are allowed!");
-    }
-    if (files && files.length > 0) {
-      const fileArray = Array.from(files);
-      setFilesToUpload((prev) => [...prev, ...fileArray]);
-      const newPreviewUrls = fileArray.map(file => URL.createObjectURL(file));
-      setFilterImages((prev) => [...prev, ...newPreviewUrls]);
+    const results = await Promise.all(
+      fileArray.map(async (file) => {
+        if (file.type !== "image/png") {
+          toast.warning(`${file.name} is not a PNG file and not transparent.`);
+          return null;
+        }
+
+        const isTransparent = await checkImageTransparency(file);
+        if (!isTransparent) {
+          toast.warning(`${file.name} is not transparent.`);
+          return null;
+        }
+
+        return file; // valid PNG with transparency
+      })
+    );
+
+    const validTransparentPngs = results.filter((file): file is File => file !== null);
+
+    if (validTransparentPngs.length === 0) return;
+
+    // Update state
+    setFilesToUpload((prev) => [...prev, ...validTransparentPngs]);
+
+    const newPreviewUrls = validTransparentPngs.map((file) =>
+      URL.createObjectURL(file)
+    );
+    setFilterImages((prev) => [...prev, ...newPreviewUrls]);
+
+    // Optional reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
+
 
   const selectedEvent = fullData.find((event: any) => event._id === selectedEventId);
   const eventCoverImage = selectedEvent?.customization?.eventLogo?.url || '/assets/images/cover/1.png';
@@ -293,6 +349,17 @@ export const CustomPhotoVideoFilter = () => {
         <Typography variant="subtitle1" fontSize={{ xs: 12, sm: 16, md: 20 }} fontWeight={500} gutterBottom>
           Upload Custom Filter
         </Typography>
+
+        {/* 🆕 Instruction Text */}
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          fontSize={{ xs: 12, sm: 14 }}
+          mb={1}
+        >
+          Please upload <strong>PNG images with a transparent background</strong>.
+        </Typography>
+
         <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2} alignItems="center">
           <Input
             inputRef={fileInputRef}
@@ -302,7 +369,6 @@ export const CustomPhotoVideoFilter = () => {
             disableUnderline
             sx={{ border: "1px solid black", padding: "8px", borderRadius: 2 }}
           />
-
           <Button
             variant="contained"
             sx={{
@@ -315,9 +381,9 @@ export const CustomPhotoVideoFilter = () => {
           >
             Apply Upload Filter
           </Button>
-
         </Box>
       </Box>
+
       {/* Live Preview */}
       <Box mb={3}>
         <Typography

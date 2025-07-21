@@ -1,7 +1,7 @@
 import { Box, Typography, Card, CardContent, Grid, FormControlLabel, Radio, TextField, Switch, Button, RadioGroup } from "@mui/material";
 import { useCallback, useState } from "react";
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "src/redux/store";
 import { eventPublicationCreate } from "src/redux/actions/event.action";
@@ -9,14 +9,21 @@ import { eventPublicationCreate } from "src/redux/actions/event.action";
 export function StepperStepFour() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
+    const [searchParams] = useSearchParams();
+    const eventId = searchParams.get('eventId'); // Get existing eventId
+
+
     const [publicationData, setPublicationData] = useState({
-        publicEvent: true,  // Set to true initially
-        privateEvent: false,
+        visibilityType: "public", // default to public
         customUrl: '',
         homepageHighlighting: false,
         autoShareOnSocialMedia: false,
         status: "publish"
     });
+
+    const link = publicationData.visibilityType === "private" ?
+        `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${eventId}` :
+        `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event`;
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = event.target;
@@ -30,10 +37,15 @@ export function StepperStepFour() {
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
 
+        // Generate the appropriate URL based on the selected visibility type
+        const newUrl = value === "private"
+            ? `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${eventId}`
+            : `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event`;
+
         setPublicationData(prevData => ({
             ...prevData,
-            publicEvent: value === 'public',
-            privateEvent: value === 'private'
+            visibilityType: value, // 'public' or 'private'
+            customUrl: newUrl    // Update the customUrl with the generated URL
         }));
     };
 
@@ -46,24 +58,29 @@ export function StepperStepFour() {
             ...publicationData,
             status: isDraft ? "draft" : "publish"
         };
+
         // Convert boolean values to strings before appending
         formEventPublicatinData.append("autoShareOnSocialMedia", submissionData.autoShareOnSocialMedia.toString());
         formEventPublicatinData.append("customUrl", submissionData.customUrl);
         formEventPublicatinData.append("homepageHighlighting", submissionData.homepageHighlighting.toString());
-        formEventPublicatinData.append("privateEvent", submissionData.privateEvent.toString());
-        formEventPublicatinData.append("publicEvent", submissionData.publicEvent.toString());
+        formEventPublicatinData.append("visibilityType", submissionData.visibilityType);
         formEventPublicatinData.append("status", submissionData.status);
+
         try {
             // Get current search params
-            const searchParams = new URLSearchParams(window.location.search);
-            const eventId = searchParams.get('eventId'); // Get existing eventId
-            const ticketCustomId = searchParams.get('ticketConfigId'); // Get existing eventId
-            const eventCustomizationId = searchParams.get('eventCustomiztionId'); // Get existing eventId
-            const result = await dispatch(eventPublicationCreate({ formEventPublicatinData, eventId, ticketCustomId, eventCustomizationId }));
+            const ticketCustomId = searchParams.get('ticketConfigId');
+            const eventCustomizationId = searchParams.get('eventCustomiztionId');
+
+            const result = await dispatch(eventPublicationCreate({
+                formEventPublicatinData,
+                eventId,
+                ticketCustomId,
+                eventCustomizationId
+            }));
+
             if (result?.status === 201) {
                 toast.success(result?.message);
                 navigate(`/`);
-
             } else {
                 toast.error(result?.message);
             }
@@ -71,8 +88,7 @@ export function StepperStepFour() {
         } catch (error) {
             toast.error("Event creation failed");
         }
-        // Here you would typically send the data to your backend
-    }, [publicationData, dispatch, navigate]);
+    }, [publicationData, dispatch, navigate, eventId, searchParams]);
 
     return (
         <Card
@@ -97,7 +113,7 @@ export function StepperStepFour() {
                     <RadioGroup
                         sx={{ marginLeft: 1 }}
                         onChange={handleRadioChange}
-                        value={publicationData.publicEvent ? "public" : "private"} // Controlled value
+                        value={publicationData.visibilityType} // Controlled value
                     >
                         <FormControlLabel
                             value="public"
@@ -119,29 +135,21 @@ export function StepperStepFour() {
                         />
                     </RadioGroup>
 
-                    {/* Rest of your form remains the same */}
-                    {/* Custom URL Field */}
+                    {/* Event Link Preview */}
                     <Typography variant="subtitle1" fontWeight="bold" mt={3}>
-                        Custom URL:
+                        Your Event Link:
                     </Typography>
-                    <TextField
-                        fullWidth
-                        name="customUrl"
-                        value={publicationData.customUrl}
-                        onChange={handleInputChange}
-                        variant="outlined"
-                        placeholder="e.g. tickm.com/event-tech-2025"
+                    <Box
                         sx={{
                             backgroundColor: "#E0E0E0",
-                            marginTop: 1,
+                            padding: 2,
                             borderRadius: 1,
+                            marginTop: 1,
+                            wordBreak: "break-word"
                         }}
-                    />
-
-                    {/* Promotion & Highlighting */}
-                    <Typography variant="subtitle1" fontWeight="bold" mt={4}>
-                        Promotion & Highlighting
-                    </Typography>
+                    >
+                        <Typography variant="body2">{link}</Typography>
+                    </Box>
 
                     <Grid container spacing={2} mt={1}>
                         <Grid item xs={12} sm={12}>

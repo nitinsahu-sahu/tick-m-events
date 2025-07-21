@@ -56,3 +56,8 @@ export const PaymentSettingTableData = [
     { type: "Mobile Money", numberAndIban: "+237 6xxxx xxxx", status: "Pending", details: "Edit" },
     { type: "Mobile Money", numberAndIban: "+237 6xxxx xxxx", status: "Approved", details: "Edit" },
 ];
+
+export interface EventData {
+  _id: string;
+  eventName: string;
+}

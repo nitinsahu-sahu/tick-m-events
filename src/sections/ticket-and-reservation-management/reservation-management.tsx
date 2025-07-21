@@ -17,7 +17,7 @@ export function ReservationManagement({ orderList }: any) {
     console.log("iii", orderList);
     const exportToExcel = useExcelExport();
     const exportToCSV = useCSVExport();
-    
+
     const chartRealTimeOptions: ApexOptions = {
         series: [45, 30, 25], // Ticket Sold, Validation, Remaining
         labels: ["Ticket Sold", "Ticket validated", "Remaining Tickets"],
@@ -75,7 +75,7 @@ export function ReservationManagement({ orderList }: any) {
             if (type === 'listName') {
                 return prev.includes('listName') ? prev.filter(t => t !== 'listName') : [...prev, 'listName'];
             }
-             if (type === 'listCode') {
+            if (type === 'listCode') {
                 return prev.includes('listCode') ? prev.filter(t => t !== 'listCode') : [...prev, 'listCode'];
             }
             if (type === 'scan') {
@@ -92,7 +92,7 @@ export function ReservationManagement({ orderList }: any) {
             await dispatch(validateViewUpdate(orderList._id, validationTypes));
             setInitialValidationTypes(validationTypes); // reset comparison baseline
             toast.success("Changes saved successfully...");
-            
+
         } catch (error) {
             toast.error("Failed to update validation preferences.");
         }
@@ -112,15 +112,18 @@ export function ReservationManagement({ orderList }: any) {
             <TicketReservationManagementTable data={order} headers={reservationManagementTableHeaders} type="3" />
 
             {/* Export Buttons */}
-            <Box mt={2} display="flex" gap={2}>
-                <Button onClick={handleCSVExport}
-                    variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
-                    Export as CSV
-                </Button>
-                <Button onClick={handleExcelExport} variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
-                    Export as Excel
-                </Button>
-            </Box>
+            {
+                order.length > 0 ? <Box mt={2} display="flex" gap={2}>
+                    <Button onClick={handleCSVExport}
+                        variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
+                        Export as CSV
+                    </Button>
+                    <Button onClick={handleExcelExport} variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
+                        Export as Excel
+                    </Button>
+                </Box> : null
+            }
+
 
             {/* Ticket Validation Section */}
             <Box mt={3}>

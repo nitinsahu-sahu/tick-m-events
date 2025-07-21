@@ -10,8 +10,8 @@ import { eventUpdate } from 'src/redux/actions/event.action';
 
 export function VisibilityType() {
   const dispatch = useDispatch<AppDispatch>();
+  const { eventsWithOrdersAndParticiapnt } = useSelector((state: RootState) => state?.promotionList);
 
-  const { fullData } = useSelector((state: RootState) => state?.event);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [eventType, setEventType] = useState<'public' | 'private'>();
 
@@ -20,7 +20,7 @@ export function VisibilityType() {
 
   const link = eventType === "private" ?
     `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${selectedEventId}` :
-    `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}`
+    `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event`
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -33,7 +33,7 @@ export function VisibilityType() {
     }
   };
   // Find the selected event
-  const selectedEvent = fullData.find((event: any) => event._id === selectedEventId);
+  const selectedEvent = eventsWithOrdersAndParticiapnt.find((event: any) => event._id === selectedEventId);
 
   const handleEventChange = (event: SelectChangeEvent<string>) => {
     setSelectedEventId(event.target.value);
@@ -41,7 +41,7 @@ export function VisibilityType() {
 
     // Update radio button based on selected event's type
     if (event.target.value) {
-      const eventTy = fullData.find((e: any) => e._id === event.target.value);
+      const eventTy = eventsWithOrdersAndParticiapnt.find((e: any) => e._id === event.target.value);
 
       setEventType(eventTy?.visibility?.visibilitySettings?.publicEvent ? 'public' : 'private');
     }
@@ -103,7 +103,7 @@ export function VisibilityType() {
               label="Select Event"
               sx={{ minWidth: 200, textTransform: "capitalize" }}
             >
-              {fullData.map((event: any) => (
+              {eventsWithOrdersAndParticiapnt.map((event: any) => (
                 <MenuItem key={event._id} value={event._id} sx={{ textTransform: "capitalize" }}>
                   {event.eventName} ({event.date})
                 </MenuItem>

@@ -23,7 +23,7 @@ export function TicketReservationManagementTable({
     data: any[];
 }) {
     console.log(data);
-    
+
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editedData, setEditedData] = useState<any>({});
     const dispatch = useDispatch<AppDispatch>();
@@ -90,27 +90,33 @@ export function TicketReservationManagementTable({
                     {!data || data.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={headers.length} align="center" sx={{ py: 4 }}>
-                                <CircularProgress size={15} />
+                                {(type === '4' || type === '3') ? (
+                                    <Typography variant="body1" color="text.secondary">
+                                        No records found.
+                                    </Typography>
+                                ) : (
+                                    <CircularProgress size={15} />
+                                )}
                             </TableCell>
                         </TableRow>
                     ) : (
                         data?.map((row, index) => (
                             <TableRow key={row._id} sx={{ backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#e0e0e0" }}>
                                 {
-                                    type==='4'?<TableCell align="center" sx={{ fontWeight: "bold", textTransform: 'capitalize' }}>
-                                    {row.transactionId}
-                                </TableCell>
-                                :<TableCell align="center" sx={{ fontWeight: "bold", textTransform: 'capitalize' }}>
-                                    {row.name || row.userId.name}
-                                </TableCell>
+                                    type === '4' ? <TableCell align="center" sx={{ fontWeight: "bold", textTransform: 'capitalize' }}>
+                                        {row.transactionId}
+                                    </TableCell>
+                                        : <TableCell align="center" sx={{ fontWeight: "bold", textTransform: 'capitalize' }}>
+                                            {row.name || row.userId.name}
+                                        </TableCell>
                                 }
-                                
+
                                 {
                                     type === "3" ? <TableCell align="center">
                                         {row.userId.email}
-                                    </TableCell> : type === "4"?<TableCell align="center">
+                                    </TableCell> : type === "4" ? <TableCell align="center">
                                         {row.userId.name}
-                                    </TableCell>:<TableCell align="center" >
+                                    </TableCell> : <TableCell align="center" >
                                         {editingId === row._id ? (
                                             <TextField
                                                 value={editedData.price}
@@ -172,7 +178,7 @@ export function TicketReservationManagementTable({
                                 }
                                 {/* totalAmount */}
                                 {
-                                    type === '4' ? <TableCell align="center">{`${row.totalAmount} XAF`}</TableCell> : null
+                                    type === '4' ? <TableCell align="center">{`${row.refundAmount} XAF`}</TableCell> : null
                                 }
 
                                 {

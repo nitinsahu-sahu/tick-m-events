@@ -13,7 +13,9 @@ const initialState = {
     childCategories: [],
     loadingChildCategories: false,
     error: null,
-    currentEvents: []
+    currentEvents: [],
+    customizationLoading: false,
+    customizationData: null,
 };
 
 const eventReducer = (state, action) => {
@@ -21,6 +23,28 @@ const eventReducer = (state, action) => {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
+        case eventConstants.EVENT_CUSTOMIZATION_FETCH_REQUEST:
+            return {
+                ...state,
+                customizationLoading: true,
+                error: null,
+                customizationData: null,
+            };
+        case eventConstants.EVENT_CUSTOMIZATION_FETCH_SUCCESS:
+            return {
+                ...state,
+                customizationLoading: false,
+                customizationData: action.payload,
+                error: null,
+            };
+        case eventConstants.EVENT_CUSTOMIZATION_FETCH_FAILURE:
+            return {
+                ...state,
+                customizationLoading: true,
+                error: action.payload.message,
+                customizationData: null,
+            };
+
         case eventConstants.UPDATE_VALIDATION_VIEW_REQUEST:
             return {
                 ...state,

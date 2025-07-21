@@ -21,9 +21,7 @@ export function PromotionsAndOffers() {
   const dispatch = useDispatch<AppDispatch>();
   const { eventsWithOrdersAndParticiapnt } = useSelector((state: RootState) => state?.promotionList);
   const [selectedEvent, setSelectedEvent] = useState<any>(null); // Replace 'any' with your Event type if available
-  console.log('========selectedEvent============================');
-  console.log(selectedEvent);
-  console.log('====================================');
+  
   const [selectedDiscounts, setSelectedDiscounts] = useState('');
   const handleDiscountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedDiscounts(event.target.value);

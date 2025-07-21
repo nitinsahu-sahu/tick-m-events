@@ -40,7 +40,7 @@ export function HelpCenterAndSecurity() {
                     </Grid>
                     <Grid item xs={12}>
                         <Button fullWidth variant="contained" sx={{ backgroundColor: "#D32F2F", borderRadius: 2 }}
-                            href={`mailto:${import.meta.env.VITE_WHATSAPP_NUMBER}`} >
+                            href={`mailto:${import.meta.env.VITE_SUPPORT_EMAIL || 'support@tickmevents.com'}`} >
                             Report a Payment Issue
                         </Button>
                     </Grid>

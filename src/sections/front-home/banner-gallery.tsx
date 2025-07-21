@@ -5,7 +5,7 @@ import { HeadingCommon } from "src/components/multiple-responsive-heading/headin
 import { formatEventDate, formatTimeTo12Hour } from "src/hooks/formate-time";
 
 
-export function BannerGallery({ coverImage, eventName, description, date, time }: any) {
+export function BannerGallery({ coverImage, eventName, description, date, time,portraitImage }: any) {
 
     return (
         <Grid container spacing={3}>
@@ -38,7 +38,7 @@ export function BannerGallery({ coverImage, eventName, description, date, time }
                 <Card
                     sx={{
                         height: "330px",
-                        backgroundImage: `url(../assets/images/cover/banner-2.png)`,
+                         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${portraitImage?.url || "../assets/images/cover/banner-2.png"})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                         borderRadius: "10px",

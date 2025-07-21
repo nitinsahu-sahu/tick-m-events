@@ -8,7 +8,6 @@ import { StepperStepFour } from "./stepper-componentes/stepper-step-four";
 import { StepperStepOne } from "./stepper-componentes/stepper-step-One";
 import { StepperStepTwo } from "./stepper-componentes/stepper-step-two";
 import { StepperStepThree } from "./stepper-componentes/stepper-step-three";
-import { StepperSuccessful } from "./stepper-componentes/event-created-succesfull";
 
 
 export function EventInformation({handleEventThemeLogo, fileInputRef, handlePortraitImage}:any) {

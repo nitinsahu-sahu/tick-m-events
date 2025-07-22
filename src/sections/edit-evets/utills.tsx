@@ -50,7 +50,7 @@ export interface PromotionAndHighlight {
 }
 
 export interface Visibility {
-  visibilitySettings: VisibilitySettings;
+  visibilityType: string;
   promotionAndHighlight: PromotionAndHighlight;
   _id: string;
   eventId: string;

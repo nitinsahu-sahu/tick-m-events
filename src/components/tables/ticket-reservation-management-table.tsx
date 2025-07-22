@@ -90,13 +90,9 @@ export function TicketReservationManagementTable({
                     {!data || data.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={headers.length} align="center" sx={{ py: 4 }}>
-                                {(type === '4' || type === '3') ? (
-                                    <Typography variant="body1" color="text.secondary">
-                                        No records found.
-                                    </Typography>
-                                ) : (
-                                    <CircularProgress size={15} />
-                                )}
+                                <Typography variant="body1" color="text.secondary">
+                                    No records found.
+                                </Typography>
                             </TableCell>
                         </TableRow>
                     ) : (

@@ -1,13 +1,13 @@
-import { useState,useEffect } from 'react';
-import { 
-  Typography, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Paper, 
+import { useState, useEffect } from 'react';
+import {
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
   IconButton,
   Dialog,
   DialogTitle,
@@ -17,8 +17,8 @@ import {
   Collapse,
   Box
 } from '@mui/material';
-import { 
-  Edit as EditIcon, 
+import {
+  Edit as EditIcon,
   Delete as DeleteIcon,
   KeyboardArrowDown as ExpandMoreIcon,
   KeyboardArrowUp as ExpandLessIcon
@@ -60,7 +60,7 @@ export function EditEventsView() {
   return (
     <DashboardContent>
       <PageTitleSection title="Events Edits" />
-      
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -74,23 +74,32 @@ export function EditEventsView() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {eventsLists?.map((eventData:any, index:any) => (
+            {!eventsLists || eventsLists.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                  <Typography variant="body1" color="text.secondary">
+                    No records found.
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              eventsLists?.map((eventData: any, index: any) => (
               <>
                 <TableRow key={eventData.event._id}>
                   <TableCell align='center'>{index + 1}</TableCell>
-                  <TableCell align='center' sx={{textTransform:"capitalize"}}>{eventData.event.eventName}</TableCell>
+                  <TableCell align='center' sx={{ textTransform: "capitalize" }}>{eventData.event.eventName}</TableCell>
                   <TableCell align='center'>{eventData.event.date}</TableCell>
                   <TableCell align='center'>{eventData.event.time}</TableCell>
-                  <TableCell align='center' sx={{textTransform:"capitalize"}}>{eventData.event.eventType}</TableCell>
+                  <TableCell align='center' sx={{ textTransform: "capitalize" }}>{eventData.event.eventType}</TableCell>
                   <TableCell align='center'>
-                    <IconButton 
+                    <IconButton
                       onClick={() => handleEditToggle(eventData.event._id)}
                       aria-label="edit"
                     >
-                      {expandedEventId === eventData.event._id ? 
+                      {expandedEventId === eventData.event._id ?
                         <ExpandLessIcon /> : <EditIcon />}
                     </IconButton>
-                    <IconButton 
+                    <IconButton
                       onClick={() => handleDeleteClick(eventData.event._id)}
                       aria-label="delete"
                     >
@@ -100,25 +109,26 @@ export function EditEventsView() {
                 </TableRow>
                 <TableRow>
                   <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                    <Collapse 
-                      in={expandedEventId === eventData.event._id} 
-                      timeout="auto" 
+                    <Collapse
+                      in={expandedEventId === eventData.event._id}
+                      timeout="auto"
                       unmountOnExit
                     >
                       <Box margin={2}>
-                        <EditEventForm 
-                          eventData={eventData} 
+                        <EditEventForm
+                          eventData={eventData}
                           onSuccess={() => {
                             setExpandedEventId(null);
                             dispatch(editEventsFetch());
-                          }} 
+                          }}
                         />
                       </Box>
                     </Collapse>
                   </TableCell>
                 </TableRow>
               </>
-            ))}
+            ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -134,8 +144,8 @@ export function EditEventsView() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
-          <Button 
-            onClick={handleDeleteConfirm} 
+          <Button
+            onClick={handleDeleteConfirm}
             color="error"
             variant="contained"
           >

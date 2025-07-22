@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import {
   TextField, Button, Grid, Select, MenuItem, InputLabel, FormControl, Typography,
-  Checkbox, FormControlLabel, Box, Divider,
+  Checkbox, FormControlLabel, Box, Divider, RadioGroup, Radio,FormLabel
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
 
-import { updateEvent } from 'src/redux/actions/editEventAction';
+import { editEventsFetch, updateEvent } from 'src/redux/actions/editEventAction';
 import { AppDispatch } from 'src/redux/store';
 
 import { EventData } from './utills';
@@ -31,52 +31,52 @@ export function EditEventForm({ eventData, onSuccess }: EditEventFormProps) {
     const { name, value, type, checked } = e.target;
 
     if (type === 'checkbox') {
-        // Handle nested checkbox fields
-        if (name.includes('.')) {
-            const [parent, child] = name.split('.');
-            setFormData((prev: any) => ({
-                ...prev,
-                [parent]: {
-                    ...prev[parent],
-                    [child]: checked
-                }
-            }));
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: checked
-            }));
-        }
-    } else if (name.startsWith('organizer.socialMedia.')) {
-        // Special handling for social media fields
-        const socialMediaField = name.split('.')[2]; // whatsapp, linkedin, etc.
-        setFormData(prev => ({
-            ...prev,
-            organizer: {
-                ...prev.organizer,
-                socialMedia: {
-                    ...prev.organizer.socialMedia,
-                    [socialMediaField]: value
-                }
-            }
-        }));
-    } else if (name.includes('.')) {
-        // Handle other nested fields
+      // Handle nested checkbox fields
+      if (name.includes('.')) {
         const [parent, child] = name.split('.');
         setFormData((prev: any) => ({
-            ...prev,
-            [parent]: {
-                ...prev[parent],
-                [child]: value
-            }
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [child]: checked
+          }
         }));
-    } else {
+      } else {
         setFormData(prev => ({
-            ...prev,
-            [name]: value
+          ...prev,
+          [name]: checked
         }));
+      }
+    } else if (name.startsWith('organizer.socialMedia.')) {
+      // Special handling for social media fields
+      const socialMediaField = name.split('.')[2]; // whatsapp, linkedin, etc.
+      setFormData(prev => ({
+        ...prev,
+        organizer: {
+          ...prev.organizer,
+          socialMedia: {
+            ...prev.organizer.socialMedia,
+            [socialMediaField]: value
+          }
+        }
+      }));
+    } else if (name.includes('.')) {
+      // Handle other nested fields
+      const [parent, child] = name.split('.');
+      setFormData((prev: any) => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
     }
-};
+  };
 
   const handleSelectChange = (e: any) => {
     const { name, value } = e.target;
@@ -139,7 +139,9 @@ export function EditEventForm({ eventData, onSuccess }: EditEventFormProps) {
       setIsSubmitting(false);
     }
   };
-
+  useEffect(() => {
+    dispatch(editEventsFetch());
+  }, [dispatch]);
   return (
     <form onSubmit={handleSubmit}>
       <Typography variant="h5" gutterBottom>
@@ -489,53 +491,85 @@ export function EditEventForm({ eventData, onSuccess }: EditEventFormProps) {
             <Typography variant="subtitle1" gutterBottom>
               Visibility Settings
             </Typography>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="visibility.visibilitySettings.publicEvent"
-                  checked={formData.visibility.visibilitySettings.publicEvent}
-                  onChange={handleChange}
+            <FormControl component="fieldset">
+              <RadioGroup
+                row
+                name="visibility.visibilityType"
+                value={formData.visibility.visibilityType}
+                onChange={handleChange}
+              >
+                <FormControlLabel
+                  value="public"
+                  control={<Radio />}
+                  label="Public Event"
                 />
-              }
-              label="Public Event"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="visibility.visibilitySettings.privateEvent"
-                  checked={formData.visibility.visibilitySettings.privateEvent}
-                  onChange={handleChange}
+                <FormControlLabel
+                  value="private"
+                  control={<Radio />}
+                  label="Private Event"
                 />
-              }
-              label="Private Event"
-            />
+              </RadioGroup>
+            </FormControl>
           </Grid>
           <Grid item xs={12}>
             <Typography variant="subtitle1" gutterBottom>
               Promotion and Highlight
             </Typography>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="visibility.promotionAndHighlight.homepageHighlighting"
-                  checked={formData.visibility.promotionAndHighlight.homepageHighlighting}
-                  onChange={handleChange}
-                />
-              }
-              label="Homepage Highlighting"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="visibility.promotionAndHighlight.autoShareOnSocialMedia"
-                  checked={formData.visibility.promotionAndHighlight.autoShareOnSocialMedia}
-                  onChange={handleChange}
-                />
-              }
-              label="Auto Share on Social Media"
-            />
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <FormControl component="fieldset">
+                  <FormLabel component="legend">Homepage Highlighting</FormLabel>
+                  <RadioGroup
+                    row
+                    name="visibility.promotionAndHighlight.homepageHighlighting"
+                    value={formData.visibility.promotionAndHighlight.homepageHighlighting}
+                    onChange={(e) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        visibility: {
+                          ...prev.visibility,
+                          promotionAndHighlight: {
+                            ...prev.visibility.promotionAndHighlight,
+                            homepageHighlighting: e.target.value === 'true'
+                          }
+                        }
+                      }));
+                    }}
+                  >
+                    <FormControlLabel value="true" control={<Radio />} label="Yes" />
+                    <FormControlLabel value="false" control={<Radio />} label="No" />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl component="fieldset">
+                  <FormLabel component="legend">Auto Share on Social Media</FormLabel>
+                  <RadioGroup
+                    row
+                    name="visibility.promotionAndHighlight.autoShareOnSocialMedia"
+                    value={formData.visibility.promotionAndHighlight.autoShareOnSocialMedia}
+                    onChange={(e) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        visibility: {
+                          ...prev.visibility,
+                          promotionAndHighlight: {
+                            ...prev.visibility.promotionAndHighlight,
+                            autoShareOnSocialMedia: e.target.value === 'true'
+                          }
+                        }
+                      }));
+                    }}
+                  >
+                    <FormControlLabel value="true" control={<Radio />} label="Yes" />
+                    <FormControlLabel value="false" control={<Radio />} label="No" />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
+
+          <Grid item xs={12} sm={12}>
             <FormControl fullWidth>
               <InputLabel>Status</InputLabel>
               <Select
@@ -546,19 +580,10 @@ export function EditEventForm({ eventData, onSuccess }: EditEventFormProps) {
               >
                 <MenuItem value="publish">Publish</MenuItem>
                 <MenuItem value="draft">Draft</MenuItem>
-                <MenuItem value="canceled">Canceled</MenuItem>
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              name="visibility.customUrl"
-              label="Custom URL"
-              fullWidth
-              value={formData.visibility.customUrl}
-              onChange={handleChange}
-            />
-          </Grid>
+          
         </Grid>
       </Box>
 

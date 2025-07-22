@@ -34,7 +34,6 @@ export const deleteEvent = (selectedEventId) => async (dispatch) => {
             type: editeventConstants.DELETE_SUCCESS,
             payload: {
                 message: response?.data?.message,
-                eventsLists: response?.data?.eventsWithDetails,
             },
 
         });
@@ -57,7 +56,6 @@ export const updateEvent = (selectedEventId, formData) => async (dispatch) => {
             type: editeventConstants.UPDATE_SUCCESS,
             payload: {
                 message: response?.data?.message,
-                eventsLists: response?.data?.eventsWithDetails,
             },
 
         });

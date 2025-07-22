@@ -6,7 +6,8 @@ const initialState = {
     popularEvents: [],
     recommendedEvents: [],
     latestEvents:[],
-    latestSales:[]
+    latestSales:[],
+    analytics:{}
 };
 
 const homeAndRecommandationReducer = (state, action) => {
@@ -41,6 +42,7 @@ const homeAndRecommandationReducer = (state, action) => {
                 popularEvents: action.payload.popularEvents,
                 recommendedEvents: action.payload.recommendedEvents,
                 latestEvents:action.payload.latestEvents,
+                analytics:action.payload.analytics,
             };
 
         case homeAndRecomConstants.GET_FAILURE:

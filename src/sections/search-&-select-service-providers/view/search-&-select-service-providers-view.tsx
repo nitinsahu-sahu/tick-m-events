@@ -96,8 +96,9 @@ export function SearchAndSelectServiceProvidersView() {
   }, [select]);
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  setIsModalOpen(false);
+  setSelected({}); // Reset the selected provider
+};
 
   const handleShareClick = (event: React.MouseEvent<HTMLElement>) => {
     setShareAnchorEl(event.currentTarget);

@@ -17,10 +17,9 @@ interface ApiResult {
   // Add other properties if needed
 }
 
-export function PromotionsAndOffers() {
+export function PromotionsAndOffers({event}:any) {
   const dispatch = useDispatch<AppDispatch>();
   const { eventsWithOrdersAndParticiapnt } = useSelector((state: RootState) => state?.promotionList);
-  console.log("ee", eventsWithOrdersAndParticiapnt);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   const [selectedDiscounts, setSelectedDiscounts] = useState('');
@@ -92,6 +91,7 @@ export function PromotionsAndOffers() {
           });
           setPromoCode('');
           setSelectedDiscounts('');
+          setShowCreateForm(false);
         } else {
           toast.error(result?.message);
         }
@@ -120,6 +120,14 @@ export function PromotionsAndOffers() {
     }
   }
 
+  const isFormValid = Boolean(
+    selectedDiscounts &&
+    promotionFormData.discountValue &&
+    promotionFormData.ticketSelection &&
+    promotionFormData.validityPeriodStart &&
+    promotionFormData.validityPeriodEnd &&
+    promoCode
+  );
 
   return (
     <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: '1px solid black' }}>
@@ -146,18 +154,23 @@ export function PromotionsAndOffers() {
       </Box>
       <Button
         fullWidth
+        disabled={!selectedEvent}
         sx={{
-          bgcolor: '#0B2E4C',
+          bgcolor: selectedEvent ? '#0B2E4C' : 'gray',
           color: 'white',
-          // mb: 3,
           py: 1.5,
           borderRadius: '10px',
-          '&:hover': { bgcolor: '#083048' },
+          '&:hover': {
+            bgcolor: selectedEvent ? '#083048' : 'gray',
+          },
         }}
-        onClick={() => setShowCreateForm(true)}
+        onClick={() => {
+          if (selectedEvent) setShowCreateForm(true);
+        }}
       >
         Create a new Promotion
       </Button>
+
 
       {showCreateForm && (
         <Paper sx={{ p: 3, borderRadius: '10px', background: '#f5f5f5', mt: 3 }}>
@@ -242,24 +255,6 @@ export function PromotionsAndOffers() {
               }}
               sx={{ mb: 2 }}
             />
-
-
-
-            {/* Discount Value */}
-            {/* <Typography variant="body2" fontWeight="bold" mb={1}>
-              Discount value
-            </Typography>
-            <TextField
-              fullWidth
-              required
-              name="discountValue"
-              placeholder="Discount Value e.g., 2,000 XAF"
-              type="text"
-              value={promotionFormData.discountValue}
-              onChange={handlePromotionChange}
-              sx={{ mb: 2 }}
-            /> */}
-
             {/* Ticket Selection */}
             <Typography variant="body2" fontWeight="bold" mb={1}>
               Ticket Selection
@@ -348,10 +343,18 @@ export function PromotionsAndOffers() {
               type="submit"
               color="inherit"
               variant="contained"
-              sx={{ mt: 2, backgroundColor: '#0B2E4C', '&:hover': { backgroundColor: '#083048' } }}
+              disabled={!isFormValid} // 👈 Disable if form is incomplete
+              sx={{
+                mt: 2,
+                backgroundColor: isFormValid ? '#0B2E4C' : 'gray',
+                '&:hover': {
+                  backgroundColor: isFormValid ? '#083048' : 'gray',
+                },
+              }}
             >
               Save Promotion
             </LoadingButton>
+
           </form>
         </Paper>
       )}

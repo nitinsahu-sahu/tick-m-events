@@ -54,7 +54,6 @@ export function MarketingEngagenmentView() {
   const [eventImage, setEventImage] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-console.log(selectedEvent,'se');
 
   useEffect(() => {
     const data = localStorage.getItem('postData');

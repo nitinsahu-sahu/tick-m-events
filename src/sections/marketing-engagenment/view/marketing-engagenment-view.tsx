@@ -120,7 +120,7 @@ console.log(selectedEvent,'se');
       <ActivePromotion />
 
       {/* Promotions & special offer section */}
-      <PromotionsAndOffers event={selectedEvent}/>
+      <PromotionsAndOffers selEvent={selectedEvent}/>
 
       {/* Notifications & Auto Reminder section */}
       <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: "1px solid black" }}>

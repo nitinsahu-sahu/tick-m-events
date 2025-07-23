@@ -17,7 +17,7 @@ interface ApiResult {
   // Add other properties if needed
 }
 
-export function PromotionsAndOffers({event}:any) {
+export function PromotionsAndOffers({ selEvent }: any) {
   const dispatch = useDispatch<AppDispatch>();
   const { eventsWithOrdersAndParticiapnt } = useSelector((state: RootState) => state?.promotionList);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);

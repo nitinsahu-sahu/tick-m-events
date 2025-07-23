@@ -5,6 +5,8 @@ import {
   Menu, ListItemIcon, Dialog, DialogTitle,
   DialogContent, DialogActions
 } from "@mui/material";
+import Rating from '@mui/material/Rating';
+
 import { toast } from "react-toastify";
 import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
 import flags from 'react-phone-number-input/flags';
@@ -33,36 +35,38 @@ export function SearchAndSelectServiceProvidersView() {
   const { providersList } = useSelector((state: RootState) => state?.providers);
   const { organizerRequests, orgLoading } = useSelector((state: RootState) => state?.serviceRequest);
   const [select, setSelected] = useState<any>({})
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const [tabValue, setTabValue] = useState(0);
-  const tabLabels = ["Global Search", "List of Providers", "Profile Display", "Requested Sevice", "Request a service"];
+  const tabLabels = ["Global Search", "List of Providers", "View Offers", "Requested Sevice", "Request a service"];
   const [showDetails, setShowDetails] = useState(false);
   const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
   const openShareMenu = Boolean(shareAnchorEl);
   const [copySuccess, setCopySuccess] = useState(false);
-
+  const [offerList, setOfferList] = useState({})
 
   const handleSelct = (row: any) => {
     setSelected(row)
+    setOfferList(row)
   }
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-  // For all tabs except 0→1 transition, just set the tab value
-  if (!(tabValue === 0 && newValue === 1)) {
-    setTabValue(newValue);
-    return;
-  }
-  
-  // Only for 0→1 transition, check if filters are applied
-  if (filtersApplied && providersList?.length) {
-    setTabValue(newValue);
-  } else {
-    // Optional: Show feedback that filters need to be applied first
-    console.log("Please apply filters first");
-  }
-};
+    // For all tabs except 0→1 transition, just set the tab value
+    if (!(tabValue === 0 && newValue === 1)) {
+      setTabValue(newValue);
+      return;
+    }
+
+    // Only for 0→1 transition, check if filters are applied
+    if (filtersApplied && providersList?.length) {
+      setTabValue(newValue);
+    } else {
+      // Optional: Show feedback that filters need to be applied first
+      console.log("Please apply filters first");
+    }
+  };
 
   const handleFiltersApplied = () => {
     setFiltersApplied(true);
@@ -96,9 +100,9 @@ export function SearchAndSelectServiceProvidersView() {
   }, [select]);
 
   const handleCloseModal = () => {
-  setIsModalOpen(false);
-  setSelected({}); // Reset the selected provider
-};
+    setIsModalOpen(false);
+    setSelected({}); // Reset the selected provider
+  };
 
   const handleShareClick = (event: React.MouseEvent<HTMLElement>) => {
     setShareAnchorEl(event.currentTarget);
@@ -145,6 +149,7 @@ export function SearchAndSelectServiceProvidersView() {
     window.open(url, '_blank', 'noopener,noreferrer');
     handleShareClose();
   };
+  console.log('select', select);
 
   return (
     <DashboardContent>
@@ -168,12 +173,10 @@ export function SearchAndSelectServiceProvidersView() {
         />
       )}
       {tabValue === 1 && (
-        <>
-          <ProviderCardList handleSelct={handleSelct} providersList={providersList} />
-        </>
+        <ProviderCardList handleSelct={handleSelct} providersList={providersList} />
       )}
       {tabValue === 2 && (
-        <ProfileCard selectedProvider={select} onRequestService={handleRequestService} />
+        <ProfileCard selectedProvider={offerList} onRequestService={handleRequestService} />
       )}
       {tabValue === 3 && (
         <RequestService requests={organizerRequests} />
@@ -443,6 +446,59 @@ export function SearchAndSelectServiceProvidersView() {
                 <Button onClick={() => setCopySuccess(false)}>OK</Button>
               </DialogActions>
             </Dialog>
+
+            {/* Reviews Section */}
+            <Box sx={{ mt: 4, p: 3 }}>
+              <Typography variant="h6" fontWeight={600} mb={2}>
+                Reviews ({select?.reviews?.length || 0})
+              </Typography>
+
+              {select?.reviews?.length > 0 ? (
+                <Box sx={{ maxHeight: 300, overflowY: 'auto' }}>
+                  {select?.reviews?.map((review: any) => (
+                    <Box key={review._id} sx={{ mb: 3, p: 2, border: '1px solid #eee', borderRadius: 2 }}>
+                      <Box display="flex" alignItems="center" mb={1}>
+                        <Avatar
+                          src={review.user?.avatar?.url}
+                          sx={{ width: 40, height: 40, mr: 2 }}
+                        />
+                        <Box>
+                          <Typography fontWeight={600}>{review.user?.name}</Typography>
+                          <Rating
+                            value={review.rating}
+                            readOnly
+                            size="small"
+                            sx={{ '& .MuiRating-iconFilled': { color: '#FFD700' } }}
+                          />
+                        </Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </Typography>
+                      </Box>
+                      <Typography>{review.comment}</Typography>
+
+                      {/* Reply section if exists */}
+                      {review.reply?.text && (
+                        <Box sx={{
+                          mt: 2,
+                          p: 2,
+                          bgcolor: '#f9f9f9',
+                          borderRadius: 1,
+                          borderLeft: '3px solid #032D4F'
+                        }}>
+                          <Typography variant="subtitle2" color="text.secondary">
+                            Response from {review.reply.repliedBy?.name || 'provider'}
+                          </Typography>
+                          <Typography>{review.reply.text}</Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <Typography color="text.secondary">No reviews yet</Typography>
+              )}
+            </Box>
 
             {/* Service List */}
             {/* {services.length > 0 && (

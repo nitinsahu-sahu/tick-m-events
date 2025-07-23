@@ -20,8 +20,9 @@ interface ApiResult {
 export function PromotionsAndOffers() {
   const dispatch = useDispatch<AppDispatch>();
   const { eventsWithOrdersAndParticiapnt } = useSelector((state: RootState) => state?.promotionList);
-  const [selectedEvent, setSelectedEvent] = useState<any>(null); // Replace 'any' with your Event type if available
-  
+  console.log("ee", eventsWithOrdersAndParticiapnt);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+
   const [selectedDiscounts, setSelectedDiscounts] = useState('');
   const handleDiscountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedDiscounts(event.target.value);
@@ -31,7 +32,7 @@ export function PromotionsAndOffers() {
   }, [dispatch])
   const [promotionFormData, setPromotionFormData] = useState({
     discountValue: '',
-    ticketSelection: 'vip',
+    ticketSelection: '',
     validityPeriodStart: '',
     validityPeriodEnd: '',
   });
@@ -52,8 +53,26 @@ export function PromotionsAndOffers() {
   const handlePomotionsCreate = useCallback(
     async (event: any) => {
       event.preventDefault();
+
+      if (!selectedEvent?._id) {
+        toast.error('Please select an event.');
+        return;
+      }
+
+      const validityStart = new Date(promotionFormData.validityPeriodStart);
+      const validityEnd = new Date(promotionFormData.validityPeriodEnd);
+      const eventCreatedAt = new Date(selectedEvent.createdAt);
+      const eventEndDate = new Date(selectedEvent.date);
+
+      if (validityStart < eventCreatedAt || validityEnd > eventEndDate) {
+        toast.error(
+          `Validity period must be between event creation date (${eventCreatedAt.toISOString().split('T')[0]}) and event end date (${eventEndDate.toISOString().split('T')[0]}).`
+        );
+        return;
+      }
+
       const formEventData = new FormData();
-      // Append all form data
+      formEventData.append('eventId', selectedEvent._id);
       formEventData.append('discountValue', promotionFormData.discountValue);
       formEventData.append('ticketSelection', promotionFormData.ticketSelection);
       formEventData.append('validityPeriodEnd', promotionFormData.validityPeriodEnd);
@@ -67,11 +86,11 @@ export function PromotionsAndOffers() {
           toast.success(result?.message);
           setPromotionFormData({
             discountValue: '',
-            ticketSelection: 'vip',
+            ticketSelection: '',
             validityPeriodStart: '',
             validityPeriodEnd: '',
           });
-          setPromoCode('')
+          setPromoCode('');
           setSelectedDiscounts('');
         } else {
           toast.error(result?.message);
@@ -80,7 +99,7 @@ export function PromotionsAndOffers() {
         toast.error('Promotion creation failed');
       }
     },
-    [promotionFormData, selectedDiscounts, promoCode, dispatch]
+    [promotionFormData, selectedDiscounts, promoCode, selectedEvent, dispatch]
   );
 
   const handleEventChange = (event: SelectChangeEvent<string>) => {
@@ -88,6 +107,19 @@ export function PromotionsAndOffers() {
     const foundEvent = eventsWithOrdersAndParticiapnt.find((e: any) => e._id === eventId);
     setSelectedEvent(foundEvent || null);
   };
+
+  const today = new Date().toISOString().split('T')[0];
+  let purchaseDeadline = today; // safe default fallback
+
+  if (selectedEvent) {
+    // Try to get deadline date string in ISO format
+    const rawDeadline = selectedEvent.ticketConfiguration?.purchaseDeadlineDate || selectedEvent.date;
+    if (rawDeadline) {
+      // Parse and format as yyyy-mm-dd
+      purchaseDeadline = new Date(rawDeadline).toISOString().split('T')[0];
+    }
+  }
+
 
   return (
     <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: '1px solid black' }}>
@@ -234,16 +266,23 @@ export function PromotionsAndOffers() {
             </Typography>
             <Select
               fullWidth
-              defaultValue="standard"
-              sx={{ mb: 2 }}
               name="ticketSelection"
               value={promotionFormData.ticketSelection}
               onChange={handlePromotionChange}
+              required
+              displayEmpty
+              sx={{ mb: 2 }}
             >
-              <MenuItem value="standard">Standard</MenuItem>
-              <MenuItem value="vip">Vip</MenuItem>
-            </Select>
+              <MenuItem value="" disabled>
+                Select Ticket Type
+              </MenuItem>
 
+              {selectedEvent?.ticketConfiguration?.tickets?.map((ticket: any) => (
+                <MenuItem key={ticket.id} value={ticket.id}>
+                  {ticket.ticketType}
+                </MenuItem>
+              ))}
+            </Select>
             {/* Validity Period */}
             <Typography variant="body2" fontWeight="bold" mb={1}>
               Validity Period
@@ -252,23 +291,31 @@ export function PromotionsAndOffers() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  placeholder="Start Date (mm/dd/yyyy)"
+                  placeholder="Start Date"
                   required
                   name="validityPeriodStart"
                   type="date"
                   value={promotionFormData.validityPeriodStart}
                   onChange={handlePromotionChange}
+                  inputProps={{
+                    min: today,
+                    max: purchaseDeadline,
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
+                  placeholder="End Date"
                   required
-                  placeholder="End Date (mm/dd/yyyy)"
                   name="validityPeriodEnd"
                   type="date"
                   value={promotionFormData.validityPeriodEnd}
                   onChange={handlePromotionChange}
+                  inputProps={{
+                    min: promotionFormData.validityPeriodStart || today,
+                    max: purchaseDeadline,
+                  }}
                 />
               </Grid>
             </Grid>

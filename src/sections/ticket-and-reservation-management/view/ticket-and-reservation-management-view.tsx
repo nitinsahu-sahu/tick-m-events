@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
-
+import { useLocation } from 'react-router-dom';
 import { PageTitleSection } from "src/components/page-title-section";
 import { DashboardContent } from "src/layouts/dashboard";
 import { AppDispatch, RootState } from "src/redux/store";
@@ -18,7 +18,10 @@ import { RefundAndCancellationManangement } from "../refund-&-cancellation-manag
 import("../style.css")
 
 
+
 export function TicketAndReservationManagementView() {
+  const location = useLocation();
+  const locationSelectedEvent = location.state?.selectedEvent;
   const { tickets } = useSelector((state: RootState) => state?.ticketReservationMang);
   const { fullData } = useSelector((state: RootState) => state?.event);
 
@@ -38,9 +41,27 @@ export function TicketAndReservationManagementView() {
     return () => clearInterval(interval);
   }, [dispatch]);
 
+  useEffect(() => {
+    if (locationSelectedEvent) {
+      setSelectedEvent(locationSelectedEvent);
+    }
+  }, [locationSelectedEvent]);
+
+
+  useEffect(() => {
+    if (locationSelectedEvent && fullData?.length > 0) {
+      const matchedEvent = fullData.find(
+        (event: any) => event._id === locationSelectedEvent._id
+      );
+      if (matchedEvent) {
+        setSelectedEvent(matchedEvent);
+      }
+    }
+  }, [locationSelectedEvent, fullData]);
+
   return (
     <DashboardContent>
-      <EventBreadCrum events={fullData} onEventSelect={handleEventSelect} />
+        <EventBreadCrum events={fullData} onEventSelect={handleEventSelect} eventInformation={selectedEvent} />
 
       <PageTitleSection
         title="Ticket & Reservation Management"

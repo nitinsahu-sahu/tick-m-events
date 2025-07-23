@@ -34,12 +34,12 @@ export const profileFields = [
     minRows: 3,
 
   },
-  {
-    name: 'serviceCategory',
-    type: 'text',
-    placeholder: 'Which type of provide service',
-    multiline: true,
-  },
+  // {
+  //   name: 'serviceCategory',
+  //   type: 'text',
+  //   placeholder: 'Which type of provide service',
+  //   multiline: true,
+  // },
   {
     name: 'address',
     type: 'text',

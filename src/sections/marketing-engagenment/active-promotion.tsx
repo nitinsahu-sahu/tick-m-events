@@ -2,19 +2,19 @@ import { Button, Typography, Paper, TextField, Box, Grid, MenuItem, Select } fro
 import { useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
- 
+
 import PromotionAndOfferTable from 'src/components/tables/promotin-and-offer-table';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { promotionUpdate } from 'src/redux/actions';
 import { promotionTableHeaders } from './utill';
- 
+
 interface ApiResult {
   status: number;
   type: string;
   message: any;
   // Add other properties if needed
 }
- 
+
 export function ActivePromotion() {
   const dispatch = useDispatch<AppDispatch>();
   const { promotions } = useSelector((state: RootState) => state?.promotionList);
@@ -23,12 +23,13 @@ export function ActivePromotion() {
     discountValue: '',
     ticketSelection: '',
     validityPeriodStart: '',
+    validityPeriodEnd: '',
     promotionType: '',
     status: '',
   });
- 
+
   const [editMode, setEditMode] = useState(false);
- 
+
   const handleModify = useCallback((rowData: any) => {
     setPromotionRowData((prev) => {
       // Only update if values actually changed
@@ -37,6 +38,7 @@ export function ActivePromotion() {
         prev.discountValue === rowData.discountValue &&
         prev.ticketSelection === rowData.ticketSelection &&
         prev.validityPeriodStart === rowData.validityPeriodStart &&
+        prev.validityPeriodEnd === rowData.validityPeriodEnd && 
         prev.promotionType === rowData.promotionType &&
         prev.status === rowData.status
       ) {
@@ -47,6 +49,7 @@ export function ActivePromotion() {
         discountValue: rowData.discountValue,
         ticketSelection: rowData.ticketSelection,
         validityPeriodStart: rowData.validityPeriodStart,
+        validityPeriodEnd: rowData.validityPeriodEnd,
         promotionType: rowData.promotionType,
         status: rowData.status,
       };
@@ -57,7 +60,7 @@ export function ActivePromotion() {
     async (id: string, newStatus: string) => {
       const formEventData = new FormData();
       formEventData.append('status', newStatus);
- 
+
       try {
         const result = await dispatch(promotionUpdate({ formEventData, _id: id }));
         if ((result as ApiResult)?.status === 200) {
@@ -71,20 +74,21 @@ export function ActivePromotion() {
     },
     [dispatch]
   );
- 
- 
+
+
   const handlePromotionUpdateChange = (event: any) => {
     event.preventDefault(); // Prevent default form submission behavior
     const { name, value } = event.target;
     setPromotionRowData((prevData) => ({ ...prevData, [name]: value }));
   };
- 
+
   const handlePomotionsUpdate = useCallback(
     async (event: any) => {
       event.preventDefault();
       const formEventData = new FormData();
       formEventData.append('promotionType', promotionRowData.promotionType);
       formEventData.append('validityPeriodStart', promotionRowData.validityPeriodStart);
+      formEventData.append('validityPeriodEnd', promotionRowData.validityPeriodEnd);
       formEventData.append('discountValue', promotionRowData.discountValue);
       formEventData.append('status', promotionRowData.status);
       try {
@@ -98,6 +102,7 @@ export function ActivePromotion() {
             discountValue: '',
             ticketSelection: '',
             validityPeriodStart: '',
+            validityPeriodEnd: '',
             promotionType: '',
             status: '',
           });
@@ -111,25 +116,26 @@ export function ActivePromotion() {
     },
     [promotionRowData, dispatch]
   );
- 
+
   const handleCancelModify = useCallback(() => {
     setPromotionRowData({
       _id: '',
       discountValue: '',
       ticketSelection: '',
       validityPeriodStart: '',
+       validityPeriodEnd: '', 
       promotionType: '',
       status: '',
     });
     setEditMode(false);
   }, []);
- 
+
   return (
     <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: '1px solid black' }}>
       <Typography variant="h6" fontWeight="bold">
         Active Promotions
       </Typography>
- 
+
       {/* Filter Header Section */}
       <Box
         mt={3}
@@ -158,16 +164,16 @@ export function ActivePromotion() {
           </Typography>
         ))}
       </Box>
- 
+
       {/* Responsive Table */}
       <PromotionAndOfferTable
         headers={promotionTableHeaders}
         data={promotions}
         onModify={handleModify}
         onStatusChange={handleStatusChange}
-      // Pass the handler
+        onCancelEdit={handleCancelModify}
       />
- 
+
       {/* Edit Promotion Section */}
       {editMode && (
         <Paper
@@ -184,11 +190,11 @@ export function ActivePromotion() {
             <Typography variant="h6" fontWeight="bold" mb={3}>
               Edit Promotion
             </Typography>
- 
+
             <Grid container spacing={3}>
               {/* Name */}
               <Grid item xs={12} sm={6}>
- 
+
                 <Typography fontSize="13px" fontWeight={500} mb={1}>
                   Promotion Type
                 </Typography>
@@ -205,7 +211,7 @@ export function ActivePromotion() {
                   <MenuItem value="earlyBuyerDiscount">Early Buyer Discount</MenuItem>
                 </Select>
               </Grid>
- 
+
               {/* Date */}
               <Grid item xs={12} sm={6}>
                 <Typography fontSize="13px" fontWeight={500} mb={1}>
@@ -220,7 +226,21 @@ export function ActivePromotion() {
                   onChange={handlePromotionUpdateChange}
                 />
               </Grid>
- 
+              <Grid item xs={12} sm={6}>
+                <Typography fontSize="13px" fontWeight={500} mb={1}>
+                  Validity Period End
+                </Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  type="date"
+                  name="validityPeriodEnd"
+                  value={promotionRowData.validityPeriodEnd}
+                  onChange={handlePromotionUpdateChange}
+                />
+              </Grid>
+
+
               {/* Discount */}
               <Grid item xs={12} sm={6}>
                 <Typography fontSize="13px" fontWeight={500} mb={1}>
@@ -235,7 +255,7 @@ export function ActivePromotion() {
                   onChange={handlePromotionUpdateChange}
                 />
               </Grid>
- 
+
               {/* Status */}
               <Grid item xs={12} sm={6}>
                 <Typography fontSize="13px" fontWeight={500} mb={1}>
@@ -254,7 +274,7 @@ export function ActivePromotion() {
                 </Select>
               </Grid>
             </Grid>
- 
+
             {/* Buttons */}
             <Box
               mt={4}

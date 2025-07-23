@@ -1,26 +1,15 @@
 import {
-  Box,
-  Grid,
-  InputLabel,
-  FormControl,
-  TextField,
-  MenuItem,
-  Typography,
-  Slider,
-  FormControlLabel,
-  Checkbox,
-  Button,
-  SelectChangeEvent,
-  Select
+  Box, Grid, InputLabel, FormControl, TextField, MenuItem, Typography,
+  Slider, FormControlLabel, Checkbox, Button, SelectChangeEvent, Select
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { fetchAllServiceCategories } from 'src/redux/actions';
 import { providersCateFetch, providersListFetch } from 'src/redux/actions/searchSelect';
 import { AppDispatch, RootState } from 'src/redux/store';
 
-const categories = ['Food', 'Web Development', 'Graphic Design', 'Marketing', 'Consulting'];
 
 interface FilterState {
   search: string;
@@ -33,8 +22,11 @@ interface FilterState {
 
 export const SearchAndAdvanceFilter = ({ onChange, onFiltersApplied }: any) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { serviceCate } = useSelector((state: RootState) => state?.providers);
+  const { categories } = useSelector((state: RootState) => state?.serviceReqCategories);
 
+  useEffect(() => {
+    dispatch(fetchAllServiceCategories());
+  }, [dispatch]);
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     serviceCategory: '',
@@ -43,7 +35,6 @@ export const SearchAndAdvanceFilter = ({ onChange, onFiltersApplied }: any) => {
     certified: false,
     location: '',
   });
-
 
   useEffect(() => {
     dispatch(providersCateFetch());
@@ -77,8 +68,6 @@ export const SearchAndAdvanceFilter = ({ onChange, onFiltersApplied }: any) => {
         [name]: Array.isArray(value) ? value[0] : value
       }));
     };
-
-
 
   return (
     <Box sx={{
@@ -123,11 +112,12 @@ export const SearchAndAdvanceFilter = ({ onChange, onFiltersApplied }: any) => {
               <MenuItem value="" disabled>
                 <em>Select Service Category</em>
               </MenuItem>
-              {serviceCate?.map((cat:any) => (
-                <MenuItem key={cat} value={cat}>
-                  {cat}
+              {categories?.map((category: any) => (
+                <MenuItem key={category._id} value={category.name}>
+                  {category.name}
                 </MenuItem>
               ))}
+
             </Select>
           </FormControl>
         </Grid>

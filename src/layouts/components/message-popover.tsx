@@ -4,7 +4,7 @@ import {
   IconButtonProps
 } from "@mui/material";
 import { useCallback, useState, useEffect } from "react";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Iconify } from "src/components/iconify";
 import { Scrollbar } from "src/components/scrollbar";
 import { fToNow } from 'src/utils/format-time';
@@ -14,6 +14,7 @@ import { AppDispatch } from '../../redux/store';
 type NotificationItemProps = {
   id: string;
   type: string;
+  location?: string;
   title: string;
   isUnRead: boolean;
   description: string;
@@ -120,6 +121,7 @@ export function MessagePopover({ data = [], sx, ...other }: NotificationsPopover
           return {
             id: item._id || String(idx),
             title: formattedTitle,
+            location: item.location || "-",
             description:
               item.description ||
               `Activity at ${new Date(item.timestamp).toLocaleTimeString()}`,
@@ -127,7 +129,7 @@ export function MessagePopover({ data = [], sx, ...other }: NotificationsPopover
             avatarUrl: null, // We use `activityType` to decide avatar in renderContent
             type: item.activityType, // <== use this to drive the icon
             isUnRead: idx < 2,
-             postedAt: item.timestamp || new Date(), // ✅ ADD THIS
+            postedAt: item.timestamp || new Date(), // ✅ ADD THIS
           } as NotificationItemProps;
         });
 
@@ -232,6 +234,9 @@ function renderContent(notification: NotificationItemProps) {
       {notification.title}
       <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>
         &nbsp; {notification.description}
+      </Typography>
+      <Typography variant="subtitle2">
+        From:{notification.location}
       </Typography>
     </Typography>
   );

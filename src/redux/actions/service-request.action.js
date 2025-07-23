@@ -6,7 +6,11 @@ export const serviceReqCreate = (formServiceData) => async (dispatch) => {
     dispatch({ type: serviceReqConstants.CREATE_REQUEST });
 
     try {
-        const response = await axios.post("/service-request", formServiceData);
+        const response = await axios.post("/service-request", formServiceData,{
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
 
         dispatch({
             type: serviceReqConstants.CREATE_SUCCESS,

@@ -57,8 +57,7 @@ export function TransectionAndPaymentView() {
       <WithdrawalTableHistory />
 
       {/* Refund Management History */}
-      <RefundManagementHistory />
-
+      <RefundManagementHistory selectedEvent={selectedEvent} />
       {/* Invoice History */}
       <InvoiceHistory />
 

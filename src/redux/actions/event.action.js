@@ -195,8 +195,8 @@ export const eventCustomizationCreate = ({ formEventCustomizeData, eventId, tick
     dispatch({ type: eventConstants.EVENT_CUSTOMIZTION_CREATE_REQUEST });
 
     try {
-        const response = await axios.post(`/event/tickets/ec/${eventId}/${ticketConfigId}`, formEventCustomizeData,{
-             headers: {
+        const response = await axios.post(`/event/tickets/ec/${eventId}/${ticketConfigId}`, formEventCustomizeData, {
+            headers: {
                 'Content-Type': 'multipart/form-data'
             }
         });
@@ -227,11 +227,11 @@ export const eventCreate = (data) => async (dispatch) => {
     dispatch({ type: eventConstants.EVENT_CREATE_REQUEST });
 
     try {
-        const response = await axios.post("/event", data ,{
-             headers: {
+        const response = await axios.post("/event", data, {
+            headers: {
                 'Content-Type': 'multipart/form-data'
             }
-        }); 
+        });
         dispatch({
             type: eventConstants.EVENT_CREATE_SUCCESS,
             payload: {
@@ -306,7 +306,7 @@ export const eventByIdFetch = (eventId) => async (dispatch) => {
 
 export const fetchAllCategories = () => async (dispatch) => {
     dispatch({ type: eventConstants.EVENT_CATEGORY_FETCH_REQUEST });
- 
+
     try {
         const response = await axios.get("/event/allCategory");
         dispatch({
@@ -325,27 +325,27 @@ export const fetchAllCategories = () => async (dispatch) => {
         });
     }
 };
- 
+
 export const fetchChildCategories = (parentId) => async (dispatch) => {
-  dispatch({ type: eventConstants.CHILD_CATEGORY_FETCH_REQUEST });
- 
-  try {
-    const response = await axios.get(`/event/children/${parentId}`);
-    dispatch({
-      type: eventConstants.CHILD_CATEGORY_FETCH_SUCCESS,
-      payload: {
-        childCategories: response?.data,
-      },
-    });
-  } catch (error) {
-    dispatch({
-      type: eventConstants.CHILD_CATEGORY_FETCH_FAILURE,
-      payload: {
-        message: error?.response?.data?.message || "Failed to fetch child categories",
-        error: error.status,
-      },
-    });
-  }
+    dispatch({ type: eventConstants.CHILD_CATEGORY_FETCH_REQUEST });
+
+    try {
+        const response = await axios.get(`/event/children/${parentId}`);
+        dispatch({
+            type: eventConstants.CHILD_CATEGORY_FETCH_SUCCESS,
+            payload: {
+                childCategories: response?.data,
+            },
+        });
+    } catch (error) {
+        dispatch({
+            type: eventConstants.CHILD_CATEGORY_FETCH_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Failed to fetch child categories",
+                error: error.status,
+            },
+        });
+    }
 };
 
 export const eventSubmitRating = (participantRating) => async (dispatch) => {
@@ -359,23 +359,23 @@ export const eventSubmitRating = (participantRating) => async (dispatch) => {
                 message: response?.data?.message
             },
         };
-        
+
         dispatch(successAction);
         dispatch(eventByIdFetch(participantRating.eventId));
-        
+
         // Return the success action consistently
         return successAction;
 
     } catch (error) {
         const failureAction = {
             type: eventConstants.EVENT_SUBMIT_RATING_FAILURE,
-            payload: { 
-                message: error?.response?.data?.message || "Server error", 
-                error: error.status 
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
             },
         };
         dispatch(failureAction);
-        
+
         // Return the failure action consistently
         return failureAction;
     }
@@ -383,7 +383,7 @@ export const eventSubmitRating = (participantRating) => async (dispatch) => {
 
 export const categoryByIdFetch = (categoryId) => async (dispatch) => {
     dispatch({ type: eventConstants.SINGLE_CATEGORY_FETCH_REQUEST });
- 
+
     try {
         const response = await axios.get(`/event/category/${categoryId}`);
         dispatch({
@@ -408,7 +408,7 @@ export const todayEventFetch = () => async (dispatch) => {
 
     try {
         const response = await axios.get(`/event/currentDateEvents`);
-  
+
         dispatch({
             type: eventConstants.GET_TODAY_EVENT_SUCCESS,
             payload: {
@@ -427,12 +427,12 @@ export const todayEventFetch = () => async (dispatch) => {
 
 export const validateViewUpdate = (eventId, validationView) => async (dispatch) => {
     dispatch({ type: eventConstants.UPDATE_VALIDATION_VIEW_REQUEST });
- 
+
     try {
         const response = await axios.patch(`/event/${eventId}/validation-view`, {
             validationView,
         });
- 
+
         dispatch({
             type: eventConstants.UPDATE_VALIDATION_VIEW_SUCCESS,
             payload: {
@@ -452,31 +452,31 @@ export const validateViewUpdate = (eventId, validationView) => async (dispatch) 
 };
 
 export const eventCustomizationPageFetch = (eventId) => async (dispatch) => {
-  dispatch({ type: eventConstants.EVENT_CUSTOMIZATION_FETCH_REQUEST });
- 
-  try {
-    const response = await axios.get(`/event/eventPageCustomization/${eventId}`);
- 
-    dispatch({
-      type: eventConstants.EVENT_CUSTOMIZATION_FETCH_SUCCESS,
-      payload: response.data.customization,
-    });
- 
-    return {
-      type: eventConstants.EVENT_CUSTOMIZATION_FETCH_SUCCESS,
-      status: response.status,
-      customization: response.data.customization,
-    };
-  } catch (error) {
-    dispatch({
-      type: eventConstants.EVENT_CUSTOMIZATION_FETCH_FAILURE,
-      payload: { message: error?.response?.data?.message || 'Server error', error: error.status },
-    });
- 
-    return {
-      type: eventConstants.EVENT_CUSTOMIZATION_FETCH_FAILURE,
-      message: error?.response?.data?.message || 'Server error',
-      status: error.status,
-    };
-  }
+    dispatch({ type: eventConstants.EVENT_CUSTOMIZATION_FETCH_REQUEST });
+
+    try {
+        const response = await axios.get(`/event/eventPageCustomization/${eventId}`);
+
+        dispatch({
+            type: eventConstants.EVENT_CUSTOMIZATION_FETCH_SUCCESS,
+            payload: response.data.customization,
+        });
+
+        return {
+            type: eventConstants.EVENT_CUSTOMIZATION_FETCH_SUCCESS,
+            status: response.status,
+            customization: response.data.customization,
+        };
+    } catch (error) {
+        dispatch({
+            type: eventConstants.EVENT_CUSTOMIZATION_FETCH_FAILURE,
+            payload: { message: error?.response?.data?.message || 'Server error', error: error.status },
+        });
+
+        return {
+            type: eventConstants.EVENT_CUSTOMIZATION_FETCH_FAILURE,
+            message: error?.response?.data?.message || 'Server error',
+            status: error.status,
+        };
+    }
 };

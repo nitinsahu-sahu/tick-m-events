@@ -5,7 +5,8 @@ import GridOnIcon from '@mui/icons-material/GridOn';
 import { useState } from "react";
 import { PaymentHistoryModal } from "../modal/payment-history-model";
 
-export function TransactionAndPaymentTable({ headers, data, type }: any) {
+export function TransactionAndPaymentTable({ headers =[], data =[], type }: any) {
+ 
     const [open, setOpen] = useState({open: false, rowData: null});
     const theme = useTheme();
     

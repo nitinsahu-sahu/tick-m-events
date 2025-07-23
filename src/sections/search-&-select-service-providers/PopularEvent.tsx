@@ -1,5 +1,6 @@
 import { Box, Button, Card, CardContent, Grid, Typography, Avatar } from '@mui/material';
 import { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const PopularEvent = ({ ticket }: any) => (
   <Card
@@ -95,9 +96,19 @@ export const PopularEvent = ({ ticket }: any) => (
 );
 
 export function ProviderListView({ providers, handleSelct }: any) {
+  const navigate = useNavigate();
   const handleViewDetails = useCallback(() => {
     handleSelct(providers); // Now passing the object directly
   }, [handleSelct, providers]);
+  const handleChatNow = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card onClick from firing
+
+    // Save provider data to sessionStorage
+    sessionStorage.setItem('currentChatProvider', JSON.stringify(providers));
+
+    // Navigate without page refresh
+    navigate('/messaging-&-client-relationship');
+  }, [providers, navigate]);
   return (
     <Card
       sx={{
@@ -110,8 +121,10 @@ export function ProviderListView({ providers, handleSelct }: any) {
         overflow: 'visible',
         position: 'relative',
         mt: 4,
-        overlay: 2.6
+        overlay: 2.6,
+        cursor: "pointer"
       }}
+      onClick={handleViewDetails}
     >
 
       <CardContent sx={{ textAlign: 'center', position: 'relative' }}>
@@ -157,10 +170,14 @@ export function ProviderListView({ providers, handleSelct }: any) {
               View Profile
             </Button>
           </Grid>
+
           <Grid item>
             <Button
               variant="contained"
-              // onClick={handleChatNow}
+              onClick={() => {
+                navigate("/messaging-relationship");
+                sessionStorage.setItem('currentChatProvider', JSON.stringify(providers));
+              }}
               sx={{ /* existing styles */ }}
             >
               Chat Now

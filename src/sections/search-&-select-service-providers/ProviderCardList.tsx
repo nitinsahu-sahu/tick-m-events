@@ -45,19 +45,25 @@ export default function ProviderCardList({ handleSelct, providersList }: any) {
           // Card View
           <Grid container spacing={3} mt={3}>
             {providersList.map((ticketc: any, index: any) => (
-              <Grid item xs={12} sm={6} md={6} key={ticketc.id || index}>
+              <Grid item xs={12} sm={6} md={6} key={ticketc.id || index} >
                 <ProviderListView providers={ticketc} key={index} handleSelct={handleSelct} />
               </Grid>
             ))}
           </Grid>
         ) : (
           // List View
-          // List View
           <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-            {providersList.map((provider: any, index: any) => (
+            {providersList?.map((provider: any, index: any) => (
               <ListItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Handle view details action
+                  handleSelct(provider);
+                }}
+                
                 key={provider._id || index}
                 sx={{
+                  cursor:"pointer",
                   borderBottom: '1px solid #eee',
                   '&:hover': { backgroundColor: '#f5f5f5' },
                   alignItems: 'flex-start', // Align items to top
@@ -65,12 +71,13 @@ export default function ProviderCardList({ handleSelct, providersList }: any) {
                 }}
                 secondaryAction={
                   <Box sx={{ display: 'flex', gap: 1 }}>
+
                     <Button
                       variant="outlined"
                       size="small"
                       sx={{
                         textTransform: 'none',
-                        borderRadius: '20px',
+                        borderRadius: 1,
                         borderColor: '#0B2E4C',
                         color: '#0B2E4C',
                         '&:hover': {
@@ -84,14 +91,14 @@ export default function ProviderCardList({ handleSelct, providersList }: any) {
                         handleSelct(provider);
                       }}
                     >
-                       View Profile
+                      View Profile
                     </Button>
                     <Button
                       variant="contained"
                       size="small"
                       sx={{
                         textTransform: 'none',
-                        borderRadius: '20px',
+                        borderRadius: 1,
                         backgroundColor: '#0B2E4C',
                         '&:hover': {
                           backgroundColor: '#071E33',

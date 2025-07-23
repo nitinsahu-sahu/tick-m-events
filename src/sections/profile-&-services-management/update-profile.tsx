@@ -1,10 +1,10 @@
-import { Avatar, Box, Button, TextField } from "@mui/material";
-import { useCallback, useState } from "react";
+import { Avatar, Box, Button, TextField, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from 'react-toastify';
 import type { E164Number } from 'libphonenumber-js';
 import PhoneInput from 'react-phone-number-input'
-import { profileUpdate } from "src/redux/actions";
+import { fetchAllServiceCategories, profileUpdate } from "src/redux/actions";
 import { AppDispatch, RootState } from "src/redux/store";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
@@ -47,7 +47,7 @@ const FormTextField = ({ name, type = 'text', value, onChange, placeholder, tran
                 },
             },
             '& input': {
-                textTransform: transform
+                textTransform: "capitalize"
             }
         }}
     />
@@ -58,7 +58,11 @@ export function UpdateProfile({ profileData, socialLinks, setProfileData, setSho
     const { _id, role } = useSelector((state: RootState) => state?.auth?.user);
     const { profile } = useSelector((state: RootState) => state?.profile);
     const [phoneNumber, setPhoneNumber] = useState(profileData.number || '');
-
+    const { categories } = useSelector((state: RootState) => state?.serviceReqCategories);
+   
+    useEffect(() => {
+        dispatch(fetchAllServiceCategories());
+    }, [dispatch]);
     const handlePhoneChange = (value: E164Number | undefined) => {
         const phoneValue = value as string; // or String(value)
         setPhoneNumber(phoneValue);
@@ -168,6 +172,35 @@ export function UpdateProfile({ profileData, socialLinks, setProfileData, setSho
                             minRows={field.minRows}
                         />
                     ))}
+                    <FormControl fullWidth>
+                        <InputLabel>Service Category</InputLabel>
+                        <Select
+                            name="serviceCategory"
+                            value={profileData.serviceCategory || ''}
+                            onChange={handleProfileUpdateChange}
+                            label="Service Category"
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                        borderColor: 'black',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: 'black',
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: 'black',
+                                    },
+                                },
+                            }}
+                        >
+                            <MenuItem value="">Select a category</MenuItem>
+                            {categories.map((category: any) => (
+                                <MenuItem key={category._id} value={category.name}>
+                                    {category.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     {/* Phone Number Input with Country Code */}
                     <Box sx={{
                         '& .PhoneInput': {

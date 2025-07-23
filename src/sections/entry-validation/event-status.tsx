@@ -36,22 +36,28 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
     }, []);
 
     const location = useLocation();
-    const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+    const [selectedEvent, setSelectedEvent] = useState<Event | null>(eventInformation || null);
+
     // Define the specific URL path where the section should appear
     const showSection = location.pathname === '/entry-validation';
     useEffect(() => {
-        if (events && events.length > 0 && !selectedEvent) {
+        if (eventInformation) {
+            setSelectedEvent(eventInformation);
+        }
+    }, [eventInformation]);
+    useEffect(() => {
+        if (events && events.length > 0 && !selectedEvent && !eventInformation) {
             const firstEvent = events[0];
             setSelectedEvent(firstEvent);
             onEventSelect(firstEvent);
         }
-    }, [events, selectedEvent, onEventSelect]);
+    }, [events, selectedEvent, eventInformation, onEventSelect]);
 
-    const handleChange = (e: any) => {
+     const handleChange = (e: any) => {
         const selectedId = e.target.value;
         const event = events.find((ev: any) => ev._id === selectedId) || null;
         setSelectedEvent(event);
-        onEventSelect(event);
+        onEventSelect?.(event);
     };
     return (
         <Box

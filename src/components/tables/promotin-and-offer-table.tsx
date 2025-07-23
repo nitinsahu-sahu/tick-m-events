@@ -27,11 +27,13 @@ const PromotionAndOfferTable = ({
     data,
     onModify,
     onStatusChange,
+    onCancelEdit,
 }: {
     headers: string[];
     data: any[];
     onModify: (rowData: any) => void;
-    onStatusChange: (id: string, newStatus: string) => void; // Add this prop
+    onStatusChange: (id: string, newStatus: string) => void;
+    onCancelEdit?: () => void;
 }) => {
     const theme = useTheme();
     const handleModifyClick = (rowData: any) => {
@@ -39,7 +41,11 @@ const PromotionAndOfferTable = ({
     };
     const handleCancelClick = (rowData: any) => {
         const updatedStatus = rowData.status === 'active' ? 'inActive' : 'active'; // Toggle or set to 'inActive'
-        onStatusChange(rowData._id, updatedStatus); // 👈 Send to parent
+        onStatusChange(rowData._id, updatedStatus);
+        if (onCancelEdit) {
+            onCancelEdit();
+        }
+
     };
     return (
         <TableContainer component={Paper} sx={{ mt: 3 }}>
@@ -64,7 +70,7 @@ const PromotionAndOfferTable = ({
                 </TableHead>
 
                 <TableBody>
-                    {!data || data.length === 0? (
+                    {!data || data.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={headers.length} align="center" sx={{ py: 4 }}>
                                 <Typography variant="body1" color="textSecondary">
@@ -122,19 +128,7 @@ const PromotionAndOfferTable = ({
                                     >
                                         Modify
                                     </Button>
-                                    <Button
-                                        variant="outlined"
-                                        size="small"
-                                        sx={{
-                                            marginX: 0.5,
-                                            color: "white",
-                                            borderColor: "gray",
-                                            backgroundColor: "#0B2E4C"
-                                        }}
-                                        onClick={() => handleCancelClick(row)}
-                                    >
-                                        Cancel
-                                    </Button>
+
                                 </TableCell>
                             </TableRow>
                         ))

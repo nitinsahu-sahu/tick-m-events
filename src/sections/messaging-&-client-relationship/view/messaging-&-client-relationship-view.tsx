@@ -9,8 +9,6 @@ import { AppDispatch, RootState } from "src/redux/store";
 import { TabWithTableView } from "../tab-with-table";
 
 export function MessagingAndClientRelationshipView() {
-   
-
     return (
         <DashboardContent>
             {/* <TabWithTableView /> */}

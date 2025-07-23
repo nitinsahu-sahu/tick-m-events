@@ -13,12 +13,13 @@ import {
 } from '@mui/material';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { EventBreadCrum } from 'src/sections/entry-validation/event-status';
 
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { promotionEvents, promotionGet } from 'src/redux/actions';
-import { AppDispatch } from 'src/redux/store';
+import { AppDispatch, RootState } from 'src/redux/store';
 
 import { PromotionsAndOffers } from '../promotion-&-offer';
 import { ActivePromotion } from '../active-promotion';
@@ -38,6 +39,7 @@ const promotionsData = [
 
 export function MarketingEngagenmentView() {
   const [selectedPromo, setSelectedPromo] = useState(promotionsData[0]);
+  const { eventsWithOrdersAndParticiapnt } = useSelector((state: RootState) => state?.promotionList);
   
   // const [onSave, setOnSave] = useState();
   // const [onCancel, setOnCancel] = useState();
@@ -51,6 +53,8 @@ export function MarketingEngagenmentView() {
   const [savedData, setSavedData] = useState<PostData | null>(null);
   const [eventImage, setEventImage] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+console.log(selectedEvent,'se');
 
   useEffect(() => {
     const data = localStorage.getItem('postData');
@@ -103,15 +107,20 @@ export function MarketingEngagenmentView() {
     dispatch(promotionGet())
   }, [dispatch])
 
+  const handleEventSelect = (event: Event | null) => {
+    setSelectedEvent(event);
+    // Do something with the selected event data
+  };
   return (
     <DashboardContent>
       <PageTitleSection title="Promotions & Special Offers"  />
+      <EventBreadCrum events={eventsWithOrdersAndParticiapnt} onEventSelect={handleEventSelect} />
 
       {/* Active Promotion */}
       <ActivePromotion />
 
       {/* Promotions & special offer section */}
-      <PromotionsAndOffers />
+      <PromotionsAndOffers selEvent={selectedEvent}/>
 
       {/* Notifications & Auto Reminder section */}
       <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: "1px solid black" }}>

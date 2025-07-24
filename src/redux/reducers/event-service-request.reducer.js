@@ -10,6 +10,8 @@ const initialState = {
     loading: false,
     organizerRequests: [],
     orgLoading: false,
+    accepedProviderReq: [],
+
 };
 
 const eventServiceRequestReducer = (state, action) => {
@@ -17,6 +19,27 @@ const eventServiceRequestReducer = (state, action) => {
         state = initialState;
     }
     switch (action.type) {
+
+        case serviceRequestConstants.PROVIDER_ACCEPTED_REQUEST:
+            return {
+                ...state,
+                loading: true,
+            };
+
+        case serviceRequestConstants.PROVIDER_ACCEPTED_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                accepedProviderReq: action.payload.accepedProviderReq,
+            };
+
+        case serviceRequestConstants.PROVIDER_ACCEPTED_FAILURE:
+            return {
+                ...state,
+                loading: false,  // fix: loading false on failure
+                error: action.payload.message,
+            };
+
         // GET requested services by provider
         case serviceRequestConstants.GET_REQUESTED_SERVICE_REQUEST:
             return { ...state, loading: true };
@@ -160,9 +183,9 @@ const eventServiceRequestReducer = (state, action) => {
                 error: action.payload.message,
             };
 
-            case serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_REQUEST:
+        case serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_REQUEST:
             return { ...state, loading: true };
- 
+
         case serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_SUCCESS:
             return {
                 ...state,
@@ -179,14 +202,14 @@ const eventServiceRequestReducer = (state, action) => {
                         : req
                 ),
             };
- 
+
         case serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_FAILURE:
             return {
                 ...state,
                 loading: false,
                 error: action.payload.message,
             };
-            
+
         default:
             return state;
     }

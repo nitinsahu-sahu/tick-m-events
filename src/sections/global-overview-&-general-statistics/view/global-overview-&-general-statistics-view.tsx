@@ -8,26 +8,12 @@ import { TicketingActivityTable } from '../TicketingActivityTable';
 import { MarketplaceActivity } from '../MarketplaceActivity';
 import { AlertsSection } from '../AlertsSection';
 
-// export function GlobalOverviewAndGeneralStatisticsView() {
-//       const [activeTab, setActiveTab] = useState('Global Statistics');
-//   return (
-//     <DashboardContent>
-//       <PageTitleSection title="Global Overview & General Statistics" />
-//             <TopNavButtons active={activeTab} onChange={setActiveTab} />
-//             <GlobalStatistics />
-//             <PlatformStatistics />
-//             <TicketingActivityTable />
-//             <MarketplaceActivity />
-//             <AlertsSection />
-//     </DashboardContent>
-//   );
-// }
 export function GlobalOverviewAndGeneralStatisticsView() {
   const [activeTab, setActiveTab] = useState('Global Statistics');
 
   return (
     <DashboardContent>
-      <PageTitleSection title="Global Overview & General Statistics" />
+      {/* <PageTitleSection title="Global Overview & General Statistics" /> */}
       <TopNavButtons active={activeTab} onChange={setActiveTab} />
 
       {activeTab === 'Global Statistics' && (
@@ -39,21 +25,21 @@ export function GlobalOverviewAndGeneralStatisticsView() {
 
       {activeTab === 'Ticketing Activity' && (
         <>
-          <GlobalStatistics />
+          {/* <GlobalStatistics /> */}
           <TicketingActivityTable />
         </>
       )}
 
       {activeTab === 'Marketplace Activity' && (
         <>
-          <GlobalStatistics />
+          {/* <GlobalStatistics /> */}
           <MarketplaceActivity />
         </>
       )}
 
       {activeTab === 'Alerts & Quick Actions' && (
         <>
-          <GlobalStatistics />
+          {/* <GlobalStatistics /> */}
           <AlertsSection />
         </>
       )}

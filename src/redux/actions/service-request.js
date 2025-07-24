@@ -1,4 +1,4 @@
-import { serviceRequestConstants } from "./constants";
+import { eventServiceConstants, serviceRequestConstants } from "./constants";
 import axios from "../helper/axios";
 
 // Event creating
@@ -22,62 +22,64 @@ import axios from "../helper/axios";
 //     }
 // };
 
+
+
 export const getRequestsByProvider = (params) => async (dispatch) => {
-    dispatch({ type: serviceRequestConstants.GET_REQUESTED_SERVICE_REQUEST });
+  dispatch({ type: serviceRequestConstants.GET_REQUESTED_SERVICE_REQUEST });
 
-    try {
-        // Convert params object to query string
-        const queryString = new URLSearchParams(params).toString();
+  try {
+    // Convert params object to query string
+    const queryString = new URLSearchParams(params).toString();
 
-        // Append query string to URL
-        const response = await axios.get(`/event-requests?${queryString}`);
+    // Append query string to URL
+    const response = await axios.get(`/event-requests?${queryString}`);
 
-        dispatch({
-            type: serviceRequestConstants.GET_REQUESTED_SERVICE_SUCCESS,
-            payload: {
-                message: response?.data?.message,
-                requests: response?.data?.requests,
-            },
-        });
-    } catch (error) {
-        dispatch({
-            type: serviceRequestConstants.GET_REQUESTED_SERVICE_FAILURE,
-            payload: {
-                message: error?.response?.data?.message || "Server error",
-                error: error?.response?.status,
-            },
-        });
-    }
+    dispatch({
+      type: serviceRequestConstants.GET_REQUESTED_SERVICE_SUCCESS,
+      payload: {
+        message: response?.data?.message,
+        requests: response?.data?.requests,
+      },
+    });
+  } catch (error) {
+    dispatch({
+      type: serviceRequestConstants.GET_REQUESTED_SERVICE_FAILURE,
+      payload: {
+        message: error?.response?.data?.message || "Server error",
+        error: error?.response?.status,
+      },
+    });
+  }
 };
 
 // Event creating
 export const organizerRequstToProvider = (formDataObj) => async (dispatch) => {
-    dispatch({ type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_REQUEST });
+  dispatch({ type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_REQUEST });
 
-    try {
-        const response = await axios.post("/event-requests", formDataObj);
-        dispatch({
-            type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_SUCCESS,
-            payload: {
-                message: response?.data?.message
-            },
-        });
-        return {
-            type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_SUCCESS,
-            message: response?.data?.message,
-            status: response?.status,
-        };
-    } catch (error) {
-        dispatch({
-            type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_FAILURE,
-            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
-        });
-        return {
-            type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_FAILURE,
-            message: error?.response?.data?.message,
-            status: error?.status
-        };
-    }
+  try {
+    const response = await axios.post("/event-requests", formDataObj);
+    dispatch({
+      type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_SUCCESS,
+      payload: {
+        message: response?.data?.message
+      },
+    });
+    return {
+      type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_SUCCESS,
+      message: response?.data?.message,
+      status: response?.status,
+    };
+  } catch (error) {
+    dispatch({
+      type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_FAILURE,
+      payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+    });
+    return {
+      type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_FAILURE,
+      message: error?.response?.data?.message,
+      status: error?.status
+    };
+  }
 };
 
 // Provider sends proposal
@@ -85,7 +87,7 @@ export const sendProviderProposal = (eventRequestId, proposalData) => async (dis
   dispatch({ type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_REQUEST });
 
   try {
-   const response = await axios.post(`/event-requests/${eventRequestId}/propose`, proposalData);
+    const response = await axios.post(`/event-requests/${eventRequestId}/propose`, proposalData);
     dispatch({
       type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_SUCCESS,
       payload: {
@@ -186,9 +188,9 @@ export const updateProviderProposal = (eventRequestId, proposalData) => async (d
 export const getRequestsByOrganizer = () => async (dispatch) => {
   try {
     dispatch({ type: serviceRequestConstants.GET_ORGANIZER_REQUESTS_REQUEST });
- 
+
     const { data } = await axios.get(`/event-requests/organizer-requests`);
- 
+
     dispatch({
       type: serviceRequestConstants.GET_ORGANIZER_REQUESTS_SUCCESS,
       payload: {
@@ -212,7 +214,7 @@ export const updateOrganizerDecision = (id, status, contractStatus) => async (di
       status,
       contractStatus,
     });
- 
+
     dispatch({
       type: serviceRequestConstants.UPDATE_ORGANIZER_DECISION_SUCCESS,
       payload: {
@@ -232,10 +234,10 @@ export const updateOrganizerDecision = (id, status, contractStatus) => async (di
 
 export const markRequestAsCompleted = (eventRequestId) => async (dispatch) => {
   dispatch({ type: serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_REQUEST });
- 
+
   try {
     const res = await axios.patch(`/event-requests/mark-completed/${eventRequestId}`);
- 
+
     dispatch({
       type: serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_SUCCESS,
       payload: {
@@ -243,7 +245,7 @@ export const markRequestAsCompleted = (eventRequestId) => async (dispatch) => {
         updatedRequest: res.data.data,
       },
     });
- 
+
     return {
       type: serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_SUCCESS,
       message: res.data.message,
@@ -257,11 +259,64 @@ export const markRequestAsCompleted = (eventRequestId) => async (dispatch) => {
         error: error?.response?.status,
       },
     });
- 
+
     return {
       type: serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_FAILURE,
       message: error?.response?.data?.message,
       status: error?.response?.status,
     };
+  }
+};
+
+export const serviceEventReqDelete = ({ serviceId }) => async (dispatch) => {
+
+  dispatch({ type: eventServiceConstants.CANCEL_SERVICE_REQUEST });
+
+  try {
+    const response = await axios.delete(`/event-requests/${serviceId}`);
+    dispatch({
+      type: eventServiceConstants.CANCEL_SERVICE_SUCCESS,
+      payload: { message: response?.data?.message },
+
+    });
+    dispatch(getRequestsByOrganizer())
+    return {
+      type: eventServiceConstants.CANCEL_SERVICE_SUCCESS,
+      message: response?.data?.message,
+      status: response?.status,
+    };
+
+  } catch (error) {
+    dispatch({
+      type: eventServiceConstants.CANCEL_SERVICE_FAILURE,
+      payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+    });
+    return {
+      type: eventServiceConstants.CANCEL_SERVICE_FAILURE,
+      message: "Server errors",
+      status: error?.status,
+    };
+  }
+};
+
+export const getAccepedByProiver = () => async (dispatch) => {
+  try {
+    dispatch({ type: serviceRequestConstants.PROVIDER_ACCEPTED_REQUEST });
+
+    const result = await axios.get(`/event-requests/acceptedByProvider`);
+console.log('===============xx=====================');
+console.log(result);
+console.log('====================================');
+    dispatch({
+      type: serviceRequestConstants.PROVIDER_ACCEPTED_SUCCESS,
+      payload: {
+        accepedProviderReq: result.data.requests
+      },
+    });
+  } catch (error) {
+    dispatch({
+      type: serviceRequestConstants.PROVIDER_ACCEPTED_FAILURE,
+      payload: { message: error?.response?.data?.message || "Failed to fetch organizer requests" },
+    });
   }
 };

@@ -16,6 +16,7 @@ import {
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers";
+import { ServiceRequestTable } from "src/components/tables/service-request-table";
 
 interface FormData {
   service: string;
@@ -27,7 +28,7 @@ interface FormData {
   file: File | null;
 }
 
-export function RequestAService() {
+export function RequestAService({ requests }: any) {
   const [formData, setFormData] = React.useState<FormData>({
     service: "",
     location: "",
@@ -37,7 +38,7 @@ export function RequestAService() {
     additionalOptions: "",
     file: null,
   });
-  
+
   const [previewOpen, setPreviewOpen] = React.useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -54,7 +55,7 @@ export function RequestAService() {
       ...formData,
       file: formData.file ? formData.file.name : null,
     });
-    
+
     setPreviewOpen(false);
   };
 
@@ -80,6 +81,17 @@ export function RequestAService() {
       }}
     >
       <Typography variant="h6" gutterBottom>
+          Finalize Contract
+        </Typography>
+        <ServiceRequestTable
+          requests={requests}
+          onActionClick={(row) => {
+            console.log("Clicked row:", row);
+          }}
+          type="2"
+        />
+
+      <Typography variant="h6" gutterBottom>
         Service Request Form
       </Typography>
 
@@ -88,7 +100,7 @@ export function RequestAService() {
         <InputLabel>Type of Service Needed</InputLabel>
         <Select
           value={formData.service}
-          onChange={(e) => setFormData(prev => ({...prev, service: e.target.value}))}
+          onChange={(e) => setFormData(prev => ({ ...prev, service: e.target.value }))}
           label="Type of Service Needed"
         >
           <MenuItem value="photography">Photography</MenuItem>
@@ -98,30 +110,30 @@ export function RequestAService() {
       </FormControl>
 
       {/* Event Location */}
-      <TextField 
-        fullWidth 
-        label="Event Location" 
-        margin="normal" 
+      <TextField
+        fullWidth
+        label="Event Location"
+        margin="normal"
         name="location"
         value={formData.location}
         onChange={handleChange}
       />
 
       {/* Date & Time */}
-      <TextField 
-        fullWidth  
-        type="datetime-local" 
-        margin="normal" 
+      <TextField
+        fullWidth
+        type="datetime-local"
+        margin="normal"
         name="dateTime"
         value={formData.dateTime}
         onChange={handleChange}
       />
 
       {/* Estimated Budget */}
-      <TextField 
-        fullWidth 
-        label="Estimated Budget" 
-        margin="normal" 
+      <TextField
+        fullWidth
+        label="Estimated Budget"
+        margin="normal"
         name="budget"
         value={formData.budget}
         onChange={handleChange}
@@ -164,8 +176,8 @@ export function RequestAService() {
 
       {/* Buttons */}
       <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
-        <Button 
-          variant="contained" 
+        <Button
+          variant="contained"
           color="primary"
           onClick={() => setPreviewOpen(true)}
         >

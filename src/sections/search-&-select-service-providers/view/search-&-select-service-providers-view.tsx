@@ -19,7 +19,7 @@ import { TabButton } from 'src/components/button/multiple-button';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { providersListFetch } from 'src/redux/actions/searchSelect';
 import { eventFetch } from 'src/redux/actions/event.action';
-import { getRequestsByOrganizer } from 'src/redux/actions/service-request';
+import { getAccepedByProiver, getRequestsByOrganizer } from 'src/redux/actions/service-request';
 import { SearchAndAdvanceFilter } from '../SearchAndAdvanceFilter';
 import ProviderCardList from '../ProviderCardList';
 import { ProfileCard } from '../ProfileCard';
@@ -33,7 +33,7 @@ interface PhoneNumberDisplayProps {
 
 export function SearchAndSelectServiceProvidersView() {
   const { providersList } = useSelector((state: RootState) => state?.providers);
-  const { organizerRequests, orgLoading } = useSelector((state: RootState) => state?.serviceRequest);
+  const { organizerRequests, accepedProviderReq } = useSelector((state: RootState) => state?.serviceRequest);
   const [select, setSelected] = useState<any>({})
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -79,6 +79,8 @@ export function SearchAndSelectServiceProvidersView() {
   useEffect(() => {
     dispatch(providersListFetch())
     dispatch(eventFetch());
+    dispatch(getAccepedByProiver());
+    
   }, [dispatch, providersList])
 
   useEffect(() => {
@@ -149,7 +151,6 @@ export function SearchAndSelectServiceProvidersView() {
     window.open(url, '_blank', 'noopener,noreferrer');
     handleShareClose();
   };
-  console.log('select', select);
 
   return (
     <DashboardContent>
@@ -182,7 +183,7 @@ export function SearchAndSelectServiceProvidersView() {
         <RequestService requests={organizerRequests} />
       )}
       {tabValue === 4 && (
-        <RequestAService />
+        <RequestAService requests={accepedProviderReq}/>
       )}
       <Modal
         open={isModalOpen}

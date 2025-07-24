@@ -12,6 +12,8 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
 
 export default function UserActivityCard() {
+  const [localLoading, setLocalLoading] = useState(true);
+
   const dispatch = useDispatch<AppDispatch>();
   const { loading, activities = [], error } = useSelector((state: any) => state.activities);
   const [page] = useState(1);
@@ -51,9 +53,17 @@ export default function UserActivityCard() {
   }));
 
 
-  useEffect(() => {
-    dispatch(fetchAdminActivities({ page, limit }));
-  }, [dispatch, page, limit]);
+useEffect(() => {
+  const loadWithDelay = async () => {
+    await dispatch(fetchAdminActivities({ page, limit }));
+    setTimeout(() => {
+      setLocalLoading(false); 
+    }, 1000); 
+  };
+
+  loadWithDelay();
+}, [dispatch, page, limit]);
+
 
   const tableData = useMemo(() => activities.docs || activities, [activities]);
 
@@ -147,7 +157,35 @@ export default function UserActivityCard() {
     { day: 'Today', value: 4 },
   ];
 
-  if (loading) return <CircularProgress />;
+if (loading || localLoading)
+  return (
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="400px"
+      width="100%"
+    >
+      <CircularProgress />
+    </Box>
+  );
+
+if (!activities || activities.length === 0)
+  return (
+    <Box
+      className="text-center text-gray-600"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="300px"
+    >
+      <Typography variant="h6" className="text-gray-500">
+        No Activity History Found.
+      </Typography>
+    </Box>
+  );
+
+
   if (error) return <Typography color="error">Error: {error.message || error}</Typography>;
 
   return (

@@ -1,4 +1,4 @@
-import { serviceReqConstants } from "../actions/constants";
+import { serviceReqConstants, serviceRequestConstants } from "../actions/constants";
  
 const initialState = {
   message: '',
@@ -15,6 +15,8 @@ const serviceRequestReducer = (state, action) => {
   }
  
   switch (action.type) {
+    
+
     case serviceReqConstants.GET_CATEGORY_REQUEST:
       return {
         ...state,

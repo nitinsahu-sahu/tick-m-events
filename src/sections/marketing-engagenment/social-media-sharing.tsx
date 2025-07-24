@@ -17,8 +17,10 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { createSocialMediaPost } from '../../redux/actions/socialMedia.actions';
+import baseURL from "../../redux/helper/axios";
 
 interface PostData {
+       _id?: string;
     description: string;
     reservationLink: string;
     hashtag: string;
@@ -42,7 +44,7 @@ const platforms = [
 export function SocialMediaSharing({ selEvent }: any) {
     console.log("sss", selEvent);
     const [description, setDescription] = useState('Join us for an unforgettable experience! Get your tickets now!');
-    const [reservationLink, setReservationLink] = useState('https://eventbooking.com/my-event');
+    const [reservationLink, setReservationLink] = useState('https://tick-m-events.vercel.app/our-event');
     const [hashtag, setHashtag] = useState('#AmazingEvent2025');
     const [eventImage, setEventImage] = useState<string | null>(null);
     const [savedPostData, setSavedPostData] = useState<PostData | null>(null);
@@ -117,27 +119,50 @@ export function SocialMediaSharing({ selEvent }: any) {
 
         if (post && post._id) {
             try {
-                const shareRes = await fetch(`http://localhost:8000/api/v1/promotion/social-share/${post._id}`);
-                const shareData = await shareRes.json();
+                const shareRes = await fetch(`https://tick-m-events-server.onrender.com/api/v1/promotion/social-share/${post._id}`, {
+                    headers: { Accept: 'text/html' }
+                });
 
-                setSavedPostData({
-                    description,
-                    reservationLink,
-                    hashtag,
-                    eventImage,
-                    eventId: selEvent?._id,
-                    createdBy: user?._id,
-                    platform: selectedPlatform.label,
-                    imageUrl: post.imageUrl,
-                    eventName: shareData?.eventName || 'N/A',
-                    eventDate: shareData?.eventDate || 'N/A',
+                if (!shareRes.ok) throw new Error(`HTTP ${shareRes.status}`);
+
+                const htmlText = await shareRes.text();
+
+                // Use DOMParser to parse the HTML and extract OG meta tags
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlText, 'text/html');
+
+                const eventName = doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || undefined;
+                const eventDateAndDescription = doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || undefined;
+
+                setSavedPostData(prev => {
+                    const base: PostData = prev ?? {
+                          _id: post._id, 
+                        description,
+                        reservationLink,
+                        hashtag,
+                        eventImage,
+                        eventId: selEvent?._id,
+                        createdBy: user?._id,
+                        platform: selectedPlatform.label,
+                        imageUrl: post.imageUrl,
+                        eventName: undefined,
+                        eventDate: undefined,
+                    };
+
+                    return {
+                        ...base,
+                        eventName,
+                        eventDate: eventDateAndDescription,  // or parse a date string here
+                    };
                 });
 
                 alert("Post saved and data loaded!");
             } catch (err) {
-                console.error("Error fetching social share info:", err);
+                console.error("Error loading OG data:", err);
                 alert("Post saved, but failed to load OG data.");
             }
+
+
         } else {
             alert("Failed to save post");
         }
@@ -153,10 +178,12 @@ export function SocialMediaSharing({ selEvent }: any) {
             description: savedDescription,
             reservationLink: savedReservationLink,
             hashtag: savedHashtag,
-            imageUrl
+            imageUrl,
+            eventId
         } = savedPostData;
 
-        const fullMsg = `${description}\nReservation: ${reservationLink}\n${hashtag}\nImage: ${imageUrl}`;
+        const fullMsg = `${savedDescription}\nReservation: ${savedReservationLink}\n${savedHashtag}\nImage: ${imageUrl}`;
+        console.log("full",fullMsg);
         const encodedMsg = encodeURIComponent(fullMsg);
 
         switch (selectedPlatform.label) {
@@ -166,15 +193,26 @@ export function SocialMediaSharing({ selEvent }: any) {
             case 'X':
                 window.open(`https://twitter.com/intent/tweet?text=${encodedMsg}`, '_blank');
                 break;
-            case 'Facebook':
-                window.open(`https://www.facebook.com/sharer/sharer.php?u=${reservationLink}&quote=${encodedMsg}`, '_blank');
+            case 'Facebook': {
+                if (!eventId || !savedPostData?._id) {
+                    alert("Missing event ID or post ID");
+                    return;
+                }
+                const shareUrl = `https://tick-m-events-server.onrender.com/api/v1/social-share/${savedPostData._id}`;
+                const encodedUrl = encodeURIComponent(shareUrl);
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank');
+                // const fbShareUrl = `https://tick-m-events.vercel.app/our-event/${eventId}`;
+                // const encodedFbUrl = encodeURIComponent(fbShareUrl);
+                // window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedFbUrl}`, '_blank');
                 break;
+            }
             case 'LinkedIn':
                 window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodedMsg}`, '_blank');
                 break;
             default:
                 break;
         }
+
     };
 
 

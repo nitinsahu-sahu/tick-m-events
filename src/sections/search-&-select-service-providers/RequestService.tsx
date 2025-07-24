@@ -26,6 +26,7 @@ export default function RequestService({ requests }: Props) {
         onActionClick={(row) => {
           console.log("Clicked row:", row);
         }}
+        type='1'
       />
     </Box>
   );

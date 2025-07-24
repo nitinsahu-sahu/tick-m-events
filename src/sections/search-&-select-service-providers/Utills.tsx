@@ -24,8 +24,9 @@ export const eventTickets = [
 
 export const serviceRequestTableHeaders = [
   { label: "Event Name", key: "eventName" },
-  { label: "Organizer", key: "organizerName" },
+  { label: "Provider", key: "providerName" },
   { label: "Budget", key: "budget" },
   { label: "Date", key: "date" },
+  { label: "Status", key: "status" },
   { label: "Action", key: "action" },
 ];

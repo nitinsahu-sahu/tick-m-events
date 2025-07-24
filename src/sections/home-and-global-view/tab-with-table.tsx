@@ -61,6 +61,8 @@ export function TabWithTableView() {
     const [description, setDescription] = useState('');
     const proposalFormRef = useRef<HTMLDivElement>(null);
     const dispatch = useDispatch<AppDispatch>()
+    console.log('selectedProject',selectedProject);
+    
     // useEffect(() => {
     //     dispatch(getRequestsByProvider({ status: "requested-by-organizer" }));
     // }, [dispatch]);
@@ -230,6 +232,8 @@ export function TabWithTableView() {
                                         <Typography variant="body2"><strong>Organizer:</strong> {selectedProject?.organizerId?.name}</Typography>
                                         <Typography variant="body2"><strong>Budget:</strong> {selectedProject?.serviceRequestId?.budget}</Typography>
                                         <Typography variant="body2"><strong>Service Type:</strong> {selectedProject?.serviceRequestId?.serviceType}</Typography>
+                                        <Typography variant="body2"><strong>Organizer Requirement:</strong> {selectedProject?.orgRequirement}</Typography>
+                                        
                                     </Box>
                                     <Grid container spacing={1}>
                                         <Grid item xs={12} md={6}>

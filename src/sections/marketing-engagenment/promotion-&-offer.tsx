@@ -27,8 +27,11 @@ export function PromotionsAndOffers({ selEvent }: any) {
     setSelectedDiscounts(event.target.value);
   };
   useEffect(() => {
-    dispatch(promotionEvents())
-  }, [dispatch])
+    if (selEvent?._id) {
+      setSelectedEvent(selEvent);
+      setShowCreateForm(false);
+    }
+  }, [selEvent]);
   const [promotionFormData, setPromotionFormData] = useState({
     discountValue: '',
     ticketSelection: '',
@@ -136,21 +139,6 @@ export function PromotionsAndOffers({ selEvent }: any) {
         <Typography variant="h6" fontSize={{ xs: 15, sm: 20, md: 26 }} fontWeight={500}>
           Promotions & Special Offers
         </Typography>
-
-        <FormControl fullWidth size="small" sx={{ maxWidth: 300 }}>
-          <InputLabel>Select Event</InputLabel>
-          <Select
-            value={selectedEvent?._id || ''}
-            onChange={handleEventChange}
-            label="Select Event"
-          >
-            {eventsWithOrdersAndParticiapnt.map((event: any) => (
-              <MenuItem key={event._id} value={event._id}>
-                {event.eventName} ({event.date})
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
       </Box>
       <Button
         fullWidth

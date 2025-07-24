@@ -15,7 +15,7 @@ interface ApiResult {
   // Add other properties if needed
 }
 
-export function ActivePromotion() {
+export function ActivePromotion({ selEvent }: any) {
   const dispatch = useDispatch<AppDispatch>();
   const { promotions } = useSelector((state: RootState) => state?.promotionList);
   const [promotionRowData, setPromotionRowData] = useState({
@@ -32,13 +32,12 @@ export function ActivePromotion() {
 
   const handleModify = useCallback((rowData: any) => {
     setPromotionRowData((prev) => {
-      // Only update if values actually changed
       if (
         prev._id === rowData._id &&
         prev.discountValue === rowData.discountValue &&
         prev.ticketSelection === rowData.ticketSelection &&
         prev.validityPeriodStart === rowData.validityPeriodStart &&
-        prev.validityPeriodEnd === rowData.validityPeriodEnd && 
+        prev.validityPeriodEnd === rowData.validityPeriodEnd &&
         prev.promotionType === rowData.promotionType &&
         prev.status === rowData.status
       ) {
@@ -123,12 +122,14 @@ export function ActivePromotion() {
       discountValue: '',
       ticketSelection: '',
       validityPeriodStart: '',
-       validityPeriodEnd: '', 
+      validityPeriodEnd: '',
       promotionType: '',
       status: '',
     });
     setEditMode(false);
   }, []);
+
+  const eventPromotions = promotions?.filter((promo: any) => promo.eventId === selEvent?._id);
 
   return (
     <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: '1px solid black' }}>
@@ -168,11 +169,12 @@ export function ActivePromotion() {
       {/* Responsive Table */}
       <PromotionAndOfferTable
         headers={promotionTableHeaders}
-        data={promotions}
+        data={eventPromotions}
         onModify={handleModify}
         onStatusChange={handleStatusChange}
         onCancelEdit={handleCancelModify}
       />
+
 
       {/* Edit Promotion Section */}
       {editMode && (

@@ -16,6 +16,7 @@ import { ServiceRequestModal } from "../modal/service-request-modal";
 interface RequestTableProps {
   requests: any[];
   onActionClick?: (row: any) => void;
+  handleSignedContract?: (row: any) => void;
   type: string
 }
 interface ApiResult {
@@ -24,18 +25,12 @@ interface ApiResult {
   message: any;
 }
 
-export function ServiceRequestTable({ requests, onActionClick, type }: RequestTableProps) {
+export function ServiceRequestTable({ handleSignedContract, requests, onActionClick, type }: RequestTableProps) {
   const data = requests;
-  console.log('..', data);
   const dispatch = useDispatch<AppDispatch>();
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
-
-  const handleViewDetails = (row: any) => {
-    setSelectedRequest(row);
-    setOpenModal(true);
-  };
 
   const handleCancelReqByOrg = useCallback(async (row: any) => {
     try {
@@ -109,11 +104,6 @@ export function ServiceRequestTable({ requests, onActionClick, type }: RequestTa
                   </TableCell>
                   <TableCell align="center">
                     <Typography
-                      // onClick={() => {
-                      //   onActionClick?.(row);
-                      //   handleViewDetails(row);
-                      // }}
-
                       sx={{
                         textTransform: "capitalize",
                         marginX: 0.5,
@@ -144,14 +134,22 @@ export function ServiceRequestTable({ requests, onActionClick, type }: RequestTa
                       </Button> : type === '2' ? <Button
                         variant="contained"
                         size="small"
+                        disabled={row.status==='accepted'}
                         sx={{
                           marginX: 0.5,
                           borderColor: "gray",
-                          backgroundColor: "gray",
+                          backgroundColor: "green",
                           color: 'white',
                         }}
+                        onClick={() => {
+                          if (handleSignedContract) {
+                            handleSignedContract(row);
+                          }
+                        }}
+
                       >
-                        Contract Send
+                        {row.status === "accepted" ? 'Signed' : 'Contract Sign'}
+
                       </Button> : <Button
                         variant="contained"
                         size="small"

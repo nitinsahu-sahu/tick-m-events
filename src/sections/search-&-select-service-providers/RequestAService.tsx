@@ -1,47 +1,61 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
-  Box,
-  Button,
-  MenuItem,
-  TextField,
-  Typography,
-  InputLabel,
-  Select,
-  FormControl,
-  Dialog,
-  DialogTitle,
-  DialogContent,
+  Box, Paper, Button, Chip, TextField, Typography, Dialog, DialogTitle, DialogContent, Avatar,
   DialogActions,
 } from "@mui/material";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers";
+import { toast } from 'react-toastify';
+import { useDispatch } from "react-redux";
+
 import { ServiceRequestTable } from "src/components/tables/service-request-table";
+import { AppDispatch } from "src/redux/store";
+import { createContractSigned } from "src/redux/actions/contract.action";
 
 interface FormData {
   service: string;
   location: string;
-  dateTime: string;
-  budget: string;
-  description: string;
-  additionalOptions: string;
-  file: File | null;
+  eventTime: string;
+  finalBudget: string;
+  explainReq: string;
+}
+
+interface ApiResult {
+  status: number;
+  type: string;
+  message: any;
+  // Add other properties if needed
 }
 
 export function RequestAService({ requests }: any) {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const [showRequestForm, setShowRequestForm] = React.useState(false);
+  const [selectedRow, setSelectedRow] = React.useState<any>(null);
+  console.log('===selectedRow=================================');
+  console.log(selectedRow);
+  console.log('====================================');
   const [formData, setFormData] = React.useState<FormData>({
     service: "",
     location: "",
-    dateTime: "",
-    budget: "",
-    description: "",
-    additionalOptions: "",
-    file: null,
+    eventTime: "",
+    finalBudget: "",
+    explainReq: "",
   });
-
   const [previewOpen, setPreviewOpen] = React.useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Update formData when selectedRow changes
+  React.useEffect(() => {
+    if (selectedRow) {
+      setFormData({
+        service: selectedRow?.serviceRequestId?.serviceType || "",
+        location: selectedRow?.eventId?.location || "",
+        eventTime: "",
+        finalBudget: "",
+        explainReq: "",
+      });
+    }
+  }, [selectedRow]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -49,24 +63,45 @@ export function RequestAService({ requests }: any) {
     }));
   };
 
-  const handleSubmit = () => {
-    // Here you would typically send the data to your backend
-    console.log({
-      ...formData,
-      file: formData.file ? formData.file.name : null,
-    });
-
-    setPreviewOpen(false);
+  const handleSignedContract = (row: any) => {
+    setSelectedRow(row);
+    setShowRequestForm(!showRequestForm);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFormData(prev => ({
-        ...prev,
-        file: e.target.files![0]
-      }));
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPreviewOpen(true);
+  };
+
+  const handleConfirm = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    const finalContractEntry = new FormData();
+    finalContractEntry.append("eventReqId", selectedRow?._id);
+    finalContractEntry.append("eventId", selectedRow?.eventId?._id);
+    finalContractEntry.append("serviceRequestId", selectedRow?.serviceRequestId?._id);
+    finalContractEntry.append("providerId", selectedRow?.providerId?._id);
+    finalContractEntry.append("service", formData.service);
+    finalContractEntry.append("eventTime", formData.eventTime);
+    finalContractEntry.append("location", formData.location);
+    finalContractEntry.append("finalBudget", formData.finalBudget);
+    finalContractEntry.append("explainReq", formData.explainReq);
+
+
+    try {
+      const result = await dispatch(createContractSigned(finalContractEntry)) as ApiResult;
+      if (result?.status === 201) {
+        toast.success("Requested Successfully...");
+        setPreviewOpen(false);
+        setShowRequestForm(false);
+      } else {
+        toast.error(result?.message || "Service creation failed");
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
     }
-  };
+  }, [dispatch, formData, selectedRow])
+
+  const renderHTML = (htmlString: string) => <Box dangerouslySetInnerHTML={{ __html: htmlString }} />;
 
   return (
     <Box
@@ -77,159 +112,192 @@ export function RequestAService({ requests }: any) {
         backgroundColor: "#fff",
         border: "1px solid #E0E0E0",
         boxShadow: 3,
-        mx: "auto",
       }}
     >
       <Typography variant="h6" gutterBottom>
-          Finalize Contract
-        </Typography>
-        <ServiceRequestTable
-          requests={requests}
-          onActionClick={(row) => {
-            console.log("Clicked row:", row);
-          }}
-          type="2"
-        />
-
-      <Typography variant="h6" gutterBottom>
-        Service Request Form
+        Finalize Contract
       </Typography>
-
-      {/* Type of Service */}
-      <FormControl fullWidth margin="normal">
-        <InputLabel>Type of Service Needed</InputLabel>
-        <Select
-          value={formData.service}
-          onChange={(e) => setFormData(prev => ({ ...prev, service: e.target.value }))}
-          label="Type of Service Needed"
-        >
-          <MenuItem value="photography">Photography</MenuItem>
-          <MenuItem value="catering">Catering</MenuItem>
-          <MenuItem value="decoration">Decoration</MenuItem>
-        </Select>
-      </FormControl>
-
-      {/* Event Location */}
-      <TextField
-        fullWidth
-        label="Event Location"
-        margin="normal"
-        name="location"
-        value={formData.location}
-        onChange={handleChange}
+      <ServiceRequestTable
+        handleSignedContract={handleSignedContract}
+        requests={requests}
+        type="2"
       />
 
-      {/* Date & Time */}
-      <TextField
-        fullWidth
-        type="datetime-local"
-        margin="normal"
-        name="dateTime"
-        value={formData.dateTime}
-        onChange={handleChange}
-      />
+      {showRequestForm && (
+        <form onSubmit={handleSubmit}>
+          <Box mt={2}>
+            <Typography variant="h6" gutterBottom>
+              Service Accepted Form
+            </Typography>
 
-      {/* Estimated Budget */}
-      <TextField
-        fullWidth
-        label="Estimated Budget"
-        margin="normal"
-        name="budget"
-        value={formData.budget}
-        onChange={handleChange}
-      />
+            <TextField
+              required
+              fullWidth
+              label="Service Type"
+              margin="normal"
+              name="service"
+              value={formData.service}
+              onChange={handleChange}
+            />
 
-      {/* Full Description */}
-      <TextField
-        fullWidth
-        label="Full Description of Requirements"
-        multiline
-        rows={4}
-        margin="normal"
-        name="description"
-        value={formData.description}
-        onChange={handleChange}
-      />
+            <TextField
+              required
+              fullWidth
+              label="Event Location"
+              margin="normal"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+            />
 
-      {/* File Upload */}
-      <Button component="label" variant="outlined" sx={{ mt: 2 }}>
-        Choose File
-        <input type="file" hidden onChange={handleFileChange} />
-      </Button>
-      {formData.file && (
-        <Typography variant="body2" sx={{ mt: 1 }}>
-          Selected: {formData.file.name}
-        </Typography>
+            <TextField
+              required
+              fullWidth
+              type="datetime-local"
+              margin="normal"
+              name="eventTime"
+              value={formData.eventTime}
+              onChange={handleChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+
+            <TextField
+              required
+              fullWidth
+              label="Final Budget"
+              margin="normal"
+              name="finalBudget"
+              value={formData.finalBudget}
+              onChange={handleChange}
+            />
+
+            <TextField
+              required
+              fullWidth
+              label="Explain Full Requirements"
+              multiline
+              rows={4}
+              margin="normal"
+              name="explainReq"
+              value={formData.explainReq}
+              onChange={handleChange}
+            />
+
+            <Button
+              variant="contained"
+              size="small"
+              type="submit"
+              sx={{
+                backgroundColor: "#08043bff",
+                color: 'white',
+                width: "100%",
+                mt: 2
+              }}
+            >
+              Preview Contract
+            </Button>
+          </Box>
+        </form>
       )}
 
-      {/* Additional Options */}
-      <TextField
-        fullWidth
-        label="Additional Options"
-        multiline
-        rows={3}
-        margin="normal"
-        name="additionalOptions"
-        value={formData.additionalOptions}
-        onChange={handleChange}
-      />
-
-      {/* Buttons */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setPreviewOpen(true)}
-        >
-          Preview Request
-        </Button>
-        <Button variant="outlined">Save as Draft</Button>
-      </Box>
-
-      {/* Preview Dialog */}
       <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Preview Your Request</DialogTitle>
+        <DialogTitle>Contract Details Preview</DialogTitle>
         <DialogContent>
-          <Box sx={{ p: 2 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              <strong>Service Type:</strong> {formData.service}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            <Chip
+              label={`Status: ${selectedRow?.status.replace(/-/g, ' ')}`}
+              color={selectedRow?.status === 'accepted-by-provider' ? 'success' : 'warning'}
+            />
+            <Chip
+              label={`Contract Status: ${selectedRow?.contractStatus}`}
+              color={selectedRow?.contractStatus === 'pending' ? 'warning' : 'success'}
+            />
+          </Box>
+
+          <Paper elevation={2} sx={{ p: 2, mb: 3 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+              Event Information
             </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-              <strong>Location:</strong> {formData.location}
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Avatar
+                src={selectedRow?.organizerId?.avatar?.url}
+                alt={selectedRow?.organizerId?.name}
+                sx={{ mr: 2 }}
+              />
+              <div>
+                <Typography><strong>Organizer:</strong> {selectedRow?.organizerId?.name}</Typography>
+                <Typography variant="body2">{selectedRow?.organizerId?.email}</Typography>
+              </div>
+            </Box>
+
+            <Typography><strong>Event Name:</strong> {selectedRow?.eventId?.eventName}</Typography>
+            <Typography><strong>Date:</strong> {new Date(selectedRow?.eventId?.date).toLocaleDateString()}</Typography>
+            <Typography><strong>Time:</strong> {selectedRow?.eventId?.time}</Typography>
+            <Typography><strong>Location:</strong> {selectedRow?.eventId?.location}</Typography>
+            <Typography mt={1}><strong>Description:</strong></Typography>
+            {renderHTML(selectedRow?.eventId?.description || '')}
+          </Paper>
+
+          <Paper elevation={2} sx={{ p: 2, mb: 3 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+              Service Provider Details
             </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-              <strong>Date & Time:</strong> {formData.dateTime}
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Avatar
+                src={selectedRow?.providerId?.avatar?.url}
+                alt={selectedRow?.providerId?.name}
+                sx={{ mr: 2 }}
+              />
+              <div>
+                <Typography><strong>Provider:</strong> {selectedRow?.providerId?.name}</Typography>
+                <Typography variant="body2">{selectedRow?.providerId?.email}</Typography>
+              </div>
+            </Box>
+
+            <Typography><strong>Service Type:</strong> {selectedRow?.serviceRequestId?.serviceType}</Typography>
+            <Typography><strong>Original Budget:</strong> {selectedRow?.serviceRequestId?.budget}</Typography>
+            <Typography><strong>Organizer Budget:</strong> {selectedRow?.orgBudget} XAF</Typography>
+            <Typography><strong>Organizer Requirements:</strong> {selectedRow?.orgRequirement}</Typography>
+            <Typography mt={1}><strong>Service Description:</strong></Typography>
+            {renderHTML(selectedRow?.serviceRequestId?.description || '')}
+          </Paper>
+
+          <Paper elevation={2} sx={{ p: 2, mb: 3 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+              Provider Proposal
             </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-              <strong>Budget:</strong> {formData.budget}
+            <Typography><strong>Proposed Amount:</strong> {selectedRow?.providerProposal?.amount} XAF</Typography>
+            <Typography><strong>Duration:</strong> {selectedRow?.providerProposal?.days} day(s)</Typography>
+            <Typography><strong>Message:</strong> {selectedRow?.providerProposal?.message}</Typography>
+          </Paper>
+
+          <Paper elevation={2} sx={{ p: 2 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+              Contract Terms
             </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-              <strong>Description:</strong>
-            </Typography>
-            <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-line' }}>
-              {formData.description}
-            </Typography>
-            {formData.additionalOptions && (
+            <Typography><strong>Final Agreed Budget:</strong> {formData.finalBudget}</Typography>
+            <Typography><strong>Event Time:</strong> {formData.eventTime}</Typography>
+            <Typography><strong>Additional Requirements:</strong></Typography>
+            <Typography>{formData.explainReq || 'None specified'}</Typography>
+
+            {selectedRow?.serviceRequestId?.additionalOptions && (
               <>
-                <Typography variant="subtitle1" gutterBottom>
-                  <strong>Additional Options:</strong>
-                </Typography>
-                <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-line' }}>
-                  {formData.additionalOptions}
-                </Typography>
+                <Typography mt={2}><strong>Service Options:</strong></Typography>
+                {renderHTML(selectedRow?.serviceRequestId?.additionalOptions)}
               </>
             )}
-            {formData.file && (
-              <Typography variant="subtitle1" gutterBottom>
-                <strong>Attached File:</strong> {formData.file.name}
-              </Typography>
-            )}
-          </Box>
+          </Paper>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setPreviewOpen(false)}>Back to Edit</Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Send Request
+          <Button
+            onClick={(e) => handleConfirm(e)}
+            variant="contained"
+            color="primary"
+          >
+            Confirm and Send Contract
           </Button>
         </DialogActions>
       </Dialog>

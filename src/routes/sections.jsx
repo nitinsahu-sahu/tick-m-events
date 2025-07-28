@@ -11,6 +11,7 @@ import { isUserLoggedIn } from 'src/redux/actions';
 import Protected from 'src/redux/helper/HOC';
 import { RoleProtectedRoute } from 'src/redux/helper/RoleWise';
 import { MultipleDashboard } from 'src/hooks/common-dashbord';
+import SignInPage from '../pages/sign-in'
 
 // ----------------------------Organizer Routes------------------------------------------
 export const MarketingEngagenmentPage = lazy(() => import('src/pages/marketing-engagenment'));
@@ -28,7 +29,7 @@ export const EventSearchAndDetailsPage = lazy(() => import('src/pages/event-sear
 // ----------------------------Service Provider Routes------------------------------------------
 
 export const HomePage = lazy(() => import('src/pages/home'));
-export const SignInPage = lazy(() => import('src/pages/sign-in'));
+// export const SignInPage = import('src/pages/sign-in');
 export const FrontHomePage = lazy(() => import('src/pages/front-home'));
 export const EventsPage = lazy(() => import('src/pages/events'));
 export const CategoriesPage = lazy(() => import('src/pages/category/category'));

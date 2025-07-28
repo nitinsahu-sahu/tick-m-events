@@ -96,7 +96,7 @@ export function MatrixOneCard({ metrics }: any) {
                     </Grid>
                 ))
             }
-            <Grid item xs={12} sm={12} md={12}>
+            {/* <Grid item xs={12} sm={12} md={12}>
                 <Card sx={{
                     height: "90%",
                     borderRadius: 2,
@@ -124,7 +124,7 @@ export function MatrixOneCard({ metrics }: any) {
                         </Typography>
                     </CardContent>
                 </Card>
-            </Grid>
+            </Grid> */}
         </Grid>
 
 

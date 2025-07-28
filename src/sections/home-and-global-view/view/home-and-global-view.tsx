@@ -5,7 +5,6 @@ export function HomeAndGlobalView() {
     return (
         <DashboardContent>
             <TabWithTableView />
-
         </DashboardContent>
     )
 }

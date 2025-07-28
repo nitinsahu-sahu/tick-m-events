@@ -304,9 +304,6 @@ export const getAccepedByProiver = () => async (dispatch) => {
     dispatch({ type: serviceRequestConstants.PROVIDER_ACCEPTED_REQUEST });
 
     const result = await axios.get(`/event-requests/acceptedByProvider`);
-console.log('===============xx=====================');
-console.log(result);
-console.log('====================================');
     dispatch({
       type: serviceRequestConstants.PROVIDER_ACCEPTED_SUCCESS,
       payload: {

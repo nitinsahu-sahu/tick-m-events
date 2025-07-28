@@ -7,15 +7,6 @@ import { Provider } from 'react-redux';
 import App from './app';
 import { store } from './redux/store';
 
-
-// // Create a wrapper component to provide the currentUser to ChatProvider
-// const ChatAppWrapper = () => {
-//   // const currentUser = useSelector((state: RootState) => state?.auth?.user);
-//   return (
-
-//   );
-// };
-
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(

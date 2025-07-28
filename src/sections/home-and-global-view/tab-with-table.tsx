@@ -55,18 +55,13 @@ export function TabWithTableView() {
     const [tabValue, setTabValue] = useState(0);
     const { requests } = useSelector((state: RootState) => state?.serviceRequest);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-    const tabLabels = ["Available Projects", "Confirmed Services"];
+    const tabLabels = ["Available Projects","Signed Projects","Ongoing Projects", "Confirmed Services"];
     const [amount, setAmount] = useState('');
     const [days, setDays] = useState('');
     const [description, setDescription] = useState('');
     const proposalFormRef = useRef<HTMLDivElement>(null);
     const dispatch = useDispatch<AppDispatch>()
-    console.log('selectedProject',selectedProject);
     
-    // useEffect(() => {
-    //     dispatch(getRequestsByProvider({ status: "requested-by-organizer" }));
-    // }, [dispatch]);
-
     useEffect(() => {
         if (tabValue === 0) {
             dispatch(getRequestsByProvider({ status: "requested-by-organizer" }));
@@ -81,9 +76,7 @@ export function TabWithTableView() {
     };
     
     const handleMarkCompleted = async (project: Project) => {
-      
         const res = await dispatch(markRequestAsCompleted(project._id) as any);
-
         if (res?.type?.includes("SUCCESS")) {
               toast.success("Marked as completed successfully.");
             dispatch(getRequestsByProvider({ status: "accepted-by-organizer" }));
@@ -135,7 +128,6 @@ export function TabWithTableView() {
                         />
                     ))}
                 </Tabs>
-
             </Paper>
             <MatrixOneCard metrics={metrics} />
             <Paper elevation={6}
@@ -323,6 +315,30 @@ export function TabWithTableView() {
 
                 )}
                 {tabValue === 1 && (
+                    <RequestTabSection
+                        title="Signed Projects"
+                        description="Track projects where the service provider has been selected."
+                        headers={confirmedServicesTableHeader}
+                        // data={confirmedServicesTableData}
+                        data={requests}
+                        type="3"
+                        onViewDetails={() => { }}
+                        onMarkCompleted={handleMarkCompleted}
+                    />
+                )}
+                {tabValue === 2 && (
+                    <RequestTabSection
+                        title="Ongoing Projects"
+                        description="Track projects where the service provider has been selected."
+                        headers={confirmedServicesTableHeader}
+                        // data={confirmedServicesTableData}
+                        data={requests}
+                        type="3"
+                        onViewDetails={() => { }}
+                        onMarkCompleted={handleMarkCompleted}
+                    />
+                )}
+                 {tabValue === 3 && (
                     <RequestTabSection
                         title="Confirmed Services"
                         description="Track projects where the service provider has been selected."

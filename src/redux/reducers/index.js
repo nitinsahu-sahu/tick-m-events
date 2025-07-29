@@ -17,8 +17,10 @@ import { paymentSettingsReducer } from './payment-setting.reducer';
 import { adminVerificationListReducer } from './verificationReducers'
 import { userReducer } from './userReducer';
 import editEventReducer from './editEventReducer'
+import homeAndGlobalReducer from './homeAndGlobal.reducer'
 
 const rootReducer = combineReducers({
+    homeAndGlobal: homeAndGlobalReducer,
     editEvent: editEventReducer,
     adminVerificationList: adminVerificationListReducer,
     paymentSettings: paymentSettingsReducer,

@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import {
   Box, Paper, Button, Chip, TextField, Typography, Dialog, DialogTitle, DialogContent, Avatar,
   DialogActions,
+  InputAdornment,
 } from "@mui/material";
 import { toast } from 'react-toastify';
 import { useDispatch } from "react-redux";
@@ -30,9 +31,7 @@ export function RequestAService({ requests }: any) {
 
   const [showRequestForm, setShowRequestForm] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<any>(null);
-  console.log('===selectedRow=================================');
-  console.log(selectedRow);
-  console.log('====================================');
+
   const [formData, setFormData] = React.useState<FormData>({
     service: "",
     location: "",
@@ -83,7 +82,7 @@ export function RequestAService({ requests }: any) {
     finalContractEntry.append("service", formData.service);
     finalContractEntry.append("eventTime", formData.eventTime);
     finalContractEntry.append("location", formData.location);
-    finalContractEntry.append("finalBudget", formData.finalBudget);
+    finalContractEntry.append("finalBudget", `${formData.finalBudget} XAF`);
     finalContractEntry.append("explainReq", formData.explainReq);
 
 
@@ -171,6 +170,9 @@ export function RequestAService({ requests }: any) {
               name="finalBudget"
               value={formData.finalBudget}
               onChange={handleChange}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">XAF</InputAdornment>,
+              }}
             />
 
             <TextField

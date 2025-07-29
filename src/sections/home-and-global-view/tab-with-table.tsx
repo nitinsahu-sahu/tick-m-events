@@ -1,13 +1,16 @@
 import { Box, Button, Paper, Tab, Tabs, Typography, Grid, TextField, CardContent, Card } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from 'react-toastify';
 import { MatrixOneCard } from "src/components/matrix-three-cards/matrix-one-cards";
 import { getRequestsByProvider, sendProviderProposal, getProposalById, updateProviderProposal, markRequestAsCompleted } from "src/redux/actions/service-request";
 import { AppDispatch, RootState } from "src/redux/store";
 
 import { RequestTabSection } from "./request-tab-section";
-import { metrics, availableProjectsTableHeaders, confirmedServicesTableData, confirmedServicesTableHeader } from "./utills";
+import { metrics, availableProjectsTableHeaders} from "./utills";
+import { ContractTable } from "./contractTable";
+import { SignedTab } from "./projectsTabs/signed";
+import { OngoingTab } from "./projectsTabs/ongoing";
+import { ConfirmedTab } from "./projectsTabs/confirmed";
 
 interface Project {
     _id: string;
@@ -55,13 +58,13 @@ export function TabWithTableView() {
     const [tabValue, setTabValue] = useState(0);
     const { requests } = useSelector((state: RootState) => state?.serviceRequest);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-    const tabLabels = ["Available Projects","Signed Projects","Ongoing Projects", "Confirmed Services"];
+    const tabLabels = ["Available Projects", "Signed Projects", "Ongoing Projects", "Confirmed Services"];
     const [amount, setAmount] = useState('');
     const [days, setDays] = useState('');
     const [description, setDescription] = useState('');
     const proposalFormRef = useRef<HTMLDivElement>(null);
     const dispatch = useDispatch<AppDispatch>()
-    
+
     useEffect(() => {
         if (tabValue === 0) {
             dispatch(getRequestsByProvider({ status: "requested-by-organizer" }));
@@ -74,17 +77,6 @@ export function TabWithTableView() {
         setTabValue(newValue);
         setSelectedProject(null);
     };
-    
-    const handleMarkCompleted = async (project: Project) => {
-        const res = await dispatch(markRequestAsCompleted(project._id) as any);
-        if (res?.type?.includes("SUCCESS")) {
-              toast.success("Marked as completed successfully.");
-            dispatch(getRequestsByProvider({ status: "accepted-by-organizer" }));
-        } else {
-              toast.error(res?.message || "Something went wrong.");
-        }
-    };
-
 
     return (
         <>
@@ -225,7 +217,7 @@ export function TabWithTableView() {
                                         <Typography variant="body2"><strong>Budget:</strong> {selectedProject?.serviceRequestId?.budget}</Typography>
                                         <Typography variant="body2"><strong>Service Type:</strong> {selectedProject?.serviceRequestId?.serviceType}</Typography>
                                         <Typography variant="body2"><strong>Organizer Requirement:</strong> {selectedProject?.orgRequirement}</Typography>
-                                        
+
                                     </Box>
                                     <Grid container spacing={1}>
                                         <Grid item xs={12} md={6}>
@@ -315,40 +307,14 @@ export function TabWithTableView() {
 
                 )}
                 {tabValue === 1 && (
-                    <RequestTabSection
-                        title="Signed Projects"
-                        description="Track projects where the service provider has been selected."
-                        headers={confirmedServicesTableHeader}
-                        // data={confirmedServicesTableData}
-                        data={requests}
-                        type="3"
-                        onViewDetails={() => { }}
-                        onMarkCompleted={handleMarkCompleted}
-                    />
+                    <SignedTab />
+                    
                 )}
                 {tabValue === 2 && (
-                    <RequestTabSection
-                        title="Ongoing Projects"
-                        description="Track projects where the service provider has been selected."
-                        headers={confirmedServicesTableHeader}
-                        // data={confirmedServicesTableData}
-                        data={requests}
-                        type="3"
-                        onViewDetails={() => { }}
-                        onMarkCompleted={handleMarkCompleted}
-                    />
+                    <OngoingTab />
                 )}
-                 {tabValue === 3 && (
-                    <RequestTabSection
-                        title="Confirmed Services"
-                        description="Track projects where the service provider has been selected."
-                        headers={confirmedServicesTableHeader}
-                        // data={confirmedServicesTableData}
-                        data={requests}
-                        type="2"
-                        onViewDetails={() => { }}
-                        onMarkCompleted={handleMarkCompleted}
-                    />
+                {tabValue === 3 && (
+                    <ConfirmedTab />
                 )}
             </Paper>
         </>

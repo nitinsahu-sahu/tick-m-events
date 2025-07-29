@@ -25,6 +25,9 @@ export const confirmedServicesTableData = [
     { service: "Wedding Catering", location: "Douala", dateTime: "10/02/2025 - 8 PM", finalBudget: "250,000 XAF", actions: [ "Contact Client", "Mark as Completed"] },
 ];
 
+export const contractTableHeader = ["Service", "Event","Location","Amount","Status", "Date & Time",  "Actions"];
+
+
 export const tansation = [{
     id: "123456789",
     datetime: "2025-03-21 14:35:22",

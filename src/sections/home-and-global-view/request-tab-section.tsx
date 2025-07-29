@@ -2,6 +2,7 @@ import { Paper, Typography, Box, Button, TextField, MenuItem, Stack } from "@mui
 import { useState } from "react";
 import DatePicker from "@mui/lab/DatePicker";
 import { HomeAndGlobalTable } from "src/components/tables/home-and-global-table";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 interface RequestSectionProps {
     title: string;
@@ -11,7 +12,7 @@ interface RequestSectionProps {
     type: string;
     onApply?: (row: any) => void;
     onViewDetails?: (row: any) => void;
-    onMarkCompleted?: (row: any) => void; 
+    onMarkCompleted?: (row: any) => void;
 }
 
 export function RequestTabSection({
@@ -85,9 +86,9 @@ export function RequestTabSection({
 
     return (
         <>
-            <Typography variant="h5" fontWeight="bold" gutterBottom>
-                {title}
-            </Typography>
+            <HeadingCommon title={title} />
+
+
             <Typography variant="body2" mb={2}>
                 {description}
             </Typography>
@@ -153,7 +154,14 @@ export function RequestTabSection({
                 )
             }
 
-            <HomeAndGlobalTable headers={headers} data={filteredData} type={type} onApply={onApply} onViewDetails={onViewDetails} onMarkCompleted={onMarkCompleted}  />
+            <HomeAndGlobalTable
+                headers={headers}
+                data={filteredData}
+                type={type}
+                onApply={onApply}
+                onViewDetails={onViewDetails}
+                onMarkCompleted={onMarkCompleted}
+            />
             {
                 filteredData.length > 0 && (
                     <Box display="flex" justifyContent="flex-end" mt={2}>

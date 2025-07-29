@@ -28,7 +28,9 @@ interface ApiResult {
 export function ServiceRequestTable({ handleSignedContract, requests, onActionClick, type }: RequestTableProps) {
   const data = requests;
   const dispatch = useDispatch<AppDispatch>();
-
+console.log('=======================esf=============');
+console.log(data);
+console.log('====================================');
   const [openModal, setOpenModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
 
@@ -95,7 +97,7 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                     {row.providerId?.name || "-"}
                   </TableCell>
                   <TableCell align="center">
-                    {row.serviceRequestId?.budget || row.orgBudget || "-"}
+                    {`${row.providerProposal?.amount} XAF` || row.orgBudget || "-"}
                   </TableCell>
                   <TableCell align="center">
                     {row.eventId?.date
@@ -114,6 +116,18 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                       {row.status === 'requested-by-organizer' ? "Pending" :
                         row.status === 'rejected-by-organizer' ? "Cancelled" :
                           row.status === 'accepted-by-provider' ? 'Accepted' : row.status}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography
+                      sx={{
+                        textTransform: "capitalize",
+                        marginX: 0.5,
+                        borderColor: "gray",
+                        // color: row.status === 'rejected-by-organizer' ? '#b71c1c' : '#2e7d32',
+                      }}
+                    >
+                      {row.contractStatus}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -153,6 +167,7 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                       </Button> : <Button
                         variant="contained"
                         size="small"
+                        disabled={row.status==='accepted'}
                         onClick={() => handleCancelReqByOrg(row)}
                         sx={{
                           marginX: 0.5,

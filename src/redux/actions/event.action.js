@@ -136,6 +136,28 @@ export const wishlistEventFetch = () => async (dispatch) => {
     }
 };
 
+export const updateEventStatus = (eventId, status, reason) => async (dispatch) => {
+    dispatch({ type: eventConstants.UPDATE_EVENT_STATUS_REQUEST });
+
+    try {
+        const response = await axios.put(`/event/status/${eventId}/${status}`, {
+            reason,
+        });
+
+        dispatch({
+            type: eventConstants.UPDATE_EVENT_STATUS_SUCCESS,
+            payload: { message: response?.data?.message },
+        });
+        dispatch(eventFetch());
+
+    } catch (error) {
+        dispatch({
+            type: eventConstants.UPDATE_EVENT_STATUS_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+    }
+};
+
 export const eventFetch = () => async (dispatch) => {
     dispatch({ type: eventConstants.EVENT_GET_REQUEST });
 

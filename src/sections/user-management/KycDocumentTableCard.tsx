@@ -10,7 +10,9 @@ import { AppDispatch, RootState } from "src/redux/store";
 import { useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { toast } from 'react-toastify';
-import { getAllAdminVerifications, approveIdentity,rejectIdentity } from '../../redux/actions/verificationActions';
+import { KycDocVerificationTable } from 'src/components/tables/kycVarification-table';
+
+import { getAllAdminVerifications, approveIdentity, rejectIdentity } from '../../redux/actions/verificationActions';
 
 
 const documentTypeLabels: Record<string, string> = {
@@ -75,6 +77,10 @@ export function KycDocumentTableCard() {
         KYC Document Verification
       </Typography>
 
+      <KycDocVerificationTable
+        headers={["User", "Documents Type", "Submission Date", "Status", "Actions"]}
+        data={verifications}
+      />
       <Box sx={{ overflowX: 'auto', borderRadius: 2 }}>
         <Box sx={{ minWidth: 700 }}>
           <Box
@@ -86,7 +92,7 @@ export function KycDocumentTableCard() {
               py: 1.5,
               px: 2,
               fontWeight: 600,
-               textAlign: 'center',
+              textAlign: 'center',
             }}
           >
             <div>User</div>
@@ -116,112 +122,110 @@ export function KycDocumentTableCard() {
           >
 
             {/* kyc validattion */}
-  {verifications && verifications.length > 0 ? (
-  verifications.map((item: any, idx: number) => (
-    <Box
-      key={idx}
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr 1fr 1fr 2fr',
-        alignItems: 'center',
-        py: 1.5,
-        px: 2,
-        borderBottom:
-          idx !== verifications.length - 1
-            ? '1px solid rgba(195, 195, 195, 1)'
-            : 'none',
-        backgroundColor: '#f5f5f5',
-        textAlign: 'center',
-      }}
-    >
-      <div>{item?.user?.name || 'N/A'}</div>
-      <div>{documentTypeLabels[item?.identityDocuments?.[0]?.type] || 'Unknown'}</div>
-      <div>{new Date(item?.identityDocuments?.[0]?.uploadedAt).toLocaleDateString()}</div>
-      <div>
-        <Typography
-          sx={{
-            color:
-              item.identityDocuments?.[0]?.status === 'pending'
-                ? 'orange'
-                : item.identityDocuments?.[0]?.status === 'approved'
-                ? 'green'
-                : 'red',
-            fontWeight: 'bold',
-          }}
-        >
-          {item.identityDocuments?.[0]?.status
-            ? item.identityDocuments[0].status.charAt(0).toUpperCase() +
-              item.identityDocuments[0].status.slice(1)
-            : 'N/A'}
-        </Typography>
-      </div>
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        spacing={1}
-        flexWrap="wrap"
-        useFlexGap
-        sx={{
-          mt: { xs: 1, sm: 0 },
-          '& button': {
-            flex: { xs: '1 1 auto', sm: 'none' },
-            minWidth: { xs: '100%', sm: '100%', md: 10, lg: 5 },
-          },
-        }}
-      >
-        {getActions(item).map((label, i) => (
-          <StyledActionButton
-            key={i}
-            label={label}
-            onClick={async () => {
-              if (label === 'View') {
-                const doc = item.identityDocuments.find((d: any) => d?.url);
-                if (doc?.url) {
-                  setSelectedDocUrl(doc.url);
-                  setOpenPreview(true);
-                }
-              } else if (label === 'Approved') {
-                if (item.user && item.user._id) {
-                  const result = await dispatch(approveIdentity(item.user._id));
-                  if (result.success) {
-                    toast.success('Identity approved successfully!');
-                    dispatch(getAllAdminVerifications());
-                  } else {
-                    toast.error(result.message || 'Approval failed.');
-                  }
-                } else {
-                  console.error('User ID missing');
-                }
-              } else if (label === 'Reject') {
-                if (item.user && item.user._id) {
-                  setSelectedUserId(item.user._id);
-                  setRejectReason('');
-                  setOpenRejectDialog(true);
-                } else {
-                  console.error('User ID missing');
-                }
-              }
-            }}
-          />
-        ))}
-      </Stack>
-    </Box>
-  ))
-) : (
-  <Box
-    sx={{
-      textAlign: 'center',
-      py: 4,
-      fontStyle: 'italic',
-      fontWeight: 'bold',
-      color: 'red',
-      backgroundColor: '#f9f9f9',
-    }}
-  >
-    No KYC records found. KYC Verification required.
-  </Box>
-)}
-
-
+            {verifications && verifications.length > 0 ? (
+              verifications.map((item: any, idx: number) => (
+                <Box
+                  key={idx}
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr 1fr 1fr 2fr',
+                    alignItems: 'center',
+                    py: 1.5,
+                    px: 2,
+                    borderBottom:
+                      idx !== verifications.length - 1
+                        ? '1px solid rgba(195, 195, 195, 1)'
+                        : 'none',
+                    backgroundColor: '#f5f5f5',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div>{item?.user?.name || 'N/A'}</div>
+                  <div>{documentTypeLabels[item?.identityDocuments?.[0]?.type] || 'Unknown'}</div>
+                  <div>{new Date(item?.identityDocuments?.[0]?.uploadedAt).toLocaleDateString()}</div>
+                  <div>
+                    <Typography
+                      sx={{
+                        color:
+                          item.identityDocuments?.[0]?.status === 'pending'
+                            ? 'orange'
+                            : item.identityDocuments?.[0]?.status === 'approved'
+                              ? 'green'
+                              : 'red',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {item.identityDocuments?.[0]?.status
+                        ? item.identityDocuments[0].status.charAt(0).toUpperCase() +
+                        item.identityDocuments[0].status.slice(1)
+                        : 'N/A'}
+                    </Typography>
+                  </div>
+                  <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    spacing={1}
+                    flexWrap="wrap"
+                    useFlexGap
+                    sx={{
+                      mt: { xs: 1, sm: 0 },
+                      '& button': {
+                        flex: { xs: '1 1 auto', sm: 'none' },
+                        minWidth: { xs: '100%', sm: '100%', md: 10, lg: 5 },
+                      },
+                    }}
+                  >
+                    {getActions(item).map((label, i) => (
+                      <StyledActionButton
+                        key={i}
+                        label={label}
+                        onClick={async () => {
+                          if (label === 'View') {
+                            const doc = item.identityDocuments.find((d: any) => d?.url);
+                            if (doc?.url) {
+                              setSelectedDocUrl(doc.url);
+                              setOpenPreview(true);
+                            }
+                          } else if (label === 'Approved') {
+                            if (item.user && item.user._id) {
+                              const result = await dispatch(approveIdentity(item.user._id));
+                              if (result.success) {
+                                toast.success('Identity approved successfully!');
+                                dispatch(getAllAdminVerifications());
+                              } else {
+                                toast.error(result.message || 'Approval failed.');
+                              }
+                            } else {
+                              console.error('User ID missing');
+                            }
+                          } else if (label === 'Reject') {
+                            if (item.user && item.user._id) {
+                              setSelectedUserId(item.user._id);
+                              setRejectReason('');
+                              setOpenRejectDialog(true);
+                            } else {
+                              console.error('User ID missing');
+                            }
+                          }
+                        }}
+                      />
+                    ))}
+                  </Stack>
+                </Box>
+              ))
+            ) : (
+              <Box
+                sx={{
+                  textAlign: 'center',
+                  py: 4,
+                  fontStyle: 'italic',
+                  fontWeight: 'bold',
+                  color: 'red',
+                  backgroundColor: '#f9f9f9',
+                }}
+              >
+                No KYC records found. KYC Verification required.
+              </Box>
+            )}
           </Box>
         </Box>
       </Box>

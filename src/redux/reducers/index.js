@@ -18,8 +18,10 @@ import { adminVerificationListReducer } from './verificationReducers'
 import { userReducer } from './userReducer';
 import editEventReducer from './editEventReducer'
 import homeAndGlobalReducer from './homeAndGlobal.reducer'
+import {notificationReducer} from './notification.reducer';
 
 const rootReducer = combineReducers({
+    notification: notificationReducer,
     homeAndGlobal: homeAndGlobalReducer,
     editEvent: editEventReducer,
     adminVerificationList: adminVerificationListReducer,
@@ -38,7 +40,7 @@ const rootReducer = combineReducers({
     ticketReservationMang: ticketTypeReducer,
     transactions: transactionPaymentReducer,
     serviceRequest: eventServiceReqReducer,
-     user: userReducer,
+    user: userReducer,
 })
 
 export default rootReducer

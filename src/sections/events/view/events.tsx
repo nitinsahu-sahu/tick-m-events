@@ -1,6 +1,6 @@
 import { Grid, Box, Fade, Typography, CircularProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { useEffect, useState,useMemo } from 'react';
 
 import { AppDispatch, RootState } from 'src/redux/store';
 import { PopularEvent } from 'src/sections/home-and-recommendations/PopularEvent';
@@ -13,23 +13,28 @@ export function EventsView() {
   const [loading, setLoading] = useState(true);
   const [showEvents, setShowEvents] = useState(false);
 
+  const approvedEvents = useMemo(() => 
+   fullData?.filter((event: any) => event.status === 'approved') || []
+  , [fullData]);
+
+
   useEffect(() => {
     dispatch(eventFetch());
   }, [dispatch]);
 
   useEffect(() => {
-    if (fullData && fullData.length > 0) {
+    if (approvedEvents && approvedEvents.length > 0) {
       const timer = setTimeout(() => {
         setLoading(false);
         setShowEvents(true);
-      }, 2000);
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
 
     setLoading(false);
     return () => { }; // Explicit empty cleanup
-  }, [fullData]);
+  }, [approvedEvents]);
 
   return (
     <Box
@@ -71,7 +76,7 @@ export function EventsView() {
         }}>
           <CircularProgress size={60} />
         </Box>
-      ) : fullData.length === 0 ? (
+      ) : approvedEvents.length === 0 ? (
         // No events found state
         <Box sx={{
           textAlign: 'center',
@@ -99,7 +104,7 @@ export function EventsView() {
             </Box>
           ) : (
             <Grid container spacing={4}>
-              {fullData.map((event: any, index: number) => (
+              {approvedEvents.map((event: any, index: number) => (
                 <Fade in={showEvents} timeout={500 + index * 200} key={event.id || index}>
                   <Grid item xs={12} sm={6} md={4}>
                     <PopularEvent event={event} />

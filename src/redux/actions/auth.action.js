@@ -1,6 +1,6 @@
 import { authConstants } from "./constants";
 import axios from "../helper/axios";
-
+import { saveUserFcmToken } from './notification.actions';
 // Checking SINGUP login or not
 export const updateProAvatar = (data) => async (dispatch) => {
     dispatch({ type: authConstants.UPDATE_AVATAR_REQUEST });
@@ -130,7 +130,10 @@ export const login = (data) => async (dispatch) => {
             type: authConstants.LOGIN_SUCCESS,
             payload: { token, user, message },
         });
-
+        if (user?._id && user?.email) {
+            console.log("✅ Dispatching saveUserFcmToken", user._id, user.email);
+            dispatch(saveUserFcmToken(user._id, user.email));
+        }
         // ✅ Explicitly return the response data
         return {
             type: authConstants.LOGIN_SUCCESS,

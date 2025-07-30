@@ -5,7 +5,7 @@ import { EventBreadCrum } from 'src/sections/entry-validation/event-status';
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
 
-import { promotionEvents, promotionGet } from 'src/redux/actions';
+import { promotionGet, promotionEvents } from 'src/redux/actions';
 import { AppDispatch, RootState } from 'src/redux/store';
 
 import { PromotionsAndOffers } from '../promotion-&-offer';
@@ -24,8 +24,7 @@ export function MarketingEngagenmentView() {
 
   useEffect(() => {
     dispatch(promotionGet());
-    dispatch(promotionEvents());
-    
+     dispatch(promotionEvents());
   }, [dispatch]);
 
   const handleEventSelect = (event: Event | null) => {
@@ -34,16 +33,15 @@ export function MarketingEngagenmentView() {
 
   return (
     <DashboardContent>
-      <EventBreadCrum events={eventsWithOrdersAndParticiapnt} onEventSelect={handleEventSelect} />
-
       <PageTitleSection title="Promotions & Special Offers" />
+      <EventBreadCrum events={eventsWithOrdersAndParticiapnt} onEventSelect={handleEventSelect} />
 
       <ActivePromotion selEvent={selectedEvent} />
       <PromotionsAndOffers selEvent={selectedEvent} />
 
-      <NotificationAndReminder />
+      <NotificationAndReminder selEvent={selectedEvent} />
       <SocialMediaSharing selEvent={selectedEvent} />
-      <MarketingPerformance />
+      {/* <MarketingPerformance /> */}
     </DashboardContent>
   );
 }

@@ -2,6 +2,7 @@ import { AppBar, Toolbar, IconButton, Drawer, List, ListItem, ListItemButton, Li
 
 import MenuIcon from '@mui/icons-material/Menu';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ShareIcon from '@mui/icons-material/Share'; // Import the Share icon
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
@@ -12,9 +13,9 @@ import ReactHtmlParser from 'react-html-parser';
 // import { NavHomeTwo } from "../nav-two";
 import { Breadcrumb } from "src/components/breadcrumb/breadcrumb";
 import { AppDispatch, RootState } from "src/redux/store";
-import { eventByIdFetch } from "src/redux/actions/event.action";
+import { eventByIdFetch, eventAddToWishlist } from "src/redux/actions/event.action";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
-
+import { toast } from 'react-toastify';
 import { BannerGallery } from "../banner-gallery";
 import { TrackingSystem } from "../tracking-system";
 import { ContactAndSharing } from "../contact-and-sharing";
@@ -23,7 +24,6 @@ import { RateAndReview } from "../rate-and-review";
 import { CompanyMarquee } from "../company-marquee";
 import { FriendWhoBooked } from "../friend-who-booked";
 import { LiveChat } from "../live-chat";
-
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
     display: "flex",
@@ -159,9 +159,11 @@ export function NavHomeOne() {
 export function FrontHome() {
     const dispatch = useDispatch<AppDispatch>();
     const { eventId } = useParams();
-    const { _id, eventName, date, time,portraitImage, category, eventType, coverImage, location, formate, description,
-        organizer, customization, tickets, visibility, averageRating,reviewCount,review
+    const { _id, eventName, date, time, portraitImage, category, eventType, coverImage, location, formate, description,
+        organizer, customization, tickets, visibility, averageRating, reviewCount, review
     } = useSelector((state: RootState) => state?.event?.eventWithDetails);
+    const wishlist = useSelector((state: RootState) => state.event.wishlist);
+    const isWishlisted = wishlist?.some((item: any) => item?.eventId?._id === _id);
     useEffect(() => {
         const fetchEvent = async () => {
             try {
@@ -173,6 +175,32 @@ export function FrontHome() {
 
         fetchEvent(); // Call the async function inside useEffect
     }, [dispatch, eventId]); // Add dependencies
+   
+    const handleAddToWishlist = async () => {
+        try {
+            const result = await dispatch(eventAddToWishlist({
+                selectedViewEvent: {
+                    _id,
+                    eventName,
+                    date,
+                    time,
+                    coverImage,
+                    location,
+                    formate,
+                    customization,
+                    averageRating
+                }
+            }));
+
+            if (result?.status === 201) {
+                // toast.success(result.message);
+            } else {
+                toast.error(result.message);
+            }
+        } catch (error) {
+            toast.error("Server maintenance");
+        }
+    };
 
     return (
         <>
@@ -212,19 +240,19 @@ export function FrontHome() {
                         >
                             Share
                         </Button>
-
                         <Button
                             variant="outlined"
+                            onClick={handleAddToWishlist}
                             sx={{
                                 color: "white",
                                 borderColor: "white",
                                 borderRadius: 8,
                                 "&:hover": {
-                                    borderColor: "white", // Ensures border stays white on hover
-                                    backgroundColor: "rgba(255, 255, 255, 0.1)" // Optional: subtle hover effect
+                                    borderColor: "white",
+                                    backgroundColor: "rgba(255, 255, 255, 0.1)"
                                 }
                             }}
-                            startIcon={<FavoriteIcon />} // Add icon to the left of text
+                            startIcon={isWishlisted ? <FavoriteIcon sx={{ color: "white" }} /> : <FavoriteBorderIcon sx={{ color: "white" }} />}
                         >
                             Wishlist
                         </Button>
@@ -245,10 +273,10 @@ export function FrontHome() {
                 <ContactAndSharing organizer={organizer} />
 
                 {/* Count Down System */}
-                <CountDownCounter date={date} time={time}/>
+                <CountDownCounter date={date} time={time} />
 
                 {/* Rate and Review */}
-                <RateAndReview reviews={review} reviewCount={reviewCount} rating={averageRating}/>
+                <RateAndReview reviews={review} reviewCount={reviewCount} rating={averageRating} />
 
                 {/* Rate and Review */}
                 <CompanyMarquee />

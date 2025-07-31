@@ -1,13 +1,13 @@
 import { Box, Button, Card, CardContent, Grid, Typography, Avatar } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { formatTimeTo12Hour } from 'src/hooks/formate-time';
-import { AppDispatch } from 'src/redux/store';
+import { AppDispatch, RootState } from 'src/redux/store';
 import { eventAddToWishlist } from 'src/redux/actions/event.action';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface ApiResult {
   status: number;
@@ -17,7 +17,8 @@ interface ApiResult {
 
 export function PopularEvent({ event, handleEventDetails, flag }: any) {
   const dispatch = useDispatch<AppDispatch>();
-
+  const { authenticate } = useSelector((state: RootState) => state?.auth)
+  const navigate = useNavigate();
   const handleViewEvent = (selectedViewEvent: any) => {
     handleEventDetails(selectedViewEvent)
   };
@@ -32,6 +33,22 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
       }
     } catch (error) {
       toast.error("Server maintenence");
+    }
+  };
+
+  const handleBookNow = () => {
+    const redirectUrl = `/ticket-purchase-process?eventId=${event._id}`
+
+    if (!authenticate) {
+      // Store ticket data in session storage before redirecting to login
+      sessionStorage.setItem('pendingPurchase', JSON.stringify({
+        eventId: event._id,
+        eventName: event.eventName,
+        redirectTo: redirectUrl
+      }));
+      navigate('/sign-in');
+    } else {
+      window.open(redirectUrl, '_blank');
     }
   };
 
@@ -146,18 +163,17 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
               ).map((text) => (
                 <Grid item xs={4} key={text}>
                   {text === "Book Now" ? (
-                    <Link to="/ticket-purchase-process" style={{ textDecoration: 'none', width: '100%' }}>
-                      <Button
-                        variant="contained"
-                        fullWidth
-                        sx={{
-                          fontSize: { xs: '12px', sm: '14px', md: '14px' },
-                          fontWeight: 500,
-                        }}
-                      >
-                        {text}
-                      </Button>
-                    </Link>
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      onClick={handleBookNow}
+                      sx={{
+                        fontSize: { xs: '12px', sm: '14px', md: '14px' },
+                        fontWeight: 500,
+                      }}
+                    >
+                      {text}
+                    </Button>
                   ) : (
                     <Button
                       variant="contained"

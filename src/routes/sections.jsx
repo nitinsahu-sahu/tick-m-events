@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Box from '@mui/material/Box';
@@ -64,7 +64,7 @@ export const ContactPage = lazy(() => import('src/pages/contact'));
 
 // ----------------------------------------------------------------------
 
-const renderFallback = (
+export const renderFallback = (
   <Box display="flex" alignItems="center" justifyContent="center" flex="1 1 auto">
     <LinearProgress
       sx={{
@@ -79,17 +79,28 @@ const renderFallback = (
 
 export function Router() {
   const dispatch = useDispatch()
-  const auth = useSelector((state) => state.auth);
+  const auth = useSelector((state) => state?.auth);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
   useEffect(() => {
-    if (!auth?.authenticate) {
-      dispatch(isUserLoggedIn());
-    }
-  }, [dispatch, auth?.authenticate]); // ✅ Remove `auth` from dependencies
+    dispatch(isUserLoggedIn()).finally(() => {
+      setIsCheckingAuth(false);
+    });
+  }, [dispatch]);
+
+  // if (isCheckingAuth) {
+  //   return renderFallback;
+  // }
+  // useEffect(() => {
+  //   if (!auth?.authenticate) {
+  //     dispatch(isUserLoggedIn());
+  //   }
+  // }, [dispatch, auth?.authenticate]); // ✅ Remove `auth` from dependencies
 
   // Get current user role from auth state
   const currentRole = auth?.user?.role || 'participant'
 
-  return useRoutes([
+  const routes= useRoutes([
     {
       element: (
         <Protected>
@@ -286,4 +297,9 @@ export function Router() {
       element: <Navigate to="/404" replace />,
     },
   ]);
+  if (isCheckingAuth) {
+    return renderFallback;
+  }
+
+  return routes;
 }

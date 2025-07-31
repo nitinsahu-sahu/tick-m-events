@@ -62,7 +62,7 @@ export const ContactPage = lazy(() => import('src/pages/contact'));
 
 // ----------------------------------------------------------------------
 
-export const renderFallback = (
+const renderFallback = (
   <Box display="flex" alignItems="center" justifyContent="center" flex="1 1 auto">
     <LinearProgress
       sx={{

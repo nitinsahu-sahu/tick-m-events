@@ -12,6 +12,7 @@ import { logout } from 'src/redux/actions';
 import { NotificationsPopover } from './notifications-popover';
 import { MessagePopover } from './message-popover';
 import { GiftPopover } from './gift-popover';
+import { NotificattionPopup } from './notification-popup';
 
 export function UserPopover() {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -73,7 +74,7 @@ export function UserPopover() {
                             color="gray"
                             fontFamily="Poppins, sans-serif"
                         >
-                            {role} |
+                            {role} |&nbsp;
                             <span
                                 role="button"
                                 tabIndex={0}
@@ -158,7 +159,11 @@ export function UserPopover() {
                                     } */}
                                 </>
                             }
-
+                            {
+                                role === 'participant' && (
+                                    <NotificattionPopup data={_messages} />
+                                )
+                            }
                             {/* <LanguagePopover data={_langs}/> */}
                         </Box>
                     }
@@ -166,11 +171,11 @@ export function UserPopover() {
                     {
                         !hiddenDashboard.some(path => pathname.includes(path)) &&
                         !hiddenTranPaymet.some(path => pathname.includes(path)) &&
-                       role !== 'participant' &&
+                        role !== 'participant' &&
                         !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
                         !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
                         !hiddenTicketManagement.some(path => pathname.includes(path)) &&
-                        !hiddenPaths.some(path => pathname.includes(path)) && 
+                        !hiddenPaths.some(path => pathname.includes(path)) &&
                         !hiddenSearchSelect.some(path => pathname.includes(path)) &&
                         !hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
                         !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
@@ -182,7 +187,7 @@ export function UserPopover() {
                         !hiddenServiceCal.some(path => pathname.includes(path)) &&
                         role !== 'provider' &&
                         role !== 'admin' &&
-                        
+
                         !hiddenCustomPhotoVideo.some(path => pathname.includes(path)) &&
                         !hiddenReserContracts.some(path => pathname.includes(path)) &&
                         <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>

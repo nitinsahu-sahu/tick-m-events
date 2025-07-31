@@ -25,6 +25,7 @@ import { GiftPopover } from '../components/gift-popover';
 import { UserPopover } from '../components/user-popover';
 import { WishlistPopover } from '../components/wishlist-popover';
 import { SearchEvent } from './search-box';
+import { NotificattionPopup } from '../components/notification-popup';
 
 
 // ----------------------------------------------------------------------
@@ -130,7 +131,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   hiddenTransectionPayment.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Transaction & Payment Management" />
                 }
 
-                
+
                 {
                   hiddenMessageClientRel.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Messaging & Client Relationship" />
                 }
@@ -210,7 +211,11 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
 
                           </>
                         }
-
+                        {
+                          role === 'participant' && (
+                            <NotificattionPopup data={_messages} />
+                          )
+                        }
                         {/* <LanguagePopover data={_langs}/> */}
                       </Box>
                     }

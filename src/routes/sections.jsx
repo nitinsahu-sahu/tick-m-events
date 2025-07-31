@@ -1,6 +1,6 @@
-import { lazy, Suspense, useEffect } from 'react';
-import { Outlet, Navigate, useRoutes } from 'react-router-dom';
+import { lazy, Suspense, useState,useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 
@@ -11,7 +11,6 @@ import { isUserLoggedIn } from 'src/redux/actions';
 import Protected from 'src/redux/helper/HOC';
 import { RoleProtectedRoute } from 'src/redux/helper/RoleWise';
 import { MultipleDashboard } from 'src/hooks/common-dashbord';
-import SignInPage from '../pages/sign-in'
 
 // ----------------------------Organizer Routes------------------------------------------
 export const MarketingEngagenmentPage = lazy(() => import('src/pages/marketing-engagenment'));
@@ -22,14 +21,13 @@ export const StatisticsAndReportsPage = lazy(() => import('src/pages/statistics-
 export const VisibilityAndAccessSettingsPage = lazy(() => import('src/pages/visibility-and-access-settings'));
 export const SearchAndSelectServiceProvidersPage = lazy(() => import('src/pages/search-&-select-service-providers'));
 
-// ----------------------------Admin Routes------------------------------------------
 // ----------------------------Participant Routes------------------------------------------
 export const EventSearchAndDetailsPage = lazy(() => import('src/pages/event-search-and-details'));
 
 // ----------------------------Service Provider Routes------------------------------------------
 
 export const HomePage = lazy(() => import('src/pages/home'));
-// export const SignInPage = import('src/pages/sign-in');
+export const SignInPage = import('src/pages/sign-in');
 export const FrontHomePage = lazy(() => import('src/pages/front-home'));
 export const EventsPage = lazy(() => import('src/pages/events'));
 export const CategoriesPage = lazy(() => import('src/pages/category/category'));
@@ -79,17 +77,28 @@ const renderFallback = (
 
 export function Router() {
   const dispatch = useDispatch()
-  const auth = useSelector((state) => state.auth);
+  const auth = useSelector((state) => state?.auth);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
   useEffect(() => {
-    if (!auth?.authenticate) {
-      dispatch(isUserLoggedIn());
-    }
-  }, [dispatch, auth?.authenticate]); // ✅ Remove `auth` from dependencies
+    dispatch(isUserLoggedIn()).finally(() => {
+      setIsCheckingAuth(false);
+    });
+  }, [dispatch]);
+
+  // if (isCheckingAuth) {
+  //   return renderFallback;
+  // }
+  // useEffect(() => {
+  //   if (!auth?.authenticate) {
+  //     dispatch(isUserLoggedIn());
+  //   }
+  // }, [dispatch, auth?.authenticate]); // ✅ Remove `auth` from dependencies
 
   // Get current user role from auth state
   const currentRole = auth?.user?.role || 'participant'
 
-  return useRoutes([
+  const routes= useRoutes([
     {
       element: (
         <Protected>
@@ -286,4 +295,9 @@ export function Router() {
       element: <Navigate to="/404" replace />,
     },
   ]);
+  if (isCheckingAuth) {
+    return renderFallback;
+  }
+
+  return routes;
 }

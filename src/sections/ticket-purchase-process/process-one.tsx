@@ -1,6 +1,7 @@
 import { Box, Button, Grid, Select, Paper, TextField, Typography, MenuItem, SelectChangeEvent } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState, useCallback, useMemo } from "react";
+import { useSearchParams } from 'react-router-dom';
 
 import { eventByIdFetch, eventFetch } from "src/redux/actions/event.action";
 import { ParticipantTable } from "src/components/tables/party-participant-table";
@@ -21,7 +22,6 @@ interface Event {
 export function ProcessOne({ onTicketsSelected, onNext }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const { basicDetails, eventWithDetails } = useSelector((state: RootState) => state?.event);
-
     // State management
     const [events, setEvents] = useState<Event[]>(basicDetails || []);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -30,7 +30,8 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
     const [promoInput, setPromoInput] = useState('');
     const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
     const [promoError, setPromoError] = useState('');
-
+    const [searchParams] = useSearchParams();
+    const eventIdFromUrl = searchParams.get('eventId');
     // Memoized event data
     const eventId = useMemo(() => eventWithDetails?._id || '', [eventWithDetails]);
     const tickets = useMemo(() => eventWithDetails?.tickets || [], [eventWithDetails]);
@@ -66,7 +67,10 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         }
     }, [dispatch]);
 
+    
+
     // Initial data loading
+
     useEffect(() => {
         if (isInitialLoad && basicDetails.length === 0) {
             fetchEvents();
@@ -89,6 +93,16 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         }
     }, [selectedEvent?._id, fetchEventById]);
 
+    // Add this useEffect to select the event from URL
+    useEffect(() => {
+        if (eventIdFromUrl && events.length > 0) {
+            const foundEvent = events.find(e => e._id === eventIdFromUrl);
+            
+            if (foundEvent) {
+                setSelectedEvent(foundEvent);
+            }
+        }
+    }, [eventIdFromUrl, events]);
     // Event change handler
     const handleEventChange = useCallback((event: SelectChangeEvent<string>) => {
         const event_id = event.target.value;
@@ -104,7 +118,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                 const quantity = ticketQuantities[item._id] || 0;
 
                 const price = item.price === "Free" ? 0 : parseFloat(item.price.replace(/[^0-9.]/g, ''))
-          
+
                 subtotal += quantity * price;
             });
         });
@@ -236,7 +250,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                             onChange={handleEventChange}
                             sx={{
                                 mt: 2,
-                                textTransform:"capitalize",
+                                textTransform: "capitalize",
                                 width: "100%",
                                 '& .MuiOutlinedInput-root': {
                                     '& fieldset': { borderColor: 'black' },
@@ -253,7 +267,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                                 </MenuItem>
                             ) : (
                                 events.map((event) => (
-                                    <MenuItem key={event._id} value={event._id}>
+                                    <MenuItem key={event._id} value={event._id} sx={{ textTransform: "capitalize" }}>
                                         {event.eventName}
                                     </MenuItem>
                                 ))

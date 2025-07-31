@@ -27,3 +27,4 @@ export const availablePromoCodes: PromoCode[] = [
     { code: 'FIXED5000', type: 'simple', value: 5000, minPurchase: 1000 }, // 5000 XAF off
     { code: 'GROUP3FOR2', type: 'group', groupBuy: 3, groupGet: 1 }, // buy 3 get 1 free
 ];
+

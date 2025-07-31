@@ -1,5 +1,5 @@
-import { AppBar, Toolbar, Box, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { AppBar,Box, Button, Toolbar } from "@mui/material";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
     display: "flex",
@@ -13,6 +13,7 @@ const NavItems = styled(Box)({
     display: "flex",
     gap: "24px",
 });
+
 export function NavHomeOne() {
     return (
         <AppBar position="static" elevation={0} sx={{ bgcolor: "background.paper" }}>

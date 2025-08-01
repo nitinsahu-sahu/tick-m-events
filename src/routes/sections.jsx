@@ -28,7 +28,7 @@ export const EventSearchAndDetailsPage = lazy(() => import('src/pages/event-sear
 
 export const HomePage = lazy(() => import('src/pages/home'));
 export const SocialShare = lazy(() => import('src/pages/social-share'));
-export const SignInPage = import('src/pages/sign-in');
+export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const FrontHomePage = lazy(() => import('src/pages/front-home'));
 export const EventsPage = lazy(() => import('src/pages/events'));
 export const CategoriesPage = lazy(() => import('src/pages/category/category'));

@@ -5,9 +5,11 @@ import { InputAdornment, Typography, IconButton, TextField, Button, Divider, Gri
 import { toast } from 'react-toastify';
 import LoadingButton from '@mui/lab/LoadingButton';
 import PhoneInput from 'react-phone-number-input'
+
 import { Iconify } from 'src/components/iconify';
 import { login, signup } from 'src/redux/actions';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+
 import 'react-phone-number-input/style.css'
 
 // ----------------------------------------------------------------------
@@ -226,26 +228,6 @@ export function SignInView() {
       />
 
       {/* Phone Number */}
-      {/* <TextField
-        fullWidth
-        required
-        name="number"
-        type='number'
-        label="Number"
-        placeholder='Enter your Phone number'
-        value={formRegisterData.number}
-        onChange={handleRegisterChange}
-        InputLabelProps={{ shrink: true }}
-        sx={{ mt: 2 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              +91
-            </InputAdornment>
-          ),
-        }}
-      /> */}
-
       <Box sx={{
         width: '100%',
         mt: 2,

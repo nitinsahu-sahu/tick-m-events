@@ -9,9 +9,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useTheme } from '@mui/material/styles';
-import { AppDispatch, RootState } from "src/redux/store";
 import { toast } from 'react-toastify';
+
+import { AppDispatch, RootState } from "src/redux/store";
 import ConfirmActionModal from 'src/components/modal/confirm-action-modal';
+
 import { getAllUsers, validateUser, blockUser } from '../../redux/actions/userActions';
 import UserDetailsModal from '../../components/modal/user-details-modal';
 

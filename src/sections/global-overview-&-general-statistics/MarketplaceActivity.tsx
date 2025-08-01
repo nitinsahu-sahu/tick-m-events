@@ -60,7 +60,7 @@ export function MarketplaceActivity() {
                   <TableCell align="center" sx={{ textTransform: "capitalize", fontSize: { xs: "12px", sm: "13px" }, fontWeight: "700" }}>{__.name}</TableCell>
                   <TableCell align="center" sx={{ textTransform: "capitalize", fontSize: { xs: "12px", sm: "13px" }, fontWeight: "normal" }}>{__.address || 'N/A'}</TableCell>
                   <TableCell align="center" sx={{ textTransform: "capitalize", fontSize: { xs: "12px", sm: "13px" }, fontWeight: "normal" }}>{__.serviceCategory || 'N/A'}</TableCell>
-                  <TableCell align="center" sx={{ textTransform: "capitalize", fontSize: { xs: "12px", sm: "13px" }, fontWeight: "normal" }}>{__.name}</TableCell>
+                  <TableCell align="center" sx={{ textTransform: "capitalize", fontSize: { xs: "12px", sm: "13px" }, fontWeight: "normal" }}>{__.contractsCount || 0}</TableCell>
                   <TableCell align="center"
                     sx={{
                       textTransform: "capitalize",

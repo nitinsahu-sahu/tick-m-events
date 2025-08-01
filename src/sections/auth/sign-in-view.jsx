@@ -19,9 +19,6 @@ export function SignInView() {
   const [showSignup, setShowSignup] = useState(false);
   const [transition, setTransition] = useState(false);
   const [avatar, setAvatar] = useState(null); // Correct initialization
-  console.log('====================================');
-  console.log(avatar);
-  console.log('====================================');
   const [phoneNumber, setPhoneNumber] = useState('');
   const getWidth = (key) => (active === key ? "50%" : "10%");
   const auth = useSelector(state => state.auth);
@@ -112,9 +109,15 @@ export function SignInView() {
       if (pendingPurchase) {
         const purchaseData = JSON.parse(pendingPurchase);
         navigate(purchaseData.redirectTo);
-      } else {
-        navigate("/");
       }
+      const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+      if (redirectAfterLogin) {
+        const redirectData = JSON.parse(redirectAfterLogin);
+        sessionStorage.removeItem('redirectAfterLogin');
+        navigate(redirectData.redirectTo || '/');
+        return;
+      }
+      navigate('/')
     } else {
       toast.error(result?.message);
     }
@@ -242,10 +245,10 @@ export function SignInView() {
           ),
         }}
       /> */}
-      
+
       <Box sx={{
-        width:'100%',
-        mt:2,
+        width: '100%',
+        mt: 2,
         '& .PhoneInput': {
           width: '100%',
           '& input': {

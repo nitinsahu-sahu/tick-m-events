@@ -1,35 +1,17 @@
-import { Box, Paper, Typography, Button, Stack } from '@mui/material';
-
-const MarketData = [
-  {
-    Provider: 'DJ Max',
-    Location: 'Douala',
-    ServicesOffered: 'DJ & Animation',
-    ContractsSigned: '15',
-    status: 'Active',
-
-  },
-  {
-    Provider: 'DJ Max',
-    Location: 'Douala',
-    ServicesOffered: 'DJ & Animation',
-    ContractsSigned: '15',
-    status: 'Pending',
-
-  },
-  {
-    Provider: 'DJ Max',
-    Location: 'Douala',
-    ServicesOffered: 'DJ & Animation',
-    ContractsSigned: '15',
-    status: 'In Progress',
-
-  },
-
-  // Add more rows as needed
-];
+import { TableHead, TableBody, Table, TableCell, TableRow, Paper, Typography, Button, Stack, TableContainer } from '@mui/material';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { fetchMarketPlaceactivity } from 'src/redux/actions/global-overview-general-statistice.action';
+import { AppDispatch, RootState } from 'src/redux/store';
 
 export function MarketplaceActivity() {
+  const dispatch = useDispatch<AppDispatch>();
+  const { providers } = useSelector((state: RootState) => state?.gogs);
+  useEffect(() => {
+    dispatch(fetchMarketPlaceactivity())
+  }, [dispatch]);
+
   return (
     <Paper
       sx={{
@@ -38,100 +20,70 @@ export function MarketplaceActivity() {
         border: '1px solid #E0E0E0',
         boxShadow: '0 0 10px rgba(0, 0, 0, 0.4)',
         backgroundColor: '#fff',
-        
+
       }}
     >
-      <Typography variant="h6" fontWeight="bold" mb={3}>
-      Marketplace Activity (Providers & Transactions)
-      </Typography>
+      <HeadingCommon variant="h6" weight={600} mb={3} title="Marketplace Activity (Providers & Transactions)" />
 
-      <Box sx={{ overflowX: 'auto', borderRadius: 2 }}>
-        <Box sx={{ minWidth: 700 }}>
-          {/* Table Header */}
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-              backgroundColor: '#1F8FCD',
-              color: 'white',
-              py: 1.5,
-              px: 2,
-              fontWeight: 600,
-              textAlign: 'center',
-            }}
-          >
-            <div>Provider</div>
-            <div>Location</div>
-            <div>Services Offered</div>
-            <data>Contracts Signed</data>
-            <div>Status</div>
-          </Box>
-
-          {/* Scrollable Table Body */}
-          <Box
-            sx={{
-              maxHeight: 300,
-              overflowY: 'auto',
-              borderTop: '1px solid #ddd',
-              '&::-webkit-scrollbar': {
-                width: '2px',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                backgroundColor: '#0B2E4C',
-                borderRadius: '10px',
-              },
-              '&::-webkit-scrollbar-track': {
-                backgroundColor: '#e0e0e0',
-                borderRadius: '10px',
-              },
-            }}
-          >
-            {MarketData.map((item, idx) => (
-              <Box
-                key={idx}
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  py: 1.5,
-                  px: 2,
-                  borderBottom:
-                    idx !== MarketData.length - 1 ? '1px solid rgba(195, 195, 195, 1)' : 'none',
-                  backgroundColor: '#f5f5f5',
-                }}
-              >
-                <div>{item.Provider}</div>
-                <div>{item.Location}</div>
-                <div>{item.ServicesOffered}</div>
-                <div>{item.ContractsSigned}</div>
-                <div>
-                  <Typography
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow sx={{ bgcolor: "#E1E1E1" }}>
+              {["Provider", "Location", "Service Offered", "Contract Signed", "Status"].map((header: string) => (
+                <TableCell
+                  key={header}
+                  align="center"
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: { xs: "0.8rem", sm: "1rem" },
+                    color: "white",
+                    backgroundColor: "#1F8FCD",
+                  }}
+                >
+                  {header}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {providers?.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                  <Typography variant="body1" color="textSecondary">
+                    No Data...
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              providers?.map((__: any) => (
+                <TableRow key={__._id} sx={{ backgroundColor: "#f5f5f5", borderBottom: "2px solid #E1E1E1" }}>
+                  <TableCell align="center" sx={{ textTransform: "capitalize", fontSize: { xs: "12px", sm: "13px" }, fontWeight: "700" }}>{__.name}</TableCell>
+                  <TableCell align="center" sx={{ textTransform: "capitalize", fontSize: { xs: "12px", sm: "13px" }, fontWeight: "normal" }}>{__.address || 'N/A'}</TableCell>
+                  <TableCell align="center" sx={{ textTransform: "capitalize", fontSize: { xs: "12px", sm: "13px" }, fontWeight: "normal" }}>{__.serviceCategory || 'N/A'}</TableCell>
+                  <TableCell align="center" sx={{ textTransform: "capitalize", fontSize: { xs: "12px", sm: "13px" }, fontWeight: "normal" }}>{__.name}</TableCell>
+                  <TableCell align="center"
                     sx={{
+                      textTransform: "capitalize",
                       color:
-                        item.status === 'Pending'
+                        __.status === 'pending'
                           ? 'red'
-                          : item.status === 'Active'
+                          : __.status === 'active'
                             ? 'green'
                             : 'orange',
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    {item.status}
-                  </Typography>
-                </div>
-              </Box>
-            ))}
-          </Box>
-        </Box>
+                      fontSize: { xs: "12px", sm: "13px" }, fontWeight: 600
+                    }}>{__.status}</TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
 
-        
-      </Box>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mt={4}>
-              <ResponsiveActionButton>Validate a Provider</ResponsiveActionButton>
-              <ResponsiveActionButton>Analyze an Organizer</ResponsiveActionButton>
-              <ResponsiveActionButton>View Provider Transactions</ResponsiveActionButton>
-            </Stack>
+        </Table>
+      </TableContainer>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mt={4}>
+        <ResponsiveActionButton>Validate a Provider</ResponsiveActionButton>
+        <ResponsiveActionButton>Analyze an Organizer</ResponsiveActionButton>
+        <ResponsiveActionButton>View Provider Transactions</ResponsiveActionButton>
+      </Stack>
     </Paper>
   );
 }

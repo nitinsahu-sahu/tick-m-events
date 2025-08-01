@@ -17,17 +17,7 @@ const GlobalStatistics = () => (
       </Typography>
 
       {/* Stat Cards */}
-      <Box
-        sx={{
-          p: 3,
-          borderRadius: 2.5,
-          mb:3,
-          border: '1px solid #E0E0E0',
-          boxShadow: '0 0 10px rgba(0, 0, 0, 0.4)',
-          backgroundColor: '#fff',
-        }}
-      >
-        <Grid container spacing={2} mt={0.5} mb={2}  justifyContent="center">
+      <Grid container spacing={2} mt={0.5} mb={2}  justifyContent="center">
           {[
             { label: 'Users', value: '12,345' },
             { label: 'Events', value: '567' },
@@ -52,7 +42,6 @@ const GlobalStatistics = () => (
             </Grid>
           ))}
         </Grid>
-      </Box>
       {/* Action Buttons */}
 
       <Grid container spacing={2} justifyContent="center">

@@ -45,17 +45,7 @@ const PlatformStatistics = () => (
       Global Platform Statistics
     </Typography>
 
-    <Box
-      sx={{
-        p: 3,
-        borderRadius: 2.5,
-        mb: 3,
-        border: '1px solid #E0E0E0',
-        boxShadow: '0 0 10px rgba(0, 0, 0, 0.4)',
-        backgroundColor: '#fff',
-      }}
-    >
-      <Grid container spacing={2} mb={3}>
+    <Grid container spacing={2} mb={3}>
         {stats.slice(0, 3).map((stat, i) => (
           <Grid item xs={12} sm={6} md={4} key={i}>
             <StatBox label={stat.label} value={stat.value} />
@@ -73,7 +63,6 @@ const PlatformStatistics = () => (
       </Grid>
 
       {/* Action Buttons */}
-
       <Box
         display="flex"
         flexDirection={{ xs: 'column', sm: 'row' }} // column on xs, row on sm+
@@ -107,7 +96,6 @@ const PlatformStatistics = () => (
           Export Data
         </Button>
       </Box>
-    </Box>
   </Box>
 );
 

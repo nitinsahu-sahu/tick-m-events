@@ -32,6 +32,7 @@ export function TabButton({ providersList, tabValue, onChange, tabLabels }: any)
                       ml: 1,
                       color: tabValue === index ? 'white' : 'black'
                     }}
+                    fontSize={14}
                   >
                     ({providersList?.length || 0})
                   </Typography>

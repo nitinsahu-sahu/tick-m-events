@@ -53,16 +53,16 @@ export default function UserActivityCard() {
   }));
 
 
-useEffect(() => {
-  const loadWithDelay = async () => {
-    await dispatch(fetchAdminActivities({ page, limit }));
-    setTimeout(() => {
-      setLocalLoading(false); 
-    }, 1000); 
-  };
+  useEffect(() => {
+    const loadWithDelay = async () => {
+      await dispatch(fetchAdminActivities({ page, limit }));
+      setTimeout(() => {
+        setLocalLoading(false);
+      }, 1000);
+    };
 
-  loadWithDelay();
-}, [dispatch, page, limit]);
+    loadWithDelay();
+  }, [dispatch, page, limit]);
 
 
   const tableData = useMemo(() => activities.docs || activities, [activities]);
@@ -157,33 +157,33 @@ useEffect(() => {
     { day: 'Today', value: 4 },
   ];
 
-if (loading || localLoading)
-  return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="400px"
-      width="100%"
-    >
-      <CircularProgress />
-    </Box>
-  );
+  if (loading || localLoading)
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="400px"
+        width="100%"
+      >
+        <CircularProgress />
+      </Box>
+    );
 
-if (!activities || activities.length === 0)
-  return (
-    <Box
-      className="text-center text-gray-600"
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="300px"
-    >
-      <Typography variant="h6" className="text-gray-500">
-        No Activity History Found.
-      </Typography>
-    </Box>
-  );
+  if (!activities || activities.length === 0)
+    return (
+      <Box
+        className="text-center text-gray-600"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="300px"
+      >
+        <Typography variant="h6" className="text-gray-500">
+          No Activity History Found.
+        </Typography>
+      </Box>
+    );
 
 
   if (error) return <Typography color="error">Error: {error.message || error}</Typography>;
@@ -193,7 +193,7 @@ if (!activities || activities.length === 0)
       <Typography variant="h6" fontWeight="bold" mb={2}>User Activity History</Typography>
 
       {/* Data Grid Table */}
-      <Box sx={{ height: 600, width: '100%' }}>
+      <Box sx={{ height: 600, width: '100%', mb: 3 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
           <TextField
             placeholder="Search..."
@@ -245,7 +245,7 @@ if (!activities || activities.length === 0)
                     size="small"
                     sx={{
                       textTransform: "capitalize",
-                      color: selectedActions.includes(option.key) ? 'white' : '#2395d4', 
+                      color: selectedActions.includes(option.key) ? 'white' : '#2395d4',
                       borderColor: '#2395d4', // blue border
                       backgroundColor: selectedActions.includes(option.key) ? '#2395d4' : 'transparent',
                       '&:hover': {
@@ -343,8 +343,8 @@ if (!activities || activities.length === 0)
         )}
       </Box>
       {/* Chart + Actions */}
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+      <Grid container spacing={3} mt={6}>
+        <Grid item xs={12} md={12}>
           <Paper sx={{ p: 2, border: '1px solid #ddd', borderRadius: 3, height: '100%' }}>
             <Typography variant="subtitle1" fontWeight="bold" mb={2}>User Trends</Typography>
             <ResponsiveContainer width="100%" height={200}>
@@ -356,14 +356,50 @@ if (!activities || activities.length === 0)
             </ResponsiveContainer>
           </Paper>
         </Grid>
-
-        <Grid item xs={12} md={6} sx={{
-          display: 'flex', flexDirection: { xs: 'column', md: 'row' },
-          justifyContent: 'flex-end', alignItems: 'center', gap: 2,
-        }}>
-          <StyledActionButton>Download Activity Report</StyledActionButton>
-          <StyledActionButton>Analyze Suspicious Behavior</StyledActionButton>
-        </Grid>
+      </Grid>
+      <Grid item xs={12} md={12} sx={{
+        display: 'flex',
+        justifyContent: 'center',  // Center horizontally
+        alignItems: 'center',
+        gap: 2,
+        mt: 3
+      }}>
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: "blue",
+            borderRadius: 3,
+            textTransform: 'none',
+            fontSize: '13px',
+            height: 35,
+            color: '#fff',
+            width: '50%',  // 66% width
+            maxWidth: 400,  // Optional: set maximum width
+            '&:hover': {
+              backgroundColor: '#071E33',
+            },
+          }}
+        >
+          Download Activity Report
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: "blue",
+            borderRadius: 3,
+            fontSize: '13px',
+            height: 35,
+            px: 2,
+            color: '#fff',
+            width: '50%',  // 66% width
+            maxWidth: 400,  // Optional: set maximum width
+            '&:hover': {
+              backgroundColor: 'blue',
+            },
+          }}
+        >
+          Analyze Suspicious Behavior
+        </Button>
       </Grid>
     </Paper>
   );

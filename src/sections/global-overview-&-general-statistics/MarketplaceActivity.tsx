@@ -69,7 +69,7 @@ export function MarketplaceActivity() {
                           ? 'red'
                           : __.status === 'active'
                             ? 'green'
-                            : 'orange',
+                            : 'black',
                       fontSize: { xs: "12px", sm: "13px" }, fontWeight: 600
                     }}>{__.status}</TableCell>
                 </TableRow>
@@ -80,7 +80,7 @@ export function MarketplaceActivity() {
         </Table>
       </TableContainer>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mt={4}>
-        <ResponsiveActionButton>Validate a Provider</ResponsiveActionButton>
+        {/* <ResponsiveActionButton>Validate a Provider</ResponsiveActionButton> */}
         <ResponsiveActionButton>Analyze an Organizer</ResponsiveActionButton>
         <ResponsiveActionButton>View Provider Transactions</ResponsiveActionButton>
       </Stack>

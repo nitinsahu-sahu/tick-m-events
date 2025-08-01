@@ -14,6 +14,7 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TwitterIcon from '@mui/icons-material/Twitter'; // X
 import MusicNoteIcon from '@mui/icons-material/MusicNote'; // TikTok placeholder
 import { useEffect, useState } from 'react';
+import { Helmet } from "react-helmet";
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { createSocialMediaPost } from '../../redux/actions/socialMedia.actions';
@@ -62,42 +63,6 @@ export function SocialMediaSharing({ selEvent }: any) {
         }
     };
 
-    // const handlePost = async () => {
-    //     if (!eventImage || !selectedFile) {
-    //         alert("Please select an image");
-    //         return;
-    //     }
-
-    //     const formData = new FormData();
-    //     formData.append('eventId', selEvent?._id);
-    //     formData.append('createdBy', user?._id);
-    //     formData.append('platform', selectedPlatform.label);
-    //     formData.append('description', description);
-    //     formData.append('reservationLink', reservationLink);
-    //     formData.append('hashtag', hashtag);
-    //     formData.append('image', selectedFile);
-
-    //     const response = await dispatch(createSocialMediaPost(formData)) as any;
-    //     console.log("Post creation response: ", response);
-    //     const post = response?.post;
-
-    //     if (post && post.imageUrl) {
-    //         setSavedPostData({
-    //             description,
-    //             reservationLink,
-    //             hashtag,
-    //             eventImage,
-    //             eventId: selEvent?._id,
-    //             createdBy: user?._id,
-    //             platform: selectedPlatform.label,
-    //             imageUrl: post.imageUrl,
-    //         });
-    //         alert("Post saved successfully");
-    //     } else {
-    //         alert("Failed to save post");
-    //     }
-
-    // };
     const handlePost = async () => {
         if (!eventImage || !selectedFile) {
             alert("Please select an image");
@@ -119,7 +84,7 @@ export function SocialMediaSharing({ selEvent }: any) {
 
         if (post && post._id) {
             try {
-                const shareRes = await fetch(`https://tick-m-events-server.onrender.com/api/v1/promotion/social-share/${post._id}`, {
+                const shareRes = await fetch(`https://tick-m-events.vercel.app/post/${post._id}`, {
                     headers: { Accept: 'text/html' }
                 });
 
@@ -198,12 +163,9 @@ export function SocialMediaSharing({ selEvent }: any) {
                     alert("Missing event ID or post ID");
                     return;
                 }
-                const shareUrl = `https://tick-m-events-server.onrender.com/api/v1/social-share/${savedPostData._id}`;
+                const shareUrl = `https://tick-m-events.vercel.app/post/${savedPostData._id}`;
                 const encodedUrl = encodeURIComponent(shareUrl);
                 window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank');
-                // const fbShareUrl = `https://tick-m-events.vercel.app/our-event/${eventId}`;
-                // const encodedFbUrl = encodeURIComponent(fbShareUrl);
-                // window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedFbUrl}`, '_blank');
                 break;
             }
             case 'LinkedIn':
@@ -217,6 +179,8 @@ export function SocialMediaSharing({ selEvent }: any) {
 
 
     return (
+        <>
+        
         <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: '1px solid black' }}>
             <Typography variant="h6" fontWeight="bold" mb={2}>Social Media Sharing</Typography>
 
@@ -237,26 +201,6 @@ export function SocialMediaSharing({ selEvent }: any) {
                     </Button>
                 ))}
             </Box>
-
-            {/* Preview Card */}
-
-            {/* {eventImage && (
-                <Card sx={{ mb: 3, p: 2, borderRadius: '10px', backgroundColor: '#e0f7fa', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <CardContent sx={{ flex: 1 }}>
-                        <img src={eventImage} alt="Event" style={{ maxWidth: 100, borderRadius: 10, marginBottom: 8 }} />
-                        <Typography variant="subtitle1" fontWeight="bold">{description}</Typography>
-                        <Typography variant="body2" sx={{ mb: 1 }}>
-                            Reservation: <a href={reservationLink} target="_blank" rel="noreferrer">{reservationLink}</a>
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary">Hashtag: {hashtag}</Typography>
-                    </CardContent>
-
-                    <IconButton onClick={handleShare} sx={{ ml: 2 }}>
-                        {selectedPlatform.icon}
-                    </IconButton>
-
-                </Card>
-            )} */}
 
             {eventImage && (
                 <Card sx={{ mb: 3, p: 2, borderRadius: '10px', backgroundColor: '#e0f7fa', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -335,5 +279,6 @@ export function SocialMediaSharing({ selEvent }: any) {
                 Post to {selectedPlatform.label}
             </Button>
         </Box>
+        </>
     );
 }

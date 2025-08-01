@@ -7,7 +7,7 @@ import ShareIcon from '@mui/icons-material/Share'; // Import the Share icon
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 import ReactHtmlParser from 'react-html-parser';
 
 // import { NavHomeTwo } from "../nav-two";
@@ -157,7 +157,9 @@ export function NavHomeOne() {
 }
 
 export function FrontHome() {
+     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
+     const { authenticate } = useSelector((state: RootState) => state?.auth)
     const { eventId } = useParams();
     const { _id, eventName, date, time, portraitImage, category, eventType, coverImage, location, formate, description,
         organizer, customization, tickets, visibility, averageRating, reviewCount, review
@@ -175,8 +177,21 @@ export function FrontHome() {
 
         fetchEvent(); // Call the async function inside useEffect
     }, [dispatch, eventId]); // Add dependencies
-   
+
+
+
     const handleAddToWishlist = async () => {
+        const redirectUrl = `/our-event/${eventId}`
+        if (!authenticate) {
+            sessionStorage.setItem('redirectAfterLogin', JSON.stringify({
+                type: 'wishlist',
+                eventId: _id,
+                redirectTo: redirectUrl
+            }));
+            navigate("/sign-in", { state: { from: redirectUrl } });
+            return;
+        }
+
         try {
             const result = await dispatch(eventAddToWishlist({
                 selectedViewEvent: {
@@ -188,12 +203,12 @@ export function FrontHome() {
                     location,
                     formate,
                     customization,
-                    averageRating
-                }
+                    averageRating,
+                },
             }));
 
             if (result?.status === 201) {
-                // toast.success(result.message);
+                toast.success("Added to wishlist");
             } else {
                 toast.error(result.message);
             }

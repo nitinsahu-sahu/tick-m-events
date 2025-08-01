@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { TopNavButtons } from '../TopNavButtons';
 import GlobalStatistics from '../GlobalStatistics';

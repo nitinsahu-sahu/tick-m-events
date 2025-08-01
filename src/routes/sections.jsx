@@ -27,7 +27,8 @@ export const EventSearchAndDetailsPage = lazy(() => import('src/pages/event-sear
 // ----------------------------Service Provider Routes------------------------------------------
 
 export const HomePage = lazy(() => import('src/pages/home'));
-export const SignInPage = import('src/pages/sign-in');
+export const SocialShare = lazy(() => import('src/pages/social-share'));
+export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const FrontHomePage = lazy(() => import('src/pages/front-home'));
 export const EventsPage = lazy(() => import('src/pages/events'));
 export const CategoriesPage = lazy(() => import('src/pages/category/category'));
@@ -86,16 +87,6 @@ export function Router() {
     });
   }, [dispatch]);
 
-  // if (isCheckingAuth) {
-  //   return renderFallback;
-  // }
-  // useEffect(() => {
-  //   if (!auth?.authenticate) {
-  //     dispatch(isUserLoggedIn());
-  //   }
-  // }, [dispatch, auth?.authenticate]); // ✅ Remove `auth` from dependencies
-
-  // Get current user role from auth state
   const currentRole = auth?.user?.role || 'participant'
 
   const routes= useRoutes([
@@ -268,6 +259,13 @@ export function Router() {
         <FrontHomePage />
       ),
     },
+    {
+      path: '/post/:id',
+      element: (
+        <SocialShare />
+      ),
+    },
+    
     {
       path: '/our-event',
       element: (

@@ -18,9 +18,11 @@ import { adminVerificationListReducer } from './verificationReducers'
 import { userReducer } from './userReducer';
 import editEventReducer from './editEventReducer'
 import homeAndGlobalReducer from './homeAndGlobal.reducer'
+import globalOverviewGeneralStatisticsReducer from './global-overview-general-statistice.reducer'
 import {notificationReducer} from './notification.reducer';
 
 const rootReducer = combineReducers({
+    gogs:globalOverviewGeneralStatisticsReducer,
     notification: notificationReducer,
     homeAndGlobal: homeAndGlobalReducer,
     editEvent: editEventReducer,

@@ -5,9 +5,11 @@ import { InputAdornment, Typography, IconButton, TextField, Button, Divider, Gri
 import { toast } from 'react-toastify';
 import LoadingButton from '@mui/lab/LoadingButton';
 import PhoneInput from 'react-phone-number-input'
+
 import { Iconify } from 'src/components/iconify';
 import { login, signup } from 'src/redux/actions';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+
 import 'react-phone-number-input/style.css'
 
 // ----------------------------------------------------------------------
@@ -19,9 +21,6 @@ export function SignInView() {
   const [showSignup, setShowSignup] = useState(false);
   const [transition, setTransition] = useState(false);
   const [avatar, setAvatar] = useState(null); // Correct initialization
-  console.log('====================================');
-  console.log(avatar);
-  console.log('====================================');
   const [phoneNumber, setPhoneNumber] = useState('');
   const getWidth = (key) => (active === key ? "50%" : "10%");
   const auth = useSelector(state => state.auth);
@@ -112,9 +111,15 @@ export function SignInView() {
       if (pendingPurchase) {
         const purchaseData = JSON.parse(pendingPurchase);
         navigate(purchaseData.redirectTo);
-      } else {
-        navigate("/");
       }
+      const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+      if (redirectAfterLogin) {
+        const redirectData = JSON.parse(redirectAfterLogin);
+        sessionStorage.removeItem('redirectAfterLogin');
+        navigate(redirectData.redirectTo || '/');
+        return;
+      }
+      navigate('/')
     } else {
       toast.error(result?.message);
     }
@@ -223,29 +228,9 @@ export function SignInView() {
       />
 
       {/* Phone Number */}
-      {/* <TextField
-        fullWidth
-        required
-        name="number"
-        type='number'
-        label="Number"
-        placeholder='Enter your Phone number'
-        value={formRegisterData.number}
-        onChange={handleRegisterChange}
-        InputLabelProps={{ shrink: true }}
-        sx={{ mt: 2 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              +91
-            </InputAdornment>
-          ),
-        }}
-      /> */}
-      
       <Box sx={{
-        width:'100%',
-        mt:2,
+        width: '100%',
+        mt: 2,
         '& .PhoneInput': {
           width: '100%',
           '& input': {

@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 interface PostData {
-    eventName: string;
+    eventName?: string;
     description: string;
     imageUrl: string;
     platform: string;
@@ -19,27 +19,21 @@ export function SocialShare() {
 
     useEffect(() => {
         if (id) {
-            axios.get(`/promotion/social-share/${id}`,{ responseType: 'text' })
+            axios.get(`/api/v1/promotion/social-share/${id}`) 
                 .then(res => {
-                     const html = res.data;
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, "text/html");
-                    const getMeta = (property: string) =>
-                        doc.querySelector(`meta[property="${property}"]`)?.getAttribute("content") || "";
-
-                    const postData = {
-                        eventName: getMeta("og:title"),
-                        description: getMeta("og:description"),
-                        imageUrl: getMeta("og:image"),
-                        reservationLink: doc.querySelector("script")?.textContent?.match(/window\.location\.href\s*=\s*'(.*?)'/)?.[1] || "",
-                        platform: "Unknown",
-                        hashtag: "#Event", // you can't get this from HTML unless added
+                    console.log("res",res);
+                    const data = res.data;
+                    const postData: PostData = {
+                        eventName: data.eventName || "Event",
+                        description: data.description,
+                        imageUrl: data.imageUrl,
+                        platform: data.platform,
+                        hashtag: data.hashtag || "#Event",
+                        reservationLink: data.reservationLink
                     };
-
                     setPost(postData);
                 })
-                .catch((err) => console.error("Failed to parse post data", err));
-
+                .catch(err => console.error("Failed to fetch post data", err));
         }
     }, [id]);
 
@@ -48,10 +42,10 @@ export function SocialShare() {
     return (
         <>
             <Helmet>
-                <title>{post?.eventName || "Event Details"}</title>
-                <meta property="og:title" content={post?.eventName || "Event Details"} />
-                <meta property="og:description" content={post?.description} />
-                <meta property="og:image" content={post?.imageUrl} />
+                <title>{post.eventName}</title>
+                <meta property="og:title" content={post.eventName} />
+                <meta property="og:description" content={post.description} />
+                <meta property="og:image" content={post.imageUrl} />
                 <meta property="og:url" content={`http://localhost:3039/post/${id}`} />
                 <meta property="og:type" content="website" />
             </Helmet>
@@ -61,23 +55,23 @@ export function SocialShare() {
                     <CardMedia
                         component="img"
                         height="300"
-                        image={post?.imageUrl}
+                        image={post.imageUrl}
                         alt="Event"
                     />
                     <CardContent>
                         <Typography variant="h6" color="text.secondary">
-                            Platform: {post?.platform}
+                            Platform: {post.platform}
                         </Typography>
                         <Typography variant="body1" my={2}>
-                            {post?.description}
+                            {post.description}
                         </Typography>
                         <Typography variant="body2" color="primary">
-                            {post?.hashtag}
+                            {post.hashtag}
                         </Typography>
                         <Button
                             variant="contained"
                             color="primary"
-                            href={post?.reservationLink}
+                            href={post.reservationLink}
                             target="_blank"
                             sx={{ mt: 2 }}
                         >

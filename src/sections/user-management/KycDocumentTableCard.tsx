@@ -95,11 +95,11 @@ export function KycDocumentTableCard() {
               textAlign: 'center',
             }}
           >
-            <div>User</div>
-            <div>Document Type</div>
-            <div>Submission Date</div>
-            <div>Status</div>
-            <div>Actions</div>
+            <Box>User</Box>
+            <Box>Document Type</Box>
+            <Box>Submission Date</Box>
+            <Box>Status</Box>
+            <Box>Actions</Box>
           </Box>
 
           <Box
@@ -140,10 +140,10 @@ export function KycDocumentTableCard() {
                     textAlign: 'center',
                   }}
                 >
-                  <div>{item?.user?.name || 'N/A'}</div>
-                  <div>{documentTypeLabels[item?.identityDocuments?.[0]?.type] || 'Unknown'}</div>
-                  <div>{new Date(item?.identityDocuments?.[0]?.uploadedAt).toLocaleDateString()}</div>
-                  <div>
+                  <Box>{item?.user?.name || 'N/A'}</Box>
+                  <Box>{documentTypeLabels[item?.identityDocuments?.[0]?.type] || 'Unknown'}</Box>
+                  <Box>{new Date(item?.identityDocuments?.[0]?.uploadedAt).toLocaleDateString()}</Box>
+                  <Box>
                     <Typography
                       sx={{
                         color:
@@ -160,7 +160,7 @@ export function KycDocumentTableCard() {
                         item.identityDocuments[0].status.slice(1)
                         : 'N/A'}
                     </Typography>
-                  </div>
+                  </Box>
                   <Stack
                     direction={{ xs: 'column', sm: 'row' }}
                     spacing={1}

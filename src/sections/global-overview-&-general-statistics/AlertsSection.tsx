@@ -75,10 +75,10 @@ export function AlertsSection() {
                 textAlign: 'center',
               }}
             >
-              <div>Date</div>
-              <div>AlertType</div>
-              <div>User Concerned</div>
-              <div>Status</div>
+              <Box>Date</Box>
+              <Box>AlertType</Box>
+              <Box>User Concerned</Box>
+              <Box>Status</Box>
             </Box>
 
             {/* Scrollable Table Body */}
@@ -115,11 +115,11 @@ export function AlertsSection() {
                     backgroundColor: '#f5f5f5',
                   }}
                 >
-                  <div>{item.Date}</div>
-                  <div>{item. AlertType}</div>
-                  <div>{item.UserConcerned}</div>
+                  <Box>{item.Date}</Box>
+                  <Box>{item. AlertType}</Box>
+                  <Box>{item.UserConcerned}</Box>
                   
-                  <div>
+                  <Box>
                     <Typography
                       sx={{
                         color:
@@ -133,7 +133,7 @@ export function AlertsSection() {
                     >
                       {item.status}
                     </Typography>
-                  </div>
+                  </Box>
                 </Box>
               ))}
             </Box>

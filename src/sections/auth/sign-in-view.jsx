@@ -19,7 +19,6 @@ export function SignInView() {
   const navigate = useNavigate();
   const [active, setActive] = useState("google");
   const [showSignup, setShowSignup] = useState(false);
-  const [transition, setTransition] = useState(false);
   const [avatar, setAvatar] = useState(null); // Correct initialization
   const [phoneNumber, setPhoneNumber] = useState('');
   const getWidth = (key) => (active === key ? "50%" : "10%");
@@ -132,10 +131,8 @@ export function SignInView() {
   }, [auth?.authenticate, navigate]);
 
   const toggleForms = () => {
-    setTransition(true);
     setTimeout(() => {
       setShowSignup(!showSignup);
-      setTransition(false);
     }, 300); // Match this with CSS transition duration
   };
 

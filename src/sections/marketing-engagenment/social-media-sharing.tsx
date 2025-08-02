@@ -132,52 +132,52 @@ export function SocialMediaSharing({ selEvent }: any) {
     //         alert("Failed to save post");
     //     }
     // };
-   
+
     const handlePost = async () => {
-  if (!eventImage || !selectedFile) {
-    alert("Please select an image");
-    return;
-  }
+        if (!eventImage || !selectedFile) {
+            alert("Please select an image");
+            return;
+        }
 
-  const formData = new FormData();
-  formData.append('eventId', selEvent?._id);
-  formData.append('createdBy', user?._id);
-  formData.append('platform', selectedPlatform.label);
-  formData.append('description', description);
-  formData.append('reservationLink', reservationLink);
-  formData.append('hashtag', hashtag);
-  formData.append('image', selectedFile);
+        const formData = new FormData();
+        formData.append('eventId', selEvent?._id);
+        formData.append('createdBy', user?._id);
+        formData.append('platform', selectedPlatform.label);
+        formData.append('description', description);
+        formData.append('reservationLink', reservationLink);
+        formData.append('hashtag', hashtag);
+        formData.append('image', selectedFile);
 
-  const response = await dispatch(createSocialMediaPost(formData)) as any;
-  const post = response?.post;
+        const response = await dispatch(createSocialMediaPost(formData)) as any;
+        const post = response?.post;
 
-  if (post && post._id) {
-    setSavedPostData({
-      _id: post._id,
-      description,
-      reservationLink,
-      hashtag,
-      eventImage,
-      eventId: selEvent?._id,
-      createdBy: user?._id,
-      platform: selectedPlatform.label,
-      imageUrl: post.imageUrl,
-      eventName: selEvent?.eventName,
-      eventDate: selEvent?.eventStartDate,
-    });
+        if (post && post._id) {
+            setSavedPostData({
+                _id: post._id,
+                description,
+                reservationLink,
+                hashtag,
+                eventImage,
+                eventId: selEvent?._id,
+                createdBy: user?._id,
+                platform: selectedPlatform.label,
+                imageUrl: post.imageUrl,
+                eventName: selEvent?.eventName,
+                eventDate: selEvent?.eventStartDate,
+            });
 
-    alert("Post saved!");
-  } else {
-    alert("Failed to save post");
-  }
-};
+            alert("Post saved!");
+        } else {
+            alert("Failed to save post");
+        }
+    };
 
-    const handleShare = () => {
+     const handleShare = () => {
         if (!savedPostData) {
             alert("Please save the post first");
             return;
         }
-
+ 
         const {
             description: savedDescription,
             reservationLink: savedReservationLink,
@@ -185,11 +185,10 @@ export function SocialMediaSharing({ selEvent }: any) {
             imageUrl,
             eventId
         } = savedPostData;
-
+ 
         const fullMsg = `${savedDescription}\nReservation: ${savedReservationLink}\n${savedHashtag}\nImage: ${imageUrl}`;
-        console.log("full", fullMsg);
         const encodedMsg = encodeURIComponent(fullMsg);
-
+ 
         switch (selectedPlatform.label) {
             case 'WhatsApp':
                 window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
@@ -207,13 +206,21 @@ export function SocialMediaSharing({ selEvent }: any) {
                 window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank');
                 break;
             }
-            case 'LinkedIn':
-                window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodedMsg}`, '_blank');
+            case 'LinkedIn': {
+                if (!eventId || !savedPostData?._id) {
+                    alert("Missing event ID or post ID");
+                    return;
+                }
+                const shareUrl = `https://tick-m-events-server.onrender.com/api/v1/promotion/social-share/${savedPostData._id}`;
+                const encodedUrl = encodeURIComponent(shareUrl);
+                window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`, '_blank');
                 break;
+            }
+ 
             default:
                 break;
         }
-
+ 
     };
 
 

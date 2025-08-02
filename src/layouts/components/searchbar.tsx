@@ -32,7 +32,7 @@ export function Searchbar({ sx, ...other }: BoxProps) {
 
   return (
     <ClickAwayListener onClickAway={handleClose}>
-      <div>
+      <Box>
         {!open && (
           <IconButton onClick={handleOpen}>
             <Iconify icon="eva:search-fill" />
@@ -79,7 +79,7 @@ export function Searchbar({ sx, ...other }: BoxProps) {
             </Button>
           </Box>
         </Slide>
-      </div>
+      </Box>
     </ClickAwayListener>
   );
 }

@@ -65,10 +65,10 @@ export const ContractDetailsModal: React.FC<ContractDetailsModalProps> = ({
               alt={contract.organizerId?.name}
               sx={{ mr: 2 }}
             />
-            <div>
+            <Box>
               <Typography><strong>Organizer:</strong> {contract.organizerId?.name}</Typography>
               <Typography variant="body2">{contract.organizerId?.email}</Typography>
-            </div>
+            </Box>
           </Box>
           
           <Typography><strong>Event Name:</strong> {contract.eventId?.eventName}</Typography>

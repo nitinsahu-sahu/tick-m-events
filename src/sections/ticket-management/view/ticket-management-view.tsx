@@ -210,34 +210,6 @@ export function TicketManagementView() {
   };
   const tabNames = ['Active Tickets', 'History', 'Cancellations & Refunds'];
 
-  // const enrichedRefunds = refundRequests.map(refund => {
-  //   const matchingTicket = tickets.find(
-  //     ticket => ticket.eventDetails && ticket.eventDetails._id === refund.eventId
-  //   );
-
-  //   const eventDateObj = new Date(refund.eventDate);
-  //   const isExpired = eventDateObj <= now;
-
-  //   const statusRaw = refund.refundStatus || 'Pending';
-  //   const status = statusRaw.charAt(0).toUpperCase() + statusRaw.slice(1);
-  //   const statusColor = statusRaw.toLowerCase() === 'confirmed' ? 'green' : 'red';
-
-  //   return {
-  //     title: matchingTicket?.eventDetails?.eventName || 'Unknown Event',
-  //     date: eventDateObj.toLocaleDateString('en-US', {
-  //       year: 'numeric',
-  //       month: 'long',
-  //       day: 'numeric'
-  //     }),
-  //     type: refund.tickets?.[0]?.ticketType || 'Standard',
-  //     money: refund.refundAmount ? `${refund.refundAmount} XAF` : '',
-  //     status,
-  //     statusColor,
-  //     button: refund.refundStatus === 'pending' && !isExpired ? ['Cancel Request'] : [],
-
-  //   };
-  // });
-
   const enrichedRefunds = refundRequests.map(refund => {
     const matchingTicket = tickets.find(
       ticket => ticket.eventDetails && ticket.eventDetails._id === refund.eventId
@@ -542,10 +514,21 @@ export function TicketManagementView() {
         </Box>
       ) : (
         <Box display="flex" justifyContent="center">
-          <Typography variant="h6" color="text.secondary" fontWeight="500" textAlign="center">
-            <QrCodeIcon sx={{ fontSize: 100, mb: 1 }} />
-            No upcoming event
-          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              mb: 2,
+            }}
+          >
+            <Typography variant="h6" color="text.secondary" fontWeight="500" textAlign="center">
+              {/* <QrCodeIcon sx={{ fontSize: 100, mb: 1 }} /> */}
+              No upcoming event
+            </Typography>
+          </Box>
         </Box>
       )}
     </DashboardContent>

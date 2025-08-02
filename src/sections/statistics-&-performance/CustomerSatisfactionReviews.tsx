@@ -49,10 +49,10 @@ export function CustomerSatisfactionReviews() {
               fontWeight: 600,
             }}
           >
-            <div>Organizer  </div>
-            <div>Rating</div>
-            <div>Date </div>
-            <div>Comment</div>
+            <Box>Organizer  </Box>
+            <Box>Rating</Box>
+            <Box>Date </Box>
+            <Box>Comment</Box>
           </Box>
 
           {/* Scrollable Table Body */}
@@ -89,10 +89,10 @@ export function CustomerSatisfactionReviews() {
                   backgroundColor: '#f5f5f5',
                 }}
               >
-                <div>{item.Organizer }</div>
-                <div>{item.Rating}</div>
-                <div>{item.Date}</div>
-                <div>{item.Comment}</div>
+                <Box>{item.Organizer }</Box>
+                <Box>{item.Rating}</Box>
+                <Box>{item.Date}</Box>
+                <Box>{item.Comment}</Box>
               </Box>
             ))}
           </Box>

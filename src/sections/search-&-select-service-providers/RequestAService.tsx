@@ -228,10 +228,10 @@ export function RequestAService({ requests }: any) {
                 alt={selectedRow?.organizerId?.name}
                 sx={{ mr: 2 }}
               />
-              <div>
+              <Box>
                 <Typography><strong>Organizer:</strong> {selectedRow?.organizerId?.name}</Typography>
                 <Typography variant="body2">{selectedRow?.organizerId?.email}</Typography>
-              </div>
+              </Box>
             </Box>
 
             <Typography><strong>Event Name:</strong> {selectedRow?.eventId?.eventName}</Typography>
@@ -252,10 +252,10 @@ export function RequestAService({ requests }: any) {
                 alt={selectedRow?.providerId?.name}
                 sx={{ mr: 2 }}
               />
-              <div>
+              <Box>
                 <Typography><strong>Provider:</strong> {selectedRow?.providerId?.name}</Typography>
                 <Typography variant="body2">{selectedRow?.providerId?.email}</Typography>
-              </div>
+              </Box>
             </Box>
 
             <Typography><strong>Service Type:</strong> {selectedRow?.serviceRequestId?.serviceType}</Typography>

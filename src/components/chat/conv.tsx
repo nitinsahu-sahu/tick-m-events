@@ -2,7 +2,7 @@ import {
   Box, Avatar, Typography, TextField, Button, List, ListItem, ListItemAvatar, ListItemText,
   InputAdornment, IconButton, MenuItem, Menu
 } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useDispatch, useSelector } from 'react-redux';
 import { io, Socket } from 'socket.io-client'
@@ -220,27 +220,66 @@ export function ChatPanel() {
     setMessages(individualMsgList)
   }, [individualMsgList])
 
-  const fetchMessages = async (conversationId: any, receiver: any) => {
-    dispatch(fetchMessagesbyConvId(conversationId, receiver, user?._id));
+  const fetchMessages = useCallback(async (conversationId: any, receiver: any) => {
+  dispatch(fetchMessagesbyConvId(conversationId, receiver, user?._id));
+}, [dispatch, user?._id]);
+
+const fetchMsgData = useCallback((convId: string | undefined, userData: any) => {
+  fetchMessages(convId, userData);
+  if (convId) {
+    setUnreadCounts(prev => ({
+      ...prev,
+      [convId]: 0
+    }));
+  }
+
+  const covData = {
+    convId: convId || "new",
+    userData,
+    _id: user?._id
   };
+}, [fetchMessages, user?._id]);
 
-  const fetchMsgData = (convId: string | undefined, userData: any) => {
+  // Add this useEffect hook near the top of the ChatPanel component
+  useEffect(() => {
+  // Check if we have a provider from the Chat Now button click
+  const storedProvider = sessionStorage.getItem('currentChatProvider');
+  if (storedProvider) {
+    try {
+      const provider = JSON.parse(storedProvider);
+      // Find if this provider already has a conversation
+      const existingConv = conv?.find((c: any) =>
+        c.user._id === provider._id ||
+        c.user.userId === provider._id
+      );
 
-    // If convId is undefined or null, it will default to "new"
-    fetchMessages(convId, userData);
-    if (convId) {
-      setUnreadCounts(prev => ({
-        ...prev,
-        [convId]: 0
-      }));
+      if (existingConv) {
+        setSelectedOption(existingConv);
+        fetchMessages(existingConv.conversationId, existingConv.user);
+      } else {
+        // Create a new conversation item for this provider
+        const newConvItem = {
+          user: {
+            _id: provider._id,
+            name: provider.name,
+            email: provider.email || '',
+            avatar: provider.avatar?.url || '',
+            receiverId: provider._id
+          },
+          conversationId: 'new'
+        };
+        setSelectedOption(newConvItem);
+        fetchMessages('new', provider._id);
+      }
+
+      // Clear the stored provider after using it
+      sessionStorage.removeItem('currentChatProvider');
+    } catch (error) {
+      console.error('Error parsing stored provider:', error);
+      sessionStorage.removeItem('currentChatProvider');
     }
-
-    const covData = {
-      convId: convId || "new",
-      userData,
-      _id: user?._id
-    };
-  };
+  }
+}, [conv, fetchMessages, fetchMsgData]); // Added fetchMessages to dependencies
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -367,7 +406,7 @@ export function ChatPanel() {
         // Send to server
         const res = await axios.post(`/conv/message`, messageData);
         console.log('====================================');
-        console.log('res',res);
+        console.log('res', res);
         console.log('====================================');
       }
     } catch (error) {
@@ -440,9 +479,9 @@ export function ChatPanel() {
             <Typography variant="subtitle2" sx={{ px: 1, py: 0.5, color: 'text.secondary' }}>
               New Conversations
             </Typography>
-            {searchResults.map((row) => (
+            {searchResults.map((row, index) => (
               <ListItem
-                key={row._id}
+                key={row._id || index}
                 button
                 onClick={() => {
                   const item = {

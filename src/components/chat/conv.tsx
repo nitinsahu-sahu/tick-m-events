@@ -242,6 +242,49 @@ export function ChatPanel() {
     };
   };
 
+  // Add this useEffect hook near the top of the ChatPanel component
+  useEffect(() => {
+    // Check if we have a provider from the Chat Now button click
+    const storedProvider = sessionStorage.getItem('currentChatProvider');
+    if (storedProvider) {
+      try {
+        const provider = JSON.parse(storedProvider);
+        // Find if this provider already has a conversation
+        const existingConv = conv?.find((c: any) =>
+          c.user._id === provider._id ||
+          c.user.userId === provider._id
+        );
+
+        if (existingConv) {
+          console.log('info', existingConv);
+
+          setSelectedOption(existingConv);
+          fetchMsgData(existingConv.conversationId, existingConv.user);
+        } else {
+          // Create a new conversation item for this provider
+          const newConvItem = {
+            user: {
+              _id: provider._id,
+              name: provider.name,
+              email: provider.email || '',
+              avatar: provider.avatar?.url || '',
+              receiverId: provider._id
+            },
+            conversationId: 'new'
+          };
+          setSelectedOption(newConvItem);
+          fetchMessages('new', provider._id);
+        }
+
+        // Clear the stored provider after using it
+        sessionStorage.removeItem('currentChatProvider');
+      } catch (error) {
+        console.error('Error parsing stored provider:', error);
+        sessionStorage.removeItem('currentChatProvider');
+      }
+    }
+  }, [conv]);
+
   useEffect(() => {
     const fetchConversations = async () => {
       try {
@@ -367,7 +410,7 @@ export function ChatPanel() {
         // Send to server
         const res = await axios.post(`/conv/message`, messageData);
         console.log('====================================');
-        console.log('res',res);
+        console.log('res', res);
         console.log('====================================');
       }
     } catch (error) {
@@ -440,9 +483,9 @@ export function ChatPanel() {
             <Typography variant="subtitle2" sx={{ px: 1, py: 0.5, color: 'text.secondary' }}>
               New Conversations
             </Typography>
-            {searchResults.map((row) => (
+            {searchResults.map((row, index) => (
               <ListItem
-                key={row._id}
+                key={row._id || index}
                 button
                 onClick={() => {
                   const item = {

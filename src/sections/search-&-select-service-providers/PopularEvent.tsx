@@ -100,15 +100,7 @@ export function ProviderListView({ providers, handleSelct }: any) {
   const handleViewDetails = useCallback(() => {
     handleSelct(providers); // Now passing the object directly
   }, [handleSelct, providers]);
-  const handleChatNow = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card onClick from firing
 
-    // Save provider data to sessionStorage
-    sessionStorage.setItem('currentChatProvider', JSON.stringify(providers));
-
-    // Navigate without page refresh
-    navigate('/messaging-&-client-relationship');
-  }, [providers, navigate]);
   return (
     <Card
       sx={{

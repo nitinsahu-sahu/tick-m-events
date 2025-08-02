@@ -59,11 +59,11 @@ export function TicketingActivityTable() {
               textAlign: 'center',
             }}
           >
-            <div>Event</div>
-            <div>Organizer</div>
-            <div>Tickets Sold</div>
+            <Box>Event</Box>
+            <Box>Organizer</Box>
+            <Box>Tickets Sold</Box>
             <data>Revenu</data>
-            <div>Status</div>
+            <Box>Status</Box>
           </Box>
 
           {/* Scrollable Table Body */}
@@ -100,11 +100,11 @@ export function TicketingActivityTable() {
                   backgroundColor: '#f5f5f5',
                 }}
               >
-                <div>{item.Event}</div>
-                <div>{item.Organizer}</div>
-                <div>{item.TicketsSold}</div>
-                <div>{item.Revenue }</div>
-                <div>
+                <Box>{item.Event}</Box>
+                <Box>{item.Organizer}</Box>
+                <Box>{item.TicketsSold}</Box>
+                <Box>{item.Revenue }</Box>
+                <Box>
                   <Typography
                     sx={{
                       color:
@@ -118,7 +118,7 @@ export function TicketingActivityTable() {
                   >
                     {item.status}
                   </Typography>
-                </div>
+                </Box>
               </Box>
             ))}
           </Box>

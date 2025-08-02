@@ -113,9 +113,9 @@ export function FinancialAnalysisRevenue() {
               <MenuItem value="6m">Last 6 Months</MenuItem>
               <MenuItem value="12m">Last 12 Months</MenuItem>
             </Select>
-            <div>Revenue Earned (XAF)</div>
-            <div>Services Completed</div>
-            <div>Average Payment (XAF)</div>
+            <Box>Revenue Earned (XAF)</Box>
+            <Box>Services Completed</Box>
+            <Box>Average Payment (XAF)</Box>
           </Box>
 
           {/* Table Body */}
@@ -166,10 +166,10 @@ export function FinancialAnalysisRevenue() {
                     backgroundColor: '#f5f5f5',
                   }}
                 >
-                  <div>{item.Period}</div>
-                  <div>{item.Revenue}</div>
-                  <div>{item.Services}</div>
-                  <div>{item.Average}</div>
+                  <Box>{item.Period}</Box>
+                  <Box>{item.Revenue}</Box>
+                  <Box>{item.Services}</Box>
+                  <Box>{item.Average}</Box>
                 </Box>
               ))
             )}

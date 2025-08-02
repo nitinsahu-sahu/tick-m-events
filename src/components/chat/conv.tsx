@@ -2,7 +2,7 @@ import {
   Box, Avatar, Typography, TextField, Button, List, ListItem, ListItemAvatar, ListItemText,
   InputAdornment, IconButton, MenuItem, Menu
 } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useDispatch, useSelector } from 'react-redux';
 import { io, Socket } from 'socket.io-client'
@@ -220,70 +220,66 @@ export function ChatPanel() {
     setMessages(individualMsgList)
   }, [individualMsgList])
 
-  const fetchMessages = async (conversationId: any, receiver: any) => {
-    dispatch(fetchMessagesbyConvId(conversationId, receiver, user?._id));
+  const fetchMessages = useCallback(async (conversationId: any, receiver: any) => {
+  dispatch(fetchMessagesbyConvId(conversationId, receiver, user?._id));
+}, [dispatch, user?._id]);
+
+const fetchMsgData = useCallback((convId: string | undefined, userData: any) => {
+  fetchMessages(convId, userData);
+  if (convId) {
+    setUnreadCounts(prev => ({
+      ...prev,
+      [convId]: 0
+    }));
+  }
+
+  const covData = {
+    convId: convId || "new",
+    userData,
+    _id: user?._id
   };
-
-  const fetchMsgData = (convId: string | undefined, userData: any) => {
-
-    // If convId is undefined or null, it will default to "new"
-    fetchMessages(convId, userData);
-    if (convId) {
-      setUnreadCounts(prev => ({
-        ...prev,
-        [convId]: 0
-      }));
-    }
-
-    const covData = {
-      convId: convId || "new",
-      userData,
-      _id: user?._id
-    };
-  };
+}, [fetchMessages, user?._id]);
 
   // Add this useEffect hook near the top of the ChatPanel component
   useEffect(() => {
-    // Check if we have a provider from the Chat Now button click
-    const storedProvider = sessionStorage.getItem('currentChatProvider');
-    if (storedProvider) {
-      try {
-        const provider = JSON.parse(storedProvider);
-        // Find if this provider already has a conversation
-        const existingConv = conv?.find((c: any) =>
-          c.user._id === provider._id ||
-          c.user.userId === provider._id
-        );
+  // Check if we have a provider from the Chat Now button click
+  const storedProvider = sessionStorage.getItem('currentChatProvider');
+  if (storedProvider) {
+    try {
+      const provider = JSON.parse(storedProvider);
+      // Find if this provider already has a conversation
+      const existingConv = conv?.find((c: any) =>
+        c.user._id === provider._id ||
+        c.user.userId === provider._id
+      );
 
-        if (existingConv) {
-          console.log('info', existingConv);
-
-          setSelectedOption(existingConv);
-          fetchMsgData(existingConv.conversationId, existingConv.user);
-        } else {
-          // Create a new conversation item for this provider
-          const newConvItem = {
-            user: {
-              _id: provider._id,
-              name: provider.name,
-              email: provider.email || '',
-              avatar: provider.avatar?.url || '',
-              receiverId: provider._id
-            },
-            conversationId: 'new'
-          };
-          setSelectedOption(newConvItem);
-          fetchMessages('new', provider._id);
-        }
-
-        // Clear the stored provider after using it
-        sessionStorage.removeItem('currentChatProvider');
-      } catch (error) {
-        console.error('Error parsing stored provider:', error);
-        sessionStorage.removeItem('currentChatProvider');
+      if (existingConv) {
+        setSelectedOption(existingConv);
+        fetchMessages(existingConv.conversationId, existingConv.user);
+      } else {
+        // Create a new conversation item for this provider
+        const newConvItem = {
+          user: {
+            _id: provider._id,
+            name: provider.name,
+            email: provider.email || '',
+            avatar: provider.avatar?.url || '',
+            receiverId: provider._id
+          },
+          conversationId: 'new'
+        };
+        setSelectedOption(newConvItem);
+        fetchMessages('new', provider._id);
       }
+
+      // Clear the stored provider after using it
+      sessionStorage.removeItem('currentChatProvider');
+    } catch (error) {
+      console.error('Error parsing stored provider:', error);
+      sessionStorage.removeItem('currentChatProvider');
     }
-  }, [conv]);
+  }
+}, [conv, fetchMessages, fetchMsgData]); // Added fetchMessages to dependencies
 
   useEffect(() => {
     const fetchConversations = async () => {

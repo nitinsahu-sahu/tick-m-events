@@ -1,5 +1,5 @@
 import {
-  Box, Paper, Typography, Button, Grid, CircularProgress, InputAdornment, IconButton, TextField, Stack
+  Box, Paper, Typography, Button, Grid, CircularProgress, InputAdornment, IconButton, TextField, Stack,ButtonProps
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from "src/redux/store";
@@ -67,6 +67,7 @@ export default function UserActivityCard() {
 
   const tableData = useMemo(() => activities.docs || activities, [activities]);
 
+
   const rows = tableData.map((item: any, index: number) => {
     const raw = getActivityKey(item.activityType || '');
     return {
@@ -75,7 +76,8 @@ export default function UserActivityCard() {
       user: item.userId?.name || item.userId?.email || 'N/A',
       action: activityOptions.find(opt => opt.key === raw)?.label || raw,
       rawAction: raw,                // use for filtering
-      location: item.location || '-',
+      location: item.location?.split(',')[0]?.trim() || '-',
+
     };
   }).filter((row: any) => {
     const matchesSearch =
@@ -93,13 +95,11 @@ export default function UserActivityCard() {
     return matchesSearch && matchesActionFilter;
   });
 
-
-
   const columns: GridColDef[] = [
     {
       field: 'date',
       headerName: 'Date',
-      flex: 1,
+      flex: 1.5,
       align: 'center',
       headerAlign: 'center',
       renderCell: (params) => (
@@ -147,15 +147,40 @@ export default function UserActivityCard() {
   ];
 
 
-  const trendData = [
-    { day: 'M', value: 3 },
-    { day: 'T', value: 5 },
-    { day: 'W', value: 2 },
-    { day: 'T', value: 6 },
-    { day: 'F', value: 5 },
-    { day: 'S', value: 2 },
-    { day: 'Today', value: 4 },
-  ];
+  const trendData = useMemo(() => {
+    const today = new Date();
+    const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    const counts: Record<string, number> = {
+      Sun: 0,
+      Mon: 0,
+      Tue: 0,
+      Wed: 0,
+      Thu: 0,
+      Fri: 0,
+      Sat: 0,
+      Today: 0,
+    };
+
+    tableData.forEach((item: any) => {
+      const activityDate = new Date(item.timestamp);
+      const isToday =
+        activityDate.toDateString() === today.toDateString();
+
+      const weekday = activityDate.toLocaleDateString('en-US', { weekday: 'short' });
+
+      if (isToday) {
+        counts.Today += 1;
+      }
+
+      if (counts[weekday] !== undefined) {
+        counts[weekday] += 1;
+      }
+    });
+
+    return [...dayLabels.map(day => ({ day, value: counts[day] })), { day: 'Today', value: counts.Today }];
+  }, [tableData]);
+
 
   if (loading || localLoading)
     return (
@@ -187,13 +212,45 @@ export default function UserActivityCard() {
 
 
   if (error) return <Typography color="error">Error: {error.message || error}</Typography>;
+  const downloadCSV = () => {
+    if (!rows || rows.length === 0) {
+      alert("No data available to download.");
+      return;
+    }
+    type RowType = {
+      date: string;
+      user: string;
+      action: string;
+      location: string;
+    };
+    const headers = ["Date", "User", "Action", "Location"];
+    const csvRows = [
+      headers.join(","),
+      ...rows.map((row: RowType) =>
+        [row.date, row.user, row.action, row.location]
+          .map(field => `"${(field || "").toString().replace(/"/g, '""')}"`)
+          .join(",")
+      ),
+    ];
+
+    const csvString = csvRows.join("\n");
+    const blob = new Blob([csvString], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `user_activity_report_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   return (
     <Paper sx={{ p: 3, borderRadius: 3, boxShadow: '0 0 10px rgba(0,0,0,0.4)' }}>
       <Typography variant="h6" fontWeight="bold" mb={2}>User Activity History</Typography>
 
       {/* Data Grid Table */}
-      <Box sx={{ height: 600, width: '100%', mb: 3 }}>
+      <Box sx={{ height: 600, width: '100%' }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
           <TextField
             placeholder="Search..."
@@ -343,10 +400,21 @@ export default function UserActivityCard() {
         )}
       </Box>
       {/* Chart + Actions */}
-      <Grid container spacing={3} mt={6}>
-        <Grid item xs={12} md={12}>
-          <Paper sx={{ p: 2, border: '1px solid #ddd', borderRadius: 3, height: '100%' }}>
-            <Typography variant="subtitle1" fontWeight="bold" mb={2}>User Trends</Typography>
+
+      <Grid container spacing={3}>
+        {/* Full Width Graph */}
+        <Grid item xs={12}>
+          <Paper
+            sx={{
+              p: 2,
+              border: '1px solid #ddd',
+              borderRadius: 3,
+              height: '100%',
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight="bold" mb={2}>
+              User Trends
+            </Typography>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={trendData}>
                 <XAxis dataKey="day" />
@@ -356,68 +424,37 @@ export default function UserActivityCard() {
             </ResponsiveContainer>
           </Paper>
         </Grid>
+
+        {/* Button Section aligned to bottom right */}
+        <Grid item xs={12}>
+          <Box display="flex" justifyContent="flex-end" gap={2}>
+            <StyledActionButton onClick={downloadCSV}>Download Activity Report</StyledActionButton>
+            <StyledActionButton>Analyze Suspicious Behavior</StyledActionButton>
+          </Box>
+        </Grid>
       </Grid>
-      <Grid item xs={12} md={12} sx={{
-        display: 'flex',
-        justifyContent: 'center',  // Center horizontally
-        alignItems: 'center',
-        gap: 2,
-        mt: 3
-      }}>
-        <Button
-          variant="contained"
-          sx={{
-            backgroundColor: "blue",
-            borderRadius: 3,
-            textTransform: 'none',
-            fontSize: '13px',
-            height: 35,
-            color: '#fff',
-            width: '50%',  // 66% width
-            maxWidth: 400,  // Optional: set maximum width
-            '&:hover': {
-              backgroundColor: '#071E33',
-            },
-          }}
-        >
-          Download Activity Report
-        </Button>
-        <Button
-          variant="contained"
-          sx={{
-            backgroundColor: "blue",
-            borderRadius: 3,
-            fontSize: '13px',
-            height: 35,
-            px: 2,
-            color: '#fff',
-            width: '50%',  // 66% width
-            maxWidth: 400,  // Optional: set maximum width
-            '&:hover': {
-              backgroundColor: 'blue',
-            },
-          }}
-        >
-          Analyze Suspicious Behavior
-        </Button>
-      </Grid>
+
     </Paper>
   );
 }
 
-function StyledActionButton({ children }: { children: React.ReactNode }) {
+function StyledActionButton({ sx, children, ...rest }: ButtonProps) {
   return (
-    <Button sx={{
-      borderRadius: '20px',
-      backgroundColor: '#0B2E4C',
-      color: 'white',
-      height: 45,
-      textTransform: 'none',
-      '&:hover': {
-        backgroundColor: '#071E33',
-      },
-    }}>
-      {children}
+    <Button
+      {...rest}
+      sx={{
+        borderRadius: '20px',
+        backgroundColor: '#0B2E4C',
+        color: 'white',
+        height: 45,
+        textTransform: 'none',
+        '&:hover': {
+          backgroundColor: '#071E33',
+        },
+        ...sx, // Now using destructured `sx`
+      }}
+    >
+      {children} {/* Now using destructured `children` */}
     </Button>
   );
 }

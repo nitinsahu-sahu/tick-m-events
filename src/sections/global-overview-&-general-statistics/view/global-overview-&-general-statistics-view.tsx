@@ -1,4 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { AppDispatch, RootState } from 'src/redux/store';
+import { fetchDashboardActivity } from 'src/redux/actions/global-overview-general-statistice.action';
+
 import { DashboardContent } from 'src/layouts/dashboard';
 import { TopNavButtons } from '../TopNavButtons';
 import GlobalStatistics from '../GlobalStatistics';
@@ -7,8 +12,14 @@ import { TicketingActivityTable } from '../TicketingActivityTable';
 import { MarketplaceActivity } from '../MarketplaceActivity';
 import { AlertsSection } from '../AlertsSection';
 
+
 export function GlobalOverviewAndGeneralStatisticsView() {
   const [activeTab, setActiveTab] = useState('Global Statistics');
+  const dispatch = useDispatch<AppDispatch>();
+  const {dashboardData } = useSelector((state: RootState) => state?.gogs);
+  useEffect(() => {
+    dispatch(fetchDashboardActivity())
+  }, [dispatch]);
 
   return (
     <DashboardContent>
@@ -17,8 +28,8 @@ export function GlobalOverviewAndGeneralStatisticsView() {
 
       {activeTab === 'Global Statistics' && (
         <>
-          <GlobalStatistics />
-          <PlatformStatistics />
+          <GlobalStatistics statistics={dashboardData}/>
+          <PlatformStatistics statistics={dashboardData}/>
         </>
       )}
 

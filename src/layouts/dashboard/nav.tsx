@@ -12,7 +12,8 @@ import { HeadingCommon } from 'src/components/multiple-responsive-heading/headin
 import { RootState } from 'src/redux/store';
 
 import { NavUpgrade } from '../components/nav-upgrade';
-
+import upIcon from '../../../public/assets/icons/navbar/ic_chevron_up.svg';
+import downIcon from '../../../public/assets/icons/navbar/ic_chevron_down.svg';
 // ----------------------------------------------------------------------
 export type UserRole = 'organizer' | 'admin' | 'provider' | 'participant';
 
@@ -128,7 +129,7 @@ const useFilteredNavData = (data: any) => {
 
 export function NavContent({ data, slots, sx }: NavContentProps) {
   const filteredData = useFilteredNavData(data); // Use the filtered data
-  const {user} = useSelector((state:RootState) => state?.auth);
+  const { user } = useSelector((state: RootState) => state?.auth);
 
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
@@ -140,7 +141,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
   return (
     <>
       <Logo />
-      <HeadingCommon baseSize="13px" title={`Account ID: ${user._id}`}/>
+      <HeadingCommon baseSize="13px" title={`Account ID: ${user._id}`} />
       {/* Account ID: TM-{user._id} */}
       {slots?.topArea}
       <DashboardHF title="MAIN MENU" />
@@ -196,7 +197,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                           <Box
                             alt="Single logo"
                             component="img"
-                            src={openMenus[item.title] ? './assets/icons/navbar/ic_chevron_down.svg' : './assets/icons/navbar/ic_chevron_up.svg'}
+                            src={openMenus[item.title] ? downIcon : upIcon}
                             width={16}
                             height={16}
                           />

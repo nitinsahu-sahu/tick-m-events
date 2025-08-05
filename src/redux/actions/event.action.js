@@ -272,7 +272,12 @@ export const eventCreate = (data) => async (dispatch) => {
             type: eventConstants.EVENT_CREATE_FAILURE,
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },
         });
-        return null; // or return an error object if you prefer
+        return {
+            type: eventConstants.EVENT_CREATE_FAILURE,
+            message: error.response?.data?.message,
+            error: error.response?.data?.error,
+            status: error.status,
+        };
     }
 };
 

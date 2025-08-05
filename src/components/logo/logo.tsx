@@ -5,7 +5,8 @@ import { useTheme, useMediaQuery } from '@mui/material';
 
 import { RouterLink } from 'src/routes/components';
 import { logoClasses } from './classes';
-
+import logoMobile from '../../../public/assets/logo/logo-mobile.png';
+import fullLogoImg from '../../../public/assets/logo/full-logo.png';
 // ----------------------------------------------------------------------
 
 export type LogoProps = BoxProps & {
@@ -24,8 +25,8 @@ export const Logo = forwardRef<HTMLDivElement, LogoProps>(
       disableLink = false, 
       className, 
       sx, 
-      singleLogoPath = "./assets/logo/logo-mobile.png",
-      fullLogoPath = "./assets/logo/full-logo.png",
+      singleLogoPath = logoMobile,
+      fullLogoPath = fullLogoImg,
       ...other 
     },
     ref

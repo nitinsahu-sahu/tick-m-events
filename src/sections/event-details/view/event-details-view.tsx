@@ -277,7 +277,7 @@ export function EventDetailsView() {
               )}
 
               <Box sx={{ position: 'absolute', bottom: 10, left: 10, display: 'flex', gap: 1 }}>
-                <HeadingCommon title="Minimum dimensions: 1500×536 pixels" baseSize="12px" color="red" />
+                <HeadingCommon title="Minimum dimensions: 1000*666 pixels" baseSize="12px" color="red" />
               </Box>
               <Box sx={{ position: 'absolute', top: 10, right: 10, display: 'flex', gap: 1 }}>
                 <IconButton onClick={handleDownload} sx={{ backgroundColor: 'rgba(255,255,255,0.7)' }}>
@@ -354,7 +354,9 @@ export function EventDetailsView() {
                   }}
                 />
               )}
-
+              <Box sx={{ position: 'absolute', bottom: 10, left: 10, display: 'flex', gap: 1 }}>
+                <HeadingCommon title="Minimum dimensions: 500*500 pixels" baseSize="12px" color="red" />
+              </Box>
               <Box sx={{ position: 'absolute', top: 10, right: 10, display: 'flex', gap: 1 }}>
                 <IconButton onClick={handleDownloadPortrait} sx={{ backgroundColor: 'rgba(255,255,255,0.7)' }}>
                   <DownloadIcon />

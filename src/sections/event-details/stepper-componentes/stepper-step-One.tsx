@@ -4,7 +4,8 @@ import 'react-quill/dist/quill.snow.css';
 import {
     Box, Typography, TextField, Select,
     MenuItem, IconButton,
-    Grid, FormControl, InputLabel, ListSubheader
+    Grid, FormControl, InputLabel, ListSubheader,
+    CircularProgress
 } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -25,16 +26,15 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
     const dispatch = useDispatch<AppDispatch>();
     const today = new Date().toISOString().split('T')[0];
     const { categories } = useSelector((state: RootState) => state.event);
-
-    // yha se
+    const [isLoading, setIsLoading] = useState(false);
+    const [description, setDescription] = useState('');
+    const [descriptionError, setDescriptionError] = useState(false);
     const portraitFileInputRef = useRef<HTMLInputElement>(null);
     const [portraitPreview, setPortraitPreview] = useState<string | null>(null);
     const handlePortraitChange = () => {
         const file = portraitFileInputRef.current?.files?.[0];
         if (file) setPortraitPreview(URL.createObjectURL(file));
     };
-
-    // yha tak
 
     useEffect(() => {
         dispatch(fetchAllCategories());
@@ -60,16 +60,25 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
     });
 
     const handleEventChange = (event: any) => {
-        // event.preventDefault();
         const { name, value } = event.target;
         setEventFormData(prev => ({
             ...prev,
-            [name]: String(value), // force string
+            [name]: String(value),
         }));
     };
-
+    const validateDescription = (content: string) => {
+        // Remove HTML tags and check if there's actual text
+        const textOnly = content.replace(/<[^>]*>/g, '').trim();
+        return textOnly.length > 0;
+    };
     const handleEventCreate = useCallback(async (event: any) => {
         event.preventDefault();
+
+        // Validate description
+        const isDescriptionValid = validateDescription(description);
+        setDescriptionError(!isDescriptionValid);
+
+        setIsLoading(true);
         const formEventData = new FormData();
         const files = fileInputRef.current?.files;
         const portraitFiles = portraitFileInputRef.current?.files;
@@ -90,24 +99,32 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
         formEventData.append("linkedin", eventFormData.linkedIn);
         formEventData.append("facebook", eventFormData.facebook);
         formEventData.append("tiktok", eventFormData.tiktok);
+        formEventData.append("description", description);
 
-        formEventData.append("description", quillRef?.current?.value as string);        // Append avatar if it exists
+        // Append avatar if it exists
         if (files && files.length > 0) {
             const selectedFile = files[0];
             formEventData.append("coverImage", selectedFile);
         }
         if (portraitFiles?.[0]) formEventData.append("portraitImage", portraitFiles[0]);
+
         try {
             const res = await dispatch(eventCreate(formEventData));
-            const eventId = res?.eventId; // Adjust based on your response structure
-
-            // Add event ID to current URL as search param
-            navigate(`?eventId=${eventId}`, { replace: true });
+            if (res.status === 500) {
+                toast.error(res.error);
+            } else {
+                const eventId = res?.eventId;
+                if (eventId !== undefined) {
+                    navigate(`?eventId=${eventId}`, { replace: true });
+                }
+            }
 
         } catch (error) {
-            toast.error("Event creation failed");
+            toast.error("Event failed to create...");
+        } finally {
+            setIsLoading(false);
         }
-    }, [eventFormData, dispatch, navigate, fileInputRef]);
+    }, [eventFormData, dispatch, navigate, fileInputRef, description]);
 
     return (
         <>
@@ -159,6 +176,7 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                             </Grid>
                             <Grid item xs={12} sm={3}>
                                 <TextField
+                                    InputLabelProps={{ shrink: true }}
                                     required
                                     name="time"
                                     type='time'
@@ -171,7 +189,7 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
 
                         {/* Second Row - Adjusted for mobile */}
                         <Grid container spacing={2} sx={{ mt: 0 }}>
-                            <Grid item xs={12} sm={6} md={3}>
+                            <Grid item xs={12} sm={12} md={6}>
                                 <TextField
                                     label="Event Cover image"
                                     type="file"
@@ -180,6 +198,7 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                                     name='coverImage'
                                     inputRef={fileInputRef}
                                     onChange={handleEventThemeLogo}
+                                    InputLabelProps={{ shrink: true }}
                                     InputProps={{
                                         sx: {
                                             borderRadius: '10px',
@@ -187,20 +206,20 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                                             backgroundColor: '#F9F9F9',
                                         },
                                         inputProps: {
-                                            accept: "image/*",  // Move accept here
+                                            accept: "image/*",
                                         },
                                     }}
                                 />
                             </Grid>
 
-                            {/** ye dala */}
-                            <Grid item xs={12} sm={6} md={3}>
+                            <Grid item xs={12} sm={12} md={6}>
                                 <TextField
                                     label="Portrait Image (Square)"
                                     type="file"
+                                    required
+                                    InputLabelProps={{ shrink: true }}
                                     inputRef={portraitFileInputRef}
                                     onChange={handlePortraitImage}
-
                                     InputProps={{
                                         inputProps: { accept: "image/*" },
                                         sx: { backgroundColor: "#F9F9F9", border: "1px solid #ccc" }
@@ -218,7 +237,10 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                                     </Box>
                                 )}
                             </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
+                        </Grid>
+                        {/* Thired Row - Adjusted for mobile */}
+                        <Grid container spacing={2} sx={{ mt: 0 }}>
+                            <Grid item xs={12} sm={12} md={4}>
                                 <FormControl fullWidth>
                                     <InputLabel id="event-category-label">Event Category</InputLabel>
                                     <Select
@@ -226,6 +248,7 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                                         name="childCategory"
                                         value={eventFormData.childCategory}
                                         onChange={handleEventChange}
+                                        required
                                         label="Event Category"
                                         renderValue={(selected) => {
                                             const selectedItem = categories
@@ -247,23 +270,22 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
+                            <Grid item xs={12} sm={12} md={4}>
                                 <FormControl fullWidth>
                                     <InputLabel id="event-type-label">Event Type</InputLabel>
-
                                     <Select
                                         labelId="event-type-label"
                                         name="eventType"
                                         value={eventFormData.eventType}
                                         onChange={handleEventChange}
                                     >
-                                        <MenuItem value="Public">Public</MenuItem>   {/* Default selected */}
+                                        <MenuItem value="Public">Public</MenuItem>
                                         <MenuItem value="Private">Private</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={12} sm={6} md={3}>
+                            <Grid item xs={12} sm={12} md={4}>
                                 <FormControl fullWidth>
                                     <InputLabel>Event Format</InputLabel>
                                     <Select
@@ -279,30 +301,45 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                                 </FormControl>
                             </Grid>
                         </Grid>
-
                         {/* Description - Full width always */}
                         <Grid item xs={12} sx={{ mt: 2 }}>
                             <ReactQuill
-                                placeholder='Enter your event description'
+                                placeholder='Enter your event description (required)'
                                 theme="snow"
-                                style={{ height: '90px', margin: "20px 0px 40px 0px" }}
+                                value={description}
+                                onChange={(content) => {
+                                    setDescription(content);
+                                    setDescriptionError(false); // Clear error when typing
+                                }}
+                                style={{
+                                    height: '90px',
+                                    margin: "20px 0px 10px 0px",
+                                    // border: descriptionError ? '1px solid red' : '1px solid #ccc',
+                                    borderRadius: '4px'
+                                }}
                                 ref={quillRef}
                             />
+                            {descriptionError && (
+                                <Typography color="error" variant="caption" >
+                                    Please enter a description for your event
+                                </Typography>
+                            )}
                         </Grid>
                     </Grid>
 
                     {/* Map Section - Full width on mobile, smaller on desktop */}
-                    <Grid item xs={12} sm={12} md={3}>
+                    <Grid item xs={12} sm={12} md={3} mt={4}>
                         <Box
                             borderRadius={2}
                             sx={{
+
                                 border: '1px solid #ccc',
                                 overflow: 'hidden',
                                 height: '100%',
-                                minHeight: { xs: 200, sm: 270 } // Adjust height for mobile
+                                minHeight: { xs: 200, sm: 270 }
                             }}
                         >
-                            <Box p={1}>
+                            <Box p={1} >
                                 <HeadingCommon width={400} baseSize="16px" title="Enter location" />
                                 <TextField
                                     required
@@ -336,7 +373,6 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                                 title="Google Maps Location"
                             />
                         </Box>
-
                     </Grid>
                 </Grid>
 
@@ -380,7 +416,6 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                             value={eventFormData.email}
                             onChange={handleEventChange}
                             fullWidth label="Email" placeholder="info@email.com" />
-
                     </Grid>
                     <Grid item xs={12} sm={6} md={4}>
                         <TextField
@@ -444,13 +479,24 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                     type="submit"
                     color="inherit"
                     variant="contained"
-                    sx={{ mt: 2 }}
+                    sx={{
+                        mt: 2,
+                        '& .MuiLoadingButton-loadingIndicator': {
+                            position: 'relative',
+                            marginLeft: '8px',
+                        }
+                    }}
+                    loading={isLoading}
+                    loadingPosition="end"
+                    loadingIndicator={
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <CircularProgress size={16} color="inherit" />
+                        </Box>
+                    }
                 >
                     Save and proceed to the next step
                 </LoadingButton>
-
             </form>
-
         </>
     )
 }

@@ -7,7 +7,8 @@ import ChatIcon from '@mui/icons-material/Chat';
 import { useDispatch, useSelector } from 'react-redux';
 import { io, Socket } from 'socket.io-client'
 import SearchIcon from '@mui/icons-material/Search';
-import { AttachFile, CameraAlt, InsertPhoto, InsertDriveFile } from '@mui/icons-material';
+import { AttachFile, CameraAlt, InsertPhoto, InsertDriveFile, EmojiEmotionsRounded } from '@mui/icons-material';
+import EmojiPicker from 'emoji-picker-react';
 
 import { fetchConversation, fetchConversationUserList, fetchMessagesbyConvId } from 'src/redux/actions/message.action';
 import { AppDispatch, RootState } from 'src/redux/store';
@@ -16,6 +17,7 @@ import { formatTimeToAMPM } from 'src/hooks/formate-time';
 import axios from '../../redux/helper/axios'
 import { HeadingCommon } from '../multiple-responsive-heading/heading';
 import { SelectedUser, ConversationUser, UnreadCounts, MessagesState, ConversationData } from './utills';
+import { Iconify } from '../iconify';
 
 export function ChatPanel() {
   const [selectedOption, setSelectedOption] = useState<SelectedUser>();
@@ -28,7 +30,7 @@ export function ChatPanel() {
     messages: []
   });
   const individualMsgList = useSelector((state: RootState) => state.allMessages.messages);
-
+  const [showPicker, setShowPicker] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [online, setOnline] = useState([]);
   const [message, setMessage] = useState<string>('');
@@ -221,65 +223,65 @@ export function ChatPanel() {
   }, [individualMsgList])
 
   const fetchMessages = useCallback(async (conversationId: any, receiver: any) => {
-  dispatch(fetchMessagesbyConvId(conversationId, receiver, user?._id));
-}, [dispatch, user?._id]);
+    dispatch(fetchMessagesbyConvId(conversationId, receiver, user?._id));
+  }, [dispatch, user?._id]);
 
-const fetchMsgData = useCallback((convId: string | undefined, userData: any) => {
-  fetchMessages(convId, userData);
-  if (convId) {
-    setUnreadCounts(prev => ({
-      ...prev,
-      [convId]: 0
-    }));
-  }
+  const fetchMsgData = useCallback((convId: string | undefined, userData: any) => {
+    fetchMessages(convId, userData);
+    if (convId) {
+      setUnreadCounts(prev => ({
+        ...prev,
+        [convId]: 0
+      }));
+    }
 
-  const covData = {
-    convId: convId || "new",
-    userData,
-    _id: user?._id
-  };
-}, [fetchMessages, user?._id]);
+    const covData = {
+      convId: convId || "new",
+      userData,
+      _id: user?._id
+    };
+  }, [fetchMessages, user?._id]);
 
   // Add this useEffect hook near the top of the ChatPanel component
   useEffect(() => {
-  // Check if we have a provider from the Chat Now button click
-  const storedProvider = sessionStorage.getItem('currentChatProvider');
-  if (storedProvider) {
-    try {
-      const provider = JSON.parse(storedProvider);
-      // Find if this provider already has a conversation
-      const existingConv = conv?.find((c: any) =>
-        c.user._id === provider._id ||
-        c.user.userId === provider._id
-      );
+    // Check if we have a provider from the Chat Now button click
+    const storedProvider = sessionStorage.getItem('currentChatProvider');
+    if (storedProvider) {
+      try {
+        const provider = JSON.parse(storedProvider);
+        // Find if this provider already has a conversation
+        const existingConv = conv?.find((c: any) =>
+          c.user._id === provider._id ||
+          c.user.userId === provider._id
+        );
 
-      if (existingConv) {
-        setSelectedOption(existingConv);
-        fetchMessages(existingConv.conversationId, existingConv.user);
-      } else {
-        // Create a new conversation item for this provider
-        const newConvItem = {
-          user: {
-            _id: provider._id,
-            name: provider.name,
-            email: provider.email || '',
-            avatar: provider.avatar?.url || '',
-            receiverId: provider._id
-          },
-          conversationId: 'new'
-        };
-        setSelectedOption(newConvItem);
-        fetchMessages('new', provider._id);
+        if (existingConv) {
+          setSelectedOption(existingConv);
+          fetchMessages(existingConv.conversationId, existingConv.user);
+        } else {
+          // Create a new conversation item for this provider
+          const newConvItem = {
+            user: {
+              _id: provider._id,
+              name: provider.name,
+              email: provider.email || '',
+              avatar: provider.avatar?.url || '',
+              receiverId: provider._id
+            },
+            conversationId: 'new'
+          };
+          setSelectedOption(newConvItem);
+          fetchMessages('new', provider._id);
+        }
+
+        // Clear the stored provider after using it
+        sessionStorage.removeItem('currentChatProvider');
+      } catch (error) {
+        console.error('Error parsing stored provider:', error);
+        sessionStorage.removeItem('currentChatProvider');
       }
-
-      // Clear the stored provider after using it
-      sessionStorage.removeItem('currentChatProvider');
-    } catch (error) {
-      console.error('Error parsing stored provider:', error);
-      sessionStorage.removeItem('currentChatProvider');
     }
-  }
-}, [conv, fetchMessages, fetchMsgData]); // Added fetchMessages to dependencies
+  }, [conv, fetchMessages, fetchMsgData]); // Added fetchMessages to dependencies
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -712,6 +714,13 @@ const fetchMsgData = useCallback((convId: string | undefined, userData: any) => 
                   }
                 }}
                 InputProps={{
+                  startAdornment: (
+                    <InputAdornment position='start'>
+                      <IconButton onClick={() => setShowPicker(!showPicker)}>
+                        <EmojiEmotionsRounded fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={() => console.log('Camera clicked')}>
@@ -729,6 +738,19 @@ const fetchMsgData = useCallback((convId: string | undefined, userData: any) => 
                   ),
                 }}
               />
+              {showPicker && (
+                <Box sx={{position:"absolute",top:'117px'}}>
+                <EmojiPicker
+                
+                  onEmojiClick={emojiObject => {
+                    setMessage(prev => prev + emojiObject.emoji);
+                    setShowPicker(!showPicker)
+                  }}
+                  width={300}
+                  height={400}
+                />
+                </Box>
+              )}
               {/* Hidden file inputs */}
               <input
                 type="file"

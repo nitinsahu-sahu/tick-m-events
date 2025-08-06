@@ -3,7 +3,8 @@ import { globalOverviewStatisticsConstants } from "../actions/constants";
 const initialState = {
     message: '',
     providers: [],
-    dashboardData:{},
+    dashboardData: {},
+    activities: [],
     loading: true,
     error: null
 };
@@ -13,7 +14,28 @@ const globalOverviewGeneralStatisticsReducer = (state, action) => {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
-         case globalOverviewStatisticsConstants.GET_DASHBOARD_ACTIVITY_REQUEST:
+        case globalOverviewStatisticsConstants.FETCH_TICKETING_ACTIVITY_REQUEST:
+            return {
+                ...state,
+                loading: true,
+            };
+
+        case globalOverviewStatisticsConstants.FETCH_TICKETING_ACTIVITY_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                activities: action.payload,
+                error: null,
+            };
+
+        case globalOverviewStatisticsConstants.FETCH_TICKETING_ACTIVITY_FAILURE:
+            return {
+                ...state,
+                loading: true,
+                error: action.payload,
+            };
+
+        case globalOverviewStatisticsConstants.GET_DASHBOARD_ACTIVITY_REQUEST:
             return { ...state, loading: true };
 
         case globalOverviewStatisticsConstants.GET_DASHBOARD_ACTIVITY_SUCCESS:

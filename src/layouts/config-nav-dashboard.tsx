@@ -85,8 +85,8 @@ export const navData: NavItem[] = [
     roles: ['organizer'],
   },
   {
-    title: 'Marketing Engagenment',
-    path: '/marketing-engagenment',
+    title: 'Marketing & Engagement',
+    path: '/marketing-engagement',
     icon: icon('ic-marketing-ngagenment'),
     roles: ['organizer'],
   },
@@ -97,8 +97,8 @@ export const navData: NavItem[] = [
     roles: ['organizer'],
   },
   {
-    title: 'Transection & Payment',
-    path: '/transection-and-payment',
+    title: 'Transaction & Payment',
+    path: '/transaction-and-payment',
     icon: icon('ic-transaction-&-payment'),
     roles: ['organizer'],
   },

@@ -159,11 +159,11 @@ export function Router() {
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><TicketAndReservationManagementPage /></RoleProtectedRoute>
         },
         {
-          path: '/marketing-engagenment',
+          path: '/marketing-engagement',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><MarketingEngagenmentPage /></RoleProtectedRoute>
         },
         {
-          path: '/transection-and-payment',
+          path: '/transaction-and-payment',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><TransectionAndPaymentPage /></RoleProtectedRoute>
         },
         {

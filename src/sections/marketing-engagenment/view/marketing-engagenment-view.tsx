@@ -33,7 +33,7 @@ export function MarketingEngagenmentView() {
 
   return (
     <DashboardContent>
-      <PageTitleSection title="Promotions & Special Offers" />
+      <PageTitleSection title="Marketing & Engagement" />
       <EventBreadCrum events={eventsWithOrdersAndParticiapnt} onEventSelect={handleEventSelect} />
 
       <ActivePromotion selEvent={selectedEvent} />

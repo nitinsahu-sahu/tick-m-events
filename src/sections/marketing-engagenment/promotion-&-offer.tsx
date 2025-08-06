@@ -6,6 +6,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
 import { promotionCreate, promotionEvents } from 'src/redux/actions/promotionAndOffer';
 import { AppDispatch, RootState } from 'src/redux/store';
@@ -136,9 +137,8 @@ export function PromotionsAndOffers({ selEvent }: any) {
     <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: '1px solid black' }}>
 
       <Box display="flex" justifyContent="space-between" mb={2}>
-        <Typography variant="h6" fontSize={{ xs: 15, sm: 20, md: 26 }} fontWeight={500}>
-          Promotions & Special Offers
-        </Typography>
+        <HeadingCommon title=" Marketing & Engagement" variant="h6"/>
+      
       </Box>
       <Button
         fullWidth

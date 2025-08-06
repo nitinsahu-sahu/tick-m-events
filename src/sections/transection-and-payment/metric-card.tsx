@@ -12,10 +12,10 @@ export function MetricCard() {
     
       // Data for metric cards
       const metrics = [
-        { title: "Total Sales", value: "$50,000", color: "#2295D4", light:"rgb(75, 162, 209)" },
-        { title: "Available Balance", value: "$45,000", color: "#2C8743",light:"rgba(104, 196, 127, 0.5)" },
-        { title: "Pending Funds", value: "$5,200", color: "#F9D000",light:"rgb(191, 178, 112)" },
-        { title: "Refunded Amounts", value: "$5,200", color: "#F90004",light:"rgb(163, 74, 75)" },
+        { title: "Total Sales", value: "50,000 XAF", color: "#2295D4", light:"rgb(75, 162, 209)" },
+        { title: "Available Balance", value: "45,000 XAF", color: "#2C8743",light:"rgba(104, 196, 127, 0.5)" },
+        { title: "Pending Funds", value: "5,200 XAF", color: "#F9D000",light:"rgb(191, 178, 112)" },
+        { title: "Refunded Amounts", value: "5,200 XAF", color: "#F90004",light:"rgb(163, 74, 75)" },
       ];
 
     return (

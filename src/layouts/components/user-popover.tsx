@@ -34,7 +34,7 @@ export function UserPopover() {
     const hiddenReserContracts = ['/reservations-and-contracts'];
     const hiddenCustomPhotoVideo = ['/custom-photo-or-video-filters-for-events'];
     const hiddenEventSearchDetails = ['/event-search-and-details'];
-    const hiddenTranPaymet = ['/transection-and-payment'];
+    const hiddenTranPaymet = ['/transaction-and-payment'];
     const hiddenDashboard = ['/'];
     const hiddenEventDetails = ['/events/add-new'];
     const hiddenVisibilityAccess = ['/visibility-and-access-settings'];

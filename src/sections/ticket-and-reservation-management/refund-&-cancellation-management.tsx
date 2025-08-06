@@ -126,6 +126,15 @@ export function RefundAndCancellationManangement({ orderList }: any) {
 
     if (result.status === 200) {
       toast.success(result.message || "Refund policy updated successfully!");
+      const newInitialPolicy = {
+        selectedPolicy,
+        daysBeforeEvent,
+        partialRefundPercent,
+        cutoffDate,
+      };
+      initialPolicyRef.current = newInitialPolicy;
+      setIsModified(false); // this will disable the button
+
     } else {
       toast.error(result.message || "Something went wrong.");
     }

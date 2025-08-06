@@ -16,13 +16,15 @@ import fetchMessagesReducers from './message.reducer'
 import { paymentSettingsReducer } from './payment-setting.reducer';
 import { adminVerificationListReducer } from './verificationReducers'
 import { userReducer } from './userReducer';
-import editEventReducer from './editEventReducer'
+import editEventReducer from './organizer/editEventReducer'
+import pageEventReducer from './organizer/pageEvents.reducer'
 import homeAndGlobalReducer from './homeAndGlobal.reducer'
 import globalOverviewGeneralStatisticsReducer from './global-overview-general-statistice.reducer'
-import {notificationReducer} from './notification.reducer';
+import { notificationReducer } from './notification.reducer';
 
 const rootReducer = combineReducers({
-    gogs:globalOverviewGeneralStatisticsReducer,
+    organizer: pageEventReducer,
+    gogs: globalOverviewGeneralStatisticsReducer,
     notification: notificationReducer,
     homeAndGlobal: homeAndGlobalReducer,
     editEvent: editEventReducer,

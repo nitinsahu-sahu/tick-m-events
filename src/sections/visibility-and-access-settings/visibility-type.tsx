@@ -1,5 +1,5 @@
 import { Box, Button, Tooltip, FormControl, IconButton, FormControlLabel, Grid, InputLabel, MenuItem, Radio, SelectChangeEvent, RadioGroup, Select, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { toast } from 'react-toastify';
@@ -7,8 +7,9 @@ import { toast } from 'react-toastify';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { eventUpdate } from 'src/redux/actions/event.action';
+import { promotionEvents } from 'src/redux/actions';
 
-export function VisibilityType() {
+export function VisibilityType({ eventId, visibility }: any) {
   const dispatch = useDispatch<AppDispatch>();
   const { eventsWithOrdersAndParticiapnt } = useSelector((state: RootState) => state?.promotionList);
 
@@ -84,6 +85,9 @@ export function VisibilityType() {
     setError(null);
   };
 
+  useEffect(() => {
+    dispatch(promotionEvents());
+  }, [dispatch]);
   return (
     <Box
       boxShadow={3}

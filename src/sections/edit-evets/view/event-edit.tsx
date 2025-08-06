@@ -13,7 +13,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { editEventsFetch, deleteEvent } from 'src/redux/actions/editEventAction';
+import { editEventsFetch, deleteEvent } from 'src/redux/actions/organizer/editEventAction';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { formatTimeTo12Hour } from 'src/hooks/formate-time';
 import { Iconify } from 'src/components/iconify';

@@ -29,10 +29,10 @@ export function ProfileCard({ selectedProvider, onRequestService }: any) {
   const { services } = selectedProvider
   const [copySuccess, setCopySuccess] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
- const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
+  const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
   const openShareMenu = Boolean(shareAnchorEl);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
- const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   useEffect(() => {
     dispatch(promotionEvents())
   }, [dispatch])
@@ -68,7 +68,7 @@ export function ProfileCard({ selectedProvider, onRequestService }: any) {
     );
   }
 
-    const handleShareClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleShareClick = (event: React.MouseEvent<HTMLElement>) => {
     setShareAnchorEl(event.currentTarget);
   };
 

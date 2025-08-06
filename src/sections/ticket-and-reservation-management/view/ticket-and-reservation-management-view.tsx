@@ -8,22 +8,21 @@ import { AppDispatch, RootState } from "src/redux/store";
 import { fetchTicketType } from "src/redux/actions/ticket-&-reservation-management.action";
 import { EventBreadCrum } from "src/sections/entry-validation/event-status";
 import { eventFetch } from "src/redux/actions/event.action";
+import { fatchOrgEvents } from "src/redux/actions/organizer/pageEvents";
 
 import { TicketManagement } from "../ticket-management";
 import { SalesAndStockTracking } from "../sales-&-stock-tracking";
 import { ReservationManagement } from "../reservation-management";
 import { RefundAndCancellationManangement } from "../refund-&-cancellation-management";
 
-
 import("../style.css")
-
-
 
 export function TicketAndReservationManagementView() {
   const location = useLocation();
   const locationSelectedEvent = location.state?.selectedEvent;
   const { tickets } = useSelector((state: RootState) => state?.ticketReservationMang);
   const { fullData } = useSelector((state: RootState) => state?.event);
+  const { __events } = useSelector((state: RootState) => state?.organizer);
 
   const dispatch = useDispatch<AppDispatch>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -33,6 +32,8 @@ export function TicketAndReservationManagementView() {
   };
 
   useEffect(() => {
+        dispatch(fatchOrgEvents());
+    
     const interval = setInterval(() => {
       dispatch(fetchTicketType());
       dispatch(eventFetch());
@@ -61,7 +62,7 @@ export function TicketAndReservationManagementView() {
 
   return (
     <DashboardContent>
-        <EventBreadCrum events={fullData} onEventSelect={handleEventSelect} eventInformation={selectedEvent} />
+      <EventBreadCrum events={__events} onEventSelect={handleEventSelect} eventInformation={selectedEvent} />
 
       <PageTitleSection
         title="Ticket & Reservation Management"

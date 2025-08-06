@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
 
-import { editEventsFetch, updateEvent } from 'src/redux/actions/editEventAction';
+import { editEventsFetch, updateEvent } from 'src/redux/actions/organizer/editEventAction';
 import { AppDispatch } from 'src/redux/store';
 
 import { EventData } from './utills';

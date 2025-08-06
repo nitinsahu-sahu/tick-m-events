@@ -71,10 +71,19 @@ export function RefundAndCancellationManangement({ orderList }: any) {
         partialRefundPercent: "",
         cutoffDate: date
       };
-    } else {
+    } else if (refundPolicy.noRefund) {
       setSelectedPolicy("noRefund");
       initialPolicy = {
         selectedPolicy: "noRefund",
+        daysBeforeEvent: "",
+        partialRefundPercent: "",
+        cutoffDate: ""
+      };
+    } else {
+      // **Neither policy selected nor explicitly “noRefund”**
+      setSelectedPolicy("");
+      initialPolicy = {
+        selectedPolicy: "",
         daysBeforeEvent: "",
         partialRefundPercent: "",
         cutoffDate: ""

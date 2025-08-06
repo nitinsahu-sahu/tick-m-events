@@ -6,6 +6,8 @@ import { eventFetch } from "src/redux/actions/event.action";
 import { AppDispatch, RootState } from "src/redux/store";
 import { PageTitleSection } from "src/components/page-title-section";
 import { DashboardContent } from "src/layouts/dashboard";
+import { EventBreadCrum } from "src/sections/entry-validation/event-status";
+import { fatchOrgEvents } from "src/redux/actions/organizer/pageEvents";
 
 import { LiveSalesRevenueData } from "../live-sales-&-revenue-data";
 import { MainDashboardStatistics } from "../main-dashboard-statistics";
@@ -18,10 +20,13 @@ export function StatisticsAndReportsView() {
   const [activeTab, setActiveTab] = useState("Overview");
   const { fullData } = useSelector((state: RootState) => state?.event);
   const dispatch = useDispatch<AppDispatch>();
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const { __events } = useSelector((state: RootState) => state?.organizer);
 
   useEffect(() => {
     // Fetch immediately on mount
     dispatch(eventFetch());
+    dispatch(fatchOrgEvents());
 
     // Set up polling every 5 minutes (300,000 ms)
     const intervalId = setInterval(() => {
@@ -38,9 +43,15 @@ export function StatisticsAndReportsView() {
     "Participant Engagement",
     "Comparisons",
   ];
-
+const handleEventSelect = (event: Event | null) => {
+    setSelectedEvent(event);
+    // Do something with the selected event data
+  };
   return (
     <DashboardContent>
+            <EventBreadCrum events={__events} onEventSelect={handleEventSelect} />
+
+
       <PageTitleSection title="Sales & Revenue Overviews" />
 
       {/* Row 3: Tab Buttons */}

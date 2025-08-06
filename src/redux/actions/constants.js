@@ -292,7 +292,7 @@ export const eventOrderConstants = {
     VERIFY_TICKET_FAILURE: 'VERIFY_TICKET_FAILURE',
 }
 
-export const editeventConstants = {
+export const organizerEventConstants = {
     DELETE_REQUEST: "DELETE_REQUEST",
     DELETE_SUCCESS: "DELETE_SUCCESS",
     DELETE_FAILURE: "DELETE_FAILURE",
@@ -304,6 +304,10 @@ export const editeventConstants = {
     GET_REQUEST: "GET_REQUEST",
     GET_SUCCESS: "GET_SUCCESS",
     GET_FAILURE: "GET_FAILURE",
+
+    GET_ORGANIZR_EVENTS_REQUEST: "GET_ORGANIZR_EVENTS_REQUEST",
+    GET_ORGANIZR_EVENTS_SUCCESS: "GET_ORGANIZR_EVENTS_SUCCESS",
+    GET_ORGANIZR_EVENTS_FAILURE: "GET_ORGANIZR_EVENTS_FAILURE",
 }
 
 export const socialMediaConstants = {

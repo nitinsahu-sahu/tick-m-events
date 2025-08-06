@@ -53,7 +53,7 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
         }
     }, [events, selectedEvent, eventInformation, onEventSelect]);
 
-     const handleChange = (e: any) => {
+    const handleChange = (e: any) => {
         const selectedId = e.target.value;
         const event = events.find((ev: any) => ev._id === selectedId) || null;
         setSelectedEvent(event);
@@ -69,53 +69,43 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
             key={eventInformation?._id}
         >
             {/* Left Section: Event & Status */}
-            {!showSection && (
-                <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
-                    <Typography fontWeight={600} fontSize={13}>Event</Typography>
-                    <Typography color="text.secondary" fontSize={13}>/</Typography>
-                    <FormControl sx={{ minWidth: 150 }} size="small">
-                        <Select
-                            value={selectedEvent?._id || ''}
-                            onChange={handleChange}
-                            displayEmpty
-                            size="small"
-                            sx={{
-                                fontSize: '0.8rem',
-                                height: '25px',
-                                '& .MuiSelect-select': {
-                                    padding: '6px 12px'
-                                },
-                                textTransform: "capitalize"
-                            }}
-                        >
-                            <MenuItem value="" disabled>
-                                Select an event
+            <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
+                <Typography fontWeight={600} fontSize={13}>Event</Typography>
+                <Typography color="text.secondary" fontSize={13}>/</Typography>
+                <FormControl sx={{ minWidth: 150 }} size="small">
+                    <Select
+                        value={selectedEvent?._id || ''}
+                        onChange={handleChange}
+                        displayEmpty
+                        size="small"
+                        sx={{
+                            fontSize: '0.8rem',
+                            height: '25px',
+                            '& .MuiSelect-select': {
+                                padding: '6px 12px'
+                            },
+                            textTransform: "capitalize"
+                        }}
+                    >
+                        <MenuItem value="" disabled>
+                            Select an event
+                        </MenuItem>
+                        {events?.map((event: any) => (
+                            <MenuItem
+                                key={event._id}
+                                value={event._id}
+                                sx={{
+                                    fontSize: '0.8rem',
+                                    minHeight: '32px',
+                                    textTransform: "capitalize"
+                                }}
+                            >
+                                {event.eventName}
                             </MenuItem>
-                            {events?.map((event: any) => (
-                                <MenuItem
-                                    key={event._id}
-                                    value={event._id}
-                                    sx={{
-                                        fontSize: '0.8rem',
-                                        minHeight: '32px',
-                                        textTransform: "capitalize"
-                                    }}
-                                >
-                                    {event.eventName}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Box>
-            )}
-
-            {showSection && (
-                <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
-                    <Typography fontWeight={600} fontSize={13}>Event</Typography>
-                    <Typography color="text.secondary" fontSize={13}>/</Typography>
-                    <Typography color="text.secondary" fontSize={13}>{eventInformation?.eventName || "select code"}</Typography>
-                </Box>
-            )}
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
 
             {/* Right Section: Connection Status + View Buttons */}
             {showSection && (

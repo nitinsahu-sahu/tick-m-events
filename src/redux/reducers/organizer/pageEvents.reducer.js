@@ -1,29 +1,29 @@
-import { editeventConstants } from "../actions/constants";
+import { organizerEventConstants } from "../../actions/constants";
 
 const initialState = {
     message: '',
-    eventsLists: [],
+    __events: [],
     error: null,
     loading: true
 };
 
-const editEventReducer = (state, action) => {
+const pageEventReducer = (state, action) => {
     if (state === undefined) {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
-        case editeventConstants.GET_REQUEST:
+        case organizerEventConstants.GET_ORGANIZR_EVENTS_REQUEST:
             return { ...state, loading: true };
 
-        case editeventConstants.GET_SUCCESS:
+        case organizerEventConstants.GET_ORGANIZR_EVENTS_SUCCESS:
             return {
                 ...state,
-                eventsLists: action.payload.eventsLists,
+                __events: action.payload.__event,
                 message: action.payload.message,
                 loading: false
             };
 
-        case editeventConstants.GET_FAILURE:
+        case organizerEventConstants.GET_ORGANIZR_EVENTS_FAILURE:
             return {
                 ...state,
                 message: action.payload.message,
@@ -36,4 +36,4 @@ const editEventReducer = (state, action) => {
 };
 
 
-export default editEventReducer;
+export default pageEventReducer;

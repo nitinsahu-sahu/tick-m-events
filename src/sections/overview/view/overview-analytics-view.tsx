@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 
 import "react-calendar/dist/Calendar.css";
 import "../CustomCalendar.css"; // Custom styling for event indicators
+import { fatchOrgEvents } from 'src/redux/actions/organizer/pageEvents';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 import { Chart } from "src/components/chart";
@@ -52,6 +53,7 @@ function getDayName(dateString: string): string {
 
 export function OverviewAnalyticsView() {
   const { upcomingEvents, latestEvents, latestSales } = useSelector((state: RootState) => state?.homeRecom);
+  const { __events } = useSelector((state: RootState) => state?.organizer);
   const eventDates = latestEvents?.map((event: any) => new Date(event.date).toDateString());
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const dispatch = useDispatch<AppDispatch>();
@@ -77,6 +79,8 @@ export function OverviewAnalyticsView() {
   useEffect(() => {
     dispatch(recommTrandingPopularEventFetch());
     dispatch(fetchLatestSales());
+    dispatch(fatchOrgEvents());
+    
   }, [dispatch]);
 
 
@@ -116,7 +120,7 @@ export function OverviewAnalyticsView() {
   };
   return (
     <DashboardContent>
-      <EventBreadCrum events={upcomingEvents} onEventSelect={handleEventSelect} />
+      <EventBreadCrum events={__events} onEventSelect={handleEventSelect} />
 
       <PageTitleSection
         title="Dashboard"

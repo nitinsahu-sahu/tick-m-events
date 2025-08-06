@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
-  Modal, Collapse, Box, Select, MenuItem, InputLabel, FormControl, Typography,
-  Button, Avatar, Grid, Paper, Divider, SelectChangeEvent, IconButton,
+  Modal, Collapse, Box, MenuItem, Typography,
+  Button, Avatar, Grid, IconButton,
   Menu, ListItemIcon, Dialog, DialogTitle,
   DialogContent, DialogActions
 } from "@mui/material";
@@ -18,13 +18,17 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { TabButton } from 'src/components/button/multiple-button';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { providersListFetch } from 'src/redux/actions/searchSelect';
+import { fatchOrgEvents } from 'src/redux/actions/organizer/pageEvents';
+import { EventBreadCrum } from 'src/sections/entry-validation/event-status';
 import { eventFetch } from 'src/redux/actions/event.action';
 import { getAccepedByProiver, getRequestsByOrganizer } from 'src/redux/actions/service-request';
+
 import { SearchAndAdvanceFilter } from '../SearchAndAdvanceFilter';
 import ProviderCardList from '../ProviderCardList';
 import { ProfileCard } from '../ProfileCard';
 import RequestService from '../RequestService';
 import { RequestAService } from '../RequestAService';
+
 
 interface PhoneNumberDisplayProps {
   phoneNumber: string;
@@ -35,6 +39,7 @@ export function SearchAndSelectServiceProvidersView() {
   const { providersList } = useSelector((state: RootState) => state?.providers);
   const { organizerRequests, accepedProviderReq } = useSelector((state: RootState) => state?.serviceRequest);
   const [select, setSelected] = useState<any>({})
+  const { __events } = useSelector((state: RootState) => state.organizer);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
@@ -46,6 +51,7 @@ export function SearchAndSelectServiceProvidersView() {
   const openShareMenu = Boolean(shareAnchorEl);
   const [copySuccess, setCopySuccess] = useState(false);
   const [offerList, setOfferList] = useState({})
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const handleSelct = (row: any) => {
     setSelected(row)
@@ -80,7 +86,7 @@ export function SearchAndSelectServiceProvidersView() {
     dispatch(providersListFetch())
     dispatch(eventFetch());
     dispatch(getAccepedByProiver());
-    
+
   }, [dispatch, providersList])
 
   useEffect(() => {
@@ -152,8 +158,19 @@ export function SearchAndSelectServiceProvidersView() {
     handleShareClose();
   };
 
+
+  useEffect(() => {
+    dispatch(fatchOrgEvents());
+  }, [dispatch]);
+
+  const handleEventSelect = (event: Event | null) => {
+    setSelectedEvent(event);
+  };
+
   return (
     <DashboardContent>
+      <EventBreadCrum events={__events} onEventSelect={handleEventSelect} />
+
       <PageTitleSection title="Search & Select Service Providers" />
 
       <Box display='flex' justifyContent='center'>
@@ -183,7 +200,7 @@ export function SearchAndSelectServiceProvidersView() {
         <RequestService requests={organizerRequests} />
       )}
       {tabValue === 4 && (
-        <RequestAService requests={accepedProviderReq}/>
+        <RequestAService requests={accepedProviderReq} />
       )}
       <Modal
         open={isModalOpen}

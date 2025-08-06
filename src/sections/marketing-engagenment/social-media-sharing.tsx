@@ -45,7 +45,7 @@ const platforms = [
 export function SocialMediaSharing({ selEvent }: any) {
     console.log("sss", selEvent);
     const [description, setDescription] = useState('Join us for an unforgettable experience! Get your tickets now!');
-    const [reservationLink, setReservationLink] = useState('https://tick-m-events.vercel.app/our-event');
+    const [reservationLink, setReservationLink] = useState('');
     const [hashtag, setHashtag] = useState('#AmazingEvent2025');
     const [eventImage, setEventImage] = useState<string | null>(null);
     const [savedPostData, setSavedPostData] = useState<PostData | null>(null);
@@ -55,6 +55,13 @@ export function SocialMediaSharing({ selEvent }: any) {
     const { user } = useSelector((state: RootState) => state.auth);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+    useEffect(() => {
+        if (selEvent?._id) {
+            const fullReservationLink = `https://tick-m-events.vercel.app/our-event/${selEvent._id}`;
+            setReservationLink(fullReservationLink);
+        }
+    }, [selEvent]);
+
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             setSelectedFile(e.target.files[0]);
@@ -62,76 +69,6 @@ export function SocialMediaSharing({ selEvent }: any) {
             setEventImage(imageUrl);
         }
     };
-
-    // const handlePost = async () => {
-    //     if (!eventImage || !selectedFile) {
-    //         alert("Please select an image");
-    //         return;
-    //     }
-
-    //     const formData = new FormData();
-    //     formData.append('eventId', selEvent?._id);
-    //     formData.append('createdBy', user?._id);
-    //     formData.append('platform', selectedPlatform.label);
-    //     formData.append('description', description);
-    //     formData.append('reservationLink', reservationLink);
-    //     formData.append('hashtag', hashtag);
-    //     formData.append('image', selectedFile);
-
-    //     const response = await dispatch(createSocialMediaPost(formData)) as any;
-    //     console.log("Post creation response: ", response);
-    //     const post = response?.post;
-
-    //     if (post && post._id) {
-    //         try {
-    //             const shareRes = await fetch(`https://tick-m-events-server.onrender.com/api/v1/promotion/social-share/${post._id}`, {
-    //                 headers: { Accept: 'text/html' }
-    //             });
-
-    //             if (!shareRes.ok) throw new Error(`HTTP ${shareRes.status}`);
-
-    //             const htmlText = await shareRes.text();
-
-    //             // Use DOMParser to parse the HTML and extract OG meta tags
-    //             const parser = new DOMParser();
-    //             const doc = parser.parseFromString(htmlText, 'text/html');
-
-    //             const eventName = doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || undefined;
-    //             const eventDateAndDescription = doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || undefined;
-
-    //             setSavedPostData(prev => {
-    //                 const base: PostData = prev ?? {
-    //                     _id: post._id,
-    //                     description,
-    //                     reservationLink,
-    //                     hashtag,
-    //                     eventImage,
-    //                     eventId: selEvent?._id,
-    //                     createdBy: user?._id,
-    //                     platform: selectedPlatform.label,
-    //                     imageUrl: post.imageUrl,
-    //                     eventName: undefined,
-    //                     eventDate: undefined,
-    //                 };
-
-    //                 return {
-    //                     ...base,
-    //                     eventName,
-    //                     eventDate: eventDateAndDescription,  // or parse a date string here
-    //                 };
-    //             });
-
-    //             alert("Post saved and data loaded!");
-    //         } catch (err) {
-    //             console.error("Error loading OG data:", err);
-    //             alert("Post saved, but failed to load OG data.");
-    //         }
-
-
-    //     } else {
-    //         alert("Failed to save post");
-    //     }
-    // };
 
     const handlePost = async () => {
         if (!eventImage || !selectedFile) {
@@ -303,7 +240,7 @@ export function SocialMediaSharing({ selEvent }: any) {
                     />
 
                     <Typography variant="body2" fontWeight="bold" mb={1}>Reservation Link</Typography>
-                    <TextField fullWidth value={reservationLink} onChange={(e) => setReservationLink(e.target.value)} sx={{ mb: 2 }} />
+                    <TextField disabled fullWidth value={reservationLink} onChange={(e) => setReservationLink(e.target.value)} sx={{ mb: 2 }} />
 
                     <Typography variant="body2" fontWeight="bold" mb={1}>Hashtag</Typography>
                     <TextField fullWidth value={hashtag} onChange={(e) => setHashtag(e.target.value)} sx={{ mb: 2 }} />

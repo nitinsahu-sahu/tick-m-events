@@ -44,6 +44,7 @@ export function HomeAndRecommendationsView() {
     async function fetchTickets() {
       try {
         const response = await axios.get(`/event-order/user/${_id}`);
+        
         const allTickets: Ticket[] = response.data;
         setTickets(allTickets);
 

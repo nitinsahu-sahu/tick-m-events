@@ -507,3 +507,34 @@ export const eventCustomizationPageFetch = (eventId) => async (dispatch) => {
         };
     }
 };
+
+// Event Updation
+export const eventVisibilityUpdate = (updatedEvent) => async (dispatch) => {
+
+    const eventId = updatedEvent?._id
+    dispatch({ type: eventConstants.UPDATE_EVENT_VISIBILITY_REQUEST });
+
+    try {
+        const response = await axios.patch(`/o/edit-event-visibility/${eventId}`, updatedEvent);
+        dispatch({
+            type: eventConstants.UPDATE_EVENT_VISIBILITY_SUCCESS,
+            payload: { message: response?.data?.message },
+        });
+        dispatch(eventFetch())
+        return {
+            type: eventConstants.UPDATE_EVENT_VISIBILITY_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
+    } catch (error) {
+        dispatch({
+            type: eventConstants.UPDATE_EVENT_VISIBILITY_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+        return {
+            type: eventConstants.UPDATE_EVENT_VISIBILITY_FAILURE,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status
+        };
+    }
+};

@@ -9,8 +9,8 @@ export function UpComingCard({ ticket }: any) {
     <Card sx={{ height: '100%' }}>
 
       <CardContent>
-        <HeadingCommon variant="h6" color="#0B2E4C" weight={600} baseSize="25px" title={ticket.eventDetails.eventName} />
-        <HeadingCommon variant="body2" weight={400} baseSize="16px" title={`${ticket.eventDetails.location} | ${ticket.eventDetails.date} | ${formatTimeTo12Hour(ticket.eventDetails.time)}`} />
+        <HeadingCommon variant="h6" color="#0B2E4C" weight={600} baseSize="25px" title={ticket.eventDetails?.eventName} />
+        <HeadingCommon variant="body2" weight={400} baseSize="16px" title={`${ticket.eventDetails?.location} | ${ticket.eventDetails?.date} | ${formatTimeTo12Hour(ticket.eventDetails?.time)}`} />
 
         <Box mt={2}>
           <Grid container spacing={1}>

@@ -4,6 +4,8 @@ import { HeadingCommon } from 'src/components/multiple-responsive-heading/headin
 import { ProviderListView } from './PopularEvent';
 
 export default function ProviderCardList({ handleSelct, providersList }: any) {
+  console.log('list', providersList);
+
   const [view, setView] = useState<'card' | 'list'>('card');
   return (
     <Paper
@@ -60,10 +62,10 @@ export default function ProviderCardList({ handleSelct, providersList }: any) {
                   // Handle view details action
                   handleSelct(provider);
                 }}
-                
+
                 key={provider._id || index}
                 sx={{
-                  cursor:"pointer",
+                  cursor: "pointer",
                   borderBottom: '1px solid #eee',
                   '&:hover': { backgroundColor: '#f5f5f5' },
                   alignItems: 'flex-start', // Align items to top
@@ -124,12 +126,14 @@ export default function ProviderCardList({ handleSelct, providersList }: any) {
                   primary={provider.name}
                   primaryTypographyProps={{ fontWeight: 'bold', variant: 'h6' }}
                   secondary={
-                    <>
-                      <Typography component="span" variant="body2" color="text.primary">
-                        {provider.category}
-                      </Typography>
-                      {provider.description && ` — ${provider.description}`}
-                    </>
+                    <Typography
+                  variant="body2"
+                  color="black"
+                  fontWeight={400}
+                  fontSize={{ xs: '8px', sm: '12px', md: '16px' }}
+                >
+                  {provider.averageRating} ★ &nbsp; | &nbsp; {provider.username} &nbsp; | {provider.address}
+                </Typography>
                   }
                 />
               </ListItem>

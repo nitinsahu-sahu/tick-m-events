@@ -127,14 +127,15 @@ export function OverviewAnalyticsView() {
         rightCom={<CountDownView selectedEvent={selectedEvent} />} // Passing SearchBar component as a prop
       />
 
-      <AnalyticsFourCards
+     <AnalyticsFourCards
         up={up}
         chartOptions={chartOptions}
         percentage={percentage}
         donutChartOptions={donutChartOptions}
+        selectedEvent={selectedEvent}
       />
 
-      <WalletBalance />
+        <WalletBalance selectedEvent={selectedEvent} />
 
       {/* Best Selling */}
       <BestSelling
@@ -143,6 +144,7 @@ export function OverviewAnalyticsView() {
         donutBestSellingChartOptions={donutBestSellingChartOptions}
         donutBestSellingChartSeries={donutBestSellingChartSeries}
         chartOptions={chartOptions}
+        selectedEvent={selectedEvent}
       />
 
 

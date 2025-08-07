@@ -149,7 +149,7 @@ export function ProviderListView({ providers, handleSelct }: any) {
           fontWeight={400}
           fontSize={{ xs: '8px', sm: '12px', md: '16px' }}
         >
-          {providers.averageRating} ★ &nbsp; | &nbsp; {providers.username} &nbsp; | {providers.status}
+          {providers.averageRating} ★ &nbsp; | &nbsp; {providers.username} &nbsp; | {providers.address}
         </Typography>
 
         <Grid container spacing={2} mt={2} justifyContent="center">

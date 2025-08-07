@@ -66,11 +66,35 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
             alignItems="center"
             flexWrap="wrap"
             gap={2}
+            px={2}
             key={eventInformation?._id}
+            sx={{
+                position: 'sticky',
+                top: 70,
+                zIndex: 1000,
+                backgroundColor: 'rgba(0, 0, 0, 0.4)', // Transparent black (70% opacity)
+                backdropFilter: 'blur(8px)', // Adds a frosted glass effect
+                py: 1,
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+                transition: 'background-color 0.3s ease', // Smooth transition effect
+                '& .MuiTypography-root': {
+                    color: 'white' // Ensure all text is white
+                },
+                '& .MuiSelect-select': {
+                    color: 'white' // Make select text white
+                },
+                '& .MuiSvgIcon-root': {
+                    color: 'white' // Make dropdown icon white
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)' // Light border for select
+                }
+            }}
         >
             {/* Left Section: Event & Status */}
             <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
-                <Typography fontWeight={600} fontSize={13}>Event</Typography>
+                <Typography fontWeight={600} fontSize={13} color="#3CB1F1">Event</Typography>
                 <Typography color="text.secondary" fontSize={13}>/</Typography>
                 <FormControl sx={{ minWidth: 150 }} size="small">
                     <Select

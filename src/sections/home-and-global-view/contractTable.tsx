@@ -115,7 +115,7 @@ export function ContractTable({
                                     }}
                                 >
                                     <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.service}</TableCell>
-                                    <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.eventId.eventName}</TableCell>
+                                    <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.eventId?.eventName}</TableCell>
                                     <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.location}</TableCell>
                                     <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.finalBudget}</TableCell>
                                     <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.contractStatus}</TableCell>

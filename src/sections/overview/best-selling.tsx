@@ -53,8 +53,19 @@ export function BestSelling(
         labels: hasData ? labels : fallbackLabels,
         legend: { show: false },
         colors: hasData ? undefined : ["#9E9E9E", "#F7F7F7"],
+        plotOptions: {
+            pie: {
+                dataLabels: {
+                    minAngleToShowLabel: 0 // show even tiny slices
+                }
+            }
+        },
         dataLabels: {
-            formatter: () => hasData ? '' : '0%',
+            enabled: true,
+            formatter: (val, opts) => {
+                const value = opts.w.config.series[opts.seriesIndex];
+                return `${value}`;
+            },
             style: {
                 colors: ['#FFFFFF'],
             },
@@ -275,14 +286,18 @@ function getLast7DaysTicketData(selectedEvent: any): number[] {
 
     return days.map(date => getTicketsSoldOnDate(selectedEvent, date));
 }
-function getTicketSalesData(event: any, selectedTicket: string): { labels: string[]; series: number[] } {
+
+
+
+function getTicketSalesData(event: any, selectedTicket: string): { labels: string[]; series: number[], total: number } {
     const ticketList = event?.tickets?.[0]?.tickets || [];
     const selected = ticketList.find((t: any) => t.ticketType === selectedTicket);
 
     if (!selected) {
         return {
-            labels: [selectedTicket || "Unknown Ticket"],
-            series: [0, 0],  // two series: sold, total
+            labels: ["Sold", "Pending"],
+            series: [0, 0],
+            total: 0
         };
     }
 
@@ -293,18 +308,29 @@ function getTicketSalesData(event: any, selectedTicket: string): { labels: strin
         if (order.paymentStatus !== "confirmed") return;
 
         order.tickets?.forEach((ticket: any) => {
-            if (ticket.ticketType === selectedTicket) {
+            if (ticket.ticketId === selected.id) {
                 soldCount += ticket.quantity || 0;
             }
         });
     });
 
-    // Return series as [soldCount, totalCount]
+    const pendingCount = Math.max(totalCount - soldCount, 0);
+
+    console.log({
+        selectedTicket,
+        totalCount,
+        soldCount,
+        pendingCount,
+        series: [soldCount, pendingCount]
+    });
+
     return {
-        labels: ["Sold", "Total"],  // or use ["Sold Tickets", "Total Tickets"]
-        series: [soldCount, totalCount],
+        labels: ["Sold", "Pending"],
+        series: [soldCount, pendingCount],
+        total: totalCount
     };
 }
+
 
 
 

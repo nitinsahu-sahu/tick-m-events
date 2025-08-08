@@ -110,7 +110,7 @@ const handleEventSelect = (event: Event | null) => {
       {activeTab === "Overview" && (
         <>
           <LiveSalesRevenueData />
-          <MainDashboardStatistics />
+         <MainDashboardStatistics selectedEvent={selectedEvent} />
           <TicketDetails events={fullData} />
         </>
       )}

@@ -28,7 +28,7 @@ import { HeadingCommon } from 'src/components/multiple-responsive-heading/headin
 
 import { SearchAndAdvanceFilter } from '../SearchAndAdvanceFilter';
 import ProviderCardList from '../ProviderCardList';
-import { ProfileCard } from '../ProfileCard';
+import { ProposalsCard } from '../ProposalsList';
 import RequestService from '../RequestService';
 import { RequestAService } from '../RequestAService';
 import { ServiceCard } from '../ServiceCard';
@@ -49,7 +49,7 @@ export function SearchAndSelectServiceProvidersView() {
   const [filtersApplied, setFiltersApplied] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const [tabValue, setTabValue] = useState(0);
-  const tabLabels = ["Global Search", "List of Providers", "Proposal", "Requested Sevice", "Place a Bid"];
+  const tabLabels = ["Global Search", "List of Providers", "Proposals", "Requested Sevice", "Place a Bid"];
   const [showDetails, setShowDetails] = useState(false);
   const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
   const openShareMenu = Boolean(shareAnchorEl);
@@ -124,7 +124,7 @@ export function SearchAndSelectServiceProvidersView() {
   };
 
   const copyProfileLink = () => {
-    const profileUrl = `${import.meta.env.VITE_Live_URL}pro/${select?._id}`;
+    const profileUrl = `${import.meta.env.VITE_FRONT_URL || 'https://tick-m-events.vercel.app'}/pro/${select?._id}`;
     navigator.clipboard.writeText(profileUrl);
     setCopySuccess(true);
     handleShareClose();
@@ -200,7 +200,7 @@ export function SearchAndSelectServiceProvidersView() {
           <ProviderCardList handleSelct={handleSelct} providersList={providersList} />
         )}
         {tabValue === 2 && (
-          <ProfileCard selectedProvider={offerList} onRequestService={handleRequestService} />
+          <ProposalsCard proposals={selectedEvent?.eventRequests} />
         )}
         {tabValue === 3 && (
           <RequestService requests={organizerRequests} />

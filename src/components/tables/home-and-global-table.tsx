@@ -94,16 +94,16 @@ export function HomeAndGlobalTable({
                                                 {row.eventId?.location}
                                             </TableCell>
                                             <TableCell align="center" sx={{ textTransform: "capitalize" }}>
-                                                {row.eventId.date}
+                                                {row.eventId?.date}
                                             </TableCell>
                                         </>
                                     ) : (
                                         <>
                                             <TableCell align="center" sx={{ fontWeight: "bold", textTransform: "capitalize" }}>
-                                                {row.service || row.eventId.eventName}
+                                                {row.service || row.eventId?.eventName}
                                             </TableCell>
                                             <TableCell align="center" sx={{ textTransform: "capitalize" }}>
-                                                {row.organizer || row.location || row.client || row.organizerId.name}
+                                                {row.organizer || row?.location || row?.client || row.organizerId?.name}
                                             </TableCell>
                                             <TableCell align="center">
                                                 {row.amountDue || row.datePosted || row.dateTime || row.lastMessage || row.eventId.date}

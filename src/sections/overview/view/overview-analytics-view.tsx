@@ -54,8 +54,10 @@ function getDayName(dateString: string): string {
 export function OverviewAnalyticsView() {
   const { upcomingEvents, latestEvents, latestSales } = useSelector((state: RootState) => state?.homeRecom);
   const { __events } = useSelector((state: RootState) => state?.organizer);
+  console.log("_ebey",__events);
   const eventDates = latestEvents?.map((event: any) => new Date(event.date).toDateString());
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  console.log("sele",selectedEvent);
   const dispatch = useDispatch<AppDispatch>();
   const [ticketType, setTicketType] = useState<TicketTypes>('VIP');
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('monthly');
@@ -118,6 +120,7 @@ export function OverviewAnalyticsView() {
   const handleTimePeriodChange = (event: SelectChangeEvent<TimePeriod>) => {
     setTimePeriod(event.target.value as TimePeriod);
   };
+  
   return (
     <DashboardContent>
       <EventBreadCrum events={__events} onEventSelect={handleEventSelect} />
@@ -132,9 +135,11 @@ export function OverviewAnalyticsView() {
         chartOptions={chartOptions}
         percentage={percentage}
         donutChartOptions={donutChartOptions}
+        selectedEvent={selectedEvent}
       />
 
-      <WalletBalance />
+     <WalletBalance selectedEvent={selectedEvent} />
+
 
       {/* Best Selling */}
       <BestSelling
@@ -143,6 +148,7 @@ export function OverviewAnalyticsView() {
         donutBestSellingChartOptions={donutBestSellingChartOptions}
         donutBestSellingChartSeries={donutBestSellingChartSeries}
         chartOptions={chartOptions}
+        selectedEvent={selectedEvent}
       />
 
 

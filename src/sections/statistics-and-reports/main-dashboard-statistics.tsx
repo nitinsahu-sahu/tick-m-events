@@ -3,6 +3,9 @@ import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
+interface MainDashboardStatisticsProps {
+    selectedEvent: any;
+}
 
 export function CommonBarHead({ totalCount, leftHead, head }: any) {
     return (
@@ -17,22 +20,114 @@ export function CommonBarHead({ totalCount, leftHead, head }: any) {
     )
 }
 
-export function MainDashboardStatistics() {
+export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisticsProps) {
+    // Calculate total tickets sold from selectedEvent
+    const totalTicketsSold = selectedEvent && typeof selectedEvent.soldTicket === "number"
+        ? selectedEvent.soldTicket
+        : 0;
+
+    // If you want total tickets available
+    const totalTicketsAvailable = selectedEvent && selectedEvent.ticketQuantity
+        ? Number(selectedEvent.ticketQuantity)
+        : 0;
+
+    const revenueGenerated = Array.isArray(selectedEvent?.order)
+        ? selectedEvent.order.reduce((sum: number, order: { totalAmount: number }) => sum + order.totalAmount, 0)
+        : 0;
+
+    const ticketsPendingPaymentCount = Array.isArray(selectedEvent?.order)
+        ? selectedEvent.order.filter((order: { payStatus: string }) => order.payStatus === "pending").length
+        : 0;
+
+    // Replace your chart data or counts with these variables
+    const totalTicketsSoldStr = totalTicketsSold.toString();
+    const revenueGeneratedStr = `${revenueGenerated}XAF`;
+
+    // 1. Create an array with days of the week labels
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    // 2. Initialize an object to accumulate sales per day
+    const ticketsSoldByDay: Record<string, number> = {
+        Sun: 0,
+        Mon: 0,
+        Tue: 0,
+        Wed: 0,
+        Thu: 0,
+        Fri: 0,
+        Sat: 0,
+    };
+
+    if (Array.isArray(selectedEvent?.order)) {
+        selectedEvent.order.forEach((order: any) => {
+            if (!order.createdAt) return;  // Use createdAt for date
+
+            const date = new Date(order.createdAt);
+            if (Number.isNaN(date.getTime())) return;
+
+            const day = daysOfWeek[date.getDay()];
+
+            // Sum all ticket quantities in this order
+            const ticketCount = Array.isArray(order.tickets)
+                ? order.tickets.reduce((sum: number, ticket: any) => sum + (ticket.quantity || 0), 0)
+                : 0;
+
+            ticketsSoldByDay[day] += ticketCount;
+        });
+    }
+
+    // 4. Prepare the chart series data in order of daysOfWeek array
+    const totalTicketsSoldPerDay = daysOfWeek.map(day => ticketsSoldByDay[day]);
+    const revenueByDay: Record<string, number> = {
+        Sun: 0,
+        Mon: 0,
+        Tue: 0,
+        Wed: 0,
+        Thu: 0,
+        Fri: 0,
+        Sat: 0,
+    };
+
+    let cumulativeSold = 0;
+    const remainingTicketsPerDay = totalTicketsSoldPerDay.map(sold => {
+        cumulativeSold += sold;
+        return totalTicketsAvailable - cumulativeSold;
+    });
+
+    if (Array.isArray(selectedEvent?.order)) {
+        selectedEvent.order.forEach((order: any) => {
+            if (!order.createdAt) return;
+
+            const date = new Date(order.createdAt);
+            if (Number.isNaN(date.getTime())) return;
+
+            const day = daysOfWeek[date.getDay()];
+            revenueByDay[day] += order.totalAmount || 0;  // sum totalAmount per day
+        });
+    }
+
+    const totalRevenuePerDay = daysOfWeek.map(day => revenueByDay[day]);
+
     // Line Chart Data (Total Tickets Sold, Revenue, Pending Payments)
     const lineChartOptions: ApexOptions = {
         chart: { type: "line", height: 50, sparkline: { enabled: true } },
         stroke: { width: 4, curve: "smooth" },
         colors: ["#2395D4"],
     };
-    const lineChartSeries = [{ data: [20, 50, 30, 80, 40, 70] }];
+    const lineChartSeries = [{ data: totalTicketsSoldPerDay }];
 
-     // Line Chart Data (Total Tickets Sold, Revenue, Pending Payments)
-     const SalesEvaluationChartOptions: ApexOptions = {
+    const weekDaysOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const weeklyTicketsSoldByDay: Record<string, number> = {
+        Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0,
+    };
+    const totalTicketsSoldThisWeek = weekDaysOrder.map(day => weeklyTicketsSoldByDay[day]);
+    // Line Chart Data (Total Tickets Sold, Revenue, Pending Payments)
+    const SalesEvaluationChartOptions: ApexOptions = {
         chart: { type: "line", height: 50, sparkline: { enabled: true } },
         stroke: { width: 4, curve: "smooth" },
         colors: ["#2395D4"],
     };
-    const SalesEvaluationChartSeries = [{ data: [20, 50, 30, 80, 40, 70] }];
+    const SalesEvaluationChartSeries = [{ data: totalTicketsSoldThisWeek }];
+
 
     // Line Chart Data (Total Tickets Sold, Revenue, Pending Payments)
     const RevenueGenerateChartOptions: ApexOptions = {
@@ -40,7 +135,7 @@ export function MainDashboardStatistics() {
         stroke: { width: 4, curve: "smooth" },
         colors: ["#0B2E4E"],
     };
-    const RevenueGenerateChartSeries = [{ data: [20, 50, 30, 80, 40, 10] }];
+    const RevenueGenerateChartSeries = [{ data: totalRevenuePerDay }];
 
     // Bar Chart Data (Remaining Tickets & Sales Trends)
     const barChartOptions: ApexOptions = {
@@ -48,27 +143,40 @@ export function MainDashboardStatistics() {
         plotOptions: { bar: { columnWidth: "50%" } },
         colors: ["#FF5733"],
     };
-    const barChartSeries = [{ data: [10, 40, 30, 70, 50, 90] }];
+    const barChartSeries = [
+        {
+            name: "Tickets Sold",
+            data: totalTicketsSoldPerDay,
+        },
+        {
+            name: "Remaining Tickets",
+            data: remainingTicketsPerDay,
+        },
+    ];
+
+
+
+
     return (
         <Box mt={3}>
-            <HeadingCommon title="Main Dashboard Statistics" mb={0}/>
+            <HeadingCommon title="Main Dashboard Statistics" mb={0} />
 
             <Grid container spacing={2} mt={1}>
                 {[
                     {
-                        totalCount: "215",
+                        totalCount: totalTicketsSoldStr || "0",
                         head: "Total Tickets Sold",
                         chartOptions: lineChartOptions,
                         chartSeries: lineChartSeries,
                     },
                     {
-                        totalCount: "$536k",
+                        totalCount: revenueGeneratedStr,
                         head: "Revenue Generated",
                         chartOptions: RevenueGenerateChartOptions,
                         chartSeries: RevenueGenerateChartSeries,
                     },
                     {
-                        totalCount: "652",
+                        totalCount: (totalTicketsAvailable - totalTicketsSold).toString(),
                         head: "Remaining Tickets & Sales Trends",
                         chartOptions: barChartOptions,
                         chartSeries: barChartSeries,
@@ -123,7 +231,7 @@ export function MainDashboardStatistics() {
                         ),
                     },
                     {
-                        totalCount: "200",
+                        totalCount: ticketsPendingPaymentCount.toString(),
                         head: "Tickets Pending Payment",
                         chartOptions: RevenueGenerateChartOptions,
                         chartSeries: RevenueGenerateChartSeries,

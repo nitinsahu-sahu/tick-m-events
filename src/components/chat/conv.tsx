@@ -2,6 +2,8 @@ import {
   Box, Avatar, Typography, TextField, Button, List, ListItem, ListItemAvatar, ListItemText,
   InputAdornment, IconButton, MenuItem, Menu
 } from '@mui/material';
+import CallIcon from '@mui/icons-material/Call';
+import VideoCallIcon from '@mui/icons-material/VideoCall';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ChatIcon from '@mui/icons-material/Chat';
 import { useDispatch, useSelector } from 'react-redux';
@@ -254,12 +256,16 @@ export function ChatPanel() {
           c.user._id === provider._id ||
           c.user.userId === provider._id
         );
-
+console.log('=======existingConv=============================');
+console.log(existingConv);
+console.log('====================================');
         if (existingConv) {
           setSelectedOption(existingConv);
           fetchMessages(existingConv.conversationId, existingConv.user);
         } else {
           // Create a new conversation item for this provider
+console.log('=======newConv=============================');
+
           const newConvItem = {
             user: {
               _id: provider._id,
@@ -277,11 +283,10 @@ export function ChatPanel() {
         // Clear the stored provider after using it
         sessionStorage.removeItem('currentChatProvider');
       } catch (error) {
-        console.error('Error parsing stored provider:', error);
         sessionStorage.removeItem('currentChatProvider');
       }
     }
-  }, [conv, fetchMessages, fetchMsgData]); // Added fetchMessages to dependencies
+  }, [conv, fetchMessages, fetchMsgData,filteredUsers]); // Added fetchMessages to dependencies
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -649,16 +654,28 @@ export function ChatPanel() {
               borderBottom: '1px solid #e0e0e0',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'space-between', // Added to push icons to the end
               gap: 2,
               backgroundColor: '#f5f5f5'
             }}>
-              <Avatar
-                src={selectedOption?.user?.avatar}
-                alt={selectedOption?.user?.name}
-              />
-              <Typography variant="h6">{selectedOption?.user?.name}</Typography>
-            </Box>
+              <Box display="flex" alignItems="center" gap={2}>
+                <Avatar
+                  src={selectedOption?.user?.avatar}
+                  alt={selectedOption?.user?.name}
+                />
+                <Typography variant="h6">{selectedOption?.user?.name}</Typography>
+              </Box>
 
+              {/* Call and Video Call Icons */}
+              <Box display="flex" gap={1}>
+                <IconButton color="primary" aria-label="call">
+                  <CallIcon />
+                </IconButton>
+                <IconButton color="primary" aria-label="video call">
+                  <VideoCallIcon />
+                </IconButton>
+              </Box>
+            </Box>
             {/* Messages */}
             <Box
               flex={1}
@@ -739,16 +756,16 @@ export function ChatPanel() {
                 }}
               />
               {showPicker && (
-                <Box sx={{position:"absolute",top:'117px'}}>
-                <EmojiPicker
-                
-                  onEmojiClick={emojiObject => {
-                    setMessage(prev => prev + emojiObject.emoji);
-                    setShowPicker(!showPicker)
-                  }}
-                  width={300}
-                  height={400}
-                />
+                <Box sx={{ position: "absolute", top: '117px' }}>
+                  <EmojiPicker
+
+                    onEmojiClick={emojiObject => {
+                      setMessage(prev => prev + emojiObject.emoji);
+                      setShowPicker(!showPicker)
+                    }}
+                    width={300}
+                    height={400}
+                  />
                 </Box>
               )}
               {/* Hidden file inputs */}

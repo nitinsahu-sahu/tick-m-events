@@ -6,8 +6,6 @@ export const fatchOrgEvents = () => async (dispatch) => {
 
     try {
         const response = await axios.get(`/o/event-com`);
-        console.log('pd',response);
-        
         dispatch({
             type: organizerEventConstants.GET_ORGANIZR_EVENTS_SUCCESS,
             payload: {

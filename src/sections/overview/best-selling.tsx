@@ -119,7 +119,7 @@ export function BestSelling(
                                 weight={400}
                                 color="primary"
                             />
-                            <Stack direction="row" justifyContent="space-between" spacing={2}>
+                            <Stack direction="row" spacing={2}>
                                 {(() => {
                                     const selectedTicketData = ticketTypes.find((t: any) => t.ticketType === selectedTicket);
                                     const ticketId = selectedTicketData?.id;
@@ -153,11 +153,6 @@ export function BestSelling(
                                                 <Box width={20} height={5} bgcolor="#1E88E5" borderRadius={2} />
                                                 <Typography variant="h6" fontWeight="bold">{soldForTicket}</Typography>
                                                 <Typography variant="caption" color="gray">Ticket Sold</Typography>
-                                            </Stack>
-                                            <Stack>
-                                                <Box width={20} height={5} bgcolor="#BDBDBD" borderRadius={2} />
-                                                <Typography variant="h6" fontWeight="bold">1</Typography>
-                                                <Typography variant="caption" color="gray">Event Held</Typography>
                                             </Stack>
                                         </>
                                     );

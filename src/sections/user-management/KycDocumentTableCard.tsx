@@ -10,7 +10,6 @@ import { AppDispatch, RootState } from "src/redux/store";
 import { useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { toast } from 'react-toastify';
-import { KycDocVerificationTable } from 'src/components/tables/kycVarification-table';
 
 import { getAllAdminVerifications, approveIdentity, rejectIdentity } from '../../redux/actions/verificationActions';
 
@@ -77,17 +76,14 @@ export function KycDocumentTableCard() {
         KYC Document Verification
       </Typography>
 
-      <KycDocVerificationTable
-        headers={["User", "Documents Type", "Submission Date", "Status", "Actions"]}
-        data={verifications}
-      />
-      <Box sx={{ overflowX: 'auto', borderRadius: 2 }}>
+     
+      <Box sx={{ overflowX: 'auto', borderRadius: 1 }}>
         <Box sx={{ minWidth: 700 }}>
           <Box
             sx={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr 1fr 1fr 2fr',
-              backgroundColor: '#1976d2',
+              backgroundColor: '#1F8FCD',
               color: 'white',
               py: 1.5,
               px: 2,
@@ -166,6 +162,7 @@ export function KycDocumentTableCard() {
                     spacing={1}
                     flexWrap="wrap"
                     useFlexGap
+                    justifyContent="center"
                     sx={{
                       mt: { xs: 1, sm: 0 },
                       '& button': {
@@ -332,11 +329,10 @@ function StyledActionButton({
       onClick={onClick}
       sx={{
         backgroundColor: getButtonColor(),
-        borderRadius: '20px',
+        borderRadius: 1,
         textTransform: 'none',
-        fontSize: '13px',
-        height: 35,
-        px: 2,
+        fontSize: 12,
+        width:80,
         color: '#fff',
         '&:hover': {
           backgroundColor: '#071E33',

@@ -4,15 +4,21 @@ import { SelectBar } from "src/components/tables/select-bar";
 import { TransactionAndPaymentTable } from "src/components/tables/transaction-&-payment-table";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
-import { allTableData, tableHeaders, ticketDate, ticketOptions } from "./utils";
+import { allTableData, tableHeaders, ticketDate, ticketOptions, mapOrdersToAllTableData } from "./utils";
 
+type PaymentHistroyProps =
+    {
+        selectedEvent: any;
+    }
 
-export function PaymentHistory() {
+export function PaymentHistory({ selectedEvent }: PaymentHistroyProps) {
     const [selectedTicket, setSelectedTicket] = useState("all"); // Default to "all"
     const [selectedTicketDate, setSelectedTicketDate] = useState("all"); // Default to "all"
-
+    const allTableDataDynamic = mapOrdersToAllTableData(selectedEvent?.orders || []);
+    console.log(allTableDataDynamic);
     // Filter data based on selections
-    const filteredData = allTableData.filter(row => {
+    // Apply filters
+    const filteredData = allTableDataDynamic.filter((row) => {
         const matchesTicket = selectedTicket === "all" || row.reference === selectedTicket;
         const matchesDate = selectedTicketDate === "all" || row.date === selectedTicketDate;
         return matchesTicket && matchesDate;
@@ -52,7 +58,7 @@ export function PaymentHistory() {
                 {/* Table with filtered data */}
                 <TransactionAndPaymentTable
                     headers={tableHeaders}
-                    data={selectedTicket === "all" && selectedTicketDate === "all" ? allTableData : filteredData}
+                    data={selectedTicket === "all" && selectedTicketDate === "all" ? allTableDataDynamic : filteredData}
                     type="1"
                 />
             </Paper>

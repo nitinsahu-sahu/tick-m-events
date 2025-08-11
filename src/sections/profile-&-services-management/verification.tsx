@@ -3,7 +3,11 @@ import { Box, Button, Grid, Stack, Typography, Modal, TextField, MenuItem, Selec
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
+import type { E164Number } from 'libphonenumber-js';
+import PhoneInput from 'react-phone-number-input'
 
+import { RootState } from 'src/redux/store';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import axios from 'src/redux/helper/axios';
 
@@ -17,6 +21,8 @@ interface VerificationItem {
 }
 
 export function ProfileVerification() {
+    const { number, email } = useSelector((state: RootState) => state?.auth?.user);
+
     const [verifications, setVerifications] = useState<VerificationItem[]>([
         { label: "Email Verified", status: false, verify: '', type: "email", disabled: false },
         { label: "WhatsApp Verified", status: false, verify: '', type: "whatsapp", disabled: true },
@@ -28,7 +34,7 @@ export function ProfileVerification() {
     const [openModal, setOpenModal] = useState(false);
     const [currentVerification, setCurrentVerification] = useState<VerificationItem | null>(null);
     const [otp, setOtp] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState(number || '');
     const [country, setCountry] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('');
 
@@ -125,6 +131,7 @@ export function ProfileVerification() {
                 updateVerificationStatus('email', true);
                 toast.success('Email verified successfully');
                 setOpenModal(false);
+                setOtp('')
             }
         } catch (error) {
             toast.error('Invalid OTP');
@@ -205,6 +212,11 @@ export function ProfileVerification() {
     //     }
     //     return [];
     // };
+
+    const handlePhoneChange = (value: E164Number | undefined) => {
+        const phoneValue = value as string; // or String(value)
+        setPhoneNumber(phoneValue);
+    };
 
     return (
         <Box sx={{ borderRadius: '20px', background: '#FFFFFF', boxShadow: '0px 0px 14px 0px #00000040', p: { xs: 2, md: 4 }, mt: 4 }}>
@@ -322,14 +334,51 @@ export function ProfileVerification() {
                             <Typography variant="body2" gutterBottom>
                                 We&apos;ll send a verification code to your WhatsApp number.
                             </Typography>
-                            <TextField
-                                label="Phone Number"
-                                value={phoneNumber}
-                                onChange={(e) => setPhoneNumber(e.target.value)}
-                                fullWidth
-                                margin="normal"
-                                placeholder="e.g., +27761234567"
-                            />
+                            {/* Phone Number Input with Country Code */}
+                            <Box sx={{
+                                '& .PhoneInput': {
+                                    width: '100%',
+                                    '& input': {
+                                        width: '100%',
+                                        padding: '16.5px 14px',
+                                        border: '1px solid rgba(0, 0, 0, 0.23)',
+                                        borderRadius: '4px',
+                                        fontFamily: 'inherit',
+                                        fontSize: '1rem',
+                                        '&:hover': {
+                                            borderColor: 'black',
+                                        },
+                                        '&:focus': {
+                                            borderColor: 'black',
+                                            borderWidth: '2px',
+                                            outline: 'none',
+                                        },
+                                    },
+                                    '& .PhoneInputCountry': {
+                                        marginRight: '8px',
+                                    },
+                                    '& .PhoneInputCountrySelect': {
+                                        marginRight: '8px',
+                                    },
+                                },
+                                '& .PhoneInput--focus': {
+                                    '& input': {
+                                        borderColor: 'black',
+                                        borderWidth: '2px',
+                                    },
+                                },
+                            }}>
+                                <PhoneInput
+                                disabled
+                                    international
+                                    defaultCountry="US"
+                                    value={phoneNumber}
+                                    onChange={handlePhoneChange}
+                                    placeholder="Enter phone number"
+                                    sx
+                                />
+                            </Box>
+                           
                             <Button
                                 variant="contained"
                                 onClick={handleWhatsAppVerification}

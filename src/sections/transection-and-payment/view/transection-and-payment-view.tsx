@@ -17,9 +17,9 @@ import { WithdrawalTableHistory } from "../withdrawal-table-history";
 import { TrnsAndPaymentBreadCrum } from "../breadcrum-trnsandpay";
 import { EventData } from "../utils";
 
+
 export function TransectionAndPaymentView() {
   const dispatch = useDispatch<AppDispatch>();
-
   const { eventsWithOrdersAndParticiapnt } = useSelector((state: RootState) => state?.promotionList);
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
 
@@ -27,10 +27,23 @@ export function TransectionAndPaymentView() {
     dispatch(promotionEvents())
   }, [dispatch])
 
-  const handleEventSelect = (event: EventData | null) => {
-    setSelectedEvent(event);
-    // Here you can add any additional logic you need when an event is selected
-  };
+const handleEventSelect = (event: EventData | null) => {
+  if (!event) {
+    setSelectedEvent(null);
+    return;
+  }
+
+  // Calculate availableBalance by summing confirmed orders
+  const availableBalance = event.orders
+    ?.filter(order => order.paymentStatus === "confirmed")
+    .reduce((sum, order) => sum + order.totalAmount, 0) || 0;
+
+  setSelectedEvent({
+    ...event,
+    availableBalance,
+  });
+};
+
   return (
     <DashboardContent>
       <TrnsAndPaymentBreadCrum
@@ -45,13 +58,13 @@ export function TransectionAndPaymentView() {
       />
 
       {/* Metric Cards */}
-      <MetricCard />
+      <MetricCard selectedEvent={selectedEvent} />
 
       {/* Payment History */}
-      <PaymentHistory />
+      <PaymentHistory selectedEvent={selectedEvent}/>
 
       {/* Payment History */}
-      <WithdrawalRequest />
+      <WithdrawalRequest availableBalance={selectedEvent?.availableBalance || 0} />
 
       {/* Withdrawal Table History */}
       <WithdrawalTableHistory />

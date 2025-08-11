@@ -9,7 +9,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { createWithdrawal, verifyWithdrawalOTP, sendWithdrawalOTP } from "src/redux/actions/transactionPaymentActions";
 import { AppDispatch, RootState } from 'src/redux/store';
 
-export function WithdrawalRequest() {
+type WithdrawalRequestProps = {
+    availableBalance: number;
+};
+
+export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) {
+    console.log("avia",availableBalance);
     const [amount, setAmount] = useState("");
     const [paymentMethod, setPaymentMethod] = useState("credit_card");
     const [withdrawalCode, setWithdrawalCode] = useState("");
@@ -199,9 +204,9 @@ export function WithdrawalRequest() {
                 <Paper sx={{ p: 3 }}>
                     {/* Available Amount */}
                     <Typography fontWeight="bold">Available Amount</Typography>
-                    <TextField fullWidth variant="outlined" value="500 XAF" sx={{ mt: 1 }} />
+                    <TextField fullWidth variant="outlined"  value={`${availableBalance} XAF`} sx={{ mt: 1 }} />
                     <Typography sx={{ fontSize: "0.9rem", mt: 1, color: "gray" }}>
-                        Minimum Withdrawal Amount: $50
+                        Minimum Withdrawal Amount: 50 XAF
                     </Typography>
 
                     {/* Amount Input */}

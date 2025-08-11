@@ -92,10 +92,10 @@ export function ActionAndSectionTable() {
                         variant="contained"
                         sx={{
                           backgroundColor: "blue",
-                          borderRadius: '20px',
+                          borderRadius: 1,
                           textTransform: 'none',
                           fontSize: '13px',
-                          height: 35,
+                          width: 100,
                           px: 2,
                           color: '#fff',
                           '&:hover': {
@@ -109,10 +109,10 @@ export function ActionAndSectionTable() {
                         variant="contained"
                         sx={{
                           backgroundColor: "blue",
-                          borderRadius: '20px',
+                          borderRadius: 1,
                           textTransform: 'none',
                           fontSize: '13px',
-                          height: 35,
+                          width: 100,
                           px: 2,
                           color: '#fff',
                           '&:hover': {
@@ -126,10 +126,10 @@ export function ActionAndSectionTable() {
                         variant="contained"
                         sx={{
                           backgroundColor: "blue",
-                          borderRadius: '20px',
+                          borderRadius: 1,
                           textTransform: 'none',
                           fontSize: '13px',
-                          height: 35,
+                          width: 100,
                           px: 2,
                           color: '#fff',
                           '&:hover': {

@@ -57,7 +57,27 @@ export const PaymentSettingTableData = [
     { type: "Mobile Money", numberAndIban: "+237 6xxxx xxxx", status: "Approved", details: "Edit" },
 ];
 
+export interface Order {
+  paymentStatus: string; 
+  totalAmount: number;
+  
+}
 export interface EventData {
   _id: string;
   eventName: string;
+  availableBalance: number;
+    orders?: Order[];
+};
+
+// utils/mapOrdersToAllTableData.ts
+export function mapOrdersToAllTableData(orders: any[]) {
+  return orders.map((order, index) => ({
+    date: new Date(order.createdAt).toLocaleDateString("en-GB"), // dd-mm-yyyy format
+    reference: order.transactionId, // or order.transactionId if you prefer real ID
+    amount: `${order.totalAmount} XAF`, // match your currency format
+     type: order.refundRequests.length === 0 ? "Ticket Sale" : "Refund",
+   paymentmethod: (order.paymentMethod ? order.paymentMethod.toUpperCase() : "-"),
+    status: order.paymentStatus === "confirmed" ? "Approved" : "Pending",
+    details: "View",
+  }));
 }

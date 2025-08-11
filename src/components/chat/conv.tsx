@@ -253,19 +253,13 @@ export function ChatPanel() {
         const provider = JSON.parse(storedProvider);
         // Find if this provider already has a conversation
         const existingConv = conv?.find((c: any) =>
-          c.user._id === provider._id ||
-          c.user.userId === provider._id
+          c.user.receiverId === provider._id
         );
-console.log('=======existingConv=============================');
-console.log(existingConv);
-console.log('====================================');
         if (existingConv) {
           setSelectedOption(existingConv);
           fetchMessages(existingConv.conversationId, existingConv.user);
         } else {
           // Create a new conversation item for this provider
-console.log('=======newConv=============================');
-
           const newConvItem = {
             user: {
               _id: provider._id,
@@ -286,7 +280,7 @@ console.log('=======newConv=============================');
         sessionStorage.removeItem('currentChatProvider');
       }
     }
-  }, [conv, fetchMessages, fetchMsgData,filteredUsers]); // Added fetchMessages to dependencies
+  }, [conv, fetchMessages, fetchMsgData, filteredUsers]); // Added fetchMessages to dependencies
 
   useEffect(() => {
     const fetchConversations = async () => {

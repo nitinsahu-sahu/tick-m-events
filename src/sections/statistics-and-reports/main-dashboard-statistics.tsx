@@ -21,10 +21,65 @@ export function CommonBarHead({ totalCount, leftHead, head }: any) {
 }
 
 export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisticsProps) {
+    console.log(selectedEvent);
+
+    const isRefundApproved = (orderId: string): boolean =>
+        Array.isArray(selectedEvent?.refundRequests) &&
+        selectedEvent.refundRequests.some(
+            (refund: any) =>
+                refund.orderId?._id === orderId && refund.refundStatus === "approved"
+        );
+
+    // PEAK SALES LOGIC
+    interface HourlySales {
+        [key: string]: number;
+    }
+
+    let peakHour = "";
+    let peakTicketsSold = 0;
+    const hourlySales: HourlySales = {};
+
+    if (Array.isArray(selectedEvent?.order)) {
+        selectedEvent.order.forEach((order: any) => {
+            if (!order.createdAt || isRefundApproved(order._id) || order.paymentStatus !== "confirmed") return;
+
+            const date = new Date(order.createdAt);
+            const hourKey = `${date.toISOString().slice(0, 13)}:00`; // e.g. "2025-08-12T15:00"
+
+            const ticketCount = Array.isArray(order.tickets)
+                ? order.tickets.reduce((sum: number, ticket: any) => sum + (ticket.quantity || 0), 0)
+                : 0;
+
+            hourlySales[hourKey] = (hourlySales[hourKey] || 0) + ticketCount;
+
+            if (hourlySales[hourKey] > peakTicketsSold) {
+                peakTicketsSold = hourlySales[hourKey];
+                peakHour = hourKey;
+            }
+        });
+    }
+
+    let formattedPeakSales = "No sales data available";
+
+    if (peakHour) {
+        const peakDate = new Date(peakHour);
+        const dateStr = peakDate.toLocaleDateString("en-GB"); // "dd/mm/yyyy"
+        const hourStr = peakDate.toLocaleTimeString("en-US", {
+            hour: "numeric",
+            hour12: true,
+        }); // e.g. "3 PM"
+
+        formattedPeakSales = `${dateStr} at ${hourStr} – ${peakTicketsSold} tickets sold in 1 hour`;
+    }
+
     // Calculate total tickets sold from selectedEvent
-    const totalTicketsSold = selectedEvent && typeof selectedEvent.soldTicket === "number"
-        ? selectedEvent.soldTicket
-        : 0;
+    const totalTicketsSold = Array.isArray(selectedEvent?.order)
+        ? selectedEvent.order
+            .filter((order: any) => order.paymentStatus === "confirmed" && !isRefundApproved(order._id))
+            .reduce((sum: number, order: any) =>
+                sum + order.tickets.reduce((ticketSum: number, ticket: any) =>
+                    ticketSum + (ticket.quantity || 0), 0)
+                , 0) : 0;
 
     // If you want total tickets available
     const totalTicketsAvailable = selectedEvent && selectedEvent.ticketQuantity
@@ -32,12 +87,18 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
         : 0;
 
     const revenueGenerated = Array.isArray(selectedEvent?.order)
-        ? selectedEvent.order.reduce((sum: number, order: { totalAmount: number }) => sum + order.totalAmount, 0)
+        ? selectedEvent.order
+            .filter((order: { paymentStatus: string }) => order.paymentStatus === "confirmed")
+            .reduce((sum: number, order: any) => {
+                if (isRefundApproved(order._id)) return sum;
+                return sum + (order.totalAmount || 0);
+            }, 0)
         : 0;
 
     const ticketsPendingPaymentCount = Array.isArray(selectedEvent?.order)
-        ? selectedEvent.order.filter((order: { payStatus: string }) => order.payStatus === "pending").length
+        ? selectedEvent.order.filter((order: { paymentStatus: string }) => order.paymentStatus === "pending").length
         : 0;
+
 
     // Replace your chart data or counts with these variables
     const totalTicketsSoldStr = totalTicketsSold.toString();
@@ -59,14 +120,12 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
 
     if (Array.isArray(selectedEvent?.order)) {
         selectedEvent.order.forEach((order: any) => {
-            if (!order.createdAt) return;  // Use createdAt for date
+            if (!order.createdAt || isRefundApproved(order._id)) return;
 
             const date = new Date(order.createdAt);
             if (Number.isNaN(date.getTime())) return;
 
             const day = daysOfWeek[date.getDay()];
-
-            // Sum all ticket quantities in this order
             const ticketCount = Array.isArray(order.tickets)
                 ? order.tickets.reduce((sum: number, ticket: any) => sum + (ticket.quantity || 0), 0)
                 : 0;
@@ -95,13 +154,11 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
 
     if (Array.isArray(selectedEvent?.order)) {
         selectedEvent.order.forEach((order: any) => {
-            if (!order.createdAt) return;
+            if (!order.createdAt || isRefundApproved(order._id)) return;
 
             const date = new Date(order.createdAt);
-            if (Number.isNaN(date.getTime())) return;
-
             const day = daysOfWeek[date.getDay()];
-            revenueByDay[day] += order.totalAmount || 0;  // sum totalAmount per day
+            revenueByDay[day] += order.totalAmount || 0;
         });
     }
 
@@ -154,7 +211,35 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
         },
     ];
 
+    const pendingTicketsByDay: Record<string, number> = {
+        Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0,
+    };
 
+    if (Array.isArray(selectedEvent?.order)) {
+        selectedEvent.order
+            .filter((order: any) => order.paymentStatus === "pending")
+            .forEach((order: any) => {
+                if (!order.createdAt) return;
+
+                const date = new Date(order.createdAt);
+                const day = daysOfWeek[date.getDay()];
+                const ticketCount = Array.isArray(order.tickets)
+                    ? order.tickets.reduce((sum: number, ticket: any) => sum + (ticket.quantity || 0), 0)
+                    : 0;
+
+                pendingTicketsByDay[day] += ticketCount;
+            });
+    }
+
+    const totalPendingTicketsPerDay = daysOfWeek.map(day => pendingTicketsByDay[day]);
+
+    const TicketsPendingChartOptions: ApexOptions = {
+        chart: { type: "line", height: 50, sparkline: { enabled: true } },
+        stroke: { width: 4, curve: "smooth" },
+        colors: ["#FF5733"], // you can change color if needed
+    };
+
+    const TicketsPendingChartSeries = [{ data: totalPendingTicketsPerDay }];
 
 
     return (
@@ -233,8 +318,8 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
                     {
                         totalCount: ticketsPendingPaymentCount.toString(),
                         head: "Tickets Pending Payment",
-                        chartOptions: RevenueGenerateChartOptions,
-                        chartSeries: RevenueGenerateChartSeries,
+                        chartOptions: TicketsPendingChartOptions,
+                        chartSeries: TicketsPendingChartSeries,
                     },
                     {
                         custom: true,
@@ -244,7 +329,7 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
                                     Peak Sales
                                 </Typography>
                                 <Typography variant="body2" color="#2395D4" fontSize={13}>
-                                    02/02/2025 at 3 PM – 700 tickets sold in 1 hour
+                                    {formattedPeakSales}
                                 </Typography>
                             </>
                         ),

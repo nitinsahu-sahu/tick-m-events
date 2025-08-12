@@ -71,13 +71,37 @@ export interface EventData {
 
 // utils/mapOrdersToAllTableData.ts
 export function mapOrdersToAllTableData(orders: any[]) {
-  return orders.map((order, index) => ({
-    date: new Date(order.createdAt).toLocaleDateString("en-GB"), // dd-mm-yyyy format
-    reference: order.transactionId, // or order.transactionId if you prefer real ID
-    amount: `${order.totalAmount} XAF`, // match your currency format
-     type: order.refundRequests.length === 0 ? "Ticket Sale" : "Refund",
-   paymentmethod: (order.paymentMethod ? order.paymentMethod.toUpperCase() : "-"),
-    status: order.paymentStatus === "confirmed" ? "Approved" : "Pending",
-    details: "View",
-  }));
+  return orders.map((order) => {
+    const hasRefund = order.refundRequests && order.refundRequests.length > 0;
+ 
+    if (hasRefund) {
+      const refund = order.refundRequests[0];
+      return {
+        date: new Date(refund.createdAt).toLocaleDateString("en-GB"),
+        reference: order.transactionId,
+        amount: `${refund.refundAmount} XAF`,
+        type: "Refund",
+        paymentmethod: refund.paymentMethod
+          ? refund.paymentMethod.toUpperCase()
+          : "-",
+        status: refund.refundStatus
+          ? refund.refundStatus.charAt(0).toUpperCase() +
+            refund.refundStatus.slice(1)
+          : "-",
+        details: "View",
+      };
+    }
+ 
+    return {
+      date: new Date(order.createdAt).toLocaleDateString("en-GB"),
+      reference: order.transactionId,
+      amount: `${order.totalAmount} XAF`,
+      type: "Ticket Sale",
+      paymentmethod: order.paymentMethod
+        ? order.paymentMethod.toUpperCase()
+        : "-",
+      status: order.paymentStatus === "confirmed" ? "Approved" : "Pending",
+      details: "View",
+    };
+  });
 }

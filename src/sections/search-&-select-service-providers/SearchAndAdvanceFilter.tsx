@@ -1,6 +1,6 @@
 import {
   Box, Grid, InputLabel, FormControl, TextField, MenuItem, Typography,
-  Slider, FormControlLabel, Checkbox, Button, SelectChangeEvent, Select
+  Slider, FormControlLabel, Checkbox, Button, SelectChangeEvent, Select, Divider
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -114,8 +114,21 @@ export const SearchAndAdvanceFilter = ({ onChange, onFiltersApplied }: any) => {
               </MenuItem>
               {categories?.map((category: any) => (
                 <MenuItem key={category._id} value={category.name}>
-                  {category.name}
+                  {category.name} {category.subcategories?.map((subcategory: any) => (
+                    <MenuItem
+                      key={subcategory._id}
+                      sx={{
+                        pl: 4,
+                        fontStyle: 'italic',
+                        color: 'text.disabled',
+                        pointerEvents: 'none' // Disables clicking
+                      }}
+                    >
+                      {subcategory.name}
+                    </MenuItem>
+                  ))}
                 </MenuItem>
+
               ))}
 
             </Select>
@@ -125,7 +138,7 @@ export const SearchAndAdvanceFilter = ({ onChange, onFiltersApplied }: any) => {
         {/* Budget Slider */}
         <Grid item xs={12}>
           <Typography variant="subtitle1" sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
-            Estimated Budget: ${filters.budget}
+            Estimated Budget: {filters.budget} XAF
           </Typography>
           <Slider
             value={filters.budget}

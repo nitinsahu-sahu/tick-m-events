@@ -27,22 +27,22 @@ export function TransectionAndPaymentView() {
     dispatch(promotionEvents())
   }, [dispatch])
 
-const handleEventSelect = (event: EventData | null) => {
-  if (!event) {
-    setSelectedEvent(null);
-    return;
-  }
+  const handleEventSelect = (event: EventData | null) => {
+    if (!event) {
+      setSelectedEvent(null);
+      return;
+    }
 
-  // Calculate availableBalance by summing confirmed orders
-  const availableBalance = event.orders
-    ?.filter(order => order.paymentStatus === "confirmed")
-    .reduce((sum, order) => sum + order.totalAmount, 0) || 0;
+    // Calculate availableBalance by summing confirmed orders
+    const availableBalance = event.orders
+      ?.filter(order => order.paymentStatus === "confirmed")
+      .reduce((sum, order) => sum + order.totalAmount, 0) || 0;
 
-  setSelectedEvent({
-    ...event,
-    availableBalance,
-  });
-};
+    setSelectedEvent({
+      ...event,
+      availableBalance,
+    });
+  };
 
   return (
     <DashboardContent>
@@ -54,14 +54,14 @@ const handleEventSelect = (event: EventData | null) => {
 
       <PageTitleSection
         title="Transaction And Payment"
-        rightCom="Available Funds: 1,500,000 XAF"
+        rightCom={`Available Funds: ${selectedEvent?.availableBalance?.toLocaleString() || 0} XAF`}
       />
 
       {/* Metric Cards */}
       <MetricCard selectedEvent={selectedEvent} />
 
       {/* Payment History */}
-      <PaymentHistory selectedEvent={selectedEvent}/>
+      <PaymentHistory selectedEvent={selectedEvent} />
 
       {/* Payment History */}
       <WithdrawalRequest availableBalance={selectedEvent?.availableBalance || 0} />

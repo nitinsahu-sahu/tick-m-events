@@ -1,61 +1,72 @@
-import { Box, Paper, Typography } from "@mui/material";
-import { useState } from "react";
+import { Box, Paper } from "@mui/material";
+import { useState, useMemo } from "react";
 import { SelectBar } from "src/components/tables/select-bar";
 import { TransactionAndPaymentTable } from "src/components/tables/transaction-&-payment-table";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+import { mapOrdersToAllTableData, tableHeaders } from "./utils";
 
-import { allTableData, tableHeaders, ticketDate, ticketOptions, mapOrdersToAllTableData } from "./utils";
-
-type PaymentHistroyProps =
-    {
-        selectedEvent: any;
-    }
+type PaymentHistroyProps = {
+    selectedEvent: any;
+};
 
 export function PaymentHistory({ selectedEvent }: PaymentHistroyProps) {
-    const [selectedTicket, setSelectedTicket] = useState("all"); // Default to "all"
-    const [selectedTicketDate, setSelectedTicketDate] = useState("all"); // Default to "all"
-    const allTableDataDynamic = mapOrdersToAllTableData(selectedEvent?.orders || []);
-    console.log(allTableDataDynamic);
-    // Filter data based on selections
-    // Apply filters
+    const [selectedTicket, setSelectedTicket] = useState("all");
+    const [selectedTicketDate, setSelectedTicketDate] = useState("all");
+
+    const allTableDataDynamic = useMemo(
+        () => mapOrdersToAllTableData(selectedEvent?.orders || []),
+        [selectedEvent]
+    );
+
+    // Dynamically generate "Reference" options
+    const ticketOptionsDynamic = useMemo(() => {
+        const uniqueRefs = Array.from(new Set(allTableDataDynamic.map((row) => row.reference)));
+        return [{ label: "All", value: "all" }, ...uniqueRefs.map((ref) => ({ label: ref, value: ref }))];
+    }, [allTableDataDynamic]);
+
+    // Dynamically generate "Date" options
+    const ticketDateDynamic = useMemo(() => {
+        const uniqueDates = Array.from(new Set(allTableDataDynamic.map((row) => row.date)));
+        return [{ label: "All", value: "all" }, ...uniqueDates.map((date) => ({ label: date, value: date }))];
+    }, [allTableDataDynamic]);
+
+    // Filter data
     const filteredData = allTableDataDynamic.filter((row) => {
         const matchesTicket = selectedTicket === "all" || row.reference === selectedTicket;
         const matchesDate = selectedTicketDate === "all" || row.date === selectedTicketDate;
         return matchesTicket && matchesDate;
     });
+
     return (
         <>
             <HeadingCommon mt={3} variant="h5" title="Payment History" weight={600} baseSize="33px" />
-
             <Paper sx={{ p: { xs: 2, sm: 2.5, md: 3 }, borderRadius: 3, boxShadow: 3 }}>
                 {/* Filters */}
                 <Box
                     sx={{
                         display: "flex",
-                        flexDirection: { xs: "column", sm: "column", md: "row" }, // Stack on xs & sm, row on md+
-                        alignItems: { xs: "stretch", sm: "stretch", md: "center" }, // Full width on small screens
-                        gap: 2, // Maintain spacing
-                        flexWrap: "wrap", // Wrap items for better fit
+                        flexDirection: { xs: "column", sm: "column", md: "row" },
+                        alignItems: { xs: "stretch", sm: "stretch", md: "center" },
+                        gap: 2,
+                        flexWrap: "wrap",
                         mb: 2
                     }}
                 >
-                    {/* Ticket Category */}
                     <SelectBar
                         title="Reference"
-                        options={ticketOptions}
+                        options={ticketOptionsDynamic}
                         value={selectedTicket}
                         onChange={(event) => setSelectedTicket(event.target.value)}
                     />
-
                     <SelectBar
                         title="Date"
-                        options={ticketDate}
+                        options={ticketDateDynamic}
                         value={selectedTicketDate}
                         onChange={(event) => setSelectedTicketDate(event.target.value)}
                     />
                 </Box>
 
-                {/* Table with filtered data */}
+                {/* Table */}
                 <TransactionAndPaymentTable
                     headers={tableHeaders}
                     data={selectedTicket === "all" && selectedTicketDate === "all" ? allTableDataDynamic : filteredData}
@@ -63,5 +74,5 @@ export function PaymentHistory({ selectedEvent }: PaymentHistroyProps) {
                 />
             </Paper>
         </>
-    )
+    );
 }

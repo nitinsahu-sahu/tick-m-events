@@ -43,13 +43,13 @@ export function StatisticsAndReportsView() {
     "Participant Engagement",
     "Comparisons",
   ];
-const handleEventSelect = (event: Event | null) => {
+  const handleEventSelect = (event: Event | null) => {
     setSelectedEvent(event);
     // Do something with the selected event data
   };
   return (
     <DashboardContent>
-            <EventBreadCrum events={__events} onEventSelect={handleEventSelect} />
+      <EventBreadCrum events={__events} onEventSelect={handleEventSelect} />
 
 
       <PageTitleSection title="Sales & Revenue Overviews" />
@@ -110,7 +110,7 @@ const handleEventSelect = (event: Event | null) => {
       {activeTab === "Overview" && (
         <>
           <LiveSalesRevenueData />
-         <MainDashboardStatistics selectedEvent={selectedEvent} />
+          <MainDashboardStatistics selectedEvent={selectedEvent} />
           <TicketDetails events={fullData} />
         </>
       )}

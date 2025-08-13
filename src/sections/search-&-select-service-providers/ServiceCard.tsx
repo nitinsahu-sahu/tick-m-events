@@ -20,16 +20,16 @@ function truncateHtmlText(html: string, wordCount: number) {
   temp.innerHTML = html;
   const text = temp.textContent || '';
   const words = text.trim().split(/\s+/);
-  
+
   if (words.length <= wordCount) {
     return { text, isTruncated: false };
   }
-  
+
   const truncated = words.slice(0, wordCount).join(' ');
-  return { 
-    text: truncated, 
+  return {
+    text: truncated,
     isTruncated: true,
-    fullText: text 
+    fullText: text
   };
 }
 
@@ -47,8 +47,11 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
-    orgBudget: '',
+    orgBudget: 0,
     orgRequirement: '',
+    serviceTime: "",
+    eventLocation: '',
+    orgAdditionalRequirement: ""
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -56,17 +59,29 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
   const handleCloseDialog = () => setOpenDialog(false);
   const [openGallery, setOpenGallery] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-// Add new state for expanded text
+  // Add new state for expanded text
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   // Process the description text
   const description = truncateHtmlText(service.description || '', 10); // 30 words limit
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+
+    // Special handling for orgBudget
+    if (name === 'orgBudget') {
+      // If the input is empty, set to empty string (will be converted to 0 in state)
+      // Or you can set to 0 directly if you prefer
+      const numericValue = value === '' ? '' : Number(value);
+      setFormData((prev: any) => ({
+        ...prev,
+        [name]: numericValue
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleSaveRequest = async (e: React.FormEvent) => {
@@ -76,18 +91,24 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
 
     try {
       const formDataObj = new FormData();
-      formDataObj.append('orgBudget', formData.orgBudget);
-      formDataObj.append('orgRequirement', formData.orgRequirement);
+      formDataObj.append('orgBudget', formData.orgBudget.toString());
       formDataObj.append('eventId', eventId);
       formDataObj.append('serviceRequestId', service._id); // assuming service has an id
+      formDataObj.append("serviceTime", formData.serviceTime);
+      formDataObj.append("orgRequirement", formData.orgRequirement);
+      formDataObj.append("orgAdditionalRequirement", formData.orgAdditionalRequirement);
+      formDataObj.append("eventLocation", formData.eventLocation);
 
       const result = await dispatch(organizerRequstToProvider(formDataObj));
       if ((result as ApiResult)?.status === 201) {
         toast.success(result.message);
         handleCloseDialog();
         setFormData({
-          orgBudget: '',
+          orgBudget: 0,
           orgRequirement: '',
+          serviceTime: "",
+          eventLocation: '',
+          orgAdditionalRequirement: ""
         })
         setTermsAccepted(false)
       } else {
@@ -352,28 +373,28 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
           color: disabled ? 'text.disabled' : 'text.secondary'
         }}>
           <Typography variant="body2">
-           <Typography variant="body2" paragraph>
-            {isExpanded ? description.fullText || description.text : description.text}
-            {description.isTruncated && (
-              <Button 
-                size="small" 
-                onClick={() => setIsExpanded(!isExpanded)}
-                sx={{ 
-                  ml: 1,
-                  minWidth: 0,
-                  padding: 0,
-                  textTransform: 'none',
-                  color: 'primary.main',
-                  '&:hover': {
-                    backgroundColor: 'transparent',
-                    textDecoration: 'underline'
-                  }
-                }}
-              >
-                {isExpanded ? 'Read less' : 'Read more'}
-              </Button>
-            )}
-          </Typography>
+            <Typography variant="body2" paragraph>
+              {isExpanded ? description.fullText || description.text : description.text}
+              {description.isTruncated && (
+                <Button
+                  size="small"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  sx={{
+                    ml: 1,
+                    minWidth: 0,
+                    padding: 0,
+                    textTransform: 'none',
+                    color: 'primary.main',
+                    '&:hover': {
+                      backgroundColor: 'transparent',
+                      textDecoration: 'underline'
+                    }
+                  }}
+                >
+                  {isExpanded ? 'Read less' : 'Read more'}
+                </Button>
+              )}
+            </Typography>
           </Typography>
         </Box>
 
@@ -414,7 +435,7 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
                 fullWidth
                 name="orgBudget"
                 label="Negotiation Price"
-                value={formData.orgBudget}
+                value={formData.orgBudget === 0 ? '' : formData.orgBudget} 
                 onChange={handleInputChange}
                 placeholder="Enter your budget..."
                 variant="outlined"
@@ -430,8 +451,30 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
                 }}
               />
             </Box>
-            <Box sx={{ mt: 2 }}>
-              <TextField
+            <TextField
+              required
+              fullWidth
+              label="Date and Time of the Service"
+              type="datetime-local"
+              margin="normal"
+              name="serviceTime"
+              value={formData.serviceTime}
+              onChange={handleInputChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            <TextField
+              required
+              fullWidth
+              label="Event Location"
+              margin="normal"
+              name="eventLocation"
+              value={formData.eventLocation}
+              onChange={handleInputChange}
+            />
+
+             <TextField
                 required
                 type="text"
                 fullWidth
@@ -444,7 +487,16 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
                 placeholder="Write your requirements..."
                 variant="outlined"
               />
-            </Box>
+            <TextField
+              fullWidth
+              label="Additional Options"
+              multiline
+              rows={4}
+              margin="normal"
+              name="orgAdditionalRequirement"
+              value={formData.orgAdditionalRequirement}
+              onChange={handleInputChange}
+            />
             <Box sx={{ mt: 3 }}>
               <FormControlLabel
                 control={

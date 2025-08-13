@@ -46,7 +46,7 @@ export function VisibilityAndAccessSettingsView() {
   const { __events } = useSelector((state: RootState) => state.organizer);
   const dispatch = useDispatch<AppDispatch>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
- 
+
   useEffect(() => {
     dispatch(fatchOrgEvents());
   }, [dispatch]);
@@ -56,19 +56,22 @@ export function VisibilityAndAccessSettingsView() {
   };
 
   return (
-    <DashboardContent>
+    <>
       <EventBreadCrum events={__events} onEventSelect={handleEventSelect} />
 
-      <PageTitleSection
-        title="Visibility And Access Settings"
-      />
-      <VisibilityType eventId={selectedEvent?._id} visibility={selectedEvent?.visibility} />
+      <DashboardContent>
 
-      <EventCustomization eventId={selectedEvent?._id} />
+        <PageTitleSection
+          title="Visibility And Access Settings"
+        />
+        <VisibilityType eventId={selectedEvent?._id} visibility={selectedEvent?.visibility} />
 
-      <CustomPhotoVideoFilter __events={selectedEvent} />
+        <EventCustomization eventId={selectedEvent?._id} />
 
-    </DashboardContent>
+        <CustomPhotoVideoFilter __events={selectedEvent} />
+
+      </DashboardContent>
+    </>
   )
 
 }

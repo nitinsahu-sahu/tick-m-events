@@ -28,9 +28,7 @@ interface ApiResult {
 export function ServiceRequestTable({ handleSignedContract, requests, onActionClick, type }: RequestTableProps) {
   const data = requests;
   const dispatch = useDispatch<AppDispatch>();
-console.log('=======================esf=============');
-console.log(data);
-console.log('====================================');
+
   const [openModal, setOpenModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
 

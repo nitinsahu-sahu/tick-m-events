@@ -14,6 +14,13 @@ interface Ticket {
     price: number;
 }
 
+interface TicketWrapper {
+    tickets: Ticket[];
+    totalAmount: number;
+    eventId: string;
+    ticketCount: number;
+}
+
 interface OrderDetails {
     // Define your order details interface here
     [key: string]: any;
@@ -21,7 +28,13 @@ interface OrderDetails {
 
 export function TicketPurchaseProcessView() {
     const [activeStep, setActiveStep] = useState(0);
-    const [selectedTickets, setSelectedTickets] = useState<Ticket[]>([]);
+    const [selectedTickets, setSelectedTickets] = useState<TicketWrapper>({
+        tickets: [],
+        totalAmount: 0,
+        eventId: '',
+        ticketCount: 0
+    });
+
     const [orderDetails, setOrderDetails] = useState<OrderDetails>({});
     const handleNext = useCallback(() => {
         setActiveStep((prev) => Math.min(prev + 1, steps.length - 1));
@@ -31,14 +44,15 @@ export function TicketPurchaseProcessView() {
         setActiveStep((prev) => Math.max(prev - 1, 0));
     }, []);
 
-    const handleTicketsUpdate = useCallback((tickets: Ticket[]) => {
-        setSelectedTickets((prev) => {
-            if (JSON.stringify(prev) !== JSON.stringify(tickets)) {
-                return tickets;
-            }
-            return prev;
-        });
-    }, []);
+ const handleTicketsUpdate = useCallback((data: TicketWrapper) => {
+  setSelectedTickets((prev) => {
+    if (JSON.stringify(prev) !== JSON.stringify(data)) {
+      return data;
+    }
+    return prev;
+  });
+}, []);
+
 
     const handleOrderDetailsUpdate = useCallback((details: OrderDetails) => {
         setOrderDetails((prev) => {
@@ -53,7 +67,7 @@ export function TicketPurchaseProcessView() {
         switch (activeStep) {
             case 0:
                 return (
-                    <ProcessOne 
+                    <ProcessOne
                         onTicketsSelected={handleTicketsUpdate}
                         onNext={handleNext}
                         initialTickets={selectedTickets} // Pass existing tickets
@@ -61,7 +75,8 @@ export function TicketPurchaseProcessView() {
                 );
             case 1:
                 return (
-                    <ProcessTwo 
+                    <ProcessTwo
+                        ticketCount={selectedTickets.ticketCount}
                         onOrderDetailsUpdate={handleOrderDetailsUpdate}
                         onBack={handleBack}
                         onNext={handleNext}
@@ -69,7 +84,7 @@ export function TicketPurchaseProcessView() {
                 );
             case 2:
                 return (
-                    <ProcessThree 
+                    <ProcessThree
                         tickets={selectedTickets}
                         orderDetails={orderDetails}
                         onBack={handleBack}
@@ -77,7 +92,7 @@ export function TicketPurchaseProcessView() {
                     />
                 );
             case 3:
-                return <FinalProcess onNext={handleNext}/>;
+                return <FinalProcess onNext={handleNext} />;
             default:
                 return null;
         }

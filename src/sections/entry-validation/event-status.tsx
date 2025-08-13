@@ -84,9 +84,6 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
                 '& .MuiSelect-select': {
                     color: 'white' // Make select text white
                 },
-                '& .MuiSvgIcon-root': {
-                    color: 'white' // Make dropdown icon white
-                },
                 '& .MuiOutlinedInput-notchedOutline': {
                     borderColor: 'rgba(255, 255, 255, 0.3)' // Light border for select
                 }
@@ -147,14 +144,15 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
                         <Button
                             variant={view === 'scan' ? 'contained' : 'text'}
                             onClick={() => setView('scan')}
-                            sx={{ fontSize: 13 }}
+                            sx={{ fontSize: 10, border:"1px solid black", width:100 }}
+
                         >
                             Scan View
                         </Button>
                         <Button
                             variant={view === 'list' ? 'contained' : 'text'}
                             onClick={() => setView('list')}
-                            sx={{ fontSize: 13 }}
+                            sx={{ fontSize: 10, border:"1px solid black", width:100 }}
                         >
                             List View
                         </Button>

@@ -5,6 +5,7 @@ import { AppDispatch, RootState } from "src/redux/store";
 import { DashboardContent } from "src/layouts/dashboard";
 import { PageTitleSection } from "src/components/page-title-section";
 import { promotionEvents } from "src/redux/actions";
+import { EventBreadCrum } from "src/sections/entry-validation/event-status";
 
 import { HelpCenterAndSecurity } from "../help-center-and-security";
 import { InvoiceHistory } from "../invoices-&-reports";
@@ -14,7 +15,6 @@ import { PaymentSettingAndPrefrenceHistory } from "../payment-settings-&-prefren
 import { RefundManagementHistory } from "../refund-management";
 import { WithdrawalRequest } from "../withdrawal-request";
 import { WithdrawalTableHistory } from "../withdrawal-table-history";
-import { TrnsAndPaymentBreadCrum } from "../breadcrum-trnsandpay";
 import { EventData } from "../utils";
 
 
@@ -45,40 +45,38 @@ export function TransectionAndPaymentView() {
   };
 
   return (
-    <DashboardContent>
-      <TrnsAndPaymentBreadCrum
-        events={eventsWithOrdersAndParticiapnt}
-        onEventSelect={handleEventSelect}
-        selectedEvent={selectedEvent}
-      />
+    <>
+      <EventBreadCrum events={eventsWithOrdersAndParticiapnt} onEventSelect={handleEventSelect} eventInformation={selectedEvent} />
 
-      <PageTitleSection
-        title="Transaction And Payment"
-        rightCom={`Available Funds: ${selectedEvent?.availableBalance?.toLocaleString() || 0} XAF`}
-      />
+      <DashboardContent>
+        <PageTitleSection
+          title="Transaction And Payment"
+          rightCom={`Available Funds: ${selectedEvent?.availableBalance?.toLocaleString() || 0} XAF`}
+        />
 
-      {/* Metric Cards */}
-      <MetricCard selectedEvent={selectedEvent} />
+        {/* Metric Cards */}
+        <MetricCard selectedEvent={selectedEvent} />
 
-      {/* Payment History */}
-      <PaymentHistory selectedEvent={selectedEvent} />
+        {/* Payment History */}
+        <PaymentHistory selectedEvent={selectedEvent} />
 
-      {/* Payment History */}
-      <WithdrawalRequest availableBalance={selectedEvent?.availableBalance || 0} />
+        {/* Payment History */}
+        <WithdrawalRequest availableBalance={selectedEvent?.availableBalance || 0} />
 
-      {/* Withdrawal Table History */}
-      <WithdrawalTableHistory />
+        {/* Withdrawal Table History */}
+        <WithdrawalTableHistory />
 
-      {/* Refund Management History */}
-      <RefundManagementHistory selectedEvent={selectedEvent} />
-      {/* Invoice History */}
-      <InvoiceHistory />
+        {/* Refund Management History */}
+        <RefundManagementHistory selectedEvent={selectedEvent} />
+        {/* Invoice History */}
+        <InvoiceHistory />
 
-      {/* Payment Setting and Prefrence History */}
-      <PaymentSettingAndPrefrenceHistory />
+        {/* Payment Setting and Prefrence History */}
+        <PaymentSettingAndPrefrenceHistory />
 
-      {/* Help Center and security */}
-      <HelpCenterAndSecurity />
-    </DashboardContent>
+        {/* Help Center and security */}
+        <HelpCenterAndSecurity />
+      </DashboardContent>
+    </>
   );
 }

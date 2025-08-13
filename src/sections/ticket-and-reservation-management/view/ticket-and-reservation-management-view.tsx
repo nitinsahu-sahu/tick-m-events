@@ -32,8 +32,8 @@ export function TicketAndReservationManagementView() {
   };
 
   useEffect(() => {
-        dispatch(fatchOrgEvents());
-    
+    dispatch(fatchOrgEvents());
+
     const interval = setInterval(() => {
       dispatch(fetchTicketType());
       dispatch(eventFetch());
@@ -61,63 +61,66 @@ export function TicketAndReservationManagementView() {
   }, [locationSelectedEvent, fullData]);
 
   return (
-    <DashboardContent>
+    <>
       <EventBreadCrum events={__events} onEventSelect={handleEventSelect} eventInformation={selectedEvent} />
 
-      <PageTitleSection
-        title="Ticket & Reservation Management"
-        desc=""
-      />
-      <TicketManagement tickets={tickets} />
-      {/* <TicketCreationAndConfiguration /> */}
-      <SalesAndStockTracking tickets={tickets} />
-      {/* {selectedEvent && <ReservationManagement orderList={selectedEvent} />} */}
-      {selectedEvent ? (
-        <ReservationManagement orderList={selectedEvent} />
-      ) : (
-        <Box
-          sx={{
-            width: '100%',
-            border: '1px solid #e0e0e0',
-            borderRadius: 3,
-            p: 3,
-            mt: 3,
-            textAlign: 'center',
-            backgroundColor: '#fafafa'
-          }}
-        >
-          <Typography variant="h6" color="textSecondary" gutterBottom>
-            No Event Selected
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            Please select an event to view reservation details
-          </Typography>
-          {/* <EventIcon sx={{ fontSize: 60, color: '#bdbdbd' }} /> */}
-        </Box>
-      )}
-      {selectedEvent ? (
-        <RefundAndCancellationManangement orderList={selectedEvent} />
-      ) : (
-        <Box
-          sx={{
-            width: '100%',
-            border: '1px solid #e0e0e0',
-            borderRadius: 3,
-            p: 3,
-            mt: 3,
-            textAlign: 'center',
-            backgroundColor: '#fafafa'
-          }}
-        >
-          <Typography variant="h6" color="textSecondary" gutterBottom>
-            No Event Selected
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            Please select an event to view reservation details
-          </Typography>
-          {/* <EventIcon sx={{ fontSize: 60, color: '#bdbdbd' }} /> */}
-        </Box>
-      )}
-    </DashboardContent>
+      <DashboardContent>
+
+        <PageTitleSection
+          title="Ticket & Reservation Management"
+          desc=""
+        />
+        <TicketManagement tickets={tickets} />
+        {/* <TicketCreationAndConfiguration /> */}
+        <SalesAndStockTracking tickets={tickets} />
+        {/* {selectedEvent && <ReservationManagement orderList={selectedEvent} />} */}
+        {selectedEvent ? (
+          <ReservationManagement orderList={selectedEvent} />
+        ) : (
+          <Box
+            sx={{
+              width: '100%',
+              border: '1px solid #e0e0e0',
+              borderRadius: 3,
+              p: 3,
+              mt: 3,
+              textAlign: 'center',
+              backgroundColor: '#fafafa'
+            }}
+          >
+            <Typography variant="h6" color="textSecondary" gutterBottom>
+              No Event Selected
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              Please select an event to view reservation details
+            </Typography>
+            {/* <EventIcon sx={{ fontSize: 60, color: '#bdbdbd' }} /> */}
+          </Box>
+        )}
+        {selectedEvent ? (
+          <RefundAndCancellationManangement orderList={selectedEvent} />
+        ) : (
+          <Box
+            sx={{
+              width: '100%',
+              border: '1px solid #e0e0e0',
+              borderRadius: 3,
+              p: 3,
+              mt: 3,
+              textAlign: 'center',
+              backgroundColor: '#fafafa'
+            }}
+          >
+            <Typography variant="h6" color="textSecondary" gutterBottom>
+              No Event Selected
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              Please select an event to view reservation details
+            </Typography>
+            {/* <EventIcon sx={{ fontSize: 60, color: '#bdbdbd' }} /> */}
+          </Box>
+        )}
+      </DashboardContent>
+    </>
   )
 }

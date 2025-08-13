@@ -30,7 +30,7 @@ import { SearchAndAdvanceFilter } from '../SearchAndAdvanceFilter';
 import ProviderCardList from '../ProviderCardList';
 import { ProposalsCard } from '../ProposalsList';
 import RequestService from '../RequestService';
-import { RequestAService } from '../RequestAService';
+import { PlaceABid } from '../place-a-bid';
 import { ServiceCard } from '../ServiceCard';
 
 
@@ -206,7 +206,7 @@ export function SearchAndSelectServiceProvidersView() {
           <RequestService requests={organizerRequests} />
         )}
         {tabValue === 4 && (
-          <RequestAService requests={accepedProviderReq} />
+          <PlaceABid _SelectedEvent={selectedEvent} />
         )}
         <Modal
           open={isModalOpen}
@@ -662,24 +662,6 @@ export function SearchAndSelectServiceProvidersView() {
                       <Box display="flex" justifyContent="space-between">
                         <HeadingCommon variant="h6" mb={1} baseSize="24px" weight={600} title='Offered Services' />
                         <HeadingCommon variant="h6" mb={1} baseSize="24px" weight={600} title={`Event Name: ${selectedEvent?.eventName}`} />
-
-                        {/* <Grid item xs={12} sm={6}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel>Select Event</InputLabel>
-                        <Select
-                          value={selectedEvent}
-                          onChange={handleEventSelect}
-                          label="Select Event"
-                          sx={{ minWidth: 200, textTransform: "capitalize" }}
-                        >
-                          {__events?.map((event: any) => (
-                            <MenuItem key={event._id} value={event._id} sx={{ textTransform: "capitalize" }}>
-                              {event.eventName} ({event.date})
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid> */}
                       </Box>
                       <Grid container spacing={2}>
                         {select.services.map((service: any) => (

@@ -24,7 +24,7 @@ export function MarketingEngagenmentView() {
 
   useEffect(() => {
     dispatch(promotionGet());
-     dispatch(promotionEvents());
+    dispatch(promotionEvents());
   }, [dispatch]);
 
   const handleEventSelect = (event: Event | null) => {
@@ -32,16 +32,20 @@ export function MarketingEngagenmentView() {
   };
 
   return (
-    <DashboardContent>
+    <>
       <EventBreadCrum events={eventsWithOrdersAndParticiapnt} onEventSelect={handleEventSelect} />
-      <PageTitleSection title="Marketing & Engagement" />
 
-      <ActivePromotion selEvent={selectedEvent} />
-      <PromotionsAndOffers selEvent={selectedEvent} />
+      <DashboardContent>
+        <PageTitleSection title="Marketing & Engagement" />
 
-      <NotificationAndReminder selEvent={selectedEvent} />
-      <SocialMediaSharing selEvent={selectedEvent} />
-      {/* <MarketingPerformance /> */}
-    </DashboardContent>
+        <ActivePromotion selEvent={selectedEvent} />
+        <PromotionsAndOffers selEvent={selectedEvent} />
+
+        <NotificationAndReminder selEvent={selectedEvent} />
+        <SocialMediaSharing selEvent={selectedEvent} />
+        {/* <MarketingPerformance /> */}
+      </DashboardContent>
+    </>
+
   );
 }

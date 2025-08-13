@@ -74,6 +74,9 @@ interface DetailsModalProps {
 }
 
 export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) => {
+  console.log('==========ef==========================');
+  console.log(data);
+  console.log('====================================');
   const { user: loggedInUser } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>()
   const [loading, setLoading] = useState(false);

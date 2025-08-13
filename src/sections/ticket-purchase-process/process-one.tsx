@@ -22,7 +22,6 @@ interface Event {
 export function ProcessOne({ onTicketsSelected, onNext }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const { basicDetails, eventWithDetails } = useSelector((state: RootState) => state?.event);
-    // State management
     const [events, setEvents] = useState<Event[]>(basicDetails || []);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -35,7 +34,10 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
     // Memoized event data
     const eventId = useMemo(() => eventWithDetails?._id || '', [eventWithDetails]);
     const tickets = useMemo(() => eventWithDetails?.tickets || [], [eventWithDetails]);
-
+    const totalTicketsSelected = useMemo(
+        () => Object.values(ticketQuantities).reduce((sum, qty) => sum + qty, 0),
+        [ticketQuantities]
+    );
     // Initialize ticket quantities
     useEffect(() => {
         if (tickets.length > 0) {
@@ -67,7 +69,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         }
     }, [dispatch]);
 
-    
+
 
     // Initial data loading
 
@@ -97,7 +99,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
     useEffect(() => {
         if (eventIdFromUrl && events.length > 0) {
             const foundEvent = events.find(e => e._id === eventIdFromUrl);
-            
+
             if (foundEvent) {
                 setSelectedEvent(foundEvent);
             }
@@ -230,10 +232,11 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         const selection = {
             tickets: getSelectedTickets(),
             totalAmount: calculateTotal(),
-            eventId
+            eventId,
+            ticketCount: totalTicketsSelected
         };
         onTicketsSelected(selection);
-    }, [ticketQuantities, eventId, getSelectedTickets, calculateTotal, onTicketsSelected]);
+    }, [ticketQuantities, eventId, getSelectedTickets, calculateTotal, onTicketsSelected, totalTicketsSelected]);
 
 
     return (
@@ -290,7 +293,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                     <Paper sx={{ height: "100%", p: 3, boxShadow: 4, borderRadius: 2, backdropFilter: "blur(14px)" }}>
                         <HeadingCommon weight={600} variant="h6" title="Summary" baseSize="20px" />
                         <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mt: 1 }}>
-                            <HeadingCommon title="Tickets: 1" baseSize="16px" />
+                            <HeadingCommon title={`Tickets: ${totalTicketsSelected}`} baseSize="16px" />
                             <HeadingCommon title={`Discount: -${calculateDiscount().toLocaleString() || 0} XAF`} baseSize="16px" />
                             <HeadingCommon
                                 title={`Payment Method: ${eventWithDetails?.tickets?.[0]?.paymentMethods || 'Cash on Delivery'}`}

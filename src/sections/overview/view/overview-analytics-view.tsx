@@ -44,7 +44,7 @@ function getDayName(dateString: string): string {
 export function OverviewAnalyticsView() {
   const { upcomingEvents, latestEvents, latestSales } = useSelector((state: RootState) => state?.homeRecom);
   const { __events } = useSelector((state: RootState) => state?.organizer);
-const eventDates = latestEvents?.map((event: any) => new Date(event.date).toDateString());
+  const eventDates = latestEvents?.map((event: any) => new Date(event.date).toDateString());
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const [ticketType, setTicketType] = useState<TicketTypes>('VIP');
@@ -110,56 +110,60 @@ const eventDates = latestEvents?.map((event: any) => new Date(event.date).toDate
   };
 
   return (
-    <DashboardContent>
+    <>
       <EventBreadCrum events={__events} onEventSelect={handleEventSelect} />
 
-      <PageTitleSection
-        title="Dashboard"
-        rightCom={<CountDownView selectedEvent={selectedEvent} />} // Passing SearchBar component as a prop
-      />
+      <DashboardContent>
 
-      <AnalyticsFourCards
-        up={up}
-        chartOptions={chartOptions}
-        percentage={percentage}
-        donutChartOptions={donutChartOptions}
-        selectedEvent={selectedEvent}
-      />
+        <PageTitleSection
+          title="Dashboard"
+          rightCom={<CountDownView selectedEvent={selectedEvent} />} // Passing SearchBar component as a prop
+        />
 
-      <WalletBalance selectedEvent={selectedEvent} />
+        <AnalyticsFourCards
+          up={up}
+          chartOptions={chartOptions}
+          percentage={percentage}
+          donutChartOptions={donutChartOptions}
+          selectedEvent={selectedEvent}
+        />
+
+        <WalletBalance selectedEvent={selectedEvent} />
 
 
-      {/* Best Selling */}
-      <BestSelling
-        selectedTicket={selectedTicket}
-        setSelectedTicket={setSelectedTicket}
-        donutBestSellingChartOptions={donutBestSellingChartOptions}
-        donutBestSellingChartSeries={donutBestSellingChartSeries}
-        chartOptions={chartOptions}
-        selectedEvent={selectedEvent}
-      />
+        {/* Best Selling */}
+        <BestSelling
+          selectedTicket={selectedTicket}
+          setSelectedTicket={setSelectedTicket}
+          donutBestSellingChartOptions={donutBestSellingChartOptions}
+          donutBestSellingChartSeries={donutBestSellingChartSeries}
+          chartOptions={chartOptions}
+          selectedEvent={selectedEvent}
+        />
 
-      <RecentEventList
-        isDesktop={isDesktop}
-        isMobileTablet={isMobileTablet}
-        selectedTicket={selectedTicket}
-        setSelectedTicket={setSelectedTicket}
-        ticketType={ticketType}
-        timePeriod={timePeriod}
-        handleTicketTypeChange={handleTicketTypeChange}
-        handleTimePeriodChange={handleTimePeriodChange}
-       chartData={chartData}
-        upcomingEvents={upcomingEvents}
-        latestSales={latestSales}
-        latestEvents={latestEvents}
-        currentDate={currentDate}
-        eventDates={eventDates}
-        getDayNumber={getDayNumber}
-        getDayName={getDayName}
-        ticketSalesData={ticketSalesData}
-        selectedEvent={selectedEvent}
-      />
+        <RecentEventList
+          isDesktop={isDesktop}
+          isMobileTablet={isMobileTablet}
+          selectedTicket={selectedTicket}
+          setSelectedTicket={setSelectedTicket}
+          ticketType={ticketType}
+          timePeriod={timePeriod}
+          handleTicketTypeChange={handleTicketTypeChange}
+          handleTimePeriodChange={handleTimePeriodChange}
+          chartData={chartData}
+          upcomingEvents={upcomingEvents}
+          latestSales={latestSales}
+          latestEvents={latestEvents}
+          currentDate={currentDate}
+          eventDates={eventDates}
+          getDayNumber={getDayNumber}
+          getDayName={getDayName}
+          ticketSalesData={ticketSalesData}
+          selectedEvent={selectedEvent}
+        />
 
-    </DashboardContent>
+      </DashboardContent>
+    </>
+
   );
 }

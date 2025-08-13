@@ -39,13 +39,14 @@ interface Event {
     public_id: string;
     url: string;
   };
+  customization: any
   // Add other properties as needed
 }
 export function VisibilityAndAccessSettingsView() {
   const { __events } = useSelector((state: RootState) => state.organizer);
   const dispatch = useDispatch<AppDispatch>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-
+ 
   useEffect(() => {
     dispatch(fatchOrgEvents());
   }, [dispatch]);
@@ -63,9 +64,9 @@ export function VisibilityAndAccessSettingsView() {
       />
       <VisibilityType eventId={selectedEvent?._id} visibility={selectedEvent?.visibility} />
 
-      <EventCustomization />
+      <EventCustomization eventId={selectedEvent?._id} />
 
-      <CustomPhotoVideoFilter />
+      <CustomPhotoVideoFilter __events={selectedEvent} />
 
     </DashboardContent>
   )

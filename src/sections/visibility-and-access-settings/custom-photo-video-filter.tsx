@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -26,9 +26,7 @@ interface SocialPlatforms {
   // Add other platforms if needed
 }
 
-export const CustomPhotoVideoFilter = () => {
-  const { fullData } = useSelector((state: RootState) => state?.event);
-  const [selectedEventId, setSelectedEventId] = useState<string>('');
+export const CustomPhotoVideoFilter = ({ __events }: any) => {
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [filterImages, setFilterImages] = useState<string[]>([
@@ -46,29 +44,23 @@ export const CustomPhotoVideoFilter = () => {
     whatsapp: false,
   });
 
-  const handleSocialChange = (event: any) => {
-    setSelectedSocial({
-      ...selectedSocial,
-      [event.target.name]: event.target.checked,
-    });
-  };
-  const handleEventChange = (event: any) => {
-    const selectedId = event.target.value;
-    setSelectedEventId(selectedId);
-
-    // Find the selected event
-    const selected = fullData.find((e: any) => e._id === selectedId);
-
+  // const handleSocialChange = (event: any) => {
+  //   setSelectedSocial({
+  //     ...selectedSocial,
+  //     [event.target.name]: event.target.checked,
+  //   });
+  // };
+  useEffect(() => {
     // If photoFrame exists, use its frameUrls, otherwise use empty list
-    if (selected?.photoFrame?.frameUrls?.length) {
-      setFilterImages(selected.photoFrame.frameUrls);
+    if (__events?.photoFrame?.frameUrls?.length) {
+      setFilterImages(__events.photoFrame.frameUrls);
     } else {
-      setFilterImages([]); // or optionally keep default frames if you want
+      setFilterImages([]);
     }
 
     // Also reset selected filter
     setSelectedFilter(null);
-  };
+  }, [__events?.photoFrame]);
 
   const checkImageTransparency = (file: File): Promise<boolean> =>
     new Promise((resolve) => {
@@ -143,11 +135,10 @@ export const CustomPhotoVideoFilter = () => {
   };
 
 
-  const selectedEvent = fullData.find((event: any) => event._id === selectedEventId);
-  const eventCoverImage = selectedEvent?.customization?.eventLogo?.url || '/assets/images/cover/1.png';
+  const eventCoverImage = __events?.customization?.eventLogo?.url || '/assets/images/cover/1.png';
 
   const handleApplyFilter = async () => {
-    if (!selectedEventId) {
+    if (!__events?._id) {
       toast.warning("Please select an event before applying.");
       return;
     }
@@ -162,7 +153,7 @@ export const CustomPhotoVideoFilter = () => {
 
       await Promise.all(filesToUpload.map(async (file) => {
         const formData = new FormData();
-        formData.append("eventId", selectedEventId);
+        formData.append("eventId", __events?._id);
         formData.append("frame", file);
 
         try {
@@ -197,7 +188,7 @@ export const CustomPhotoVideoFilter = () => {
     }
   };
   const applySelectedFilter = async () => {
-    if (!selectedEventId) {
+    if (!__events?._id) {
       toast.warning("Please select an event before applying.");
       return;
     }
@@ -208,7 +199,7 @@ export const CustomPhotoVideoFilter = () => {
 
     try {
       const response = await axios.put('/custom-frame/select-frame', {
-        eventId: selectedEventId,
+        eventId: __events?._id,
         selectedFrameUrl: selectedFilter,
       });
 
@@ -229,17 +220,6 @@ export const CustomPhotoVideoFilter = () => {
         <Typography variant="h6" fontSize={{ xs: 15, sm: 20, md: 26 }} fontWeight={500}>
           Custom Photo & Video Filters
         </Typography>
-
-        <FormControl fullWidth size="small" sx={{ maxWidth: 300 }}>
-          <InputLabel>Select Event</InputLabel>
-          <Select value={selectedEventId} onChange={handleEventChange} label="Select Event">
-            {fullData.map((event: any) => (
-              <MenuItem key={event._id} value={event._id}>
-                {event.eventName} ({event.date})
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
       </Box>
       {/* Enable Checkbox */}
       <Box mb={2}>
@@ -273,11 +253,11 @@ export const CustomPhotoVideoFilter = () => {
                     onClick={async (e) => {
                       e.stopPropagation();
                       const isUploadedUrl = filename.startsWith('http') || filename.includes('/uploads/');
-                      if (isUploadedUrl && selectedEventId) {
+                      if (isUploadedUrl && __events?._id) {
                         try {
                           const res = await axios.delete("/custom-frame/delete-frame", {
                             params: {
-                              eventId: selectedEventId,
+                              eventId: __events?._id,
                               frameUrl: filename,
                             },
                           });

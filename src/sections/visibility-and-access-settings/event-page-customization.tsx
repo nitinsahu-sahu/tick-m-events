@@ -1,23 +1,14 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import {
-  Box, Grid, FormControl, InputLabel, Select, MenuItem,
-  Button, Typography, TextField, Input, SelectChangeEvent
-} from '@mui/material';
+import { Box, Button, Typography, TextField, Input } from '@mui/material';
 import { toast } from 'react-toastify';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { AppDispatch, RootState } from 'src/redux/store';
-import {
-  eventCustomizationPageUpdate,
-  eventCustomizationPageFetch
-} from 'src/redux/actions/event.action'; // 👈 Import fetch action
+import { AppDispatch } from 'src/redux/store';
+import { eventCustomizationPageUpdate, eventCustomizationPageFetch } from 'src/redux/actions/event.action'; // 👈 Import fetch action
 
-export const EventCustomization = () => {
+export const EventCustomization = ({ eventId }: any) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { fullData, customizationData } = useSelector((state: RootState) => state.event);
-
-  const [selectedEventId, setSelectedEventId] = useState<string>('');
   const [primaryColor, setPrimaryColor] = useState('#072F4A');
   const [secondaryColor, setSecondaryColor] = useState('#3F51B5');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -27,28 +18,30 @@ export const EventCustomization = () => {
   const eventBannerRef = useRef<HTMLInputElement>(null);
 
   // Fetch existing customization on event change
-  const handleEventChange = async (event: SelectChangeEvent<string>) => {
-    const selectedId = event.target.value;
-    setSelectedEventId(selectedId);
+  useEffect(() => {
+    const fetchEventCustomization = async () => {
+      if (!eventId) return; // Don't run if no eventId is selected
 
-    const result = await dispatch(eventCustomizationPageFetch(selectedId));
+      const result = await dispatch(eventCustomizationPageFetch(eventId));
 
-    if ('customization' in result && result.status === 200) {
-      const customization = result.customization;
+      if ('customization' in result && result.status === 200) {
+        const customization = result.customization;
 
-      setPrimaryColor(customization.themeColor || '#072F4A');
-      setSecondaryColor(customization.customColor || '#3F51B5');
+        setPrimaryColor(customization.themeColor || '#072F4A');
+        setSecondaryColor(customization.customColor || '#3F51B5');
 
-      if (customization?.eventLogo?.url) {
-        setEventLogoPreview(customization.eventLogo.url);
+        if (customization?.eventLogo?.url) {
+          setEventLogoPreview(customization.eventLogo.url);
+        }
+
+        if (customization?.event?.coverImage?.url) {
+          setPreviewImage(customization.event.coverImage.url);
+        }
       }
+    };
 
-      if (customization?.event?.coverImage?.url) {
-        setPreviewImage(customization.event.coverImage.url);
-      }
-    }
-
-  };
+    fetchEventCustomization();
+  }, [eventId, dispatch]); // Run whenever eventId changes
 
   const handleEventThemeLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
@@ -88,7 +81,7 @@ export const EventCustomization = () => {
       formData.append('coverImage', eventBanner[0]);
     }
 
-    const updatedEvent = { _id: selectedEventId, formData };
+    const updatedEvent = { _id: eventId, formData };
     const result = await dispatch(eventCustomizationPageUpdate(updatedEvent));
 
     if (result?.status === 200) {
@@ -96,30 +89,13 @@ export const EventCustomization = () => {
     } else {
       toast.error(result?.message);
     }
-  }, [dispatch, primaryColor, secondaryColor, selectedEventId]);
+  }, [dispatch, primaryColor, secondaryColor, eventId]);
 
   return (
     <Box boxShadow={3} borderRadius={3} p={{ xs: 2, sm: 3, md: 4 }} bgcolor="white" mt={3}>
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <Box display="flex" justifyContent="space-between">
           <HeadingCommon title="Event Page Customization" />
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Select Event</InputLabel>
-              <Select
-                value={selectedEventId}
-                onChange={handleEventChange}
-                label="Select Event"
-                sx={{ minWidth: 200 }}
-              >
-                {fullData.map((event: any) => (
-                  <MenuItem key={event._id} value={event._id}>
-                    {event.eventName} ({event.date})
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
         </Box>
 
         {/* Theme Color Selection */}

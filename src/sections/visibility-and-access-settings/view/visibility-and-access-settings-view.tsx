@@ -39,6 +39,7 @@ interface Event {
     public_id: string;
     url: string;
   };
+  customization: any
   // Add other properties as needed
 }
 export function VisibilityAndAccessSettingsView() {
@@ -55,19 +56,22 @@ export function VisibilityAndAccessSettingsView() {
   };
 
   return (
-    <DashboardContent>
+    <>
       <EventBreadCrum events={__events} onEventSelect={handleEventSelect} />
 
-      <PageTitleSection
-        title="Visibility And Access Settings"
-      />
-      <VisibilityType eventId={selectedEvent?._id} visibility={selectedEvent?.visibility} />
+      <DashboardContent>
 
-      <EventCustomization />
+        <PageTitleSection
+          title="Visibility And Access Settings"
+        />
+        <VisibilityType eventId={selectedEvent?._id} visibility={selectedEvent?.visibility} />
 
-      <CustomPhotoVideoFilter />
+        <EventCustomization eventId={selectedEvent?._id} />
 
-    </DashboardContent>
+        <CustomPhotoVideoFilter __events={selectedEvent} />
+
+      </DashboardContent>
+    </>
   )
 
 }

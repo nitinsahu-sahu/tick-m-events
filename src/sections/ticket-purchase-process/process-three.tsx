@@ -28,7 +28,8 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
         event.preventDefault();
         const orderFormEntry = new FormData();
         orderFormEntry.append("eventId", tickets.eventId);
-        orderFormEntry.append("orderAddress", JSON.stringify(orderDetails));
+        orderFormEntry.append("orderAddress", JSON.stringify(orderDetails.orderAddress));
+        orderFormEntry.append("participantDetails", JSON.stringify(orderDetails.participants));
         orderFormEntry.append("tickets", JSON.stringify(tickets));
         orderFormEntry.append("totalAmount", tickets?.totalAmount);
         orderFormEntry.append("paymentMethod", selectedPayment?.value);

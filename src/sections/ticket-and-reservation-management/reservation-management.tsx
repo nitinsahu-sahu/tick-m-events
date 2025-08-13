@@ -14,7 +14,6 @@ import { validateViewUpdate } from "../../redux/actions/event.action";
 
 export function ReservationManagement({ orderList }: any) {
     const { order } = orderList
-    console.log("iii", orderList);
     const exportToExcel = useExcelExport();
     const exportToCSV = useCSVExport();
 

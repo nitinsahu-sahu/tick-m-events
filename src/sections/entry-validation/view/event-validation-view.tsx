@@ -33,21 +33,24 @@ export function EventValidationView() {
     setSelectedEvent(event);
   };
   return (
-    <DashboardContent>
+    <>
       <EventBreadCrum events={__events} view={view} onEventSelect={handleEventSelect} setView={setView} />
 
-      <PageTitleSection
-        title="Entry Validation (QR Code Scan)"
-      />
-      {
-        view === 'scan' ? <TicketScanner /> : <EnterTicketCode setEventInformation={setEventInformation} />
-      }
+      <DashboardContent>
 
-      {/* Entry List Section */}
-      <EntryListView />
+        <PageTitleSection
+          title="Entry Validation (QR Code Scan)"
+        />
+        {
+          view === 'scan' ? <TicketScanner /> : <EnterTicketCode setEventInformation={setEventInformation} />
+        }
 
-      {/* Statistics Section */}
-      <RealTimeStatistics />
-    </DashboardContent>
+        {/* Entry List Section */}
+        <EntryListView />
+
+        {/* Statistics Section */}
+        <RealTimeStatistics />
+      </DashboardContent>
+    </>
   );
 }

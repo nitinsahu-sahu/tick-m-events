@@ -4,8 +4,6 @@ import { HeadingCommon } from 'src/components/multiple-responsive-heading/headin
 import { ProviderListView } from './PopularEvent';
 
 export default function ProviderCardList({ handleSelct, providersList }: any) {
-  console.log('list', providersList);
-
   const [view, setView] = useState<'card' | 'list'>('card');
   return (
     <Paper

@@ -163,7 +163,7 @@ export function ChatPanel() {
       return;
     }
 
-    const tempMessageId = Date.now().toString(); // Temporary ID for optimistic update
+    const tempMessageId = Date.now().toString();
     const messageData = {
       conversationId: messages?.conversationId,
       senderId: user?._id,
@@ -208,8 +208,25 @@ export function ChatPanel() {
       });
 
       // Then send to server
-      await axios.post(`/conv/message`, messageData);
+      const response = await axios.post(`/conv/message`, messageData);
 
+      // If this was a new conversation, update the conversation ID
+      if (messages?.conversationId === 'new' && response.data.conversationId) {
+        // Update the selected conversation with the new ID
+        setSelectedOption((prev: any) => ({
+          ...prev,
+          conversationId: response.data.conversationId
+        }));
+
+        // Update messages state with the new conversation ID
+        setMessages(prev => ({
+          ...prev,
+          conversationId: response.data.conversationId
+        }));
+
+        // Refresh conversations list
+        dispatch(fetchConversation());
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       // Rollback optimistic update on error
@@ -309,21 +326,30 @@ export function ChatPanel() {
   };
 
   // File input handler
-  const handleFileInputChange = (type: 'image' | 'document') => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileInputChange = (type: 'image' | 'document' | 'video') => (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     const file = files[0];
-    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    const validDocumentTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+    // Validate file type
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const validDocumentTypes = ['application/pdf', 'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const validVideoTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
 
     if (type === 'image' && !validImageTypes.includes(file.type)) {
-      alert('Please select a valid image file (JPEG, PNG, GIF)');
+      alert('Please select a valid image file (JPEG, PNG, GIF, WEBP)');
       return;
     }
 
     if (type === 'document' && !validDocumentTypes.includes(file.type)) {
       alert('Please select a valid document file (PDF, DOC, DOCX)');
+      return;
+    }
+
+    if (type === 'video' && !validVideoTypes.includes(file.type)) {
+      alert('Please select a valid video file (MP4, WEBM, MOV)');
       return;
     }
 
@@ -418,6 +444,21 @@ export function ChatPanel() {
     }
   };
 
+  useEffect(() => {
+    // When conversations are loaded, check if we need to update the selected conversation
+    if (selectedOption?.conversationId === 'new' && conv) {
+      const newConv = conv.find((c: any) =>
+        c.user.receiverId === selectedOption.user.receiverId ||
+        c.user._id === selectedOption.user.receiverId
+      );
+
+      if (newConv) {
+        setSelectedOption(newConv);
+        fetchMessages(newConv.conversationId, newConv.user);
+      }
+    }
+  }, [conv, selectedOption, fetchMessages]);
+
   return (
     <Box sx={{
       display: 'flex',
@@ -485,17 +526,28 @@ export function ChatPanel() {
                 key={row._id || index}
                 button
                 onClick={() => {
-                  const item = {
-                    user: {
-                      receiverId: row._id,
-                      name: row.name,
-                      email: row.email,
-                      avatar: row.avatar.url
-                    },
-                    conversationId: 'new'
-                  };
-                  setSelectedOption(item);
-                  fetchMessages('new', row._id);
+                  // First check if this user already has a conversation
+                  const existingConv = conv?.find((c: any) =>
+                    c.user.receiverId === row._id ||
+                    c.user._id === row._id
+                  );
+
+                  if (existingConv) {
+                    setSelectedOption(existingConv);
+                    fetchMessages(existingConv.conversationId, existingConv.user);
+                  } else {
+                    const item = {
+                      user: {
+                        receiverId: row._id,
+                        name: row.name,
+                        email: row.email,
+                        avatar: row.avatar.url
+                      },
+                      conversationId: 'new'
+                    };
+                    setSelectedOption(item);
+                    fetchMessages('new', row._id);
+                  }
                 }}
                 sx={{
                   '&:hover': {
@@ -792,7 +844,7 @@ export function ChatPanel() {
                   handleClose();
                 }}>
                   <InsertPhoto fontSize="small" sx={{ mr: 1 }} />
-                  Gallery
+                  Image
                 </MenuItem>
                 <MenuItem onClick={() => {
                   console.log('Document selected');

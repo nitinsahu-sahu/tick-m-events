@@ -106,7 +106,7 @@ export function HomeAndGlobalTable({
                                                 {row.organizer || row?.location || row?.client || row.organizerId?.name}
                                             </TableCell>
                                             <TableCell align="center">
-                                                {row.amountDue || row.datePosted || row.dateTime || row.lastMessage || row.eventId.date}
+                                                {row.amountDue || row.datePosted || row.dateTime || row.lastMessage || row.eventId?.date}
                                             </TableCell>
                                         </>
                                     )}

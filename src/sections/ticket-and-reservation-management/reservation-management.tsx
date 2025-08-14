@@ -1,9 +1,9 @@
-import { Box, Button, Checkbox, FormControlLabel, Typography } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, Typography, FormControl, Radio, RadioGroup } from "@mui/material";
 import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
 import { Link } from "react-router-dom";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
-import { AppDispatch, RootState } from 'src/redux/store';
+import { AppDispatch } from 'src/redux/store';
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
 import { getUniqueFileName } from "src/hooks/download_unique_name";
 import { useCSVExport, useExcelExport } from "src/hooks/downloadable";
@@ -11,33 +11,96 @@ import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from 'react-toastify';
 import { validateViewUpdate } from "../../redux/actions/event.action";
+import { chartRealTimeOptions, ListViewMethod, reservationManagementTableHeaders, ValidationOptions } from "./utills";
 
 export function ReservationManagement({ orderList }: any) {
-    const { order } = orderList
+
+    const { order,  validationOptions: initialValidationOptions } = orderList
+ 
+    const dispatch = useDispatch<AppDispatch>();
     const exportToExcel = useExcelExport();
     const exportToCSV = useCSVExport();
+     // Initialize state with either the existing options or defaults
+    const [validationOption, setValidationOption] = useState<ValidationOptions>(
+        initialValidationOptions || {  // Remove .validationOptions here
+            selectedView: 'scan',
+            listViewMethods: []
+        }
+    );
+    const [isModified, setIsModified] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const chartRealTimeOptions: ApexOptions = {
-        series: [45, 30, 25], // Ticket Sold, Validation, Remaining
-        labels: ["Ticket Sold", "Ticket validated", "Remaining Tickets"],
-        chart: { type: "donut" },
-        colors: ["#2395D4", "#002E4E", "#29A71A"], // Match colors from screenshot
-        legend: { position: "bottom", markers: { strokeWidth: 8 } },
-        dataLabels: { enabled: true },
-        responsive: [{ breakpoint: 768, options: { legend: { position: "bottom" } } }],
+    const handleViewChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value as 'scan' | 'list';
+        setValidationOption(prev => ({
+            ...prev,
+            selectedView: value,
+            // Clear list methods when switching to scan view
+            ...(value === 'scan' ? { listViewMethods: [] } : {})
+        }));
+        setIsModified(true);
+        setError(null); // Clear error when view changes
     };
 
-    const reservationManagementTableHeaders = ["Name", "Email", "Ticket Type", "Purchase Date", "Status"];
+    // Reset form when initialValidationOptions changes
+     useEffect(() => {
+        if (initialValidationOptions) {  // Remove .validationOptions here
+            setValidationOption(initialValidationOptions);
+            setIsModified(false);
+        }
+    }, [initialValidationOptions]);
+
+    const handleListViewMethodChange = (method: ListViewMethod) => {
+        setValidationOption(prev => {
+            const methods = prev.listViewMethods.includes(method)
+                ? prev.listViewMethods.filter(m => m !== method)
+                : [...prev.listViewMethods, method];
+
+            return {
+                ...prev,
+                listViewMethods: methods
+            };
+        });
+        setIsModified(true);
+        setError(null); // Clear error when method changes
+    };
+
+    const handleSaveValidationChanges = async () => {
+        if (!orderList?._id) return;
+
+        // Validate that at least one method is selected in list view
+        if (validationOption.selectedView === 'list' && validationOption.listViewMethods.length === 0) {
+            setError('Please select at least one validation method for List View');
+            return;
+        }
+
+        try {
+            await dispatch(validateViewUpdate(orderList._id, validationOption));
+            toast.success("Changes Saved...");
+            setIsModified(false);
+            setError(null);
+        } catch (errors) {
+            toast.error("Failed to update validation settings");
+        }
+    };
+
+    // Enable save button when:
+    // 1. Scan view is selected (default has isModified true)
+    // 2. Or list view is selected with at least one method
+    const isSaveEnabled = isModified &&
+        (validationOption.selectedView === 'scan' ||
+            (validationOption.selectedView === 'list' && validationOption.listViewMethods.length > 0));
 
     const transformDataForExport = (orders: any[]) =>
-        orders.map(item => ({
-            name: item.userId.name,
-            email: item.userId.email,
-            createdAt: item.createdAt,
-            paymentStatus: item.paymentStatus,
-            ticketType: item.tickets.map((t: any) => t.ticketType).join(' | '),
-        }));
-
+        orders.map(
+            item => ({
+                name: item.userId.name,
+                email: item.userId.email,
+                createdAt: item.createdAt,
+                paymentStatus: item.paymentStatus,
+                ticketType: item.tickets.map((t: any) => t.ticketType).join(' | '),
+            })
+        );
     const handleExcelExport = () => {
         const exportData = transformDataForExport(order);
         exportToExcel(exportData, {
@@ -54,49 +117,6 @@ export function ReservationManagement({ orderList }: any) {
             fieldNames: ['name', 'email', 'createdAt', 'paymentStatus', 'ticketType']
         });
     };
-
-    const dispatch = useDispatch<AppDispatch>();
-    const [validationTypes, setValidationTypes] = useState<string[]>([]);
-    const [initialValidationTypes, setInitialValidationTypes] = useState<string[]>([]);
-
-    const areArraysEqual = (arr1: string[], arr2: string[]) =>
-        [...arr1].sort().join(',') === [...arr2].sort().join(',');
-
-    useEffect(() => {
-        if (orderList?.validationView) {
-            setValidationTypes(orderList.validationView);
-            setInitialValidationTypes(orderList.validationView);
-        }
-    }, [orderList]);
-
-    const handleValidationTypeChange = (type: string) => {
-        setValidationTypes(prev => {
-            if (type === 'listName') {
-                return prev.includes('listName') ? prev.filter(t => t !== 'listName') : [...prev, 'listName'];
-            }
-            if (type === 'listCode') {
-                return prev.includes('listCode') ? prev.filter(t => t !== 'listCode') : [...prev, 'listCode'];
-            }
-            if (type === 'scan') {
-                return prev.includes('scan') ? prev.filter(t => t !== 'scan') : [...prev, 'scan'];
-            }
-            return prev;
-        });
-    };
-
-    const handleSaveValidationChanges = async () => {
-        if (!orderList?._id) return;
-
-        try {
-            await dispatch(validateViewUpdate(orderList._id, validationTypes));
-            setInitialValidationTypes(validationTypes); // reset comparison baseline
-            toast.success("Changes saved successfully...");
-
-        } catch (error) {
-            toast.error("Failed to update validation preferences.");
-        }
-    };
-    const isModified = !areArraysEqual(validationTypes, initialValidationTypes);
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
             <HeadingCommon
@@ -106,7 +126,6 @@ export function ReservationManagement({ orderList }: any) {
                 title="Reservation Management"
                 color="#0B2E4E"
             />
-
             {/* Table */}
             <TicketReservationManagementTable data={order} headers={reservationManagementTableHeaders} type="3" />
 
@@ -123,7 +142,6 @@ export function ReservationManagement({ orderList }: any) {
                 </Box> : null
             }
 
-
             {/* Ticket Validation Section */}
             <Box mt={3}>
                 <HeadingCommon
@@ -133,58 +151,95 @@ export function ReservationManagement({ orderList }: any) {
                     title="Ticket Validation"
                     color="#0B2E4E"
                 />
-                <Box display="flex" flexDirection="column" gap={1} mt={1}>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={validationTypes.includes('scan')}
-                                onChange={() => handleValidationTypeChange('scan')}
-                            />
-                        }
-                        label="QR Code Scan"
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={validationTypes.includes('listCode')}
-                                onChange={() => handleValidationTypeChange('listCode')}
-                            />
-                        }
-                        label="Manual Entry of Unique Code"
-                    />
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={validationTypes.includes('listName')}
-                                onChange={() => handleValidationTypeChange('listName')}
-                            />
-                        }
-                        label="Validation via Name List & Account ID"
-                    />
-                    <Box display="flex" gap={2} mt={2}>
-                        <Button
-                            onClick={handleSaveValidationChanges}
-                            variant="contained"
-                            sx={{
-                                bgcolor: isModified ? "#0B2E4C" : "grey.500",
-                                color: "white",
-                                cursor: isModified ? 'pointer' : 'not-allowed'
-                            }}
-                            disabled={!isModified}
+                <form>
+                    <FormControl component="fieldset">
+                        <RadioGroup
+                            value={validationOption.selectedView}
+                            onChange={handleViewChange}
                         >
-                            Save Changes
-                        </Button>
+                            {/* Scan View Option */}
+                            <FormControlLabel
+                                value="scan"
+                                control={<Radio />}
+                                label={
+                                    <Box>
+                                        <Typography>Scan View</Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Validation via QR Code Scan
+                                        </Typography>
+                                    </Box>
+                                }
+                            />
 
-                        <Link to='/entry-validation'>
-                            <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
-                                Go to Ticket Validation Page
+                            {/* List View Option */}
+                            <FormControlLabel
+                                value="list"
+                                control={<Radio />}
+                                label="List View"
+                            />
+                        </RadioGroup>
+
+                        {/* List View Sub-options (only visible if listView is selected) */}
+                        {validationOption.selectedView === 'list' && (
+                            <Box ml={4} display="flex" flexDirection="column" gap={1}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={validationOption.listViewMethods.includes('manualCode')}
+                                            onChange={() => handleListViewMethodChange('manualCode')}
+                                        />
+                                    }
+                                    label="Manual Entry of Unique Code"
+                                />
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={validationOption.listViewMethods.includes('nameList')}
+                                            onChange={() => handleListViewMethodChange('nameList')}
+                                        />
+                                    }
+                                    label="Validation via Name List"
+                                />
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={validationOption.listViewMethods.includes('accountId')}
+                                            onChange={() => handleListViewMethodChange('accountId')}
+                                        />
+                                    }
+                                    label="Validation via Account ID"
+                                />
+                            </Box>
+                        )}
+
+                        {error && (
+                            <Typography color="error" variant="body2" mt={1}>
+                                {error}
+                            </Typography>
+                        )}
+
+                        <Box display="flex" gap={2} mt={2}>
+                            <Button
+                                onClick={handleSaveValidationChanges}
+                                variant="contained"
+                                sx={{
+                                    bgcolor: isSaveEnabled ? "#0B2E4C" : "grey.500",
+                                    color: "white",
+                                    cursor: isSaveEnabled ? 'pointer' : 'not-allowed'
+                                }}
+                                disabled={!isSaveEnabled}
+                            >
+                                Save Changes
                             </Button>
-                        </Link>
-                    </Box>
 
-                </Box>
-
-
+                            <Link to='/entry-validation'>
+                                <Button variant="contained" sx={{ bgcolor: "#0B2E4C", color: "white" }}>
+                                    Go to Ticket Validation Page
+                                </Button>
+                            </Link>
+                        </Box>
+                    </FormControl>
+                </form>
             </Box>
 
             {/* Real-time Entry Statistics */}
@@ -212,7 +267,6 @@ export function ReservationManagement({ orderList }: any) {
                     <Chart options={chartRealTimeOptions} series={chartRealTimeOptions.series} type="donut" width="100%" height={250} />
                 </Box>
             </Box>
-
         </Box>
     )
 }

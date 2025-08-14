@@ -53,9 +53,19 @@ export const tableDataSecond = [
     { type: "Jean M", price: "jean@email.com", total: "VIP", remaining: "02/04/2025", sold: ["Pending", "Confirmed", "Canceled"], revenue: "Cancel" },
 ];
 
+export const realTimeSalseTrackingTableHeaders = ["Ticket Type", "Price", "Total Stock", "Remaining Stock", "Tickets Sold", "Revenue Generated"];
+
+// Reservation Manangement
+export type ListViewMethod = 'manualCode' | 'nameList' | 'accountId';
+
+export interface ValidationOptions {
+ selectedView: 'scan' | 'list';
+  listViewMethods: ListViewMethod[];
+}
+
 export const chartRealTimeOptions: ApexOptions = {
     series: [45, 30, 25], // Ticket Sold, Validation, Remaining
-    labels: ["Ticket Sold", "Ticket Validation", "Remaining Tickets"],
+    labels: ["Ticket Sold", "Ticket validated", "Remaining Tickets"],
     chart: { type: "donut" },
     colors: ["#2395D4", "#002E4E", "#29A71A"], // Match colors from screenshot
     legend: { position: "bottom", markers: { strokeWidth: 8 } },
@@ -63,4 +73,4 @@ export const chartRealTimeOptions: ApexOptions = {
     responsive: [{ breakpoint: 768, options: { legend: { position: "bottom" } } }],
 };
 
-export const realTimeSalseTrackingTableHeaders = ["Ticket Type", "Price", "Total Stock", "Remaining Stock", "Tickets Sold", "Revenue Generated"];
+export const reservationManagementTableHeaders = ["Name", "Email", "Ticket Type", "Purchase Date", "Status"];

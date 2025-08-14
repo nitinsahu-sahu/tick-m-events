@@ -33,13 +33,8 @@ export function TicketAndReservationManagementView() {
 
   useEffect(() => {
     dispatch(fatchOrgEvents());
-
-    const interval = setInterval(() => {
-      dispatch(fetchTicketType());
-      dispatch(eventFetch());
-    }, 5000);
-
-    return () => clearInterval(interval);
+    dispatch(fetchTicketType());
+    dispatch(eventFetch());
   }, [dispatch]);
 
   useEffect(() => {
@@ -75,7 +70,7 @@ export function TicketAndReservationManagementView() {
         <SalesAndStockTracking tickets={tickets} />
         {/* {selectedEvent && <ReservationManagement orderList={selectedEvent} />} */}
         {selectedEvent ? (
-          <ReservationManagement orderList={selectedEvent} />
+          <ReservationManagement orderList={selectedEvent}/>
         ) : (
           <Box
             sx={{

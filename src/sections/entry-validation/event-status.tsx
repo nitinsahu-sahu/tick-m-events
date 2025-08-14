@@ -19,8 +19,13 @@ function StatusChip({ label, color }: { label: string; color: string }) {
     );
 }
 
-export function EventBreadCrum({ view, setView, eventInformation, events, onEventSelect }: any) {
+export function EventBreadCrum({ _selectEve, view, setView, eventInformation, events, onEventSelect }: any) {
     const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine); // Track online status
+    const location = useLocation();
+    const [selectedEvent, setSelectedEvent] = useState<Event | null>(eventInformation || null);
+
+    // Define the specific URL path where the section should appear
+    const showSection = location.pathname === '/entry-validation';
 
     useEffect(() => {
         const handleOnline = () => setIsOnline(true);
@@ -35,11 +40,7 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
         };
     }, []);
 
-    const location = useLocation();
-    const [selectedEvent, setSelectedEvent] = useState<Event | null>(eventInformation || null);
 
-    // Define the specific URL path where the section should appear
-    const showSection = location.pathname === '/entry-validation';
     useEffect(() => {
         if (eventInformation) {
             setSelectedEvent(eventInformation);
@@ -52,6 +53,12 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
             onEventSelect(firstEvent);
         }
     }, [events, selectedEvent, eventInformation, onEventSelect]);
+
+    useEffect(() => {
+        if (_selectEve?.validationOptions?.selectedView) {
+            setView(_selectEve.validationOptions.selectedView);
+        }
+    }, [_selectEve, setView]);
 
     const handleChange = (e: any) => {
         const selectedId = e.target.value;
@@ -142,17 +149,44 @@ export function EventBreadCrum({ view, setView, eventInformation, events, onEven
 
                     <Box display="flex" gap={1}>
                         <Button
-                            variant={view === 'scan' ? 'contained' : 'text'}
+                            variant={view === 'scan' ? 'contained' : 'outlined'}
                             onClick={() => setView('scan')}
-                            sx={{ fontSize: 10, border:"1px solid black", width:100 }}
-
+                            disabled={view === 'list'} // Disable when list view is active
+                            sx={{
+                                fontSize: 10,
+                                width: 100,
+                                color: view === 'scan' ? "white" : "black",
+                                bgcolor: view === 'scan' ? "#0B2E4C" : "transparent",
+                                border: "1px solid black",
+                                '&:hover': {
+                                    bgcolor: view === 'scan' ? "#0B2E4C" : "rgba(0,0,0,0.1)"
+                                },
+                                '&.Mui-disabled': {
+                                    color: 'rgba(0, 0, 0, 0.26)',
+                                    border: "1px solid rgba(0, 0, 0, 0.12)"
+                                }
+                            }}
                         >
                             Scan View
                         </Button>
                         <Button
-                            variant={view === 'list' ? 'contained' : 'text'}
+                            variant={view === 'list' ? 'contained' : 'outlined'}
                             onClick={() => setView('list')}
-                            sx={{ fontSize: 10, border:"1px solid black", width:100 }}
+                            disabled={view === 'scan'} // Disable when scan view is active
+                            sx={{
+                                fontSize: 10,
+                                width: 100,
+                                color: view === 'list' ? "white" : "black",
+                                bgcolor: view === 'list' ? "#0B2E4C" : "transparent",
+                                border: "1px solid black",
+                                '&:hover': {
+                                    bgcolor: view === 'list' ? "#0B2E4C" : "rgba(0,0,0,0.1)"
+                                },
+                                '&.Mui-disabled': {
+                                    color: 'rgba(0, 0, 0, 0.26)',
+                                    border: "1px solid rgba(0, 0, 0, 0.12)"
+                                }
+                            }}
                         >
                             List View
                         </Button>

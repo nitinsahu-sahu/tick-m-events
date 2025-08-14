@@ -148,7 +148,6 @@ export function RefundAndCancellationManangement({ orderList }: any) {
       toast.error(result.message || "Something went wrong.");
     }
   };
-  console.log('order', order);
 
   const isFreeTicket = tickets?.every((ticket: any) => ticket?.payStatus?.toLowerCase() === "free");
 

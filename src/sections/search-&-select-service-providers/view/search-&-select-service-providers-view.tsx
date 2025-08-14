@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import {
-  Modal, Collapse, Box, MenuItem, Typography, Select,
-  Button, Avatar, Grid, IconButton, InputLabel,
-  Menu, ListItemIcon, Dialog, DialogTitle, FormControl,
+  Modal, Collapse, Box, MenuItem, Typography,
+  Button, Avatar, Grid, IconButton,
+  Menu, ListItemIcon, Dialog, DialogTitle, 
   DialogContent, DialogActions, Chip, Divider
 } from "@mui/material";
 import Rating from '@mui/material/Rating';
@@ -42,7 +42,7 @@ interface PhoneNumberDisplayProps {
 
 export function SearchAndSelectServiceProvidersView() {
   const { providersList } = useSelector((state: RootState) => state?.providers);
-  const { organizerRequests, accepedProviderReq } = useSelector((state: RootState) => state?.serviceRequest);
+  const { organizerRequests } = useSelector((state: RootState) => state?.serviceRequest);
   const [select, setSelected] = useState<any>({})
   const { __events } = useSelector((state: RootState) => state.organizer);
   const [isModalOpen, setIsModalOpen] = useState(false);

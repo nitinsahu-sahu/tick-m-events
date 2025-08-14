@@ -22,8 +22,6 @@ export function TicketReservationManagementTable({
     type: string;
     data: any[];
 }) {
-    console.log(data);
-
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editedData, setEditedData] = useState<any>({});
     const dispatch = useDispatch<AppDispatch>();

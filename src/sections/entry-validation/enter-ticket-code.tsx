@@ -40,7 +40,10 @@ interface ApiResult {
     ticket: Ticket;
 }
 
-export function EnterTicketCode({setEventInformation}:any) {
+export function EnterTicketCode({ _selectEve }: any) {
+    console.log('====================================');
+    console.log(_selectEve.listViewMethods);
+    console.log('====================================');
     const dispatch = useDispatch<AppDispatch>();
     const [verifyData, setVerifyData] = useState({
         ticketCode: "",
@@ -74,11 +77,7 @@ export function EnterTicketCode({setEventInformation}:any) {
                     message: result?.message,
                     ticket: result?.ticket,
                 });
-                 setEventInformation({
-                    eventName: result.eventName.eventName,
-                    _id: result.eventName._id,
-                    // include other relevant data
-                });
+
             } else {
                 setFlag({
                     counter: result?.flag,
@@ -89,7 +88,7 @@ export function EnterTicketCode({setEventInformation}:any) {
         } catch (error) {
             toast.error(error.message);
         }
-    }, [verifyData, dispatch,setEventInformation]);
+    }, [verifyData, dispatch]);
 
     const handleCancelState = () => {
         setFlag({
@@ -137,7 +136,7 @@ export function EnterTicketCode({setEventInformation}:any) {
             console.error('Verification error:', error);
         }
     }, [verifyData, dispatch]);
-
+    const listViewMethods = _selectEve?.listViewMethods || [];
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
@@ -145,58 +144,72 @@ export function EnterTicketCode({setEventInformation}:any) {
             <Typography mt={3} mb={0} color='red'>{flag.counter === 'field' ? flag.message : null}</Typography>
 
             {/* Form with proper submission handling */}
-            <form onSubmit={handleVerifyTicketCode} >
+            <form onSubmit={handleVerifyTicketCode}>
                 <Grid container spacing={2} alignItems="center" mt={0.1}>
-                    {/* Ticket Code Field */}
-                    <Grid item xs={12} sm={4} md={4}>
-                        <TextField
-                            fullWidth
-                            type="text"
-                            name="ticketCode"
-                            label="Enter Ticket Code"
-                            variant="outlined"
-                            placeholder="583-356"
-                            size="small"
-                            value={verifyData.ticketCode}
-                            onChange={handleEventChange}
-                        />
-                    </Grid>
+                    {/* Calculate the grid size based on number of fields */}
+                    {(() => {
+                        const fieldCount = listViewMethods.length;
+                        const gridSize = fieldCount > 0 ? Math.floor(12 / fieldCount) : 12;
 
-                    {/* Participant ID Field */}
-                    <Grid item xs={12} sm={4} md={4}>
-                        <TextField
-                            fullWidth
-                            type="text"
-                            name="participantId"
-                            label="Search by Participant ID"
-                            variant="outlined"
-                            placeholder="Enter Participant ID"
-                            size="small"
-                            value={verifyData.participantId}
-                            onChange={handleEventChange}
-                        />
-                    </Grid>
+                        return (
+                            <>
+                                {/* Manual Code Field */}
+                                {listViewMethods.includes('manualCode') && (
+                                    <Grid item xs={12} sm={gridSize} md={gridSize}>
+                                        <TextField
+                                            fullWidth
+                                            type="text"
+                                            name="ticketCode"
+                                            label="Enter Ticket Code"
+                                            variant="outlined"
+                                            placeholder="583-356"
+                                            size="small"
+                                            value={verifyData.ticketCode}
+                                            onChange={handleEventChange}
+                                        />
+                                    </Grid>
+                                )}
 
-                    {/* Participant Name Field */}
-                    <Grid item xs={12} sm={4} md={4}>
-                        <TextField
-                            fullWidth
-                            name="name"
-                            type="text"
-                            label="Search by Participant Name"
-                            variant="outlined"
-                            placeholder="Enter Participant Name"
-                            size="small"
-                            value={verifyData.name}
-                            onChange={handleEventChange}
-                        />
+                                {/* Account ID Field */}
+                                {listViewMethods.includes('accountId') && (
+                                    <Grid item xs={12} sm={gridSize} md={gridSize}>
+                                        <TextField
+                                            fullWidth
+                                            type="text"
+                                            name="participantId"
+                                            label="Search by Participant ID"
+                                            variant="outlined"
+                                            placeholder="Enter Participant ID"
+                                            size="small"
+                                            value={verifyData.participantId}
+                                            onChange={handleEventChange}
+                                        />
+                                    </Grid>
+                                )}
 
-                    </Grid>
+                                {/* Name List Field */}
+                                {listViewMethods.includes('nameList') && (
+                                    <Grid item xs={12} sm={gridSize} md={gridSize}>
+                                        <TextField
+                                            fullWidth
+                                            name="name"
+                                            type="text"
+                                            label="Search by Participant Name"
+                                            variant="outlined"
+                                            placeholder="Enter Participant Name"
+                                            size="small"
+                                            value={verifyData.name}
+                                            onChange={handleEventChange}
+                                        />
+                                    </Grid>
+                                )}
+                            </>
+                        );
+                    })()}
 
-                    {/* Verify Button */}
-                    {flag.counter === 'granted' ? null :
+                    {/* Verify Button - Only show if at least one field is visible */}
+                    {flag.counter !== 'granted' && listViewMethods.length > 0 && (
                         <Grid item xs={12} sm={6} md={4} mt={2}>
-
                             <Button
                                 variant="contained"
                                 fullWidth
@@ -215,7 +228,8 @@ export function EnterTicketCode({setEventInformation}:any) {
                             >
                                 Verify
                             </Button>
-                        </Grid>}
+                        </Grid>
+                    )}
                 </Grid>
             </form>
 

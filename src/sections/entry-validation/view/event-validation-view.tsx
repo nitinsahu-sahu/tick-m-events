@@ -12,29 +12,51 @@ import { EntryListView } from "../entry-list-view";
 import { RealTimeStatistics } from "../real-time-statistics";
 import { EventBreadCrum } from "../event-status";
 
-interface EventInformation {
-  eventName?: any;
-  _id?: any;
-  // Add other expected fields
+export interface ValidationOptions {
+  selectedView: 'scan' | 'list';
+  listViewMethods: ListViewMethod[];
 }
 
+export type ListViewMethod = 'manualCode' | 'nameList' | 'accountId';
+
+export interface Event {
+  _id: string;
+  eventName: string;
+  date?: string;
+  time?: string;
+  category?: string;
+  eventType?: string;
+  validationOptions?: ValidationOptions;
+  // Add other event properties as needed
+}
 
 export function EventValidationView() {
-  const [view, setView] = useState('scan');
-  const [eventInformation, setEventInformation] = useState<EventInformation>({});
   const { __events } = useSelector((state: RootState) => state?.organizer);
   const dispatch = useDispatch<AppDispatch>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [view, setView] = useState<'scan' | 'list'>('scan'); // Make type specific
+
 
   useEffect(() => {
     dispatch(fatchOrgEvents());
   }, [dispatch]);
   const handleEventSelect = (event: Event | null) => {
     setSelectedEvent(event);
+    // Set the view based on the event's validationOptions if they exist
+    if (event?.validationOptions?.selectedView) {
+      setView(event.validationOptions.selectedView);
+    }
   };
+
   return (
     <>
-      <EventBreadCrum events={__events} view={view} onEventSelect={handleEventSelect} setView={setView} />
+      <EventBreadCrum
+        _selectEve={selectedEvent}
+        events={__events}
+        view={view}
+        onEventSelect={handleEventSelect}
+        setView={setView}
+      />
 
       <DashboardContent>
 
@@ -42,7 +64,7 @@ export function EventValidationView() {
           title="Entry Validation (QR Code Scan)"
         />
         {
-          view === 'scan' ? <TicketScanner /> : <EnterTicketCode setEventInformation={setEventInformation} />
+          view === 'scan' ? <TicketScanner /> : <EnterTicketCode _selectEve={selectedEvent?.validationOptions}/>
         }
 
         {/* Entry List Section */}

@@ -1,5 +1,6 @@
 import { eventConstants } from "./constants";
 import axios from "../helper/axios";
+import { fatchOrgEvents } from "./organizer/pageEvents";
 
 export const removeFromWishlist = ({ eventId }) => async (dispatch) => {
     dispatch({ type: eventConstants.WISHLIST_ADD_REQUEST });
@@ -452,21 +453,22 @@ export const todayEventFetch = () => async (dispatch) => {
     }
 };
 
-export const validateViewUpdate = (eventId, validationView) => async (dispatch) => {
+export const validateViewUpdate = (eventId, validationOptions) => async (dispatch) => {
     dispatch({ type: eventConstants.UPDATE_VALIDATION_VIEW_REQUEST });
 
     try {
         const response = await axios.patch(`/event/${eventId}/validation-view`, {
-            validationView,
+            validationOptions,
         });
 
         dispatch({
             type: eventConstants.UPDATE_VALIDATION_VIEW_SUCCESS,
             payload: {
                 message: response?.data?.message,
-                validationView: response?.data?.validationView,
+                validationOptions: response?.data?.validationOptions,
             },
         });
+        dispatch(fatchOrgEvents())
     } catch (error) {
         dispatch({
             type: eventConstants.UPDATE_VALIDATION_VIEW_FAILURE,

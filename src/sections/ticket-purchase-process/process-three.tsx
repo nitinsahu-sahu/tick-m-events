@@ -31,6 +31,7 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
         orderFormEntry.append("orderAddress", JSON.stringify(orderDetails.orderAddress));
         orderFormEntry.append("participantDetails", JSON.stringify(orderDetails.participants));
         orderFormEntry.append("tickets", JSON.stringify(tickets));
+          orderFormEntry.append("deviceUsed", getDeviceType());
         orderFormEntry.append("totalAmount", tickets?.totalAmount);
         orderFormEntry.append("paymentMethod", selectedPayment?.value);
         try {
@@ -114,4 +115,17 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
             </Paper>
         </Box>
     )
+}
+
+function getDeviceType(): string {
+  const ua = navigator.userAgent;
+ 
+  if (/Mobi|Android/i.test(ua)) return "Smartphones";
+  if (/Tablet|iPad/i.test(ua)) return "Tablets";
+  if (/Macintosh|Windows|Linux/i.test(ua)) {
+    if (window.innerWidth < 1024) return "Laptops";
+    return "Desktops";
+  }
+ 
+  return "Unknown";
 }

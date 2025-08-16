@@ -19,6 +19,7 @@ import { TicketDetails } from "../ticket-details";
 export function StatisticsAndReportsView() {
   const [activeTab, setActiveTab] = useState("Overview");
   const { fullData } = useSelector((state: RootState) => state?.event);
+  
   const dispatch = useDispatch<AppDispatch>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const { __events } = useSelector((state: RootState) => state?.organizer);
@@ -113,13 +114,13 @@ export function StatisticsAndReportsView() {
           <>
             <LiveSalesRevenueData />
             <MainDashboardStatistics selectedEvent={selectedEvent} />
-            <TicketDetails events={fullData} />
+            <TicketDetails events={__events} />
           </>
         )}
 
-        {activeTab === "Ticket Details" && <TicketDetailsAndCategories />}
+        {activeTab === "Ticket Details" && <TicketDetailsAndCategories selectedEvent={selectedEvent}/>}
 
-        {activeTab === "Participant Engagement" && <MainChartComponents />}
+        {activeTab === "Participant Engagement" && <MainChartComponents selectedEvent={selectedEvent}/>}
 
         {activeTab === "Comparisons" && <ReportDataExport />}
 

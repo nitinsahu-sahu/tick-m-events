@@ -3,6 +3,9 @@ import { Box, Card, Grid, Typography, useTheme, useMediaQuery } from "@mui/mater
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
+type MainChartComponentsProps = {
+  selectedEvent: any;
+}
 const TicketSalesChartSeries = [50, 5, 25, 5, 10, 5];
 
 const TicketSalesChartOptions: ApexOptions = {
@@ -53,7 +56,7 @@ const GenderChartOptions: ApexOptions = {
   }]
 };
 
-const GenderChartSeries = [3000, 2000];
+
 
 const geographicalDistributionOptions: ApexOptions = {
   chart: {
@@ -91,6 +94,41 @@ const geographicalDistributionOptions: ApexOptions = {
 
 const geographicalDistributionSeries = [{ data: [800, 500, 400, 350, 300] }];
 
+// const ageGroupsOptions: ApexOptions = {
+//   chart: {
+//     type: "bar",
+//     animations: { enabled: false }
+//   },
+//   plotOptions: { bar: { columnWidth: "50%" } },
+//   dataLabels: { enabled: false },
+//   xaxis: {
+//     categories: ["Youth (17-24)", "Adults (25-50)", "Seniors (50+)"],
+//     labels: {
+//       style: {
+//         fontSize: '12px'
+//       }
+//     }
+//   },
+//   yaxis: {
+//     labels: {
+//       style: {
+//         fontSize: '12px'
+//       }
+//     }
+//   },
+//   colors: ["#1976D2"],
+//   responsive: [{
+//     breakpoint: 600,
+//     options: {
+//       plotOptions: {
+//         bar: {
+//           columnWidth: '60%'
+//         }
+//       }
+//     }
+//   }]
+// };
+
 const ageGroupsOptions: ApexOptions = {
   chart: {
     type: "bar",
@@ -107,6 +145,9 @@ const ageGroupsOptions: ApexOptions = {
     }
   },
   yaxis: {
+    min: 0,
+    max: 90, // Adjust this if your expected data exceeds 90
+    tickAmount: 6, // Divides Y-axis into 6 segments: 0, 15, 30, ..., 90
     labels: {
       style: {
         fontSize: '12px'
@@ -126,8 +167,6 @@ const ageGroupsOptions: ApexOptions = {
   }]
 };
 
-const ageGroupsSeries = [{ data: [400, 850, 400] }];
-
 const deviceUsageOptions: ApexOptions = {
   chart: {
     type: "pie",
@@ -144,8 +183,6 @@ const deviceUsageOptions: ApexOptions = {
     }
   }]
 };
-
-const deviceUsageSeries = [3000, 1000, 2000, 800];
 
 const clickRatesOptions: ApexOptions = {
   chart: {
@@ -173,38 +210,153 @@ interface ChartCardProps {
   type: "pie" | "bar" | "line" | "area" | "donut" | "radialBar" | "scatter" | "bubble" | "heatmap" | "candlestick" | "boxPlot" | "radar" | "polarArea" | "rangeBar" | "treemap";
 }
 
-const ChartCard: React.FC<ChartCardProps> = ({ title, options, series, type }) => (
-  <Grid item xs={12} sm={6} md={6}>
-    <Card sx={{
-      p: { xs: 1, sm: 2, md: 3 },
-      borderRadius: 3,
-      boxShadow: 3,
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
-      <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' } }}>
-        {title}
-      </Typography>
-      <Box sx={{ flexGrow: 1, minHeight: 300 }}>
-        <Chart
-          options={options}
-          series={series}
-          type={type}
-          height="100%"
-          width="100%"
-        />
-      </Box>
-    </Card>
-  </Grid>
-);
+const ChartCard: React.FC<ChartCardProps> = ({ title, options, series, type }) => {
+  const isEmptyData = Array.isArray(series) && series.every((value) => value === 0);
+  const isGenderChart = title.toLowerCase().includes("gender");
 
-export function MainChartComponents() {
+  return (
+    <Grid item xs={12} sm={6} md={6}>
+      <Card
+        sx={{
+          p: { xs: 1, sm: 2, md: 3 },
+          borderRadius: 3,
+          boxShadow: 3,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Typography
+          variant="h6"
+          fontWeight="bold"
+          sx={{
+            mb: 2,
+            fontSize: { xs: "1rem", sm: "1.1rem", md: "1.25rem" },
+          }}
+        >
+          {title}
+        </Typography>
+
+        <Box sx={{ flexGrow: 1, minHeight: 300, position: "relative" }}>
+          {isEmptyData ? (
+            <>
+              <Chart
+                options={{
+                  ...options,
+                  chart: { ...options.chart, type: "donut" },
+                  labels: isGenderChart ? ["Male", "Female"] : ["No data"],
+                  colors: isGenderChart ? ["#4CAF50", "#FFC107"] : ["#B0BEC5"],
+                  legend: { show: true },
+                  dataLabels: { enabled: false },
+                }}
+                series={isGenderChart ? [0, 0] : [1]}
+                type="donut"
+                height="100%"
+                width="100%"
+              />
+
+              {/* Centered overlay message */}
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  textAlign: "center",
+                  color: "text.secondary"
+                }}
+              >
+                No data available (0%)
+              </Typography>
+            </>
+          ) : (
+            <Chart options={options} series={series} type={type} height="100%" width="100%" />
+          )}
+        </Box>
+      </Card>
+    </Grid>
+  );
+};
+
+
+export function MainChartComponents({ selectedEvent }: MainChartComponentsProps) {
+  console.log(selectedEvent);
+    // ----------------- Gender Breakdown -----------------
+  let maleCount = 0;
+  let femaleCount = 0;
+  selectedEvent.order.forEach((order: any) => {
+    if (order.participantDetails && order.participantDetails.length > 0) {
+      order.participantDetails.forEach((participant: any) => {
+        if (participant.gender.toLowerCase() === "male") maleCount += 1;
+        else if (participant.gender.toLowerCase() === "female") femaleCount += 1;
+      });
+    } else {
+      // If participantDetails is empty or undefined, fallback if you have user gender info
+      // Here we skip since no gender info is available
+    }
+  });
+  const GenderChartSeries = [maleCount, femaleCount];
+
+  // ----------------- Age Groups -----------------
+  let youthCount = 0;
+  let adultCount = 0;
+  let seniorCount = 0;
+
+  selectedEvent.order.forEach((order: any) => {
+    order.participantDetails?.forEach((participant: any) => {
+      const age = parseInt(participant.age, 10);
+      if (!Number.isNaN(age)) {
+        if (age >= 17 && age <= 24) {
+          youthCount += 1;
+        } else if (age >= 25 && age <= 50) {
+          adultCount += 1;
+        } else if (age > 50) {
+          seniorCount += 1;
+        }
+      }
+    });
+  });
+
+  const ageGroupsSeries = [{ data: [youthCount, adultCount, seniorCount] }];
+
+    // ----------------- Device Usage -----------------
+  let smartphones = 0;
+  let tablets = 0;
+  let laptops = 0;
+  let desktops = 0;
+
+  selectedEvent.order.forEach((order: any) => {
+    switch (order.deviceUsed?.toLowerCase()) {
+      case "smartphones":
+      case "smartphone":
+        smartphones +=1;
+        break;
+      case "tablets":
+      case "tablet":
+        tablets +=1;
+        break;
+      case "laptops":
+      case "laptop":
+        laptops += 1;
+        break;
+      case "desktops":
+      case "desktop":
+        desktops += 1;
+        break;
+      default:
+        break; // no device info
+    }
+  });
+
+    const deviceUsageSeries = [smartphones, tablets, laptops, desktops];
+
   const chartData = [
     { title: "Ticket Sales Distribution", options: TicketSalesChartOptions, series: TicketSalesChartSeries, type: "pie" as const },
     { title: "Gender Breakdown", options: GenderChartOptions, series: GenderChartSeries, type: "pie" as const },
     { title: "Geographical Distribution", options: geographicalDistributionOptions, series: geographicalDistributionSeries, type: "bar" as const },
-    { title: "Device Usage", options: deviceUsageOptions, series: deviceUsageSeries, type: "pie" as const },
+     { title: "Device Usage", options: deviceUsageOptions, series: deviceUsageSeries, type: "pie" as const },
     { title: "Age Groups", options: ageGroupsOptions, series: ageGroupsSeries, type: "bar" as const },
     { title: "Email & Notification Click Rates", options: clickRatesOptions, series: clickRatesSeries, type: "pie" as const },
   ];

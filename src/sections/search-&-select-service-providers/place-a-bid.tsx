@@ -14,12 +14,13 @@ import { providersCateFetch } from "src/redux/actions/searchSelect";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { fetchAllServiceCategories } from "src/redux/actions";
 import { organizerRequstToProvider } from "src/redux/actions/service-request";
+import { organizerPlaceABid } from "src/redux/actions/organizer/place-a-bid.action";
 
 interface FormData {
   serviceCategoryId: string;
   eventLocation: string;
   serviceTime: string;
-  orgBudget: number;
+  orgBudget: string;
   orgRequirement: string;
   orgAdditionalRequirement: string
 }
@@ -39,7 +40,7 @@ export function PlaceABid({ _SelectedEvent }: any) {
     serviceCategoryId: "",
     eventLocation: "",
     serviceTime: "",
-    orgBudget: 0,
+    orgBudget: "",
     orgRequirement: "",
     orgAdditionalRequirement: ""
   });
@@ -47,23 +48,12 @@ export function PlaceABid({ _SelectedEvent }: any) {
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-     const { name, value } = e.target;
+    const { name, value } = e.target;
 
-    // Special handling for orgBudget
-    if (name === 'orgBudget') {
-      // If the input is empty, set to empty string (will be converted to 0 in state)
-      // Or you can set to 0 directly if you prefer
-      const numericValue = value === '' ? '' : Number(value);
-      setFormData((prev: any) => ({
-        ...prev,
-        [name]: numericValue
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSelectChange = (event: SelectChangeEvent<string>) => {
@@ -78,7 +68,6 @@ export function PlaceABid({ _SelectedEvent }: any) {
     e.preventDefault();
     const formDataObj = new FormData();
     formDataObj.append("eventId", _SelectedEvent?._id);
-    formDataObj.append("status", 'requested-by-organizer');
     formDataObj.append("serviceCategoryId", formData.serviceCategoryId);
     formDataObj.append("serviceTime", formData.serviceTime);
     formDataObj.append("eventLocation", formData.eventLocation);
@@ -86,14 +75,14 @@ export function PlaceABid({ _SelectedEvent }: any) {
     formDataObj.append("orgRequirement", formData.orgRequirement);
     formDataObj.append("orgAdditionalRequirement", formData.orgAdditionalRequirement);
     try {
-      const result = await dispatch(organizerRequstToProvider(formDataObj)) as ApiResult;
+      const result = await dispatch(organizerPlaceABid(formDataObj)) as ApiResult;
       if (result?.status === 201) {
         toast.success("Requested Successfully...");
         setFormData({
           serviceCategoryId: "",
           eventLocation: "",
           serviceTime: "",
-          orgBudget: 0,
+          orgBudget: "",
           orgRequirement: "",
           orgAdditionalRequirement: ""
         })
@@ -191,12 +180,16 @@ export function PlaceABid({ _SelectedEvent }: any) {
           <TextField
             required
             fullWidth
-            type="number"
+            type="text"
             label="Estimated Budget"
             margin="normal"
+            placeholder="e.g. 1500 - 2000"
             name="orgBudget"
-           value={formData.orgBudget === 0 ? '' : formData.orgBudget} 
+            value={formData.orgBudget}
             onChange={handleChange}
+            InputLabelProps={{
+              shrink: true,
+            }}
             InputProps={{
               endAdornment: <InputAdornment position="end">XAF</InputAdornment>,
             }}

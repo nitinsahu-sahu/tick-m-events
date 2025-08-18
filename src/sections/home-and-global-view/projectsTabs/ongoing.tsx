@@ -1,5 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
+import { Paper } from "@mui/material";
+
 import { AppDispatch, RootState } from "src/redux/store";
 import { getContract } from "src/redux/actions/homeAndGlobal.action";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
@@ -15,7 +17,14 @@ export function OngoingTab() {
         dispatch(getContract('ongoing'));
     }, [dispatch]);
     return (
-        <>
+        <Paper elevation={6}
+                sx={{
+                    mt: 2,
+                    p: 3,
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    overflow: "hidden",
+                }}>
             <HeadingCommon title="Ongoing Projects (By Organizer)" />
 
             <ContractTable
@@ -23,6 +32,6 @@ export function OngoingTab() {
                 headers={contractTableHeader}
                 type="3"
             />
-        </>
+        </Paper>
     )
 }

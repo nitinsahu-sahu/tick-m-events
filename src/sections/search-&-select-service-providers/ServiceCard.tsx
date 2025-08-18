@@ -40,7 +40,9 @@ interface ApiResult {
 }
 
 // ServiceCard.tsx (new component)
-export function ServiceCard({ service, onRequest, eventId, disabled = false }: any) {
+export function ServiceCard({ event, service, onRequest, eventId, disabled = false }: any) {
+  console.log(event);
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const dispatch = useDispatch<AppDispatch>();
@@ -138,6 +140,19 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
       </Paper>
     );
   }
+
+  // Get current date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+
+  // Format the event date for datetime-local input (remove timezone offset)
+  const eventDate = event?.date ? new Date(event.date).toISOString().slice(0, 16) : '';
+
+  // Calculate min datetime (current time)
+  const minDateTime = new Date();
+  // Set seconds and milliseconds to 0 for cleaner display
+  minDateTime.setSeconds(0, 0);
+  const minDateTimeString = minDateTime.toISOString().slice(0, 16);
+
 
   return (
     <>
@@ -435,7 +450,7 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
                 fullWidth
                 name="orgBudget"
                 label="Negotiation Price"
-                value={formData.orgBudget === 0 ? '' : formData.orgBudget} 
+                value={formData.orgBudget === 0 ? '' : formData.orgBudget}
                 onChange={handleInputChange}
                 placeholder="Enter your budget..."
                 variant="outlined"
@@ -463,6 +478,11 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
               InputLabelProps={{
                 shrink: true,
               }}
+              inputProps={{
+                min: minDateTimeString, // Prevent selecting past dates/times
+                max: eventDate, // Prevent selecting dates after the event
+              }}
+              disabled={disabled}
             />
             <TextField
               required
@@ -474,19 +494,19 @@ export function ServiceCard({ service, onRequest, eventId, disabled = false }: a
               onChange={handleInputChange}
             />
 
-             <TextField
-                required
-                type="text"
-                fullWidth
-                multiline
-                rows={4}
-                name="orgRequirement"
-                label="Requirements"
-                value={formData.orgRequirement}
-                onChange={handleInputChange}
-                placeholder="Write your requirements..."
-                variant="outlined"
-              />
+            <TextField
+              required
+              type="text"
+              fullWidth
+              multiline
+              rows={4}
+              name="orgRequirement"
+              label="Requirements"
+              value={formData.orgRequirement}
+              onChange={handleInputChange}
+              placeholder="Write your requirements..."
+              variant="outlined"
+            />
             <TextField
               fullWidth
               label="Additional Options"

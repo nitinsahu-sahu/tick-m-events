@@ -668,6 +668,7 @@ export function SearchAndSelectServiceProvidersView() {
                           <Grid item xs={12} sm={6} key={service._id} sx={{ my: 3 }}>
                             <ServiceCard
                               eventId={selectedEvent?._id}
+                              event={selectedEvent}
                               service={service}
                               // onRequest={() => onRequestService(service._id)}
                               disabled={!selectedEvent?._id} // Disable if no event selected

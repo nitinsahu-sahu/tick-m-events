@@ -1,28 +1,6 @@
 import { eventServiceConstants, serviceRequestConstants } from "./constants";
 import axios from "../helper/axios";
 
-// Event creating
-// export const getRequestsByProvider = (request) => async (dispatch) => {
-//     dispatch({ type: serviceRequestConstants.GET_REQUESTED_SERVICE_REQUEST });
-
-//     try {
-//         const response = await axios.get("/event-requests");
-//         dispatch({
-//             type: serviceRequestConstants.GET_REQUESTED_SERVICE_SUCCESS,
-//             payload: {
-//                 message: response?.data?.message,
-//                 requests: response?.data?.requests
-//             },
-//         });
-//     } catch (error) {
-//         dispatch({
-//             type: serviceRequestConstants.GET_REQUESTED_SERVICE_FAILURE,
-//             payload: { message: error?.response?.data?.message || "Server error", error: error.status },
-//         });
-//     }
-// };
-
-
 
 export const getRequestsByProvider = (params) => async (dispatch) => {
   dispatch({ type: serviceRequestConstants.GET_REQUESTED_SERVICE_REQUEST });

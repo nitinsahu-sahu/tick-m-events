@@ -85,7 +85,14 @@ export function RequestTabSection({
     ];
 
     return (
-        <>
+        <Paper elevation={6}
+                sx={{
+                    mt: 2,
+                    p: 3,
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    overflow: "hidden",
+                }}>
             <HeadingCommon title={title} />
 
 
@@ -171,6 +178,6 @@ export function RequestTabSection({
                     </Box>
                 )
             }
-        </>
+        </Paper>
     );
 };

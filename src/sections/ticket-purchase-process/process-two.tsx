@@ -28,6 +28,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
   // Get user data from Redux store
   const { name, email, number, gender } = useSelector((state: RootState) => state.auth.user);
   const [phoneNumber, setPhoneNumber] = useState(number || '');
+  const [formTouched, setFormTouched] = useState(false);
 
   // Location data
   const [countries, setCountries] = useState<string[]>([]);
@@ -52,10 +53,16 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
   );
 
   const handlePhoneChange = (value: E164Number | undefined) => {
-    const phoneValue = value as string; // or String(value)
+    const phoneValue = value as string;
     setPhoneNumber(phoneValue);
-    setFormData((prevData: any) => ({ ...prevData, number: phoneValue }));
+
+    setFormData(prevData => {
+      const updated = [...prevData];
+      updated[0] = { ...updated[0], number: phoneValue };
+      return updated;
+    });
   };
+
 
   // 📌 Fetch countries on mount
   useEffect(() => {
@@ -119,7 +126,9 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setFormTouched(true); 
 
+    if (!isFormValid()) return; 
     // Extract participants data
     const participants = formData.map(({ name: participantName, age, gender: participantGender }) => ({
       name: participantName,
@@ -144,6 +153,28 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
     });
 
     onNext();
+  };
+
+  const isFormValid = () => {
+    const first = formData[0];
+
+    const requiredAddressFieldsFilled = (
+      first.email.trim() &&
+      (first.number || phoneNumber) &&
+      first.country &&
+      first.state &&
+      first.city &&
+      first.address.trim() &&
+      first.hearAboutEvent
+    );
+
+    const allParticipantsValid = formData.every(p =>
+      p.name.trim() &&
+      p.age.trim() &&
+      p.gender
+    );
+
+    return requiredAddressFieldsFilled && allParticipantsValid;
   };
 
 
@@ -172,6 +203,8 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                     onChange={(e) => handleChange(index, 'name', e.target.value)}
                     placeholder="Full Name"
                     variant="outlined"
+                    error={formTouched && !participant.name}
+                    helperText={!participant.name ? 'Name is required' : ''}
                   />
 
                   {/* Age */}
@@ -183,6 +216,8 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                     placeholder="Age"
                     type="number"
                     variant="outlined"
+                    error={formTouched && !participant.age}
+                    helperText={formTouched && !participant.age ? 'Age is required' : ''}
                   />
 
                   {/* Gender */}
@@ -194,6 +229,8 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                     onChange={(e) => handleChange(index, 'gender', e.target.value)}
                     SelectProps={{ native: true }}
                     variant="outlined"
+                    error={formTouched && !participant.gender}
+                    helperText={formTouched && !participant.gender ? 'Please Select Gender' : ''}
                   >
                     <option value="">Select Gender</option>
                     <option value="Male">Male</option>
@@ -214,6 +251,9 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                   variant="outlined"
                   placeholder="Enter your email"
                   sx={fieldStyles}
+                  error={formTouched && !formData[0]?.email}
+                  helperText={formTouched && !formData[0]?.email ? 'Email is required' : ''}
+
                 />
               </Grid>
               <Grid item xs={12} sx={{
@@ -257,6 +297,11 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                   placeholder="Enter phone number"
                   sx
                 />
+                {(!phoneNumber && !formData[0]?.number) && (
+                  <Box sx={{ color: 'red', fontSize: '0.8rem', mt: 0.5 }}>
+                    Phone number is required
+                  </Box>
+                )}
               </Grid>
 
               {/* Country */}
@@ -267,6 +312,8 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                   label="Country"
                   value={formData[0]?.country || ''}
                   onChange={(e) => handleChange(0, "country", e.target.value)}
+                  error={formTouched && !formData[0]?.country}
+                  helperText={formTouched && !formData[0]?.country ? 'Country is required' : ''}
                 >
                   <MenuItem value="">Select Country</MenuItem>
                   {countries.map((c, i) => (
@@ -284,6 +331,8 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                   value={formData[0]?.state || ''}
                   onChange={(e) => handleChange(0, "state", e.target.value)}
                   disabled={!states.length}
+                  error={formTouched && !formData[0]?.state}
+                  helperText={formTouched && !formData[0]?.state ? 'State is required' : ''}
                 >
                   <MenuItem value="">Select State</MenuItem>
                   {states.map((s, i) => (
@@ -301,6 +350,8 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                   value={formData[0]?.city || ''}
                   onChange={(e) => handleChange(0, "city", e.target.value)}
                   disabled={!cities.length}
+                  error={formTouched && !formData[0]?.city}
+                  helperText={formTouched && !formData[0]?.city ? 'City is required' : ''}
                 >
                   <MenuItem value="">Select City</MenuItem>
                   {cities.map((c, i) => (
@@ -320,20 +371,33 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                   variant="outlined"
                   placeholder="Enter your full address"
                   sx={fieldStyles}
+                  error={formTouched && !formData[0]?.address}
+                  helperText={formTouched && !formData[0]?.address ? 'Address is required' : ''}
                 />
               </Grid>
 
               <Grid item xs={12}>
                 <TextField
+                  select
                   fullWidth
                   name="hearAboutEvent"
+                  label="How did you hear about the event?"
                   value={formData[0]?.hearAboutEvent || ''}
                   onChange={(e) => handleChange(0, 'hearAboutEvent', e.target.value)}
-                  type="text"
                   variant="outlined"
-                  placeholder="How did you hear about the event?"
                   sx={fieldStyles}
-                />
+                  error={formTouched && !formData[0]?.hearAboutEvent}
+                  helperText={formTouched && !formData[0]?.hearAboutEvent ? 'Please select an option' : ''}
+                >
+                  <MenuItem value="">Select an option</MenuItem>
+                  <MenuItem value="Browsing TICK-M EVENTS">Browsing TICK-M EVENTS</MenuItem>
+                  <MenuItem value="Social Media Shares">Social Media Shares</MenuItem>
+                  <MenuItem value="Push/Email Notifications">Push/Email Notifications</MenuItem>
+                  <MenuItem value="Official Website">Official Website</MenuItem>
+                  <MenuItem value="Word of Mouth">Word of Mouth</MenuItem>
+                  <MenuItem value="Paid Ads">Paid Ads</MenuItem>
+                </TextField>
+
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -394,7 +458,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                 },
                 flex: { sm: 1 }
               }}
-            // disabled={!isValid}  // Add validation state
+              disabled={!isFormValid()}
             >
               Proceed to Participant Details
             </Button>

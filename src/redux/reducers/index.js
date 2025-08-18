@@ -21,8 +21,10 @@ import pageEventReducer from './organizer/pageEvents.reducer'
 import homeAndGlobalReducer from './homeAndGlobal.reducer'
 import globalOverviewGeneralStatisticsReducer from './global-overview-general-statistice.reducer'
 import { notificationReducer } from './notification.reducer';
+import placeABidReducer from './provider/Home-Global-View/freelancer.reducer'
 
 const rootReducer = combineReducers({
+    provider: placeABidReducer,
     organizer: pageEventReducer,
     gogs: globalOverviewGeneralStatisticsReducer,
     notification: notificationReducer,

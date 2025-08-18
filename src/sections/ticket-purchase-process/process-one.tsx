@@ -401,7 +401,8 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                 />
             </Box>
             <Box mt={3} display="flex" justifyContent="center">
-                <Button onClick={onNext} fullWidth variant="contained" sx={{ bgcolor: "#0B3558", mt: 2 }}>
+                <Button onClick={onNext} fullWidth variant="contained" sx={{ bgcolor: "#0B3558", mt: 2 }}
+                    disabled={!selectedEvent || totalTicketsSelected < 1} >
                     Proceed to Participant Details
                 </Button>
             </Box>

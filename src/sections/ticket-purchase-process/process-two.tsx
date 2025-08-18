@@ -1,11 +1,11 @@
-import { Box, Button, Grid, Paper, TextField } from "@mui/material";
+import { Box, Button, Grid, Paper, TextField, MenuItem } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import PhoneInput from 'react-phone-number-input'
 import type { E164Number } from 'libphonenumber-js';
 
 import { RootState } from "src/redux/store";
-
+import axios from "axios";
 import { HeadProcess } from "./head-process";
 import 'react-phone-number-input/style.css'
 
@@ -14,18 +14,10 @@ interface FormData {
   name: string;
   email: string;
   number: string;
+  country: string;
+  state: string;
   city: string;
-  gender: string;
-  age: string;
-  hearAboutEvent: string;
-  eventSpecificInfo: string;
-}
-
-interface FormData {
-  name: string;
-  email: string;
-  number: string;
-  city: string;
+  address: string;
   gender: string;
   age: string;
   hearAboutEvent: string;
@@ -33,10 +25,15 @@ interface FormData {
 }
 
 export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }: any) {
-  console.log(ticketCount);
   // Get user data from Redux store
   const { name, email, number, gender } = useSelector((state: RootState) => state.auth.user);
   const [phoneNumber, setPhoneNumber] = useState(number || '');
+  const [formTouched, setFormTouched] = useState(false);
+
+  // Location data
+  const [countries, setCountries] = useState<string[]>([]);
+  const [states, setStates] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
 
   // Initialize form state with user data
   const [formData, setFormData] = useState<FormData[]>(
@@ -44,7 +41,10 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
       name: '',
       email: '',
       number: '',
+      country: '',
+      state: '',
       city: '',
+      address: '',
       gender: '',
       age: '',
       hearAboutEvent: '',
@@ -53,10 +53,40 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
   );
 
   const handlePhoneChange = (value: E164Number | undefined) => {
-    const phoneValue = value as string; // or String(value)
+    const phoneValue = value as string;
     setPhoneNumber(phoneValue);
-    setFormData((prevData: any) => ({ ...prevData, number: phoneValue }));
+
+    setFormData(prevData => {
+      const updated = [...prevData];
+      updated[0] = { ...updated[0], number: phoneValue };
+      return updated;
+    });
   };
+
+
+  // 📌 Fetch countries on mount
+  useEffect(() => {
+    axios.get("https://countriesnow.space/api/v0.1/countries/positions")
+      .then(res => {
+        setCountries(res.data.data.map((c: any) => c.name));
+      })
+      .catch(err => console.error(err));
+  }, []);
+
+  // 📌 Fetch states when country changes
+  const fetchStates = (country: string) => {
+    axios.post("https://countriesnow.space/api/v0.1/countries/states", { country })
+      .then(res => setStates(res.data.data.states.map((s: any) => s.name)))
+      .catch(err => console.error(err));
+  };
+
+  // 📌 Fetch cities when state changes
+  const fetchCities = (country: string, state: string) => {
+    axios.post("https://countriesnow.space/api/v0.1/countries/state/cities", { country, state })
+      .then(res => setCities(res.data.data))
+      .catch(err => console.error(err));
+  };
+
   // Update form if user data changes
   useEffect(() => {
     setFormData(prev => {
@@ -82,12 +112,23 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
       updated[index] = { ...updated[index], [field]: value };
       return updated;
     });
+    // Trigger dependent data loads
+    if (field === "country") {
+      fetchStates(value);
+      setStates([]);
+      setCities([]);
+    }
+    if (field === "state") {
+      fetchCities(formData[index].country, value);
+      setCities([]);
+    }
   };
-
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setFormTouched(true); 
 
+    if (!isFormValid()) return; 
     // Extract participants data
     const participants = formData.map(({ name: participantName, age, gender: participantGender }) => ({
       name: participantName,
@@ -98,7 +139,10 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
     const orderAddress = {
       email: formData[0].email,
       number: formData[0].number || phoneNumber,
+      country: formData[0].country,
+      state: formData[0].state,
       city: formData[0].city,
+      address: formData[0].address,
       hearAboutEvent: formData[0].hearAboutEvent,
       eventSpecificInfo: formData[0].eventSpecificInfo
     };
@@ -111,18 +155,40 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
     onNext();
   };
 
+  const isFormValid = () => {
+    const first = formData[0];
+
+    const requiredAddressFieldsFilled = (
+      first.email.trim() &&
+      (first.number || phoneNumber) &&
+      first.country &&
+      first.state &&
+      first.city &&
+      first.address.trim() &&
+      first.hearAboutEvent
+    );
+
+    const allParticipantsValid = formData.every(p =>
+      p.name.trim() &&
+      p.age.trim() &&
+      p.gender
+    );
+
+    return requiredAddressFieldsFilled && allParticipantsValid;
+  };
+
 
   return (
     <Box mt={6}>
       <form onSubmit={handleSubmit}>
         <Paper sx={{ width: "100%", p: 4, boxShadow: 3, borderRadius: 2, position: "relative" }}>
           <HeadProcess title="Participant Details" step="2" />
-          <Grid container spacing={2} mt={2}>
+          <Grid container rowSpacing={2} mt={2}>
             <Grid item xs={12}>
-              <Box display="flex" fontWeight="bold" px={2}>
+              <Box display="flex" fontWeight="bold">
                 <Box width="33%">Full Name</Box>
-                <Box width="33%">Age</Box>
-                <Box width="33%">Gender</Box>
+                <Box width="33%" pl={1}>Age</Box>
+                <Box width="33%" pl={2}>Gender</Box>
               </Box>
             </Grid>
 
@@ -137,6 +203,8 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                     onChange={(e) => handleChange(index, 'name', e.target.value)}
                     placeholder="Full Name"
                     variant="outlined"
+                    error={formTouched && !participant.name}
+                    helperText={!participant.name ? 'Name is required' : ''}
                   />
 
                   {/* Age */}
@@ -148,6 +216,8 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                     placeholder="Age"
                     type="number"
                     variant="outlined"
+                    error={formTouched && !participant.age}
+                    helperText={formTouched && !participant.age ? 'Age is required' : ''}
                   />
 
                   {/* Gender */}
@@ -159,6 +229,8 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                     onChange={(e) => handleChange(index, 'gender', e.target.value)}
                     SelectProps={{ native: true }}
                     variant="outlined"
+                    error={formTouched && !participant.gender}
+                    helperText={formTouched && !participant.gender ? 'Please Select Gender' : ''}
                   >
                     <option value="">Select Gender</option>
                     <option value="Male">Male</option>
@@ -168,7 +240,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                 </Box>
               </Grid>
             ))}
-            <Grid container spacing={3} mt={4}>
+            <Grid container spacing={3} mt={2}>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -179,6 +251,9 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                   variant="outlined"
                   placeholder="Enter your email"
                   sx={fieldStyles}
+                  error={formTouched && !formData[0]?.email}
+                  helperText={formTouched && !formData[0]?.email ? 'Email is required' : ''}
+
                 />
               </Grid>
               <Grid item xs={12} sx={{
@@ -222,30 +297,107 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                   placeholder="Enter phone number"
                   sx
                 />
+                {(!phoneNumber && !formData[0]?.number) && (
+                  <Box sx={{ color: 'red', fontSize: '0.8rem', mt: 0.5 }}>
+                    Phone number is required
+                  </Box>
+                )}
               </Grid>
+
+              {/* Country */}
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  select
+                  fullWidth
+                  label="Country"
+                  value={formData[0]?.country || ''}
+                  onChange={(e) => handleChange(0, "country", e.target.value)}
+                  error={formTouched && !formData[0]?.country}
+                  helperText={formTouched && !formData[0]?.country ? 'Country is required' : ''}
+                >
+                  <MenuItem value="">Select Country</MenuItem>
+                  {countries.map((c, i) => (
+                    <MenuItem key={i} value={c}>{c}</MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              {/* State */}
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  select
+                  fullWidth
+                  label="State"
+                  value={formData[0]?.state || ''}
+                  onChange={(e) => handleChange(0, "state", e.target.value)}
+                  disabled={!states.length}
+                  error={formTouched && !formData[0]?.state}
+                  helperText={formTouched && !formData[0]?.state ? 'State is required' : ''}
+                >
+                  <MenuItem value="">Select State</MenuItem>
+                  {states.map((s, i) => (
+                    <MenuItem key={i} value={s}>{s}</MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              {/* City */}
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  select
+                  fullWidth
+                  label="City"
+                  value={formData[0]?.city || ''}
+                  onChange={(e) => handleChange(0, "city", e.target.value)}
+                  disabled={!cities.length}
+                  error={formTouched && !formData[0]?.city}
+                  helperText={formTouched && !formData[0]?.city ? 'City is required' : ''}
+                >
+                  <MenuItem value="">Select City</MenuItem>
+                  {cities.map((c, i) => (
+                    <MenuItem key={i} value={c}>{c}</MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  name="city"
-                  value={formData[0]?.city || ''}
-                  onChange={(e) => handleChange(0, 'city', e.target.value)}
+                  name="address"
+                  value={formData[0]?.address || ''}
+                  onChange={(e) => handleChange(0, 'address', e.target.value)}
                   type="text"
                   variant="outlined"
                   placeholder="Enter your full address"
                   sx={fieldStyles}
+                  error={formTouched && !formData[0]?.address}
+                  helperText={formTouched && !formData[0]?.address ? 'Address is required' : ''}
                 />
               </Grid>
+
               <Grid item xs={12}>
                 <TextField
+                  select
                   fullWidth
                   name="hearAboutEvent"
+                  label="How did you hear about the event?"
                   value={formData[0]?.hearAboutEvent || ''}
                   onChange={(e) => handleChange(0, 'hearAboutEvent', e.target.value)}
-                  type="text"
                   variant="outlined"
-                  placeholder="How did you hear about the event?"
                   sx={fieldStyles}
-                />
+                  error={formTouched && !formData[0]?.hearAboutEvent}
+                  helperText={formTouched && !formData[0]?.hearAboutEvent ? 'Please select an option' : ''}
+                >
+                  <MenuItem value="">Select an option</MenuItem>
+                  <MenuItem value="Browsing TICK-M EVENTS">Browsing TICK-M EVENTS</MenuItem>
+                  <MenuItem value="Social Media Shares">Social Media Shares</MenuItem>
+                  <MenuItem value="Push/Email Notifications">Push/Email Notifications</MenuItem>
+                  <MenuItem value="Official Website">Official Website</MenuItem>
+                  <MenuItem value="Word of Mouth">Word of Mouth</MenuItem>
+                  <MenuItem value="Paid Ads">Paid Ads</MenuItem>
+                </TextField>
+
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -306,12 +458,11 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                 },
                 flex: { sm: 1 }
               }}
-            // disabled={!isValid}  // Add validation state
+              disabled={!isFormValid()}
             >
               Proceed to Participant Details
             </Button>
           </Box>
-
         </Paper>
       </form>
     </Box>
@@ -321,6 +472,6 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
 // Reusable styles
 const fieldStyles = {
   backgroundColor: "#fff",
-  borderRadius: "15px",
-  '& .MuiOutlinedInput-root': { borderRadius: '15px' },
+  borderRadius: 1,
+  '& .MuiOutlinedInput-root': { borderRadius: 1 },
 };

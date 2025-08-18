@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { Paper, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { AppDispatch, RootState } from "src/redux/store";
@@ -16,7 +16,14 @@ export function ConfirmedTab() {
         dispatch(getContract('completed'));
     }, [dispatch]);
     return (
-        <>
+        <Paper elevation={6}
+                sx={{
+                    mt: 2,
+                    p: 3,
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    overflow: "hidden",
+                }}>
             <HeadingCommon title="Completed Project (By You)" />
 
             <ContractTable
@@ -24,6 +31,6 @@ export function ConfirmedTab() {
                 headers={contractTableHeader}
                 type="2"
             />
-        </>
+        </Paper>
     )
 }

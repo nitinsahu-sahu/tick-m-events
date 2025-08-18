@@ -6,7 +6,6 @@ import { ApexOptions } from "apexcharts";
 type MainChartComponentsProps = {
   selectedEvent: any;
 }
-const TicketSalesChartSeries = [50, 5, 25, 5, 10, 5];
 
 const TicketSalesChartOptions: ApexOptions = {
   chart: {
@@ -56,43 +55,6 @@ const GenderChartOptions: ApexOptions = {
   }]
 };
 
-
-
-const geographicalDistributionOptions: ApexOptions = {
-  chart: {
-    type: "bar",
-    animations: { enabled: false }
-  },
-  dataLabels: { enabled: false },
-  xaxis: {
-    categories: ["USA", "UK", "Germany", "France", "India"],
-    labels: {
-      style: {
-        fontSize: '12px'
-      }
-    }
-  },
-  yaxis: {
-    labels: {
-      style: {
-        fontSize: '12px'
-      }
-    }
-  },
-  colors: ["#1976D2"],
-  responsive: [{
-    breakpoint: 600,
-    options: {
-      plotOptions: {
-        bar: {
-          columnWidth: '60%'
-        }
-      }
-    }
-  }]
-};
-
-const geographicalDistributionSeries = [{ data: [800, 500, 400, 350, 300] }];
 
 // const ageGroupsOptions: ApexOptions = {
 //   chart: {
@@ -283,7 +245,7 @@ const ChartCard: React.FC<ChartCardProps> = ({ title, options, series, type }) =
 
 export function MainChartComponents({ selectedEvent }: MainChartComponentsProps) {
   console.log(selectedEvent);
-    // ----------------- Gender Breakdown -----------------
+  // ----------------- Gender Breakdown -----------------
   let maleCount = 0;
   let femaleCount = 0;
   selectedEvent.order.forEach((order: any) => {
@@ -321,7 +283,7 @@ export function MainChartComponents({ selectedEvent }: MainChartComponentsProps)
 
   const ageGroupsSeries = [{ data: [youthCount, adultCount, seniorCount] }];
 
-    // ----------------- Device Usage -----------------
+  // ----------------- Device Usage -----------------
   let smartphones = 0;
   let tablets = 0;
   let laptops = 0;
@@ -331,11 +293,11 @@ export function MainChartComponents({ selectedEvent }: MainChartComponentsProps)
     switch (order.deviceUsed?.toLowerCase()) {
       case "smartphones":
       case "smartphone":
-        smartphones +=1;
+        smartphones += 1;
         break;
       case "tablets":
       case "tablet":
-        tablets +=1;
+        tablets += 1;
         break;
       case "laptops":
       case "laptop":
@@ -350,13 +312,99 @@ export function MainChartComponents({ selectedEvent }: MainChartComponentsProps)
     }
   });
 
-    const deviceUsageSeries = [smartphones, tablets, laptops, desktops];
+  const deviceUsageSeries = [smartphones, tablets, laptops, desktops];
+
+  // ----------------- Geographical Distribution (Dynamic) -----------------
+
+  const geoDisplayOrder = ["USA", "UK", "Germany", "France", "India"];
+
+  const countryAliasMap: Record<string, string> = {
+    "united states": "USA",
+    "united kingdom": "UK",
+    "india": "India",
+    "germany": "Germany",
+    "france": "France"
+  };
+
+  const geoCounts: Record<string, number> = {};
+
+  // Count orders per mapped country
+  selectedEvent.order.forEach((order: any) => {
+    const rawCountry = order.orderAddress?.country?.toLowerCase()?.trim();
+
+    if (rawCountry) {
+      const mappedCountry = countryAliasMap[rawCountry] || rawCountry;
+      geoCounts[mappedCountry] = (geoCounts[mappedCountry] || 0) + 1;
+    }
+  });
+
+  const geoData = geoDisplayOrder.map(country => geoCounts[country] || 0);
+
+  const geographicalDistributionOptions: ApexOptions = {
+    chart: {
+      type: "bar",
+      animations: { enabled: false }
+    },
+    dataLabels: { enabled: false },
+    xaxis: {
+      categories: geoDisplayOrder, // fixed full list
+      labels: {
+        style: {
+          fontSize: '12px'
+        }
+      }
+    },
+    yaxis: {
+      labels: {
+        style: {
+          fontSize: '12px'
+        }
+      }
+    },
+    colors: ["#1976D2"],
+    responsive: [{
+      breakpoint: 600,
+      options: {
+        plotOptions: {
+          bar: {
+            columnWidth: '60%'
+          }
+        }
+      }
+    }]
+  };
+  const geographicalDistributionSeries = [{ data: geoData }];
+
+  // ----------------- Ticket Sales Distribution (Dynamic) -----------------
+  const salesLabels = [
+    "Browsing TICK-M EVENTS",
+    "Social Media Shares",
+    "Push/Email Notifications",
+    "Official Website",
+    "Word of Mouth",
+    "Paid Ads"
+  ];
+
+  const salesCounts: Record<string, number> = {};
+  salesLabels.forEach(label => {
+    salesCounts[label] = 0;
+  });
+
+ selectedEvent.order.forEach((order: any) => {
+  const source = order.orderAddress?.hearAboutEvent;
+  if (salesLabels.includes(source)) {
+    salesCounts[source] += 1;
+  }
+});
+
+  const TicketSalesChartSeries = salesLabels.map(label => salesCounts[label]);
+
 
   const chartData = [
     { title: "Ticket Sales Distribution", options: TicketSalesChartOptions, series: TicketSalesChartSeries, type: "pie" as const },
     { title: "Gender Breakdown", options: GenderChartOptions, series: GenderChartSeries, type: "pie" as const },
     { title: "Geographical Distribution", options: geographicalDistributionOptions, series: geographicalDistributionSeries, type: "bar" as const },
-     { title: "Device Usage", options: deviceUsageOptions, series: deviceUsageSeries, type: "pie" as const },
+    { title: "Device Usage", options: deviceUsageOptions, series: deviceUsageSeries, type: "pie" as const },
     { title: "Age Groups", options: ageGroupsOptions, series: ageGroupsSeries, type: "bar" as const },
     { title: "Email & Notification Click Rates", options: clickRatesOptions, series: clickRatesSeries, type: "pie" as const },
   ];

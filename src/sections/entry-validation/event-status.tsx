@@ -19,7 +19,7 @@ function StatusChip({ label, color }: { label: string; color: string }) {
     );
 }
 
-export function EventBreadCrum({ _selectEve, view, setView, eventInformation, events, onEventSelect }: any) {
+export function EventBreadCrum({ _selectEve, view, setView, eventInformation, events, onEventSelect, enableComparison = false }: any) {
     const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine); // Track online status
     const location = useLocation();
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(eventInformation || null);
@@ -40,7 +40,6 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
             window.removeEventListener("offline", handleOffline);
         };
     }, []);
-
 
     useEffect(() => {
         if (eventInformation) {
@@ -204,7 +203,7 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
             )}
 
             {/* Right Section: Statistics And Report */}
-            {statisticsAndReport && (
+            {statisticsAndReport && enableComparison && (
                 <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
                     <Typography fontWeight={600} fontSize={13} color="#3CB1F1">Comparison Event</Typography>
                     <Typography color="text.secondary" fontSize={13}>/</Typography>

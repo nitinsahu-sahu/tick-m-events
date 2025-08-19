@@ -22,8 +22,6 @@ export const sendUserNotification = (payload) => async (dispatch) => {
 
 
 export const saveUserFcmToken = (userId, email) => async (dispatch) => {
-  console.log("🔥 Saving FCM Token for user:", userId, email);
-
   try {
     const token = await getToken(messaging, {
      vapidKey: 'BDyU463vlZw_OB9O2wTj3SCwRBtGNunRez4DGb-08cfxk8KgMTV6pAOx96jMVdqo6ji1KCnVRxy5gxlulMNnhPA',
@@ -61,8 +59,6 @@ export const saveUserFcmToken = (userId, email) => async (dispatch) => {
 export const fetchUserNotifications = (email) => async (dispatch) => {
   try {
     const { data } = await axios.get(`/promotion/notifications/user?email=${encodeURIComponent(email)}`);
-
-    console.log("📩 Notifications fetched:", data.notifications); // <-- Add this
 
     dispatch({
       type: notificationConstants.FETCH_NOTIFICATIONS_SUCCESS,

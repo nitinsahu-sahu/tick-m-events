@@ -2,6 +2,39 @@ import { Box, Card, Grid, Typography, Table, TableBody, TableCell, TableContaine
 import { ApexOptions } from "apexcharts";
 import Chart from "react-apexcharts";
 
+
+// Helper function to compute metrics
+const calculateMetrics = (eventData: any) => {
+    const orders = eventData?.order || [];
+
+    const confirmedOrders = orders.filter((order: any) => order.paymentStatus === "confirmed");
+
+    const totalTicketsSold = confirmedOrders.reduce(
+        (acc: number, order: any) => acc + order.tickets.reduce((sum: number, ticket: any) => sum + ticket.quantity, 0),
+        0
+    );
+
+    const totalRevenue = confirmedOrders.reduce(
+        (acc: number, order: any) => acc + order.totalAmount,
+        0
+    );
+
+    const totalAvailableTickets = eventData?.tickets?.[0]?.tickets?.reduce(
+        (acc: number, ticket: any) => acc + Number(ticket.totalTickets || 0),
+        0
+    );
+
+    const conversionRate = totalAvailableTickets
+        ? Number(((totalTicketsSold / totalAvailableTickets) * 100).toFixed(2))
+        : 0;
+
+    return {
+        totalTicketsSold,
+        totalRevenue,
+        conversionRate,
+    };
+};
+
 // 📊 Chart Options & Data
 const chartOptions: ApexOptions = {
     responsive: [{
@@ -47,12 +80,49 @@ const chartOptions: ApexOptions = {
 };
 
 
-const chartSeries = [
-    { name: "Current Edition", data: [4500, 4500, 4500] },
-    { name: "Previous Edition", data: [3800, 3800, 3800] },
-];
 
 export function ReportDataExport({ compairableEvent, selectEvent }: any) {
+    const currentMetrics = calculateMetrics(selectEvent);
+    const previousMetrics = compairableEvent ? calculateMetrics(compairableEvent) : null;
+    const chartSeries = [
+        {
+            name: "Current Edition",
+            data: [
+                currentMetrics.totalTicketsSold,
+                currentMetrics.totalRevenue,
+                currentMetrics.conversionRate
+            ]
+        },
+        {
+            name: "Previous Edition",
+            data: previousMetrics
+                ? [
+                    previousMetrics.totalTicketsSold,
+                    previousMetrics.totalRevenue,
+                    previousMetrics.conversionRate
+                ]
+                : [0, 0, 0]
+        }
+    ];
+
+    const rows = [
+        {
+            label: "Total Tickets Sold",
+            current: currentMetrics.totalTicketsSold,
+            previous: previousMetrics?.totalTicketsSold || 0
+        },
+        {
+            label: "Total Revenue",
+            current: currentMetrics.totalRevenue,
+            previous: previousMetrics?.totalRevenue || 0
+        },
+        {
+            label: "Conversion Rate (%)",
+            current: currentMetrics.conversionRate,
+            previous: previousMetrics?.conversionRate || 0
+        },
+    ];
+
     return (
         <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
             {/* Main Grid Layout */}
@@ -73,18 +143,19 @@ export function ReportDataExport({ compairableEvent, selectEvent }: any) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {[
-                                        { label: "Total Tickets Sold", current: 4500, previous: 3800 },
-                                        { label: "Total Revenue", current: 4500, previous: 3800 },
-                                        { label: "Conversion Rate", current: 4500, previous: 3800 },
-                                    ].map((row, index) => (
+                                    {rows.map((row, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{row.label}</TableCell>
-                                            <TableCell>{row.current}</TableCell>
-                                            <TableCell>{row.previous}</TableCell>
+                                            <TableCell>
+                                                {row.label.includes("Conversion Rate") ? `${row.current}%` : row.current}
+                                            </TableCell>
+                                            <TableCell>
+                                                {row.label.includes("Conversion Rate") ? `${row.previous}%` : row.previous}
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
+
                             </Table>
                         </TableContainer>
                     </Card>

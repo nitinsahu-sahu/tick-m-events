@@ -25,7 +25,8 @@ export const SearchAndSelectServiceProvidersPage = lazy(() => import('src/pages/
 export const EventSearchAndDetailsPage = lazy(() => import('src/pages/event-search-and-details'));
 
 // ----------------------------Service Provider Routes------------------------------------------
-
+export const Projects = lazy(() => import('src/pages/projects/projects-view'));
+export const ProjectSinglePage = lazy(() => import('src/pages/projects/single-project'));
 export const HomePage = lazy(() => import('src/pages/home'));
 export const SocialShare = lazy(() => import('src/pages/social-share'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
@@ -180,6 +181,15 @@ export function Router() {
         },
 
         // -----------------------**************-------------------------
+        {
+          path: '/project/view',
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><Projects /> </RoleProtectedRoute>
+        },
+        {
+          path: '/project/:projectId',
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><ProjectSinglePage /> </RoleProtectedRoute>
+        },
+
         {
           path: '/statistics-&-performance',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><StatisticsAndPerformancePage /> </RoleProtectedRoute>

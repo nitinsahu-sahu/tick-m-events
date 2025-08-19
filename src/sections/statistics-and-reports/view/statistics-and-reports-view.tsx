@@ -57,7 +57,19 @@ export function StatisticsAndReportsView() {
   };
   return (
     <>
-      <EventBreadCrum events={__events} onEventSelect={handleEventSelect} />
+      {activeTab === "Comparisons" ? (
+        <EventBreadCrum
+          events={__events}
+          onEventSelect={handleEventSelect}
+          enableComparison // pass a flag so it shows 2 dropdowns
+        />
+      ) : (
+        <EventBreadCrum
+          events={__events}
+          onEventSelect={handleEventSelect}
+          enableComparison={false} // force single dropdown
+        />
+      )}
       <DashboardContent>
         <PageTitleSection title="Sales & Revenue Overviews" />
         {/* Row 3: Tab Buttons */}

@@ -109,8 +109,6 @@ export function MessagePopover({ data = [], sx, ...other }: NotificationsPopover
       try {
         const response = await dispatch(fetchLoginActivities()) as any;
         const activities = response.payload || [];
-        console.log(activities);
-
         const formatted = activities.map((item: any, idx: number) => {
           // Compute the formatted title first
           const formattedTitle = item.activityType

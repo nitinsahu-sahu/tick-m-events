@@ -2,8 +2,6 @@ import { placeABidConstants } from "../constants";
 import axios from "../../helper/axios"
 
 export const organizerPlaceABid = (formDataObj) => async (dispatch) => {
-    console.log('dd');
-    
   dispatch({ type: placeABidConstants.POST_PLACEABID_REQUEST });
 
   try {

@@ -7,7 +7,7 @@ import ShareIcon from '@mui/icons-material/Share'; // Import the Share icon
 import { styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams,useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import ReactHtmlParser from 'react-html-parser';
 
 // import { NavHomeTwo } from "../nav-two";
@@ -58,7 +58,6 @@ const MobileMenuButton = styled(IconButton)(({ theme }) => ({
 export function NavHomeOne() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -157,9 +156,9 @@ export function NavHomeOne() {
 }
 
 export function FrontHome() {
-     const navigate = useNavigate();
+    const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
-     const { authenticate } = useSelector((state: RootState) => state?.auth)
+    const { authenticate } = useSelector((state: RootState) => state?.auth)
     const { eventId } = useParams();
     const { _id, eventName, date, time, portraitImage, category, eventType, coverImage, location, formate, description,
         organizer, customization, tickets, visibility, averageRating, reviewCount, review

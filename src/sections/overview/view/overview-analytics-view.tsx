@@ -70,7 +70,6 @@ export function OverviewAnalyticsView() {
     dispatch(recommTrandingPopularEventFetch());
     dispatch(fetchLatestSales());
     dispatch(fatchOrgEvents());
-
   }, [dispatch]);
 
 

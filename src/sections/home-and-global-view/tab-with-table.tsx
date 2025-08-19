@@ -7,11 +7,9 @@ import { AppDispatch, RootState } from "src/redux/store";
 
 import { RequestTabSection } from "./request-tab-section";
 import { metrics, availableProjectsTableHeaders } from "./utills";
-import { ContractTable } from "./contractTable";
 import { SignedTab } from "./projectsTabs/signed";
 import { OngoingTab } from "./projectsTabs/ongoing";
 import { ConfirmedTab } from "./projectsTabs/confirmed";
-import { Freelancer } from "./freelancer";
 
 interface Project {
     _id: string;
@@ -59,7 +57,7 @@ export function TabWithTableView() {
     const [tabValue, setTabValue] = useState(0);
     const { requests } = useSelector((state: RootState) => state?.serviceRequest);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-    const tabLabels = ["Available Projects", "Signed Projects", "Ongoing Projects", "Confirmed Services", "Freelancer"];
+    const tabLabels = ["Available Projects", "Signed Projects", "Ongoing Projects", "Confirmed Services"];
     const [amount, setAmount] = useState('');
     const [days, setDays] = useState('');
     const [description, setDescription] = useState('');
@@ -122,10 +120,11 @@ export function TabWithTableView() {
                     ))}
                 </Tabs>
             </Paper>
-            <MatrixOneCard metrics={metrics} />
+            
            
             {tabValue === 0 && (
                 <>
+                <MatrixOneCard metrics={metrics} />
                     <RequestTabSection
                         title="Available Projects (Organizer Requests)"
                         description=""
@@ -307,9 +306,6 @@ export function TabWithTableView() {
             )}
             {tabValue === 3 && (
                 <ConfirmedTab />
-            )}
-            {tabValue === 4 && (
-                <Freelancer />
             )}
         </>
 

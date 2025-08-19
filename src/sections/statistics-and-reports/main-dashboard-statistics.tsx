@@ -75,7 +75,7 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
     // Calculate total tickets sold from selectedEvent
     const totalTicketsSold = Array.isArray(selectedEvent?.order)
         ? selectedEvent.order
-            .filter((order: any) => order.paymentStatus === "confirmed" && !isRefundApproved(order._id))
+            .filter((order: any) => !isRefundApproved(order._id))
             .reduce((sum: number, order: any) =>
                 sum + order.tickets.reduce((ticketSum: number, ticket: any) =>
                     ticketSum + (ticket.quantity || 0), 0)
@@ -86,17 +86,23 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
         ? Number(selectedEvent.ticketQuantity)
         : 0;
 
+    const conversionRate = totalTicketsAvailable
+        ? Number(((totalTicketsSold / totalTicketsAvailable) * 100).toFixed(2))
+        : 0;
+
     const revenueGenerated = Array.isArray(selectedEvent?.order)
         ? selectedEvent.order
-            .filter((order: { paymentStatus: string }) => order.paymentStatus === "confirmed")
-            .reduce((sum: number, order: any) => {
-                if (isRefundApproved(order._id)) return sum;
-                return sum + (order.totalAmount || 0);
-            }, 0)
+            .filter((order: any) => order.paymentStatus === "confirmed" && !isRefundApproved(order._id))
+            .reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0)
         : 0;
 
     const ticketsPendingPaymentCount = Array.isArray(selectedEvent?.order)
-        ? selectedEvent.order.filter((order: { paymentStatus: string }) => order.paymentStatus === "pending").length
+        ? selectedEvent.order
+            .filter((order: any) => order.paymentStatus === "pending" && !isRefundApproved(order._id))
+            .reduce((sum: number, order: any) =>
+                sum + order.tickets.reduce((ticketSum: number, ticket: any) =>
+                    ticketSum + (ticket.quantity || 0), 0)
+                , 0)
         : 0;
 
 
@@ -154,7 +160,7 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
 
     if (Array.isArray(selectedEvent?.order)) {
         selectedEvent.order.forEach((order: any) => {
-            if (!order.createdAt || isRefundApproved(order._id)) return;
+            if (!order.createdAt || isRefundApproved(order._id) || order.paymentStatus !== "confirmed") return;
 
             const date = new Date(order.createdAt);
             const day = daysOfWeek[date.getDay()];
@@ -176,7 +182,40 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
     const weeklyTicketsSoldByDay: Record<string, number> = {
         Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0,
     };
+    if (Array.isArray(selectedEvent?.order)) {
+        // Get start (Sunday) and end (Saturday) of the current week
+        const now = new Date();
+        const startOfWeek = new Date(now);
+        startOfWeek.setHours(0, 0, 0, 0);
+        startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday
+        endOfWeek.setHours(23, 59, 59, 999);
+          
+        // console.log(startOfWeek);
+        // console.log(endOfWeek);
+        selectedEvent.order.forEach((order: any) => {
+              // console.log("xd",new Date(order.createdAt).toISOString().split('T')[0]);
+            if (!order.createdAt) return;
+        
+            const orderDate = new Date(order.createdAt);
+            console.log("orderData", orderDate)
+            // ✅ Only include orders between Sun and Sat of this week
+            if (orderDate < startOfWeek || orderDate > endOfWeek) return;
+
+            const dayName = daysOfWeek[orderDate.getDay()];
+            const ticketCount = Array.isArray(order.tickets)
+                ? order.tickets.reduce((sum: number, ticket: any) => sum + (ticket.quantity || 0), 0)
+                : 0;
+
+            weeklyTicketsSoldByDay[dayName] += ticketCount;
+        });
+
+    }
+
     const totalTicketsSoldThisWeek = weekDaysOrder.map(day => weeklyTicketsSoldByDay[day]);
+
     // Line Chart Data (Total Tickets Sold, Revenue, Pending Payments)
     const SalesEvaluationChartOptions: ApexOptions = {
         chart: { type: "line", height: 50, sparkline: { enabled: true } },
@@ -185,7 +224,9 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
     };
     const SalesEvaluationChartSeries = [{ data: totalTicketsSoldThisWeek }];
 
+    // console.log("Orders counted this week:", weeklyTicketsSoldByDay);
 
+    // console.log("SalesEvaluationChartSeries", SalesEvaluationChartSeries);
     // Line Chart Data (Total Tickets Sold, Revenue, Pending Payments)
     const RevenueGenerateChartOptions: ApexOptions = {
         chart: { type: "line", height: 50, sparkline: { enabled: true } },
@@ -304,12 +345,12 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
                                     </Typography>
                                 </Box>
                                 <Box position="relative" display="flex" alignItems="center">
-                                    <CircularProgress variant="determinate" value={75} size={55} thickness={5} sx={{ color: "#2395D4" }} />
+                                    <CircularProgress variant="determinate" value={conversionRate} size={55} thickness={5} sx={{ color: "#2395D4" }} />
                                     <Typography
                                         variant="caption"
                                         sx={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", fontWeight: "bold" }}
                                     >
-                                        75%
+                                        {conversionRate}%
                                     </Typography>
                                 </Box>
                             </Box>

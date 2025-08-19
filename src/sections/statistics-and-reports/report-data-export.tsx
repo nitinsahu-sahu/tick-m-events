@@ -52,7 +52,7 @@ const chartSeries = [
     { name: "Previous Edition", data: [3800, 3800, 3800] },
 ];
 
-export function ReportDataExport() {
+export function ReportDataExport({ compairableEvent, selectEvent }: any) {
     return (
         <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
             {/* Main Grid Layout */}

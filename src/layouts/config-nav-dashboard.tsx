@@ -73,6 +73,20 @@ export const navData: NavItem[] = [
     ],
   },
   {
+    title: 'Projects',
+    path: '#',
+    icon: icon('ic_events'),
+    info: <EventsInfo />,
+    roles: ['provider'],
+    children: [ // Submenu items
+      {
+        title: 'View',
+        path: '/project/view',
+        icon: icon('ic_event_create'),
+      }
+    ],
+  },
+  {
     title: 'Messaging',
     path: '/messaging-relationship',
     icon: icon('ic_chat'),

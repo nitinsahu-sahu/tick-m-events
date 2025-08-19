@@ -19,13 +19,14 @@ function StatusChip({ label, color }: { label: string; color: string }) {
     );
 }
 
-export function EventBreadCrum({ _selectEve, view, setView, eventInformation, events, onEventSelect }: any) {
+export function EventBreadCrum({ _selectEve, view, setView, eventInformation, events, onEventSelect, enableComparison = false }: any) {
     const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine); // Track online status
     const location = useLocation();
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(eventInformation || null);
-
+    const [comparisonEvent, setComparisonEvent] = useState<Event | null>(null);
     // Define the specific URL path where the section should appear
     const showSection = location.pathname === '/entry-validation';
+    const statisticsAndReport = location.pathname === '/statistics-&-reports';
 
     useEffect(() => {
         const handleOnline = () => setIsOnline(true);
@@ -39,7 +40,6 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
             window.removeEventListener("offline", handleOffline);
         };
     }, []);
-
 
     useEffect(() => {
         if (eventInformation) {
@@ -65,6 +65,14 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
         const event = events.find((ev: any) => ev._id === selectedId) || null;
         setSelectedEvent(event);
         onEventSelect?.(event);
+    };
+
+    const handleComparisonChange = (e: any) => {
+        const selectedId = e.target.value;
+        const event = events.find((ev: any) => ev._id === selectedId) || null;
+        setComparisonEvent(event);
+        // Pass both selected event and comparison event to parent
+        onEventSelect?.(selectedEvent, event); // Modified to pass both events
     };
     return (
         <Box
@@ -191,6 +199,49 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
                             List View
                         </Button>
                     </Box>
+                </Box>
+            )}
+
+            {/* Right Section: Statistics And Report */}
+            {statisticsAndReport && enableComparison && (
+                <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
+                    <Typography fontWeight={600} fontSize={13} color="#3CB1F1">Comparison Event</Typography>
+                    <Typography color="text.secondary" fontSize={13}>/</Typography>
+                    <FormControl sx={{ minWidth: 150 }} size="small">
+                        <Select
+                            value={comparisonEvent?._id || ''}
+                            onChange={handleComparisonChange}
+                            displayEmpty
+                            size="small"
+                            sx={{
+                                fontSize: '0.8rem',
+                                height: '25px',
+                                '& .MuiSelect-select': {
+                                    padding: '6px 12px'
+                                },
+                                textTransform: "capitalize"
+                            }}
+                        >
+                            <MenuItem value="" disabled>
+                                Select comparison event
+                            </MenuItem>
+                            {events
+                                ?.filter((event: any) => event._id !== selectedEvent?._id) // Filter out the currently selected event
+                                .map((event: any) => (
+                                    <MenuItem
+                                        key={event._id}
+                                        value={event._id}
+                                        sx={{
+                                            fontSize: '0.8rem',
+                                            minHeight: '32px',
+                                            textTransform: "capitalize"
+                                        }}
+                                    >
+                                        {event.eventName}
+                                    </MenuItem>
+                                ))}
+                        </Select>
+                    </FormControl>
                 </Box>
             )}
 

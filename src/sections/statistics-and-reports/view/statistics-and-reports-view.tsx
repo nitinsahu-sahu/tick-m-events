@@ -16,14 +16,13 @@ import { MainChartComponents } from "../small-charts/main-chart-componets";
 import { ReportDataExport } from "../report-data-export";
 import { TicketDetails } from "../ticket-details";
 
+
 export function StatisticsAndReportsView() {
   const [activeTab, setActiveTab] = useState("Overview");
-  const { fullData } = useSelector((state: RootState) => state?.event);
-  
   const dispatch = useDispatch<AppDispatch>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const { __events } = useSelector((state: RootState) => state?.organizer);
-
+  const [comparisonEventList, setComparisonEventList] = useState<Event | null>(null);
   useEffect(() => {
     // Fetch immediately on mount
     dispatch(eventFetch());
@@ -44,19 +43,23 @@ export function StatisticsAndReportsView() {
     "Participant Engagement",
     "Comparisons",
   ];
-  const handleEventSelect = (event: Event | null) => {
-    setSelectedEvent(event);
-    // Do something with the selected event data
+  const handleEventSelect = (event: Event | null, comparisonEvent: Event | null = null) => {
+    if (comparisonEvent) {
+      // This is a comparison event selection
+      setComparisonEventList(comparisonEvent);
+    } else {
+      // This is the main event selection
+      setSelectedEvent(event);
+      // Reset comparison when main event changes
+      setComparisonEventList(null);
+    }
+   
   };
   return (
     <>
       <EventBreadCrum events={__events} onEventSelect={handleEventSelect} />
-
       <DashboardContent>
-
-
         <PageTitleSection title="Sales & Revenue Overviews" />
-
         {/* Row 3: Tab Buttons */}
         <Grid container spacing={2} mt={1} justifyContent="center">
           <Grid item xs={12}>
@@ -118,11 +121,11 @@ export function StatisticsAndReportsView() {
           </>
         )}
 
-        {activeTab === "Ticket Details" && <TicketDetailsAndCategories selectedEvent={selectedEvent}/>}
+        {activeTab === "Ticket Details" && <TicketDetailsAndCategories selectedEvent={selectedEvent} />}
 
-        {activeTab === "Participant Engagement" && <MainChartComponents selectedEvent={selectedEvent}/>}
+        {activeTab === "Participant Engagement" && <MainChartComponents selectedEvent={selectedEvent} />}
 
-        {activeTab === "Comparisons" && <ReportDataExport />}
+        {activeTab === "Comparisons" && <ReportDataExport compairableEvent={comparisonEventList} selectEvent={selectedEvent}/>}
 
       </DashboardContent>
     </>

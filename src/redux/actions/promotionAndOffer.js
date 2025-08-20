@@ -117,3 +117,50 @@ export const promotionEvents = () => async (dispatch) => {
         })
     }
 };
+
+export const promotionValidate = (promoCode, eventId, ticketIds) => async (dispatch) => {
+    dispatch({ type: promotionConstants.VALIDATE_REQUEST });
+ 
+    try {
+        const response = await axios.post("/promotion/validate", {
+            promoCode,
+            eventId,
+            selectedTickets: ticketIds
+        });
+ 
+        dispatch({
+            type: promotionConstants.VALIDATE_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                promo: response?.data?.promo,
+                eventId,
+                selectedTickets: ticketIds
+            }
+        });
+ 
+        // ✅ Return plain object (no constants)
+        return {
+            success: true,
+            promo: response?.data?.promo,
+            message: response?.data?.message,
+            eventId,
+            selectedTickets: ticketIds,
+            status: response.status
+        };
+    } catch (error) {
+        dispatch({
+            type: promotionConstants.VALIDATE_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
+            }
+        });
+ 
+        // ✅ Return plain object (no constants)
+        return {
+            success: false,
+            message: error?.response?.data?.message || "Server error",
+            status: error.status
+        };
+    }
+};

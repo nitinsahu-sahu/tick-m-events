@@ -127,7 +127,7 @@ export function StatisticsAndReportsView() {
         {/* Conditional Tab Content */}
         {activeTab === "Overview" && (
           <>
-            <LiveSalesRevenueData />
+            <LiveSalesRevenueData selectedEvent={selectedEvent}/>
             <MainDashboardStatistics selectedEvent={selectedEvent} />
             <TicketDetails events={__events} />
           </>

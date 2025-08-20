@@ -312,7 +312,6 @@ export function EventDetailsView() {
             justifyContent: "center",
             alignItems: "center",
             textAlign: "center",
-            p: 1,
             position: 'relative'
           }}
         >

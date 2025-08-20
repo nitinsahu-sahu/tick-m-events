@@ -7,7 +7,7 @@ import { eventByIdFetch, eventFetch } from "src/redux/actions/event.action";
 import { ParticipantTable } from "src/components/tables/party-participant-table";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { AppDispatch, RootState } from "src/redux/store";
-
+import { promotionValidate } from "src/redux/actions/promotionAndOffer";
 import { HeadProcess } from "./head-process";
 import { availablePromoCodes, PromoCode } from "../front-home/utill";
 import { processOneTableHeaders } from "./utils";
@@ -186,32 +186,53 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         return selected;
     }, [tickets, ticketQuantities]);
 
-    // Memoized promo code handlers
-    const applyPromoCode = useCallback(() => {
+
+    const applyPromoCode = useCallback(async () => {
         setPromoError('');
-        const promo = availablePromoCodes.find(p => p.code === promoInput.toUpperCase());
 
-        if (!promo) {
-            setPromoError('Invalid promo code');
+        const selectedTickets = getSelectedTickets();
+        if (!promoInput || !eventId) {
+            setPromoError('Promo code and Event ID are required');
             return;
         }
 
-        const subtotal = calculateSubtotal();
+        try {
+            const result = await dispatch(promotionValidate(promoInput.toUpperCase(), eventId, selectedTickets));
 
-        if (promo.minPurchase && subtotal < promo.minPurchase) {
-            setPromoError(`Minimum purchase of ${promo.minPurchase.toLocaleString()} XAF required`);
-            return;
+            if (result.success) {
+                const promo = result.promo;
+                const validatedPromo: PromoCode = {
+                    code: promo.code,
+                    type: promo.type,
+                    value: Number(promo.value),
+                    groupBuy: promo.groupBuy ?? 0,
+                    groupGet: promo.groupGet ?? 0,
+                    minPurchase: promo.minPurchase ?? 0,
+                    ticketSelection: promo.ticketSelection ?? '',
+                    eventId: promo.eventId,
+                    validityPeriodStart: promo.validityPeriodStart,
+                    validityPeriodEnd: promo.validityPeriodEnd,
+                };
+                
+
+                setAppliedPromo(validatedPromo);
+              
+            } else {
+                setPromoError(result.message || 'Invalid promo code');
+            }
+        } catch (error: any) {
+            console.error("Error applying promo:", error);
+            setPromoError('Something went wrong');
         }
+    }, [promoInput, eventId, getSelectedTickets, dispatch]);
 
-        setAppliedPromo(promo);
-    }, [promoInput, calculateSubtotal]);
 
     const removePromoCode = useCallback(() => {
         setAppliedPromo(null);
         setPromoInput('');
         setPromoError('');
     }, []);
-
+    
     // Ticket quantity handlers
     const handleDecrement = useCallback((ticketId: string) => {
         setTicketQuantities(prev => (prev[ticketId] <= 0 ? prev : {
@@ -354,7 +375,11 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                         }}
                         onClick={appliedPromo ? removePromoCode : applyPromoCode}
                     >
-                        {appliedPromo ? 'Remove' : 'Apply'} Promo Code
+                        <>
+                            {appliedPromo ? 'Remove' : 'Apply'} Promo Code
+                        </>
+
+
                     </Button>
                 </Grid>
             </Grid>

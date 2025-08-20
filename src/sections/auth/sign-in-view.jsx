@@ -1,13 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { InputAdornment, Typography, IconButton, TextField, Button, Divider, Grid, Avatar, Box, Link } from '@mui/material';
+import { InputAdornment, Typography, IconButton, TextField, Button, Grid, Box, Link } from '@mui/material';
 import { toast } from 'react-toastify';
 import LoadingButton from '@mui/lab/LoadingButton';
-import PhoneInput from 'react-phone-number-input'
 
 import { Iconify } from 'src/components/iconify';
-import { login, signup } from 'src/redux/actions';
+import { login } from 'src/redux/actions';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
 import 'react-phone-number-input/style.css'
@@ -19,84 +18,17 @@ export function SignInView() {
   const navigate = useNavigate();
   const [active, setActive] = useState("google");
   const [showSignup, setShowSignup] = useState(false);
-  const [avatar, setAvatar] = useState(null); // Correct initialization
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const getWidth = (key) => (active === key ? "50%" : "10%");
   const auth = useSelector(state => state.auth);
-  const [formData, setFormData] = useState({ email: 'organizer.William1@gmail.com', password: 'Manoj@123' });
-  const [formRegisterData, setRegisterData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    gender: "Male",
-    role: "",
-  });
+  const [formData, setFormData] = useState({ email: 'provider.aidenM1991@gmail.com', password: 'Aiden@123' });
 
-  const handlePhoneChange = (value) => {
-    const phoneValue = value; // or String(value)
-    setPhoneNumber(phoneValue);
-    setRegisterData((prevData) => ({ ...prevData, number: phoneValue }));
-  };
 
   const [showPassword, setShowPassword] = useState(false);
-
-  const handleAvatar = (e) => {
-    if (e.target.files?.[0]) { // Check if a file exists
-      setAvatar(e.target.files[0]); // Store the File object directly
-    }
-  };
-
-  const handleRegisterChange = (event) => {
-    event.preventDefault(); // Prevent default form submission behavior
-    const { name, value } = event.target;
-    setRegisterData((prevData) => ({ ...prevData, [name]: value }));
-  };
 
   const handleChange = (event) => {
     event.preventDefault(); // Prevent default form submission behavior
     const { name, value } = event.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
-
-  const handleRegistration = useCallback(async (event) => {
-    event.preventDefault();
-    const formSignData = new FormData();
-
-    // Append all form data
-    formSignData.append("name", formRegisterData.name);
-    formSignData.append("email", formRegisterData.email);
-    formSignData.append("password", formRegisterData.password);
-    formSignData.append("number", phoneNumber);
-    formSignData.append("role", formRegisterData.role);
-    formSignData.append("gender", formRegisterData.gender);
-
-    // Append avatar if it exists
-    if (avatar) {
-      formSignData.append("avatar", avatar);
-    }
-
-    try {
-      const result = await dispatch(signup(formSignData));
-
-      if (result.status === 201) {
-        toast.success(result?.message);
-        // Reset form and states
-        setRegisterData({
-          name: '',
-          email: '',
-          password: '',
-          role: '',
-          gender: 'Male'
-        });
-        setAvatar(null); // Clear avatar if using
-        navigate("/");
-      } else {
-        toast.error(result?.message);
-      }
-    } catch (error) {
-      toast.error("Registration failed");
-    }
-  }, [formRegisterData, navigate, avatar, dispatch, phoneNumber]);
 
   const handleSignIn = useCallback(async (event) => {
     event.preventDefault();
@@ -136,196 +68,6 @@ export function SignInView() {
     }, 300); // Match this with CSS transition duration
   };
 
-  const renderSignupForm = (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="flex-end"
-      mt={2}
-      sx={{
-        position: 'relative',
-        right: showSignup ? 0 : '100%',
-        opacity: showSignup ? 1 : 0,
-        transition: 'all 0.3s ease',
-        width: '100%'
-      }}
-    >
-      {/* Full Name */}
-      <TextField
-        fullWidth
-        required
-        name="name"
-        type='text'
-        label="Full Name"
-        placeholder='Enter your Fullname'
-        value={formRegisterData.name}
-        onChange={handleRegisterChange}
-        InputLabelProps={{ shrink: true }}
-        sx={{ mt: 2 }}
-      />
-
-      {/* Email */}
-      <TextField
-        fullWidth
-        required
-        name="email"
-        type='email'
-        label="Email address"
-        placeholder='Enter your Email'
-        value={formRegisterData.email}
-        onChange={handleRegisterChange}
-        InputLabelProps={{ shrink: true }}
-        sx={{ mt: 2 }}
-
-      />
-
-      {/* Gender Radio Buttons */}
-      <Box sx={{ width: '100%' }} mt={2}>
-        <Box display="flex" gap={2} alignItems="center">
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Gender *
-          </Typography>
-
-          {['Male', 'Female', 'Other'].map((gender) => (
-            <Box key={gender} display="flex" alignItems="center">
-              <input
-                type="radio"
-                id={`gender-${gender}`}
-                name="gender"
-                value={gender}
-                checked={formRegisterData.gender === gender}
-                onChange={handleRegisterChange}
-                required={formRegisterData.gender === ''} // Show required only if nothing selected
-                style={{ marginRight: 8 }}
-              />
-              <label htmlFor={`gender-${gender}`}>
-                <Typography variant="body2">{gender}</Typography>
-              </label>
-            </Box>
-          ))}
-        </Box>
-      </Box>
-
-      <TextField
-        label="Avatar"
-        type="file"
-        fullWidth
-        required
-        name='avatar'
-        accept="image/*"
-        onChange={handleAvatar}
-        sx={{ mt: 2 }}
-        InputProps={{
-          sx: {
-            borderRadius: '10px',
-            border: '1px solid #ccc',
-            backgroundColor: '#F9F9F9',
-          },
-        }}
-      />
-
-      {/* Phone Number */}
-      <Box sx={{
-        width: '100%',
-        mt: 2,
-        '& .PhoneInput': {
-          width: '100%',
-          '& input': {
-            width: '100%',
-            padding: '16.5px 14px',
-            border: '1px solid rgba(0, 0, 0, 0.23)',
-            borderRadius: "10px",
-            fontFamily: 'inherit',
-            fontSize: '1rem',
-            '&:hover': {
-              borderColor: 'black',
-            },
-            '&:focus': {
-              borderColor: 'black',
-              borderWidth: '2px',
-              outline: 'none',
-            },
-          },
-          '& .PhoneInputCountry': {
-            marginRight: '8px',
-          },
-          '& .PhoneInputCountrySelect': {
-            marginRight: '8px',
-          },
-        },
-        '& .PhoneInput--focus': {
-          '& input': {
-            borderColor: 'black',
-            borderWidth: '2px',
-          },
-        },
-      }}>
-        <PhoneInput
-          international
-          defaultCountry="US"
-          value={phoneNumber}
-          onChange={handlePhoneChange}
-          placeholder="Enter phone number"
-        />
-      </Box>
-      {/* Role Select */}
-      <TextField
-        fullWidth
-        select
-        required
-        name="role"
-        label="Role"
-        value={formRegisterData.role}
-        onChange={handleRegisterChange}
-        InputLabelProps={{ shrink: true }}
-        sx={{ mt: 2 }}
-        SelectProps={{
-          native: true,
-        }}
-      >
-        <option value="">Select your role</option>
-        <option value="participant">Participant</option>
-        <option value="organizer">Organizer</option>
-        <option value="provider">Provider</option>
-      </TextField>
-
-      {/* Password */}
-      <TextField
-        fullWidth
-        required
-        name="password"
-        label="Password"
-        placeholder='Enter your Password'
-        value={formRegisterData.password}
-        onChange={handleRegisterChange}
-        type={showPassword ? 'text' : 'password'}
-        InputLabelProps={{ shrink: true }}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                <Iconify icon={showPassword ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-        sx={{ mt: 2 }}
-      />
-
-      {/* Register Button */}
-      <LoadingButton
-        fullWidth
-        size="large"
-        type="submit"
-        color="inherit"
-        variant="contained"
-        sx={{ mt: 2 }}
-      >
-        Register
-      </LoadingButton>
-    </Box>
-  )
-
   const renderForm = (
     <>
       <HeadingCommon variant="h4" title="Welcome back" weight={600} mb={2} />
@@ -336,8 +78,8 @@ export function SignInView() {
         alignItems="flex-end"
         sx={{
           position: 'relative',
-          left: showSignup ? '100%' : 0,
-          opacity: showSignup ? 0 : 1,
+          left: 0,
+          opacity: 1,
           transition: 'all 0.3s ease',
           width: '100%'
         }}
@@ -481,55 +223,31 @@ export function SignInView() {
         }}
       >
         <Box sx={{ width: "100%", maxWidth: 400 }} textAlign="center">
-          {
-            showSignup ? <Box display="flex" alignItems="center" justifyContent="space-between" gap={2}>
-              <Button
-                size="small"
-                variant="h6"
-                fontWeight={600}
-                sx={{
-                  backgroundColor: "#1F8FCD",
-                  color: "white",
-                  textTransform: "none",
-                }}
-              >
-                Sign Up
-              </Button>
-              {
-                avatar ? (
-                  <Avatar
-                    src={URL.createObjectURL(avatar)} // avatar is a File object
-                    alt="Preview"
-                    sx={{ width: 56, height: 56, mt: 2 }}
-                  />
-                ) : (
-                  <Avatar alt="User" src="/path-to-default-avatar.jpg" />
-                )
-              }
-            </Box>
-              :
-              <Button size="small" variant="h6" fontWeight={600} mb={2} sx={{ backgroundColor: "#1F8FCD", color: "white" }}>
-                Sign In
-              </Button>
-          }
+          <Button size="small" variant="h6" fontWeight={600} mb={2} sx={{ backgroundColor: "#1F8FCD", color: "white" }}>
+            Sign In
+          </Button>
 
 
 
-          <form encType='multipart/form-data' onSubmit={showSignup ? handleRegistration : handleSignIn}>
-            {showSignup ? renderSignupForm : renderForm}
+          <form encType='multipart/form-data' onSubmit={handleSignIn}>
+            {renderForm}
           </form>
 
           <Typography variant="body2" my={2}>
-            {showSignup ? 'Already have an account?' : 'Don\'t have an account?'}
+            Don\&apos;t have an account?
             <Link
-              href="#"
-              sx={{ ml: 0.5 }}
-              onClick={(e) => {
-                e.preventDefault();
-                toggleForms();
+              component={RouterLink}
+              to="/register"
+              sx={{
+                ml: 0.5,
+                textDecoration: 'none',
+                color: 'primary.main',
+                '&:hover': {
+                  textDecoration: 'underline'
+                }
               }}
             >
-              {showSignup ? 'Login Here!' : 'Register Here!'}
+              Register Here!
             </Link>
           </Typography>
         </Box>

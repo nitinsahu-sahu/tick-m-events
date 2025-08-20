@@ -29,7 +29,8 @@ export const Projects = lazy(() => import('src/pages/projects/projects-view'));
 export const ProjectSinglePage = lazy(() => import('src/pages/projects/single-project'));
 export const HomePage = lazy(() => import('src/pages/home'));
 export const SocialShare = lazy(() => import('src/pages/social-share'));
-export const SignInPage = lazy(() => import('src/pages/sign-in'));
+export const SignInPage = lazy(() => import('src/pages/auth/sign-in'));
+export const RegisterPage = lazy(() => import('src/pages/auth/register'));
 export const FrontHomePage = lazy(() => import('src/pages/front-home'));
 export const EventsPage = lazy(() => import('src/pages/events'));
 export const CategoriesPage = lazy(() => import('src/pages/category/category'));
@@ -254,6 +255,14 @@ export function Router() {
       element: (
         <AuthLayout>
           <SignInPage />
+        </AuthLayout>
+      ),
+    },
+    {
+      path: 'register',
+      element: (
+        <AuthLayout>
+          <RegisterPage />
         </AuthLayout>
       ),
     },

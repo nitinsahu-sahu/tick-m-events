@@ -253,44 +253,59 @@ export function LiveSalesRevenueData({ selectedEvent }: { selectedEvent: any }) 
   // }, [selectedEvent, comparisonHours]);
 const hourLabels = useMemo(() => getDynamicHourLabels(comparisonHours), [comparisonHours]);
 
-  const salesComparisonSeries = useMemo(() => {
+const salesComparisonSeries = useMemo(() => {
   if (!selectedEvent?.order) return [];
 
   const todayData = Array(hourLabels.length).fill(0);
   const yesterdayData = Array(hourLabels.length).fill(0);
 
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
+  const now = new Date();
+  const currentHour = now.getHours();
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
 
   selectedEvent.order.forEach((order: Order) => {
     const orderDate = new Date(order.createdAt);
-    const hourLabel = orderDate.getHours().toString().padStart(2, "0");
-    const index = hourLabels.indexOf(hourLabel);
+    const orderHour = orderDate.getHours();
 
-    if (index === -1) return;
-
-    const amount = order.totalAmount || 0;
-
+    // Check if order is today or yesterday
     const isToday =
-      orderDate.getFullYear() === today.getFullYear() &&
-      orderDate.getMonth() === today.getMonth() &&
-      orderDate.getDate() === today.getDate();
+      orderDate.getFullYear() === now.getFullYear() &&
+      orderDate.getMonth() === now.getMonth() &&
+      orderDate.getDate() === now.getDate();
 
     const isYesterday =
       orderDate.getFullYear() === yesterday.getFullYear() &&
       orderDate.getMonth() === yesterday.getMonth() &&
       orderDate.getDate() === yesterday.getDate();
 
-    if (isToday) todayData[index] += amount;
-    else if (isYesterday) yesterdayData[index] += amount;
+    if (!isToday && !isYesterday) return;
+
+    // Calculate difference in hours relative to current time
+    let hourDiff;
+    if (isToday) {
+      hourDiff = currentHour - orderHour;
+    } else {
+      hourDiff = currentHour + (24 - orderHour);
+    }
+
+    if (hourDiff < 0 || hourDiff >= comparisonHours) return;
+    const index = comparisonHours - hourDiff - 1;
+    if (index < 0 || index >= hourLabels.length) return;
+     
+    const amount = order.totalAmount || 0;
+
+    if (isToday) {
+      todayData[index] += amount;
+    } else if (isYesterday) {
+      yesterdayData[index] += amount;
+    }
   });
 
-  // Total amounts
+  // Calculate percentage comparison
   const totalToday = todayData.reduce((sum, v) => sum + v, 0);
   const totalYesterday = yesterdayData.reduce((sum, v) => sum + v, 0);
 
-  // Percentage difference
   let percentage = 0;
   if (totalYesterday > 0) {
     percentage = ((totalToday - totalYesterday) / totalYesterday) * 100;
@@ -298,14 +313,17 @@ const hourLabels = useMemo(() => getDynamicHourLabels(comparisonHours), [compari
     percentage = 100;
   }
 
-  setComparisonPercentage(Math.round(percentage)); 
+  setComparisonPercentage(Math.round(percentage));
 
   return [
     { name: "Today", data: todayData },
     { name: "Yesterday", data: yesterdayData },
   ];
-}, [selectedEvent, hourLabels]);
+}, [selectedEvent, hourLabels, comparisonHours]);
 
+
+
+console.log("ss",salesComparisonSeries);
 const salesComparisonOptions = useMemo<ApexOptions>(() => ({
   ...commonChartOptions,
   chart: { type: "bar", stacked: false },
@@ -329,6 +347,7 @@ const salesComparisonOptions = useMemo<ApexOptions>(() => ({
   },
   grid: { show: false },
 }), [hourLabels]);
+
 
 
   return (
@@ -434,20 +453,17 @@ const ChartCard = ({
   </Box>
 );
 
-function getDynamicHourLabels(totalHours = 10) {
+function getDynamicHourLabels(totalHours = 24) {
   const now = new Date();
-  const currentHour = now.getHours(); // 0-23
+  const currentHour = now.getHours();
+  const hours = [];
 
-  // Calculate the start hour
-  let startHour = currentHour - totalHours + 1;
-  if (startHour < 0) startHour = 0;
-
-  // Generate labels for hours from startHour to currentHour
-  const labels = [];
-  for (let i = startHour; i <= currentHour; i += 1) {
-    labels.push(i.toString().padStart(2, "0")); // e.g., "06", "07"
+  for (let i = totalHours - 1; i >= 0; i-= 1) {
+    let hour = currentHour - i;
+    if (hour < 0) hour += 24;
+    hours.push(hour.toString().padStart(2, "0"));
   }
 
-  return labels;
+  return hours;
 }
 

@@ -22,7 +22,6 @@ export default function ProjectSinglePage() {
     const { projectId } = useParams();
     const { _project } = useSelector((state: RootState) => state.provider);
     const [activeTab, setActiveTab] = useState('details');
-    console.log(_project);
     const tabs = [
         { id: 'details', label: 'Details' },
         // { id: 'proposals', label: 'Proposals' },
@@ -54,17 +53,41 @@ export default function ProjectSinglePage() {
 
                     }}>
                         {/* Title & Status */}
-                        <Stack direction="row" justifyContent="space-between" alignItems="center">
-                            <Typography variant="h6" fontWeight="bold" textTransform="capitalize">
-                                {_project.eventId?.eventName}
-                            </Typography>
+                        <Stack
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                            sx={{ width: '100%' }}
+                        >
+                            {/* Left Content */}
+                            <Box sx={{ textAlign: 'left' }}>
+                                <Typography variant="h6" fontWeight="bold" textTransform="capitalize">
+                                    {_project.eventId?.eventName}
+                                </Typography>
+                                <Typography variant="body2" color="gray" >
+                                    Event Location : {_project?.eventLocation}
+                                </Typography>
+                            </Box>
 
-
-                            <Chip label={_project?.status} color="success" size="small" sx={{ textTransform: "capitalize" }} />
+                            {/* Right Content */}
+                            <Box sx={{
+                                textAlign: 'right',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-end',
+                                gap: 1
+                            }}>
+                                <Chip
+                                    label={_project?.bidStatus}
+                                    color={_project?.bidStatus === "closed" ? "error" : "success"}
+                                    size="small"
+                                    sx={{ textTransform: "capitalize" }}
+                                />
+                                <Typography variant="h6" fontWeight="bold" textTransform="capitalize">
+                                    Avg Bid Amount : {_project.avgBidAmount} XAF
+                                </Typography>
+                            </Box>
                         </Stack>
-                        <Typography variant="body2" color="gray" mb={2}>
-                            Event Location : {_project?.eventLocation}
-                        </Typography>
 
                         {/* Tabs (Details / Proposals) */}
                         <Box>
@@ -100,7 +123,10 @@ export default function ProjectSinglePage() {
                     </Paper>
 
                     {/* Provider Bid Section */}
-                    <PlaceBidOnProject _project={_project}/>
+                    <PlaceBidOnProject
+                        project={_project}
+                    />
+
                 </Grid>
 
 

@@ -1,6 +1,6 @@
 import { Typography, Box, Chip, Stack, Card, CardContent, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate  } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useDispatch, useSelector } from "react-redux";
 import StarIcon from '@mui/icons-material/Star';
@@ -15,9 +15,9 @@ import { DashboardContent } from "src/layouts/dashboard";
 export function FreelancerJobCard({ project }: any) {
     const navigate = useNavigate();
 
-const handleCardClick = (projectId: string) => {
-  navigate(`/project/${projectId}`);
-};
+    const handleCardClick = (projectId: string) => {
+        navigate(`/project/${projectId}`);
+    };
     return (
         <Card
             sx={{
@@ -39,21 +39,42 @@ const handleCardClick = (projectId: string) => {
         >
             <CardContent>
                 {/* Title and Budget */}
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                    <Typography variant="h6" fontWeight="bold" textTransform="capitalize">
-                        {project.eventId?.eventName}
-                    </Typography>
-                    <Typography variant="subtitle1" color="text.secondary" textTransform="capitalize">
-                        Budget {project?.orgBudget} XAF
-                    </Typography>
-                </Box>
 
-                {/* Event Location */}
-                <Box alignItems="center" mb={1}>
-                    <Typography variant="subtitle1" fontWeight={600} fontSize={12} textTransform="capitalize">
-                        Event Location: <span style={{ color: "#3CB1F1" }}>{project.eventLocation}</span>
-                    </Typography>
-                </Box>
+                <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{ width: '100%' }}
+                >
+                    {/* Left Content */}
+                    <Box sx={{ textAlign: 'left' }}>
+                        <Typography variant="h6" fontWeight="bold" textTransform="capitalize">
+                            {project.eventId?.eventName}
+                        </Typography>
+                        <Typography variant="subtitle1" fontWeight={600} fontSize={12} textTransform="capitalize">
+                            Event Location: <span style={{ color: "#3CB1F1" }}>{project.eventLocation}</span>
+                        </Typography>
+                    </Box>
+
+                    {/* Right Content */}
+                    <Box sx={{
+                        textAlign: 'right',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-end',
+                        gap: 1
+                    }}>
+                        <Chip
+    label={project?.bidStatus}
+    color={project?.bidStatus === "closed" ? "error" : "success"}
+    size="small"
+    sx={{ textTransform: "capitalize" }}
+/>
+                        <Typography variant="subtitle1" color="text.secondary" textTransform="capitalize">
+                            Budget {project?.orgBudget} XAF
+                        </Typography>
+                    </Box>
+                </Stack>
 
                 {/* Description - Update TextWithShowMore to include class for detection */}
                 <Box onClick={(e) => e.stopPropagation()}>
@@ -88,7 +109,7 @@ const handleCardClick = (projectId: string) => {
                             {project?.bidsCount} bids
                         </Typography>
                         <Typography variant="caption" display="block" color="text.secondary">
-                            {project?.avgBids} XAF average bid
+                            {project?.avgBidAmount} XAF average bid
                         </Typography>
                     </Box>
                 </Box>

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState,useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 import Box from '@mui/material/Box';
@@ -27,6 +27,7 @@ export const EventSearchAndDetailsPage = lazy(() => import('src/pages/event-sear
 // ----------------------------Service Provider Routes------------------------------------------
 export const Projects = lazy(() => import('src/pages/projects/projects-view'));
 export const ProjectSinglePage = lazy(() => import('src/pages/projects/single-project'));
+export const ProviderBidsPage = lazy(() => import('src/pages/projects/provider-bids-list'));
 export const HomePage = lazy(() => import('src/pages/home'));
 export const SocialShare = lazy(() => import('src/pages/social-share'));
 export const SignInPage = lazy(() => import('src/pages/auth/sign-in'));
@@ -91,7 +92,7 @@ export function Router() {
 
   const currentRole = auth?.user?.role || 'participant'
 
-  const routes= useRoutes([
+  const routes = useRoutes([
     {
       element: (
         <Protected>
@@ -190,7 +191,10 @@ export function Router() {
           path: '/project/:projectId',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><ProjectSinglePage /> </RoleProtectedRoute>
         },
-
+        {
+          path: '/project/bids',
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><ProviderBidsPage /> </RoleProtectedRoute>
+        },
         {
           path: '/statistics-&-performance',
           element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><StatisticsAndPerformancePage /> </RoleProtectedRoute>
@@ -284,7 +288,7 @@ export function Router() {
         <SocialShare />
       ),
     },
-    
+
     {
       path: '/our-event',
       element: (

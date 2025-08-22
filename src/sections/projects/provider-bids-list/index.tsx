@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -19,8 +19,16 @@ import {
   Remove as MinusIcon,
   Chat as ChatIcon
 } from '@mui/icons-material';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from 'src/redux/store';
+import { getMyBids } from 'src/redux/actions/provider/projects/place-a-bd.action';
 
 export function ProviderBidsList() {
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(getMyBids());
+  }, [dispatch]);
   const bids = [
     {
       project: "MERN Stack E-commerce...",
@@ -56,10 +64,10 @@ export function ProviderBidsList() {
 
   return (
     <Box sx={{ p: 3 }}>
-      <TableContainer 
-        component={Paper} 
-        sx={{ 
-          
+      <TableContainer
+        component={Paper}
+        sx={{
+
           boxShadow: 3
         }}
       >
@@ -83,7 +91,7 @@ export function ProviderBidsList() {
                 sx={{
                   borderTop: '1px solid',
                   borderColor: 'grey.700',
-                  '&:hover': { backgroundColor: 'grey.800' }
+                  '&:hover': { backgroundColor: 'grey.600' }
                 }}
               >
                 <TableCell sx={{ color: 'black', py: 2 }}>

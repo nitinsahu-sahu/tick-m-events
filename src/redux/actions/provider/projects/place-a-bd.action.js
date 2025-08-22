@@ -47,13 +47,12 @@ export const getMyBids = () => async (dispatch) => {
   dispatch({ type: providerProposalConstants.GET_MYBIDS_REQUEST });
   try {
     const response = await axios.get(`/p/project/my-bids`);
-    console.log('mybids',response);
     
     dispatch({
       type: providerProposalConstants.GET_MYBIDS_SUCCESS,
       payload: {
         message: response?.data?.message,
-        project: response?.data?.project,
+        mybids: response?.data?.mybids,
       },
     });
   } catch (error) {
@@ -64,21 +63,24 @@ export const getMyBids = () => async (dispatch) => {
   }
 };
 
-export const getMyBidsSpecificProject = (projectId) => async (dispatch) => {
-  dispatch({ type: providerProposalConstants.GET_MYBID_REQUEST });
+// Provider see all bids only
+export const withdrawnMyBids = (bidId) => async (dispatch) => {
+  dispatch({ type: providerProposalConstants.DELETE_MYBID_REQUEST });
   try {
-    const response = await axios.get(`/p/project/${projectId}/my-bid`);
+    const response = await axios.delete(`/p/project/${bidId}`);
+    
     dispatch({
-      type: providerProposalConstants.GET_MYBID_SUCCESS,
+      type: providerProposalConstants.DELETE_MYBID_SUCCESS,
       payload: {
         message: response?.data?.message,
-        project: response?.data?.project,
       },
     });
+    dispatch(getMyBids())
   } catch (error) {
     dispatch({
-      type: providerProposalConstants.GET_MYBID_FAILURE,
+      type: providerProposalConstants.DELETE_MYBID_FAILURE,
       payload: { message: error?.response?.data?.message || "Server error", error: error.status },
     });
   }
 };
+

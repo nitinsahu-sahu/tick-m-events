@@ -1,4 +1,4 @@
-import { Typography, IconButton, Box, Button, Card, Grid, Tooltip } from "@mui/material";
+import { Typography, IconButton, Box, Button, Card, Grid, Tooltip, TableCell, TableBody, Table, TableHead, TableRow } from "@mui/material";
 import { useState } from "react";
 import QrReader from 'react-qr-scanner'
 import { useDispatch } from "react-redux";
@@ -23,7 +23,14 @@ interface Ticket {
         email: string;
         _id: string;
     };
-    ticket: null
+    ticket: null;
+    participantDetails?: Array<{
+        name: string;
+        age: string;
+        gender: string;
+        validation?: boolean;
+        _id?: string;
+    }>;
 
 }
 
@@ -41,29 +48,69 @@ export function TicketScanner() {
     const [isScanning, setIsScanning] = useState(false);
     const [scanMessage, setScanMessage] = useState<string | null>(null);
     const [hasScanned, setHasScanned] = useState(false);
+     const allParticipantsValidated = flag.ticket?.participantDetails?.every(p => p.validation) ?? false;
 
-    const handleScan = (data: any) => {
-        if (data && !hasScanned) {
-            let scannedText = "";
+   const handleScan = async (data: any) => {
+    if (data && !hasScanned) {
+        let scannedText = "";
 
-            // Handle both string or object form of data
-            if (typeof data === "string") {
-                scannedText = data;
-            } else if (typeof data === "object" && data?.text) {
-                scannedText = data.text;
-            } else {
-                console.error("Unexpected scan data:", data);
-                return;
-            }
-
-            setResult(scannedText);
-            setScanMessage("✅ QR Code scanned successfully!");
-            setHasScanned(true);
-            setShowScanner(false);
-            setIsScanning(false);
-            setTimeout(() => setScanMessage(null), 3000);
+        if (typeof data === "string") {
+            scannedText = data;
+        } else if (typeof data === "object" && data?.text) {
+            scannedText = data.text;
+        } else {
+            console.error("Unexpected scan data:", data);
+            return;
         }
-    };
+
+        setResult(scannedText);
+        setScanMessage("✅ QR Code scanned successfully!");
+        setHasScanned(true);
+        setShowScanner(false);
+        setIsScanning(false);
+        setTimeout(() => setScanMessage(null), 3000);
+
+        // ✅ Immediately verify ticket after scan
+        try {
+            const parts = scannedText.split("/");
+            const ticketCode = parts[parts.length - 1];
+
+            const res = await dispatch(verifyTicketCode({ ticketCode }));
+            console.log("Verify on Scan:", res);
+
+            if (res.type === "VERIFY_TICKET_SUCCESS") {
+                const ticket = res.ticket;
+
+                // 🔴 check payment status first
+                if (ticket.paymentStatus !== "confirmed") {
+                    setFlag({
+                        status: "payment-pending",
+                        message: "❌ Payment not confirmed. Please complete payment.",
+                        ticket: null,
+                    });
+                    return;
+                }
+
+                // proceed with normal checks
+                if (res.flag === "granted") {
+                    setFlag({ status: "granted", message: res.message, ticket });
+                } else if (res.flag === "already") {
+                    setFlag({ status: "already", message: "Ticket already used.", ticket });
+                } else if (res.flag === "expired") {
+                    setFlag({ status: "expired", message: "Ticket has expired.", ticket });
+                } else {
+                    setFlag({ status: "invalid", message: "Invalid or expired ticket.", ticket: null });
+                }
+            } else {
+                setFlag({ status: "error", message: res.message, ticket: null });
+            }
+        } catch (err) {
+            console.error(err);
+            setFlag({ status: "error", message: "Verification failed. Try again." });
+        }
+    }
+};
+
 
     const handleError = (err: Error) => {
         setIsScanning(false);
@@ -143,6 +190,39 @@ export function TicketScanner() {
         }
     };
 
+    const handleConfirmParticipant = async (participantId: string) => {
+        const ticketCode = result?.split("/")?.pop();
+        if (!ticketCode) return;
+
+        const now = new Date();
+        const entryTime = now.toISOString();
+
+        const res = await dispatch(
+            confirmTicketEntry({
+                verifyData: {
+                    ticketCode,
+                    participantId, 
+                },
+                verifyEntry: true,
+                entryTime,
+            })
+        );
+
+        console.log("Confirm Participant Response:", res);
+
+        if (res.type === "ENTER_USER_EVENT_SUCCESS") {
+            // update UI so participant row shows validation true
+            setFlag((prev) => ({
+                ...prev,
+                ticket: {
+                    ...prev.ticket,
+                    participantDetails: prev.ticket?.participantDetails?.map((p) =>
+                        p._id === participantId ? { ...p, validation: true, entryTime } : p
+                    ),
+                },
+            }));
+        }
+    };
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
@@ -203,13 +283,15 @@ export function TicketScanner() {
                         "&:hover": { backgroundColor: "#0A1E36" }
                     }}
                     onClick={handleVerifyClick}
+                     disabled={flag.status === "payment-pending"}  
                 >
                     Verify
                 </Button>
 
             </Box>
-
-            {["granted", "already", "invalid", "error"].includes(flag.status) && (
+        
+        
+         {["granted", "already", "invalid", "error", "payment-pending", "expired"].includes(flag.status) && (
                 <Grid container spacing={2} mt={2}>
                     <Grid item xs={12}>
                         <Card
@@ -242,6 +324,56 @@ export function TicketScanner() {
                                         width={{ md: "34%" }}
                                     />
 
+                                    {/* 👇 Add this box to show participants */}
+                                    {/* 👇 Add this box to show participants */}
+                                    <Box mt={2} p={2} border="1px solid #ccc" borderRadius="8px" bgcolor="#f9f9f9">
+                                        <Typography variant="h6" mb={1}>Participant Details</Typography>
+
+                                        {flag.ticket?.participantDetails?.length ? (
+                                            <Table size="small">
+                                                <TableHead>
+                                                    <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
+                                                        <TableCell><b>Name</b></TableCell>
+                                                        <TableCell><b>Age</b></TableCell>
+                                                        <TableCell><b>Gender</b></TableCell>
+
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {flag.ticket.participantDetails.map((p: any, i: number) => (
+                                                        <TableRow key={i}>
+                                                            <TableCell>{p.name}</TableCell>
+                                                            <TableCell>{p.age}</TableCell>
+                                                            <TableCell>{p.gender}</TableCell>
+                                                            <TableCell>
+                                                                <Button
+                                                                    variant="contained"
+                                                                    size="small"
+                                                                    sx={{
+                                                                        backgroundColor: p.validation ? "gray" : "green",
+                                                                        color: "white",
+                                                                        borderRadius: "6px",
+                                                                        "&:hover": { backgroundColor: p.validation ? "gray" : "darkgreen" },
+                                                                    }}
+                                                                    disabled={p.validation} // disable if already validated
+                                                                    onClick={() => handleConfirmParticipant(p._id)}
+                                                                >
+                                                                    {p.validation ? "✔ Entered" : "Confirm"}
+                                                                </Button>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        ) : (
+                                            <Typography fontSize="14px" color="text.secondary">
+                                                No participant details found
+                                            </Typography>
+                                        )}
+                                    </Box>
+
+
+                                    {/* existing Confirm / Cancel buttons */}
                                     <Box
                                         display="flex"
                                         justifyContent="space-between"
@@ -256,87 +388,33 @@ export function TicketScanner() {
                                                 color: "white",
                                                 borderRadius: "8px",
                                                 "&:hover": { backgroundColor: "darkgreen" },
-                                                width: { xs: "100%", sm: "auto", md: "auto" },
                                             }}
                                             onClick={handleConfirmEntry}
-                                            disabled={flag.ticket?.verifyEntry}
+                                            disabled={!allParticipantsValidated || flag.ticket?.verifyEntry}
                                         >
                                             Confirm Entry
                                         </Button>
 
-                                        <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            width={{ xs: "100%", sm: "auto", md: "auto" }}
-                                            gap={1}
+                                        <Button
+                                            variant="contained"
+                                            sx={{
+                                                backgroundColor: "red",
+                                                color: "white",
+                                                borderRadius: "8px",
+                                                "&:hover": { backgroundColor: "darkred" },
+                                            }}
+                                            onClick={() => {
+                                                setShowScanner(false);
+                                                setResult("No result");
+                                                setFlag({ status: "", message: "", ticket: undefined });
+                                            }}
                                         >
-                                            <Button
-                                                variant="contained"
-                                                sx={{
-                                                    backgroundColor: "red",
-                                                    color: "white",
-                                                    borderRadius: "8px",
-                                                    "&:hover": { backgroundColor: "darkred" },
-                                                    width: { xs: "100%", sm: "auto", md: "auto" },
-                                                }}
-                                                onClick={() => {
-                                                    setShowScanner((prev) => {
-                                                        const nextState = !prev;
-                                                        setIsScanning(nextState); // start scanning
-                                                        if (!nextState) {
-                                                            setScanMessage(null); // clear message on close
-                                                        }
-                                                        return nextState;
-                                                    });
-
-                                                    setResult('No result');
-                                                    setFlag({ status: '', message: '', ticket: undefined });
-                                                }}
-
-                                            >
-                                                Cancel
-                                            </Button>
-                                            <Tooltip
-                                                arrow
-                                                disableInteractive
-                                                title={
-                                                    <Box sx={{ maxWidth: 250, p: 1, pointerEvents: 'none' }}>
-                                                        {flag.status === 'granted' && flag.ticket?.userId?.name ? (
-                                                            <>
-                                                                <HeadingCommon
-                                                                    title={`Name: ${flag.ticket.userId.name}`}
-                                                                    color="white"
-                                                                    baseSize="14px"
-                                                                    mt={1}
-                                                                />
-                                                                <HeadingCommon color="white" title={`Email: ${flag.ticket.userId.email || "N/A"}`} baseSize="12px" />
-                                                                <HeadingCommon
-                                                                    color="white"
-                                                                    title={`Ticket Type: ${flag.ticket?.tickets?.[0]?.ticketType || 'N/A'}`}
-                                                                    baseSize="12px"
-                                                                />
-                                                                <HeadingCommon
-                                                                    title={flag?.ticket?.verifyEntry ? "Ticket Status: Verified" : "Ticket Status: Unverified"}
-                                                                    baseSize="12px"
-                                                                    color="white"
-                                                                />
-                                                            </>
-                                                        ) : (
-                                                            <Typography color="white" fontSize="12px">No user data</Typography>
-                                                        )}
-                                                    </Box>
-                                                }
-                                            >
-                                                <IconButton sx={{ ml: 1 }}>
-                                                    <Iconify icon="mdi:information-outline" />
-                                                </IconButton>
-                                            </Tooltip>
-
-
-                                        </Box>
+                                            Cancel
+                                        </Button>
                                     </Box>
                                 </>
                             )}
+
 
                             {flag.status !== "granted" && (
                                 <Tooltip

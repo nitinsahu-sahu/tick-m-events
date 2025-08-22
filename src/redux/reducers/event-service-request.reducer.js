@@ -11,7 +11,7 @@ const initialState = {
     organizerRequests: [],
     orgLoading: false,
     accepedProviderReq: [],
-
+    activeContracts: [],
 };
 
 const eventServiceRequestReducer = (state, action) => {
@@ -19,7 +19,25 @@ const eventServiceRequestReducer = (state, action) => {
         state = initialState;
     }
     switch (action.type) {
+        case serviceRequestConstants.ACTIVE_CONTRACTS_REQUEST:
+            return {
+                ...state,
+                loading: true,
+            };
 
+        case serviceRequestConstants.ACTIVE_CONTRACTS_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                activeContracts: action.payload.activeContracts,
+            };
+
+        case serviceRequestConstants.ACTIVE_CONTRACTS_FAILURE:
+            return {
+                ...state,
+                loading: false,
+                error: action.payload.message,
+            };
         case serviceRequestConstants.PROVIDER_ACCEPTED_REQUEST:
             return {
                 ...state,

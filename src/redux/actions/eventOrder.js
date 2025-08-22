@@ -36,16 +36,19 @@ export const eventOrderCreate = (orderFormEntry) => async (dispatch) => {
 };
 
 export const verifyTicketCode = (verifyData) => async (dispatch) => {
-  
+ 
   dispatch({ type: eventOrderConstants.VERIFY_TICKET_REQUEST });
-
+ 
   try {
     const res = await axios.post("/event-order/verify-ticket", verifyData);
     dispatch({
       type: eventOrderConstants.VERIFY_TICKET_SUCCESS,
       payload: {
         message: res.data.message,
-        name: res.data.name
+        name: res.data.name,
+        ticket: res.data.ticket,
+        eventName: res.data.eventName,
+        flag: res.data.flag
       }
     });
     return {
@@ -54,7 +57,7 @@ export const verifyTicketCode = (verifyData) => async (dispatch) => {
       ticket: res.data.ticket,
       eventName: res.data.eventName,
       status: res.status,
-      flag:  res?.data?.flag
+      flag: res?.data?.flag
     };
   } catch (err) {
     dispatch({
@@ -63,16 +66,16 @@ export const verifyTicketCode = (verifyData) => async (dispatch) => {
         message: err?.response?.data?.message || "Error verifying ticket"
       }
     });
-
+ 
     return {
       type: eventOrderConstants.VERIFY_TICKET_FAILURE, // ✅ fixed here
       message: err?.response?.data?.message || "Error verifying ticket",
       status: err?.status,
       ticket: {},
-      flag:  err?.response?.data?.flag
+      flag: err?.response?.data?.flag
     };
   }
-};
+}
 
 export const confirmTicketEntry = (data) => async (dispatch) => {
   

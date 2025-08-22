@@ -17,8 +17,7 @@ export function SignInView() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [active, setActive] = useState("google");
-  const [showSignup, setShowSignup] = useState(false);
-  const auth = useSelector(state => state.auth);
+  const { authenticate } = useSelector(state => state.auth);
   const [formData, setFormData] = useState({ email: 'provider.aidenM1991@gmail.com', password: 'Aiden@123' });
 
 
@@ -57,16 +56,10 @@ export function SignInView() {
   }, [formData, dispatch, navigate]);
 
   useEffect(() => {
-    if (auth?.authenticate) {
+    if (authenticate) {
       navigate("/");
     }
-  }, [auth?.authenticate, navigate]);
-
-  const toggleForms = () => {
-    setTimeout(() => {
-      setShowSignup(!showSignup);
-    }, 300); // Match this with CSS transition duration
-  };
+  }, [authenticate, navigate]);
 
   const renderForm = (
     <>
@@ -226,9 +219,6 @@ export function SignInView() {
           <Button size="small" variant="h6" fontWeight={600} mb={2} sx={{ backgroundColor: "#1F8FCD", color: "white" }}>
             Sign In
           </Button>
-
-
-
           <form encType='multipart/form-data' onSubmit={handleSignIn}>
             {renderForm}
           </form>

@@ -1,28 +1,41 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Box, Grid, Typography, Paper } from '@mui/material';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import StarRateIcon from '@mui/icons-material/StarRate';
+import { AppDispatch, RootState } from 'src/redux/store';
+import { getActiveContractsByProvider } from '../../redux/actions/service-request';
 
-const stats = [
-  {
-    title: 'Contracts Obtained',
-    value: '15',
-    icon: <AssignmentIcon sx={{ fontSize: 40, color: '#0099E5' }} />,
-  },
-  {
-    title: 'Revenue Generated',
-    value: '5,000,000 XAF',
-    icon: <MonetizationOnIcon sx={{ fontSize: 40, color: '#0099E5' }} />,
-  },
-  {
-    title: 'Customer Ratings',
-    value: '4.8/5',
-    icon: <StarRateIcon sx={{ fontSize: 40, color: '#0099E5' }} />,
-  },
-];
+const ProviderStats = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { activeContracts } = useSelector((state: RootState) => state?.serviceRequest);
 
-const ProviderStats = () => (
+  useEffect(() => {
+    dispatch(getActiveContractsByProvider());
+  }, [dispatch]);
+
+  const contractCount = activeContracts?.length || 0;
+     
+  const stats = [
+    {
+      title: 'Contracts Obtained',
+      value: contractCount,
+      icon: <AssignmentIcon sx={{ fontSize: 40, color: '#0099E5' }} />,
+    },
+    {
+      title: 'Revenue Generated',
+      value: '5,000,000 XAF', // You can make this dynamic
+      icon: <MonetizationOnIcon sx={{ fontSize: 40, color: '#0099E5' }} />,
+    },
+    {
+      title: 'Customer Ratings',
+      value: '4.8/5', // You can make this dynamic
+      icon: <StarRateIcon sx={{ fontSize: 40, color: '#0099E5' }} />,
+    },
+  ];
+
+  return (
     <Box sx={{ my: 4 }}>
       <Grid container spacing={3}>
         {stats.map((stat, index) => (
@@ -54,6 +67,6 @@ const ProviderStats = () => (
       </Grid>
     </Box>
   );
-
+};
 
 export default ProviderStats;

@@ -41,8 +41,6 @@ interface ApiResult {
 
 // ServiceCard.tsx (new component)
 export function ServiceCard({ event, service, onRequest, eventId, disabled = false }: any) {
-  console.log(event);
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const dispatch = useDispatch<AppDispatch>();

@@ -295,3 +295,24 @@ export const getAccepedByProiver = () => async (dispatch) => {
     });
   }
 };
+
+export const getActiveContractsByProvider = () => async (dispatch) => {
+  try {
+    dispatch({ type: serviceRequestConstants.ACTIVE_CONTRACTS_REQUEST });
+ 
+    const result = await axios.get(`/event-requests/active-contracts`);
+    dispatch({
+      type: serviceRequestConstants.ACTIVE_CONTRACTS_SUCCESS,
+      payload: {
+        activeContracts: result.data.requests,
+      },
+    });
+  } catch (error) {
+    dispatch({
+      type: serviceRequestConstants.ACTIVE_CONTRACTS_FAILURE,
+      payload: {
+        message: error?.response?.data?.message || "Failed to fetch active contracts",
+      },
+    });
+  }
+};

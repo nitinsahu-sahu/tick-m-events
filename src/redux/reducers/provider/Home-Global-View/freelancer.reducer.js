@@ -1,4 +1,4 @@
-import { placeABidConstants,providerProposalConstants } from "src/redux/actions/constants";
+import { placeABidConstants, providerProposalConstants } from "src/redux/actions/constants";
 
 const initialState = {
     loading: false,
@@ -6,7 +6,7 @@ const initialState = {
     _mybids: [],
     _project: {},
     error: null,
-    message:""
+    message: ""
 };
 
 const placeABidReducer = (state, action) => {
@@ -15,6 +15,23 @@ const placeABidReducer = (state, action) => {
     }
 
     switch (action.type) {
+        case providerProposalConstants.UPDATE_MYBID_REQUEST:
+            return { ...state, loading: true };
+
+        case providerProposalConstants.UPDATE_MYBID_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                message: action.payload.message,
+                // Optionally update the specific bid in _mybids
+                _mybids: state._mybids.map((bid) =>
+                    bid._id === action.payload.updatedBid._id ? action.payload.updatedBid : bid
+                ),
+            };
+
+        case providerProposalConstants.UPDATE_MYBID_FAILURE:
+            return { ...state, loading: false, error: action.payload };
+
         case providerProposalConstants.GET_MYBIDS_REQUEST:
             return { ...state, loading: true };
 

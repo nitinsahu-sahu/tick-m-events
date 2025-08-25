@@ -84,3 +84,29 @@ export const withdrawnMyBids = (bidId) => async (dispatch) => {
   }
 };
 
+export const updateBid = (bidId, updatedData) => async (dispatch) => {
+  dispatch({ type: providerProposalConstants.UPDATE_MYBID_REQUEST });
+ 
+  try {
+    const response = await axios.put(`/p/project/${bidId}`, updatedData);
+ 
+    dispatch({
+      type: providerProposalConstants.UPDATE_MYBID_SUCCESS,
+      payload: {
+        message: response?.data?.message,
+        updatedBid: response?.data?.data, // Assuming `data` contains the updated bid
+      },
+    });
+ 
+    // Refresh the bid list to reflect updates
+    dispatch(getMyBids());
+  } catch (error) {
+    dispatch({
+      type: providerProposalConstants.UPDATE_MYBID_FAILURE,
+      payload: {
+        message: error?.response?.data?.message || "Failed to update bid",
+        error: error?.status,
+      },
+    });
+  }
+};

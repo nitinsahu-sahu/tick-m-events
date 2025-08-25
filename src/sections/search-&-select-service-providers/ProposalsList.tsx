@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import {
-  Box, Typography, Avatar, Grid, Button, Paper, Divider, Tooltip
+  Box, Typography, Avatar, Grid, Button, Paper, Divider, Tooltip,
+  Tabs, Tab
 } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import ChatIcon from '@mui/icons-material/Chat';
@@ -9,147 +10,211 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { SocialLinks } from './socialLinks';
 
-export function ProposalsCard({ proposals }: any) {
+// TabPanel component for rendering tab content
+function TabPanel({ children, value, index, ...other }:any) {
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`proposals-tabpanel-${index}`}
+      aria-labelledby={`proposals-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+export function ProposalsCard({ proposals }:any) {
   const navigate = useNavigate();
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleTabChange = (event:any, newValue:any) => {
+    setTabValue(newValue);
+  };
+
+  // Sample data for demonstration - in a real app, this would come from props
+  const manualBids = proposals || [];
+  const customBids = [
+    {
+      _id: 'custom1',
+      providerId: {
+        name: 'Custom Bid Provider',
+        username: 'customprovider',
+        isVerified: true,
+        avatar: { url: '' },
+        serviceCategory: 'Custom Development',
+        averageRating: 4.8,
+        reviewCount: 12,
+        address: 'remote',
+        experience: 'Specializing in custom solutions tailored to client needs'
+      },
+      orgBudget: 'Custom Quote',
+      isCustom: true
+    }
+  ];
 
   return (
-    <>
-      {proposals?.length > 0 ? (
-        proposals?.map((__i: any, index: any) => (
-          <Paper elevation={3} key={index || __i._id} sx={{
-            borderRadius: 2.5,
-            p: 4,
-            mt: 3,
-            mb: 4,
-            backgroundColor: '#f9f9f9',
+    <Box>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+        <Tabs value={tabValue} onChange={handleTabChange} aria-label="proposal tabs">
+          <Tab label="Manual Bids" />
+          <Tab label="Custom Bids" />
+        </Tabs>
+      </Box>
 
-          }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={2}>
-                <Avatar
-                  src={__i?.providerId?.avatar?.url}
-                  alt="Provider"
-                  sx={{ width: 80, height: 80 }}
+      <TabPanel value={tabValue} index={0}>
+        {manualBids?.length > 0 ? (
+          manualBids.map((proposal:any, index:any) => (
+            <ProposalItem key={index || proposal._id} proposal={proposal} />
+          ))
+        ) : (
+          <EmptyProposals message="No Manual Bids Found Yet..." />
+        )}
+      </TabPanel>
+
+      <TabPanel value={tabValue} index={1}>
+        {customBids?.length > 0 ? (
+          customBids.map((proposal, index) => (
+            <ProposalItem key={index || proposal._id} proposal={proposal} />
+          ))
+        ) : (
+          <EmptyProposals message="No Custom Bids Found Yet..." />
+        )}
+      </TabPanel>
+    </Box>
+  );
+}
+
+// Component for individual proposal item
+function ProposalItem({ proposal }:any) {
+  const navigate = useNavigate();
+  
+  return (
+    <Paper elevation={3} sx={{
+      borderRadius: 2.5,
+      p: 4,
+      mt: 3,
+      mb: 4,
+      backgroundColor: '#f9f9f9',
+    }}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={2}>
+          <Avatar
+            src={proposal?.providerId?.avatar?.url}
+            alt="Provider"
+            sx={{ width: 80, height: 80 }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={10}>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Box display="flex" justifyContent="space-between" alignItems="center" gap={2}>
+              <Typography variant="h6" fontWeight="bold">
+                {proposal?.providerId?.name}
+              </Typography>
+              <Typography variant="subtitle2" color="text.secondary">
+                {proposal?.providerId?.username}
+              </Typography>
+              {proposal?.providerId?.isVerified ? (
+                <Tooltip title="Verified">
+                  <CheckCircleIcon sx={{ color: '#4CAF50' }} />
+                </Tooltip>
+              ) : (
+                <Tooltip title="Not Verified">
+                  <CancelIcon sx={{ color: '#F44336' }} />
+                </Tooltip>
+              )}
+            </Box>
+
+            <Typography variant="h6" color="primary">
+              {proposal?.orgBudget} {proposal?.isCustom ? '' : 'XAF'}
+            </Typography>
+          </Grid>
+
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Box display="flex" justifyContent="space-between" alignItems="center" gap={2}>
+              <Typography variant="h6" fontWeight="bold">
+                {proposal?.providerId?.serviceCategory}
+              </Typography>
+            </Box>
+          </Grid>
+
+          <Box mt={1} display="flex" alignItems="center" gap={1}>
+            <Box display="flex" alignItems="center">
+              {[...Array(5)].map((_, index) => (
+                <StarIcon
+                  key={index}
+                  fontSize="small"
+                  sx={{
+                    color: index < Math.floor(proposal?.providerId?.averageRating || 0) ? '#f39c12' : '#ddd',
+                  }}
                 />
-              </Grid>
+              ))}
+            </Box>
+            <Typography variant="body2">| {proposal?.providerId?.reviewCount} Reviews</Typography>
+            <Typography variant="body2">| 90% Completion</Typography>
+            <Typography variant="body2" textTransform="capitalize">| {proposal?.providerId?.address}</Typography>
+          </Box>
 
-              <Grid item xs={12} sm={10}>
-                <Grid container justifyContent="space-between" alignItems="center">
-                  <Box display="flex" justifyContent="space-between" alignItems="center" gap={2}>
-                    <Typography variant="h6" fontWeight="bold">
-                      {__i?.providerId?.name}
-                    </Typography>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      {__i?.providerId?.username}
-                    </Typography>
-                    {__i?.providerId?.isVerified ? (
-                      <Tooltip title="Verified">
-                        <span> {/* or <Box> or <div> */}
-                          <CheckCircleIcon sx={{ color: '#4CAF50' }} />
-                        </span>
-                      </Tooltip>
-                    ) : (
-                      <Tooltip title="Not Verified">
-                        <span> {/* or <Box> or <div> */}
-                          <CancelIcon sx={{ color: '#F44336' }} />
-                        </span>
-                      </Tooltip>
-                    )}
-                  </Box>
-
-                  <Typography variant="h6" color="primary">
-                    {__i?.orgBudget} XAF
-                  </Typography>
-                </Grid>
-
-                <Grid container justifyContent="space-between" alignItems="center">
-                  <Box display="flex" justifyContent="space-between" alignItems="center" gap={2}>
-                    <Typography variant="h6" fontWeight="bold">
-                      {__i?.providerId?.serviceCategory}
-                    </Typography>
-                  </Box>
-                </Grid>
-
-                <Box mt={1} display="flex" alignItems="center" gap={1}>
-                  <Box display="flex" alignItems="center">
-                    {[...Array(5)].map((_, _idx) => (
-                      <StarIcon
-                        key={_idx}
-                        fontSize="small"
-                        sx={{
-                          color: _idx < Math.floor(__i?.providerId?.averageRating || 0) ? '#f39c12' : '#ddd',
-                        }}
-                      />
-                    ))}
-                  </Box>
-                  <Typography variant="body2">| {__i?.providerId?.reviewCount} Reviews</Typography>
-                  <Typography variant="body2">| 90% Completion</Typography>
-                  <Typography variant="body2" textTransform="capitalize">| {__i?.providerId?.address}</Typography>
-                </Box>
-
-                <Grid container justifyContent="space-between"  >
-                  <Grid item xs={12} sm={10} md={10}>
-                    <Typography variant="body2" mt={2} minHeight={60}>
-                      {__i?.providerId?.experience}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={10} md={2}>
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      alignItems="center"  // Horizontal centering
-                      justifyContent="center"  // Vertical centering
-                      height="100%"  // Ensure the Box takes full height of Grid item
-                    >
-                      {/* <Typography variant="body2" color="text.secondary">
-                        in 50 days
-                      </Typography> */}
-                      <Button
-                        variant="outlined"
-                        startIcon={<ChatIcon />}
-                        onClick={() => {
-                          navigate("/messaging-relationship");
-                          sessionStorage.setItem('currentChatProvider', JSON.stringify(__i?.providerId));
-                        }}
-                        size="small"
-                        sx={{ mt: 1 }}  // Add some margin top for spacing
-                      >
-                        Chat
-                      </Button>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Grid>
+          <Grid container justifyContent="space-between">
+            <Grid item xs={12} sm={10} md={10}>
+              <Typography variant="body2" mt={2} minHeight={60}>
+                {proposal?.providerId?.experience}
+              </Typography>
             </Grid>
+            <Grid item xs={12} sm={10} md={2}>
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                height="100%"
+              >
+                <Button
+                  variant="outlined"
+                  startIcon={<ChatIcon />}
+                  onClick={() => {
+                    navigate("/messaging-relationship");
+                    sessionStorage.setItem('currentChatProvider', JSON.stringify(proposal?.providerId));
+                  }}
+                  size="small"
+                  sx={{ mt: 1 }}
+                >
+                  Chat
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
 
-            <Divider sx={{ my: 2 }} />
+      <Divider sx={{ my: 2 }} />
 
-            {/* Social Links */}
-            <SocialLinks socialLinks={__i?.providerId?.socialLinks} />
-          </Paper>
-        ))
+      <SocialLinks socialLinks={proposal?.providerId?.socialLinks} />
+    </Paper>
+  );
+}
 
-      ) : (
-        // Show "No Proposals" when length is 0 or undefined
-        <Paper
-          elevation={3}
-          sx={{
-            borderRadius: 2.5,
-            p: 4,
-            mt: 3,
-            mb: 4,
-            backgroundColor: '#f9f9f9',
-            display: 'flex',           // Added for centering
-            alignItems: 'center',      // Vertical centering
-            justifyContent: 'center',  // Horizontal centering
-            height: 200,               // Set your desired height (in pixels)
-            textAlign: 'center'        // Ensures text alignment is centered
-          }}
-        >
-          <Typography variant="body1" color="blue">No Proposals Found Yet...</Typography>
-        </Paper>
-      )}
-    </>
-
+// Component for empty state
+function EmptyProposals({ message }:any) {
+  return (
+    <Paper
+      elevation={3}
+      sx={{
+        borderRadius: 2.5,
+        p: 4,
+        mt: 3,
+        mb: 4,
+        backgroundColor: '#f9f9f9',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 200,
+        textAlign: 'center'
+      }}
+    >
+      <Typography variant="body1" color="blue">{message}</Typography>
+    </Paper>
   );
 }

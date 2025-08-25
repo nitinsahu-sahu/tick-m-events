@@ -8,7 +8,7 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { TabButton } from 'src/components/button/multiple-button';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { providersListFetch } from 'src/redux/actions/searchSelect';
-import { fatchOrgEvents } from 'src/redux/actions/organizer/pageEvents';
+import { fatchOrgEvents, fatchOrgPlaceABids } from 'src/redux/actions/organizer/pageEvents';
 import { EventBreadCrum } from 'src/sections/entry-validation/event-status';
 import { eventFetch } from 'src/redux/actions/event.action';
 import { getAccepedByProiver, getRequestsByOrganizer } from 'src/redux/actions/service-request';
@@ -25,7 +25,6 @@ export function SearchAndSelectServiceProvidersView() {
   const { providersList } = useSelector((state: RootState) => state?.providers);
   const { organizerRequests } = useSelector((state: RootState) => state?.serviceRequest);
   const [select, setSelected] = useState<any>({})
-  console.log('select',select);
   
   const { __events } = useSelector((state: RootState) => state.organizer);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -91,8 +90,9 @@ export function SearchAndSelectServiceProvidersView() {
   };
 
   useEffect(() => {
+    dispatch(fatchOrgPlaceABids(selectedEvent?._id))
     dispatch(fatchOrgEvents());
-  }, [dispatch]);
+  }, [dispatch,selectedEvent]);
 
   const handleEventSelect = (event: Event | null) => {
     setSelectedEvent(event);

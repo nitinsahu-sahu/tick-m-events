@@ -1,7 +1,11 @@
-import { Box, Button, Select, MenuItem, Typography, Stack, FormControl } from "@mui/material";
+import { Box, Button, Select, MenuItem, Typography, Stack, FormControl,ListSubheader } from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import { fetchAllServiceCategories } from "src/redux/actions";
+import { AppDispatch, RootState } from "src/redux/store";
 
 interface Event {
     _id: string;
@@ -22,11 +26,15 @@ function StatusChip({ label, color }: { label: string; color: string }) {
 export function EventBreadCrum({ _selectEve, view, setView, eventInformation, events, onEventSelect, enableComparison = false }: any) {
     const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine); // Track online status
     const location = useLocation();
+    const dispatch = useDispatch<AppDispatch>();
+
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(eventInformation || null);
     const [comparisonEvent, setComparisonEvent] = useState<Event | null>(null);
     // Define the specific URL path where the section should appear
     const showSection = location.pathname === '/entry-validation';
     const statisticsAndReport = location.pathname === '/statistics-&-reports';
+    const searchAndSelect = location.pathname === '/search-&-select-service-providers';
+    const { categories } = useSelector((state: RootState) => state?.serviceReqCategories);
 
     useEffect(() => {
         const handleOnline = () => setIsOnline(true);
@@ -74,6 +82,10 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
         // Pass both selected event and comparison event to parent
         onEventSelect?.(selectedEvent, event); // Modified to pass both events
     };
+
+    useEffect(() => {
+        dispatch(fetchAllServiceCategories());
+    }, [dispatch]);
     return (
         <Box
             display="flex"
@@ -245,6 +257,52 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
                 </Box>
             )}
 
+            {
+                searchAndSelect && (
+                    <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
+                        <Typography fontWeight={600} fontSize={13} color="#3CB1F1">Categories</Typography>
+                        <Typography color="text.secondary" fontSize={13}>/</Typography>
+                        <FormControl sx={{ minWidth: 150 }} size="small">
+                            <Select
+                                labelId="event-category-label"
+                                name="childCategory"
+                                // value={eventFormData.childCategory}
+                                // onChange={handleEventChange}
+                                size="small"
+                                sx={{
+                                    fontSize: '0.8rem',
+                                    height: '25px',
+                                    '& .MuiSelect-select': {
+                                        padding: '6px 12px'
+                                    },
+                                    textTransform: "capitalize"
+                                }}
+                                required
+                                renderValue={(selected) => {
+                                    const selectedItem = categories
+                                        .flatMap((cat: any) => cat.subcategories || [])
+                                        .find((child: any) => child._id === selected);
+                                    return selectedItem ? selectedItem.name : 'Select Subcategory';
+                                }}
+                            >
+                               
+                                {categories?.map((parent: any) => (
+                                    parent.subcategories?.length > 0 && [
+                                        <ListSubheader key={`header-${parent._id}`}>{parent.name}</ListSubheader>,
+                                        ...parent.subcategories.map((child: any) => (
+                                            
+                                            <MenuItem key={child._id} value={child._id}>
+                                                {child.name}
+                                            </MenuItem>
+                                        ))
+                                    ]
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Box>
+
+                )
+            }
         </Box>
     )
 }

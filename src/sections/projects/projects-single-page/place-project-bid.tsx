@@ -126,7 +126,14 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
             ...prev,
             [name]: value
         }));
+
+        // Trigger re-validation if bidAmount is changed
+        if (name === 'bidAmount') {
+            setTimeout(() => validateForm(), 0);
+        }
     };
+
+
 
     const addMilestone = () => {
         if (milestones.length < 5) {
@@ -144,46 +151,57 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
     };
 
     const handleMilestoneChange = (id: number, field: keyof Milestone, value: string) => {
-        setMilestones(prev => prev.map(milestone =>
-            milestone.id === id ? { ...milestone, [field]: value } : milestone
-        ));
+        setMilestones(prev => {
+            const updated = prev.map(milestone =>
+                milestone.id === id ? { ...milestone, [field]: value } : milestone
+            );
+            setTimeout(() => validateForm(), 0);
+            return updated;
+        });
     };
 
     const validateForm = (): boolean => {
-        const newErrors: FormErrors = {};
+    const newErrors: FormErrors = {};
 
-        // Validate bid amount
-        const bidAmountNum = Number(bidData.bidAmount);
-        if (!bidData.bidAmount || Number.isNaN(bidAmountNum) || bidAmountNum <= 0) {
-            newErrors.bidAmount = "Please enter a valid bid amount";
+    const bidAmountNum = Number(bidData.bidAmount);
+    if (!bidData.bidAmount || Number.isNaN(bidAmountNum) || bidAmountNum <= 0) {
+        newErrors.bidAmount = "Please enter a valid bid amount";
+    }
+
+    const deliveryTimeNum = parseInt(bidData.deliveryTime, 10);
+    if (!bidData.deliveryTime || Number.isNaN(deliveryTimeNum) || deliveryTimeNum <= 0) {
+        newErrors.deliveryTime = "Please enter a valid delivery time";
+    }
+
+    if (!bidData.proposal || bidData.proposal.length < 100) {
+        newErrors.proposal = "Proposal must be at least 100 characters";
+    }
+
+    // Track milestone total and mark only the violating milestone
+    let runningTotal = 0;
+    milestones.forEach((milestone, index) => {
+        const name = milestone.milestorneName.trim();
+        const amountNum = Number(milestone.amount);
+
+        if (!name) {
+            newErrors[`milestone_${index}_milestorneName`] = "Milestone name is required";
         }
 
-        // Validate delivery time
-        const deliveryTimeNum = parseInt(bidData.deliveryTime, 10);
-        if (!bidData.deliveryTime || Number.isNaN(deliveryTimeNum) || deliveryTimeNum <= 0) {
-            newErrors.deliveryTime = "Please enter a valid delivery time";
-        }
+        if (!milestone.amount || Number.isNaN(amountNum) || amountNum <= 0) {
+            newErrors[`milestone_${index}_amount`] = "Valid amount is required";
+        } else {
+            runningTotal += amountNum;
 
-        // Validate proposal
-        if (!bidData.proposal || bidData.proposal.length < 100) {
-            newErrors.proposal = "Proposal must be at least 100 characters";
-        }
-
-        // Validate milestones
-        milestones.forEach((milestone, index) => {
-            if (!milestone.milestorneName.trim()) {
-                newErrors[`milestone_${index}_milestorneName`] = "Milestone name is required";
+            if (bidAmountNum > 0 && runningTotal > bidAmountNum) {
+                newErrors[`milestone_${index}_amount`] = "Milestone exceeds the total bid amount";
             }
+        }
+    });
 
-            const amountNum = Number(milestone.amount);
-            if (!milestone.amount || Number.isNaN(amountNum) || amountNum <= 0) {
-                newErrors[`milestone_${index}_amount`] = "Valid amount is required";
-            }
-        });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+};
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();

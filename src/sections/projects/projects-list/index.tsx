@@ -65,11 +65,11 @@ export function FreelancerJobCard({ project }: any) {
                         gap: 1
                     }}>
                         <Chip
-    label={project?.bidStatus}
-    color={project?.bidStatus === "closed" ? "error" : "success"}
-    size="small"
-    sx={{ textTransform: "capitalize" }}
-/>
+                            label={project?.bidStatus}
+                            color={project?.bidStatus === "closed" ? "error" : "success"}
+                            size="small"
+                            sx={{ textTransform: "capitalize" }}
+                        />
                         <Typography variant="subtitle1" color="text.secondary" textTransform="capitalize">
                             Budget {project?.orgBudget} XAF
                         </Typography>

@@ -24,3 +24,29 @@ export const fatchOrgEvents = () => async (dispatch) => {
         });
     }
 };
+
+export const fatchOrgPlaceABids = (eventId) => async (dispatch) => {
+    dispatch({ type: organizerEventConstants.GET_PLACEABID_REQUEST });
+
+    try {
+        const response = await axios.get(`/o/event/${eventId}/bid-data`)
+        console.log('res',response);
+        
+        dispatch({
+            type: organizerEventConstants.GET_PLACEABID_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                __event: response?.data?.__event,
+            },
+
+        });
+    } catch (error) {
+        dispatch({
+            type: organizerEventConstants.GET_PLACEABID_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
+            },
+        });
+    }
+};

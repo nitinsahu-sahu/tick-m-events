@@ -6,6 +6,7 @@ export const fatchOrgEvents = () => async (dispatch) => {
 
     try {
         const response = await axios.get("/o/event-com")
+        
         dispatch({
             type: organizerEventConstants.GET_ORGANIZR_EVENTS_SUCCESS,
             payload: {
@@ -43,6 +44,30 @@ export const fatchOrgPlaceABids = (eventId) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: organizerEventConstants.GET_PLACEABID_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
+            },
+        });
+    }
+};
+
+export const fatchOrgProjectBids = (projectId) => async (dispatch) => {
+    dispatch({ type: organizerEventConstants.GET_BIDS_REQUEST });
+
+    try {
+        const response = await axios.get(`/o/place-a-bid/${projectId}/bid-data`)
+        dispatch({
+            type: organizerEventConstants.GET_BIDS_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                projectWithBids: response?.data?.data,
+            },
+
+        });
+    } catch (error) {
+        dispatch({
+            type: organizerEventConstants.GET_BIDS_FAILURE,
             payload: {
                 message: error?.response?.data?.message || "Server error",
                 error: error.status

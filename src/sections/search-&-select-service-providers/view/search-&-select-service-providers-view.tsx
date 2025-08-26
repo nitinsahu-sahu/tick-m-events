@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography } from "@mui/material";
-
-import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
+import { Box } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -18,20 +16,19 @@ import { SearchAndAdvanceFilter } from '../SearchAndAdvanceFilter';
 import ProviderCardList from '../ProviderCardList';
 import { ProposalsCard } from '../ProposalsList';
 import RequestService from '../RequestService';
-import { PlaceABid } from '../place-a-bid';
 
 
 export function SearchAndSelectServiceProvidersView() {
   const { providersList } = useSelector((state: RootState) => state?.providers);
   const { organizerRequests } = useSelector((state: RootState) => state?.serviceRequest);
   const [select, setSelected] = useState<any>({})
-  
+
   const { __events } = useSelector((state: RootState) => state.organizer);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const [tabValue, setTabValue] = useState(0);
-  const tabLabels = ["Global Search", "List of Providers", "Proposals", "Requested Sevice", "Place a Bid"];
+  const tabLabels = ["Global Search", "List of Providers", "Proposals", "Requested Sevice"];
   const [offerList, setOfferList] = useState({})
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
 
@@ -92,7 +89,7 @@ export function SearchAndSelectServiceProvidersView() {
   useEffect(() => {
     dispatch(fatchOrgPlaceABids(selectedEvent?._id))
     dispatch(fatchOrgEvents());
-  }, [dispatch,selectedEvent]);
+  }, [dispatch, selectedEvent]);
 
   const handleEventSelect = (event: Event | null) => {
     setSelectedEvent(event);
@@ -132,9 +129,7 @@ export function SearchAndSelectServiceProvidersView() {
         {tabValue === 3 && (
           <RequestService requests={organizerRequests} />
         )}
-        {tabValue === 4 && (
-          <PlaceABid _SelectedEvent={selectedEvent} />
-        )}
+       
         <ProviderOrganizerInfoModal
           isModalOpen={isModalOpen}
           handleCloseModal={handleCloseModal}

@@ -3,6 +3,7 @@ import { organizerEventConstants } from "../../actions/constants";
 const initialState = {
     message: '',
     __events: [],
+    __projectWithBids: {},
     error: null,
     loading: true
 };
@@ -12,6 +13,24 @@ const pageEventReducer = (state, action) => {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
+        case organizerEventConstants.GET_BIDS_REQUEST:
+            return { ...state, loading: true };
+
+        case organizerEventConstants.GET_BIDS_SUCCESS:
+            return {
+                ...state,
+                __projectWithBids: action.payload.projectWithBids,
+                message: action.payload.message,
+                loading: false
+            };
+
+        case organizerEventConstants.GET_BIDS_FAILURE:
+            return {
+                ...state,
+                message: action.payload.message,
+                loading: true
+            };
+
         case organizerEventConstants.GET_ORGANIZR_EVENTS_REQUEST:
             return { ...state, loading: true };
 

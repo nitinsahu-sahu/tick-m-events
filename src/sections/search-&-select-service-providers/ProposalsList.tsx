@@ -11,7 +11,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { SocialLinks } from './socialLinks';
 
 // TabPanel component for rendering tab content
-function TabPanel({ children, value, index, ...other }:any) {
+function TabPanel({ children, value, index, ...other }: any) {
   return (
     <div
       role="tabpanel"
@@ -25,13 +25,9 @@ function TabPanel({ children, value, index, ...other }:any) {
   );
 }
 
-export function ProposalsCard({ proposals }:any) {
+export function ProposalsCard({ proposals }: any) {
   const navigate = useNavigate();
-  const [tabValue, setTabValue] = useState(0);
-
-  const handleTabChange = (event:any, newValue:any) => {
-    setTabValue(newValue);
-  };
+  
 
   // Sample data for demonstration - in a real app, this would come from props
   const manualBids = proposals || [];
@@ -56,40 +52,21 @@ export function ProposalsCard({ proposals }:any) {
 
   return (
     <Box>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="proposal tabs">
-          <Tab label="Manual Bids" />
-          <Tab label="Custom Bids" />
-        </Tabs>
-      </Box>
-
-      <TabPanel value={tabValue} index={0}>
-        {manualBids?.length > 0 ? (
-          manualBids.map((proposal:any, index:any) => (
-            <ProposalItem key={index || proposal._id} proposal={proposal} />
-          ))
-        ) : (
-          <EmptyProposals message="No Manual Bids Found Yet..." />
-        )}
-      </TabPanel>
-
-      <TabPanel value={tabValue} index={1}>
-        {customBids?.length > 0 ? (
-          customBids.map((proposal, index) => (
-            <ProposalItem key={index || proposal._id} proposal={proposal} />
-          ))
-        ) : (
-          <EmptyProposals message="No Custom Bids Found Yet..." />
-        )}
-      </TabPanel>
+      {manualBids?.length > 0 ? (
+        manualBids.map((proposal: any, index: any) => (
+          <ProposalItem key={index || proposal._id} proposal={proposal} />
+        ))
+      ) : (
+        <EmptyProposals message="No Manual Bids Found Yet..." />
+      )}
     </Box>
   );
 }
 
 // Component for individual proposal item
-function ProposalItem({ proposal }:any) {
+function ProposalItem({ proposal }: any) {
   const navigate = useNavigate();
-  
+
   return (
     <Paper elevation={3} sx={{
       borderRadius: 2.5,
@@ -197,7 +174,7 @@ function ProposalItem({ proposal }:any) {
 }
 
 // Component for empty state
-function EmptyProposals({ message }:any) {
+function EmptyProposals({ message }: any) {
   return (
     <Paper
       elevation={3}

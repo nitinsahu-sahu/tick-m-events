@@ -13,6 +13,10 @@ import { RoleProtectedRoute } from 'src/redux/helper/RoleWise';
 import { MultipleDashboard } from 'src/hooks/common-dashbord';
 
 // ----------------------------Organizer Routes------------------------------------------
+export const PlaceABidAddPage = lazy(() => import('src/pages/projects/placeABidAdd'));
+export const BidsOnPlaceABidsPage = lazy(() => import('src/pages/projects/bidsOnPlaceABids'));
+export const PlaceABidListPage = lazy(() => import('src/pages/projects/placeABidList'));
+//
 export const MarketingEngagenmentPage = lazy(() => import('src/pages/marketing-engagenment'));
 export const EventDetailsPage = lazy(() => import('src/pages/event-details'));
 export const EntryValidationPage = lazy(() => import('src/pages/entry-validation'));
@@ -182,6 +186,18 @@ export function Router() {
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><VisibilityAndAccessSettingsPage /></RoleProtectedRoute>
         },
 
+        {
+          path: '/place-a-bid/add',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><PlaceABidAddPage /></RoleProtectedRoute>
+        },
+        {
+          path: '/place-a-bid/view',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><PlaceABidListPage /></RoleProtectedRoute>
+        },
+        {
+          path: '/place-a-bid/bids/:projectId',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><BidsOnPlaceABidsPage /></RoleProtectedRoute>
+        },
         // -----------------------**************-------------------------
         {
           path: '/project/view',

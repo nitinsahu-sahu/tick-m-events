@@ -84,9 +84,33 @@ export const navData: NavItem[] = [
         path: '/project/view',
         icon: icon('ic_project_view'),
       },
-       {
+      {
         title: 'Bids',
         path: '/project/bids',
+        icon: icon('ic_bids_list'),
+      }
+    ],
+  },
+  {
+    title: 'Place A Bid',
+    path: '#',
+    icon: icon('ic_projects'),
+    info: <EventsInfo />,
+    roles: ['organizer'],
+    children: [ // Submenu items
+      {
+        title: 'Add',
+        path: '/place-a-bid/add',
+        icon: icon('ic_project_view'),
+      },
+      {
+        title: 'View Place A Bids',
+        path: '/place-a-bid/view',
+        icon: icon('ic_project_view'),
+      },
+      {
+        title: 'View Bids',
+        path: '/place-a-bid/bids',
         icon: icon('ic_bids_list'),
       }
     ],

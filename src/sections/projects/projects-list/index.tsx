@@ -64,12 +64,24 @@ export function FreelancerJobCard({ project }: any) {
                         alignItems: 'flex-end',
                         gap: 1
                     }}>
-                        <Chip
-                            label={project?.bidStatus}
-                            color={project?.bidStatus === "closed" ? "error" : "success"}
-                            size="small"
-                            sx={{ textTransform: "capitalize" }}
-                        />
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Chip
+                                label={project?.bidStatus}
+                                color={project?.bidStatus === "closed" ? "error" : "success"}
+                                size="small"
+                                sx={{ textTransform: "capitalize" }}
+                            />
+                            {project?.isSigned && (
+                                <Chip
+                                    label="Signed"
+                                    color="primary"
+                                    size="small"
+                                    sx={{ textTransform: "capitalize" }}
+                                />
+                            )}
+                        </Box>
+
+
                         <Typography variant="subtitle1" color="text.secondary" textTransform="capitalize">
                             Budget {project?.orgBudget} XAF
                         </Typography>

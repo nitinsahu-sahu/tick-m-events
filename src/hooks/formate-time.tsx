@@ -64,3 +64,38 @@ export function formatTimeToAMPM(dateString: string): string {
 
     return `${hours}:${minutesStr} ${ampm}`;
 }
+
+export const formatDateTimeCustom = (dateTimeString:any, formatType = 'standard') => {
+  try {
+    const date = new Date(dateTimeString);
+    
+    const year = date.getFullYear();
+    const month = date.toLocaleString('en-US', { month: 'long' });
+    const day = date.getDate();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    // Convert hours to 12-hour format
+    const hours12 = hours % 12 || 12;
+    
+    // Pad minutes with leading zero if needed
+    const minutesPadded = minutes.toString().padStart(2, '0');
+    
+    switch (formatType) {
+      case 'short':
+        return `${month.substring(0, 3)} ${day}, ${year} ${hours12}:${minutesPadded} ${ampm}`;
+      case 'date-only':
+        return `${month} ${day}, ${year}`;
+      case 'time-only':
+        return `${hours12}:${minutesPadded} ${ampm}`;
+      case 'numeric':
+        return `${date.getMonth() + 1}/${day}/${year} ${hours12}:${minutesPadded} ${ampm}`;
+      default: // standard
+        return `${month} ${day}, ${year} at ${hours12}:${minutesPadded} ${ampm}`;
+    }
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid date';
+  }
+};

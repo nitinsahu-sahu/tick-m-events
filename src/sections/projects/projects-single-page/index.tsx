@@ -77,12 +77,23 @@ export default function ProjectSinglePage() {
                                 alignItems: 'flex-end',
                                 gap: 1
                             }}>
-                                <Chip
-                                    label={_project?.bidStatus}
-                                    color={_project?.bidStatus === "closed" ? "error" : "success"}
-                                    size="small"
-                                    sx={{ textTransform: "capitalize" }}
-                                />
+                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <Chip
+                                        label={_project?.bidStatus}
+                                        color={_project?.bidStatus === "closed" ? "error" : "success"}
+                                        size="small"
+                                        sx={{ textTransform: "capitalize" }}
+                                    />
+                                    {_project?.isSigned && (
+                                        <Chip
+                                            label="Signed"
+                                            color="primary"
+                                            size="small"
+                                            sx={{ textTransform: "capitalize" }}
+                                        />
+                                    )}
+                                </Box>
+
                                 <Typography variant="h6" fontWeight="bold" textTransform="capitalize">
                                     Avg Bid Amount : {_project.avgBidAmount} XAF
                                 </Typography>

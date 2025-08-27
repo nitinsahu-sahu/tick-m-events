@@ -316,14 +316,6 @@ function getTicketSalesData(event: any, selectedTicket: string): { labels: strin
 
     const pendingCount = Math.max(totalCount - soldCount, 0);
 
-    console.log({
-        selectedTicket,
-        totalCount,
-        soldCount,
-        pendingCount,
-        series: [soldCount, pendingCount]
-    });
-
     return {
         labels: ["Sold", "Pending"],
         series: [soldCount, pendingCount],

@@ -61,7 +61,6 @@ export const RecentEventList: React.FC<Props> = ({
     selectedEvent,
 }) => {
     const theme = useTheme();
-    console.log("hgfdgfc", selectedEvent);
     const ticketTypes: Ticket[] = selectedEvent?.tickets?.[0]?.tickets || [];
     useEffect(() => {
         const tickets = selectedEvent?.tickets?.[0]?.tickets || [];

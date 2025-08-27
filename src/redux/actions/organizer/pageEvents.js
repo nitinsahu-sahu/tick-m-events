@@ -6,7 +6,7 @@ export const fatchOrgEvents = () => async (dispatch) => {
 
     try {
         const response = await axios.get("/o/event-com")
-        
+
         dispatch({
             type: organizerEventConstants.GET_ORGANIZR_EVENTS_SUCCESS,
             payload: {
@@ -31,8 +31,8 @@ export const fatchOrgPlaceABids = (eventId) => async (dispatch) => {
 
     try {
         const response = await axios.get(`/o/event/${eventId}/bid-data`)
-        console.log('res',response);
-        
+        console.log('res', response);
+
         dispatch({
             type: organizerEventConstants.GET_PLACEABID_SUCCESS,
             payload: {
@@ -68,6 +68,37 @@ export const fatchOrgProjectBids = (projectId) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: organizerEventConstants.GET_BIDS_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
+            },
+        });
+    }
+};
+
+
+export const assignProjectToProvider = (projectId, bidId, data) => async (dispatch) => {
+        console.log("response");
+
+    dispatch({ type: organizerEventConstants.ASSIGN_PROJECT_REQUEST });
+
+    try {
+        // /place-a-bid/:projectId/:bidId
+        const response = await axios.put(`/o/place-a-bid/${projectId}/${bidId}`, { data })
+        console.log(response);
+        
+        dispatch({
+            type: organizerEventConstants.ASSIGN_PROJECT_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                projectWithBids: response?.data?.data,
+            },
+
+        });
+        dispatch(fatchOrgProjectBids(projectId))
+    } catch (error) {
+        dispatch({
+            type: organizerEventConstants.ASSIGN_PROJECT_FAILURE,
             payload: {
                 message: error?.response?.data?.message || "Server error",
                 error: error.status

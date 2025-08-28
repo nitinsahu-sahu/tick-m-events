@@ -4,20 +4,21 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { FilterGrid } from '../FilterGrid';
 import ShareSection from '../ShareSection';
 import { PhotoFilterSection } from '../PhotoFilterSection';
+import { FrameProvider } from './FrameContext';
 
 export function CustomPhotoAndVideoFiltersforEventsView() {
   return (
-    <DashboardContent>
-      <PageTitleSection title="Custom Photo or Video Filter" />
-
-
-      <PhotoFilterSection />
-      <Box mt={4}>
-        <FilterGrid />
-      </Box>
-      <Box mt={4}>
-        <ShareSection />
-      </Box>
-    </DashboardContent>
+    <FrameProvider>
+      <DashboardContent>
+        <PageTitleSection title="Custom Photo or Video Filter" />
+        <PhotoFilterSection />
+        <Box mt={4}>
+          <FilterGrid />
+        </Box>
+        <Box mt={4}>
+          <ShareSection />
+        </Box>
+      </DashboardContent>
+    </FrameProvider>
   );
 }

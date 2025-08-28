@@ -107,11 +107,6 @@ export const navData: NavItem[] = [
         title: 'View Place A Bids',
         path: '/place-a-bid/view',
         icon: icon('ic_project_view'),
-      },
-      {
-        title: 'View Bids',
-        path: '/place-a-bid/bids',
-        icon: icon('ic_bids_list'),
       }
     ],
   },

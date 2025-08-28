@@ -1,27 +1,18 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import ChatIcon from '@mui/icons-material/Chat';
+import InfoIcon from "@mui/icons-material/Info";
 
 import {
-    Typography, Box, Card, TextField, Grid, Chip, Button, Avatar, Divider,
-    Container, Paper, Tabs, Tab, Skeleton, Alert, IconButton, Dialog, DialogTitle,
-    DialogContent, DialogActions
+    Typography, Box, Card, Grid, Chip, Button, Avatar, Divider,
+    Container, Paper, Tabs, Tab, Skeleton, Alert, IconButton, Tooltip
 } from "@mui/material";
-import {
-    ArrowBack,
-    CheckCircle,
-    Cancel,
-    AttachMoney,
-    Schedule,
-    Person,
-    Work,
-    LocationOn,
-    Event
-} from "@mui/icons-material";
-import { assignProjectToProvider, fatchOrgProjectBids } from "src/redux/actions/organizer/pageEvents";
+import { ArrowBack, Schedule, Person, Work, LocationOn, Event } from "@mui/icons-material";
+import { fatchOrgProjectBids } from "src/redux/actions/organizer/pageEvents";
 import { AppDispatch, RootState } from "src/redux/store";
 import { formatDateTimeCustom } from "src/hooks/formate-time";
+import { BidActionDialog } from "./bidActionDialog";
 
 // Define TypeScript interfaces for better type safety
 interface Provider {
@@ -57,6 +48,7 @@ interface Bid {
     updatedAt: string;
     __v: number;
     winningBid: number;
+    rejectionReason: string
 }
 
 interface Project {
@@ -98,16 +90,6 @@ interface Project {
     bidStatus: string;
 }
 
-interface ProjectWithBids {
-    project: Project;
-    bids: Bid[];
-    bidStats: {
-        totalBids: number;
-        averageBid: number;
-        lowestBid: number;
-        highestBid: number;
-    };
-}
 
 export function BidsOnPlaceABid() {
     const dispatch = useDispatch<AppDispatch>();
@@ -211,9 +193,19 @@ export function BidsOnPlaceABid() {
 
             {/* Project Details Card */}
             <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-                <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Work sx={{ mr: 1 }} /> {project.eventId.eventName}
-                </Typography>
+                <Box display="flex" justifyContent="space-between">
+                    <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Work sx={{ mr: 1 }} /> {project.eventId.eventName}
+                    </Typography>
+                    {project?.isSigned && (
+                        <Chip
+                            label="Signed"
+                            color="success"
+                            size="small"
+                            sx={{ textTransform: "capitalize", p: 2, fontWeight: 700 }}
+                        />
+                    )}
+                </Box>
 
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
                     <Chip
@@ -352,10 +344,10 @@ export function BidsOnPlaceABid() {
                 onClose={handleDialogClose}
                 onAction={(bidId: any, actionType: any, data: any) => {
                     // Handle the action here
-                    if (actionType === 'reject') {
+                    if (actionType === 'rejected') {
                         // Call API to reject bid with data.rejectionReason
                         console.log('Rejecting bid:', bidId, 'Reason:', data.rejectionReason);
-                    } else if (actionType === 'accept') {
+                    } else if (actionType === 'accepted') {
                         // Call API to accept bid with data.acceptedAmount
                         console.log('Accepting bid:', bidId, 'Amount:', data.acceptedAmount);
                     }
@@ -441,6 +433,17 @@ function BidCard({ bid, onSelect }: BidCardProps) {
                                         bid.status === 'rejected' ? 'error' : 'default'
                                 }
                                 size="small"
+                                // Add delete icon for rejected status with tooltip
+                                {...(bid.status === 'rejected' && bid.rejectionReason && {
+                                    deleteIcon: (
+                                        <Tooltip title={bid.rejectionReason} arrow>
+                                            <IconButton size="small">
+                                                <InfoIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                    ),
+                                    onDelete: () => { } // Empty function to make the delete icon appear
+                                })}
                             />
                             <Button
                                 variant="outlined"
@@ -487,247 +490,5 @@ function LoadingSkeleton() {
 export default BidsOnPlaceABid;
 
 
-interface ApiResult {
-    status: number;
-    type: string;
-    message: any;
-}
-
-function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
-    const [actionType, setActionType] = useState(null); // 'reject' or 'accept'
-    const [rejectionReason, setRejectionReason] = useState("");
-    const [acceptedAmount, setAcceptedAmount] = useState(0);
-    const [errors, setErrors] = useState({ acceptedAmount: "", rejectionReason: "" });
-    const dispatch = useDispatch<AppDispatch>();
-    // console.log(selectedBid, 'selectedBid');
 
 
-    const handleActionClick = (type: any) => {
-        setActionType(type);
-        if (type === 'accept') {
-            setAcceptedAmount(selectedBid?.bidAmount || 0);
-        }
-    };
-
-    const handleConfirmAction = useCallback(async () => {
-        console.log("1");
-
-        const newErrors = { acceptedAmount: "", rejectionReason: "" };
-
-        if (actionType === 'reject' && !rejectionReason.trim()) {
-            newErrors.rejectionReason = 'Rejection reason is required';
-        }
-
-        if (actionType === 'accept' && (!acceptedAmount || acceptedAmount <= 0)) {
-            newErrors.acceptedAmount = 'Valid amount is required';
-        }
-
-        if (Object.keys(newErrors)) {
-            setErrors(newErrors);
-            return;
-        }
-
-        onAction(selectedBid._id, actionType, {
-            rejectionReason,
-            acceptedAmount
-        });
-
-        const data = {
-            status: actionType, rejectionReason, acceptedAmount
-        };
-        console.log('2', data);
-
-        try {
-            const result = await dispatch(assignProjectToProvider(data, selectedBid?.projectId, selectedBid?._id));
-
-            // if (result?.status === 200) {
-            //     // Reset state
-            //     setActionType(null);
-            //     setRejectionReason("");
-            //     setAcceptedAmount(0);
-            //     setErrors({ acceptedAmount: "", rejectionReason: "" });
-            // }
-        } catch (error) {
-
-            console.error("Verification error:", error);
-        }
-
-
-    }, [acceptedAmount, actionType, dispatch, onAction, rejectionReason, selectedBid])
-
-    const handleCancelAction = () => {
-        setActionType(null);
-        setRejectionReason("");
-        setAcceptedAmount(0);
-        setErrors({ acceptedAmount: "", rejectionReason: "" });
-    };
-
-    const handleClose = () => {
-        handleCancelAction();
-        onClose();
-    };
-
-    return (
-        <>
-            {/* Main Bid Details Dialog */}
-            <Dialog open={open && !actionType} onClose={handleClose} maxWidth="md" fullWidth>
-                <DialogTitle>
-                    {selectedBid && (
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <Avatar
-                                src={selectedBid.providerId.avatar?.url}
-                                sx={{ mr: 2 }}
-                            >
-                                {selectedBid.providerId.name.charAt(0)}
-                            </Avatar>
-                            <Box>
-                                <Typography variant="h6">{selectedBid.providerId.name}</Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {selectedBid.providerId.email}
-                                </Typography>
-                            </Box>
-                        </Box>
-                    )}
-                </DialogTitle>
-                <DialogContent>
-                    {selectedBid && (
-                        <>
-                            <Box sx={{ mb: 3 }}>
-                                <Typography variant="h5" color="primary" gutterBottom>
-                                    {selectedBid.bidAmount} XAF
-                                </Typography>
-                                <Typography variant="body2" gutterBottom>
-                                    Delivery in {selectedBid.deliveryTime} {selectedBid.deliveryUnit}
-                                </Typography>
-                                <Chip
-                                    label={selectedBid.status}
-                                    color={
-                                        selectedBid.status === 'accepted' ? 'success' :
-                                            selectedBid.status === 'rejected' ? 'error' : 'default'
-                                    }
-                                    size="small"
-                                    sx={{ mt: 1 }}
-                                />
-                            </Box>
-
-                            <Typography variant="h6" gutterBottom>Proposal</Typography>
-                            <Typography variant="body1" paragraph>
-                                {selectedBid.proposal}
-                            </Typography>
-
-                            {selectedBid.milestones && selectedBid.milestones.length > 0 && (
-                                <>
-                                    <Typography variant="h6" gutterBottom>Milestones</Typography>
-                                    {selectedBid.milestones.map((milestone: any) => (
-                                        <Box key={milestone._id} sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}>
-                                            <Typography variant="body1">{milestone.milestorneName}</Typography>
-                                            <Typography variant="body1">
-                                                {milestone.amount} {milestone.currency}
-                                            </Typography>
-                                        </Box>
-                                    ))}
-                                </>
-                            )}
-                        </>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        startIcon={<Cancel />}
-                        color="error"
-                        onClick={() => handleActionClick('reject')}
-                        disabled={selectedBid?.status !== 'pending'}
-                    >
-                        Reject
-                    </Button>
-                    <Button
-                        startIcon={<CheckCircle />}
-                        variant="contained"
-                        color="success"
-                        onClick={() => handleActionClick('accept')}
-                        disabled={selectedBid?.status !== 'pending'}
-                    >
-                        Accept Bid
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Reject Confirmation Dialog */}
-            <Dialog open={actionType === 'reject'} onClose={handleCancelAction} maxWidth="sm" fullWidth>
-                <DialogTitle>Confirm Rejection</DialogTitle>
-                <DialogContent>
-                    <Alert severity="warning" sx={{ mb: 2 }}>
-                        Are you sure you want to reject this bid?
-                    </Alert>
-                    <TextField
-                        fullWidth
-                        multiline
-                        rows={4}
-                        label="Reason for rejection"
-                        value={rejectionReason}
-                        onChange={(e) => {
-                            setRejectionReason(e.target.value);
-                            if (errors.rejectionReason) setErrors({ ...errors, rejectionReason: '' });
-                        }}
-                        error={!!errors.rejectionReason}
-                        helperText={errors.rejectionReason || "Please provide a detailed reason for rejection"}
-                        required
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCancelAction}>Cancel</Button>
-                    <Button
-                        onClick={handleConfirmAction}
-                        color="error"
-                        variant="contained"
-                    >
-                        Confirm Rejection
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Accept Confirmation Dialog */}
-            <Dialog open={actionType === 'accept'} onClose={handleCancelAction} maxWidth="sm" fullWidth>
-                <DialogTitle>Confirm Acceptance</DialogTitle>
-                <DialogContent>
-                    <Alert severity="info" sx={{ mb: 2 }}>
-                        Are you sure you want to accept this bid?
-                    </Alert>
-                    <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" color="text.secondary">
-                            Original Bid Amount: {selectedBid?.bidAmount} XAF
-                        </Typography>
-                    </Box>
-                    <TextField
-                        fullWidth
-                        type="number"
-                        label="Accepted Amount (XAF)"
-                        value={acceptedAmount}
-                        onChange={(e) => {
-                            const value = parseFloat(e.target.value);
-                            setAcceptedAmount(value ? 0 : value);
-                            if (errors.acceptedAmount) setErrors({ ...errors, acceptedAmount: '' });
-                        }}
-                        error={!!errors.acceptedAmount}
-                        helperText={errors.acceptedAmount || "Enter the final accepted amount"}
-                        required
-                        inputProps={{
-                            min: 1,
-                            max: selectedBid?.bidAmount || 0
-                        }}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCancelAction}>Cancel</Button>
-                    <Button
-                        onClick={handleConfirmAction}
-                        color="success"
-                        variant="contained"
-                    >
-                        Confirm Acceptance
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </>
-    );
-}

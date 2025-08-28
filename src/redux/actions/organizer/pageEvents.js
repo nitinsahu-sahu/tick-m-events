@@ -76,17 +76,16 @@ export const fatchOrgProjectBids = (projectId) => async (dispatch) => {
     }
 };
 
-
-export const assignProjectToProvider = (projectId, bidId, data) => async (dispatch) => {
-        console.log("response");
+export const assignProjectToProvider = (data,projectId, bidId) => async (dispatch) => {
+     console.log("response", projectId, bidId, data);
 
     dispatch({ type: organizerEventConstants.ASSIGN_PROJECT_REQUEST });
 
     try {
         // /place-a-bid/:projectId/:bidId
-        const response = await axios.put(`/o/place-a-bid/${projectId}/${bidId}`, { data })
+        const response = await axios.put(`/o/place-a-bid/${projectId}/${bidId}`, {data})
         console.log(response);
-        
+
         dispatch({
             type: organizerEventConstants.ASSIGN_PROJECT_SUCCESS,
             payload: {
@@ -96,7 +95,16 @@ export const assignProjectToProvider = (projectId, bidId, data) => async (dispat
 
         });
         dispatch(fatchOrgProjectBids(projectId))
+
+        return {
+            type: organizerEventConstants.ASSIGN_PROJECT_SUCCESS,
+            message: response?.response?.data?.message || "Failed to fetch activities",
+            status: response.status,
+        };
+
     } catch (error) {
+        console.log(error);
+
         dispatch({
             type: organizerEventConstants.ASSIGN_PROJECT_FAILURE,
             payload: {
@@ -104,5 +112,11 @@ export const assignProjectToProvider = (projectId, bidId, data) => async (dispat
                 error: error.status
             },
         });
+        return {
+            type: organizerEventConstants.ASSIGN_PROJECT_FAILURE,
+            message: error?.response?.data?.message || "Failed to fetch activities",
+            status: error.status,
+        };
+
     }
-};
+}

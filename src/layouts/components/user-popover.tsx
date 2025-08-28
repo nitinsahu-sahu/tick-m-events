@@ -12,7 +12,6 @@ import { logout } from 'src/redux/actions';
 import { NotificationsPopover } from './notifications-popover';
 import { MessagePopover } from './message-popover';
 import { GiftPopover } from './gift-popover';
-import { NotificattionPopup } from './notification-popup';
 
 export function UserPopover() {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -159,11 +158,7 @@ export function UserPopover() {
                                     } */}
                                 </>
                             }
-                            {
-                                role === 'participant' && (
-                                    <NotificattionPopup data={_messages} />
-                                )
-                            }
+                           
                             {/* <LanguagePopover data={_langs}/> */}
                         </Box>
                     }

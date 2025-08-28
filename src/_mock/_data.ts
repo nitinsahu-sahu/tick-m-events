@@ -9,13 +9,6 @@ import {
   _fullName
 } from './_mock';
 
-// ----------------------------------------------------------------------
-
-export const _myAccount = {
-  displayName: 'Jaydon Frankie',
-  email: 'demo@minimals.cc',
-  photoURL: '/assets/images/avatar/avatar-25.webp',
-};
 
 // ----------------------------------------------------------------------
 
@@ -37,19 +30,6 @@ export const _posts = [...Array(23)].map((_, index) => ({
 
 // ----------------------------------------------------------------------
 
-const COLORS = [
-  '#00AB55',
-  '#000000',
-  '#FFFFFF',
-  '#FFC0CB',
-  '#FF4842',
-  '#1890FF',
-  '#94D82D',
-  '#FFC107',
-];
-
-// ----------------------------------------------------------------------
-
 export const _langs = [
   {
     value: 'en',
@@ -63,27 +43,6 @@ export const _langs = [
   },
 ];
 
-// ----------------------------------------------------------------------
-
-export const _timeline = [...Array(5)].map((_, index) => ({
-  id: _id(index),
-  title: [
-    '1983, orders, $4220',
-    '12 Invoices have been paid',
-    'Order #37745 from September',
-    'New order placed #XF-2356',
-    'New order placed #XF-2346',
-  ][index],
-  type: `order${index + 1}`,
-  time: _times(index),
-}));
-
-// ----------------------------------------------------------------------
-
-export const _tasks = [...Array(5)].map((_, index) => ({
-  id: _id(index),
-  name: _taskNames(index),
-}));
 
 // ----------------------------------------------------------------------
 

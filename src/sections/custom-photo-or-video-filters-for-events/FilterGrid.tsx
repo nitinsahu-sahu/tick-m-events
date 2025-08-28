@@ -8,9 +8,6 @@ export function FilterGrid() {
       <Grid item xs={12} md={6}>
         <FilterCard title="Event Filters" isVideoMode={false} />
       </Grid>
-      <Grid item xs={12} md={6}>
-        <FilterCard title="Video Mode: Recording & Effects" isVideoMode />
-      </Grid>
     </Grid>
   );
 };

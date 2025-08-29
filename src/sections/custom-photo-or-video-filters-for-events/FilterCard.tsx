@@ -7,9 +7,10 @@ import { useFrame } from './view/FrameContext';
 interface FilterCardProps {
   title: string;
   isVideoMode: boolean;
+  onShare?: (img: string) => void;
 }
 
-export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode }) => {
+export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onShare }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { selectedFrame } = useFrame();
@@ -90,59 +91,67 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode }) =>
     const delta = -e.deltaY;
     setZoom((prev) => Math.max(0.5, Math.min(3, prev + delta * 0.001)));
   };
-
-  const downloadImage = () => {
-    if (!capturedPhoto || !canvasRef.current) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) return;
-
-    // Clear canvas first
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Create photo image
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = capturedPhoto;
-    img.onload = () => {
-      // Apply zoom and offset by drawing scaled and moved image
-      const scaledWidth = 400 * zoom;
-      const scaledHeight = 300 * zoom;
-      const dx = offset.x - scaledWidth / 2;
-      const dy = offset.y - scaledHeight / 2;
-
-      // Draw photo with zoom and position
-      ctx.filter = selectedFilter !== 'none' ? `${selectedFilter}(1)` : 'none';
-      ctx.drawImage(img, dx, dy, scaledWidth, scaledHeight);
-
-      // Overlay frame (if any)
-      if (selectedFrame) {
-        const frameImg = new Image();
-        frameImg.crossOrigin = 'anonymous'; 
-        frameImg.src = selectedFrame;
-        frameImg.onload = () => {
-          ctx.filter = 'none';
-          ctx.drawImage(frameImg, 0, 0, 400, 300);
-
-          // Export and download
-          const finalImage = canvas.toDataURL('image/png');
-          const link = document.createElement('a');
-          link.href = finalImage;
-          link.download = 'framed-photo.png';
-          link.click();
-        };
-      } else {
-        // If no frame, just download the photo
-        const finalImage = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = finalImage;
-        link.download = 'photo.png';
-        link.click();
+  const generateFinalImage = (): Promise<string | null> => 
+    new Promise((resolve) => {
+      if (!capturedPhoto || !canvasRef.current) {
+        resolve(null);
+        return;
       }
-    };
+
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(null);
+        return;
+      }
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = capturedPhoto;
+
+      img.onload = () => {
+        const scaledWidth = 400 * zoom;
+        const scaledHeight = 300 * zoom;
+        const dx = offset.x - scaledWidth / 2;
+        const dy = offset.y - scaledHeight / 2;
+
+        ctx.filter = selectedFilter !== 'none' ? `${selectedFilter}(1)` : 'none';
+        ctx.drawImage(img, dx, dy, scaledWidth, scaledHeight);
+
+        if (selectedFrame) {
+          const frameImg = new Image();
+          frameImg.crossOrigin = 'anonymous';
+          frameImg.src = selectedFrame;
+
+          frameImg.onload = () => {
+            ctx.filter = 'none';
+            ctx.drawImage(frameImg, 0, 0, 400, 300);
+
+            // Resolve with final image
+            const finalImage = canvas.toDataURL('image/png');
+            resolve(finalImage);
+          };
+        } else {
+          const finalImage = canvas.toDataURL('image/png');
+          resolve(finalImage);
+        }
+      };
+    });
+  
+
+  const downloadImage = async () => {
+    const finalImage = await generateFinalImage();
+    if (!finalImage) return;
+
+    const link = document.createElement('a');
+    link.href = finalImage;
+    link.download = 'framed-photo.png';
+    link.click();
   };
+
 
   return (
     <Box
@@ -339,6 +348,14 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode }) =>
           <Button
             fullWidth
             disabled={!capturedPhoto}
+            onClick={async () => {
+              if (onShare) {
+                const finalImage = await generateFinalImage();
+                if (finalImage) {
+                  onShare(finalImage);
+                }
+              }
+            }}
             variant="contained"
             sx={{
               backgroundColor: '#0B2E4C',

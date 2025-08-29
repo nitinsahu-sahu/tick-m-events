@@ -1,27 +1,124 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { InputAdornment, Typography, IconButton, TextField, Button, Grid, Box, Link } from '@mui/material';
+import { CircularProgress, Paper, Alert, Modal, InputAdornment, Typography, IconButton, TextField, Button, Grid, Box, Link } from '@mui/material';
+
 import { toast } from 'react-toastify';
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import { Iconify } from 'src/components/iconify';
-import { login } from 'src/redux/actions';
+import { login, resetPassword, sendResetCode, verifyResetCode } from 'src/redux/actions';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
 import 'react-phone-number-input/style.css'
 
 // ----------------------------------------------------------------------
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+  borderRadius: 2
+};
 
 export function SignInView() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [active, setActive] = useState("google");
-  const { authenticate } = useSelector(state => state.auth);
-  const [formData, setFormData] = useState({ email: 'provider.aidenM1991@gmail.com', password: 'Aiden@123' });
-
-
+  const { authenticate, error, message } = useSelector(state => state.auth);
+  const [formData, setFormData] = useState({ email: 'participant.Christopher1@gmail.com', password: 'Yashi@123' });
   const [showPassword, setShowPassword] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [step, setStep] = useState(1); // 1: email, 2: code verification, 3: new password
+  const [email, setEmail] = useState('');
+  const [resetCode, setResetCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setOpen(false);
+    setStep(1);
+    setEmail('');
+    setResetCode('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setErrors({});
+  };
+
+  const validateEmail = () => {
+    const newErrors = {};
+    if (!email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateCode = () => {
+    const newErrors = {};
+    if (!resetCode) {
+      newErrors.resetCode = 'Reset code is required';
+    } else if (resetCode.length !== 6) {
+      newErrors.resetCode = 'Code must be 6 digits';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validatePassword = () => {
+    const newErrors = {};
+    if (!newPassword) {
+      newErrors.newPassword = 'Password is required';
+    } else if (newPassword.length < 6) {
+      newErrors.newPassword = 'Password must be at least 6 characters';
+    }
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (newPassword !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSendCode = async () => {
+    setLoading(true)
+
+    if (validateEmail()) {
+      const response = await dispatch(sendResetCode(email));
+      if (response.status === 200) {
+        setStep(2);
+        setLoading(false)
+      } else {
+        setLoading(false)
+
+      }
+
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    if (validateCode()) {
+      const response = await dispatch(verifyResetCode(email, resetCode));
+      setStep(3);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (validatePassword()) {
+      const response = await dispatch(resetPassword(email, resetCode, newPassword));
+      // On success, you might want to automatically close the modal or show success message
+    }
+  };
+
 
   const handleChange = (event) => {
     event.preventDefault(); // Prevent default form submission behavior
@@ -59,6 +156,7 @@ export function SignInView() {
     if (authenticate) {
       navigate("/");
     }
+    // navigate("/sign-in");
   }, [authenticate, navigate]);
 
   const renderForm = (
@@ -108,10 +206,27 @@ export function SignInView() {
               </InputAdornment>
             ),
           }}
-          sx={{ mb: 3 }}
-        />
 
+        />
+        <Typography variant="body2">
+          <Link
+            component="button"
+            type="button"
+            onClick={handleOpen}
+            sx={{
+              ml: 0.5,
+              textDecoration: 'none',
+              color: 'primary.main',
+              '&:hover': {
+                textDecoration: 'underline'
+              }
+            }}
+          >
+            Forgot Password?
+          </Link>
+        </Typography>
         <LoadingButton
+          sx={{ mt: 3 }}
           fullWidth
           size="large"
           type="submit"
@@ -224,7 +339,7 @@ export function SignInView() {
           </form>
 
           <Typography variant="body2" my={2}>
-            Don\&apos;t have an account?
+            Don&apos;t have an account?
             <Link
               component={RouterLink}
               to="/register"
@@ -242,6 +357,112 @@ export function SignInView() {
           </Typography>
         </Box>
       </Grid>
+      <Modal open={open} onClose={handleClose}>
+        <Paper sx={modalStyle}>
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
+
+          {step === 1 && (
+            <>
+              <Typography variant="h6" gutterBottom>
+                Reset Password
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Enter your email address and we&apos;ll send you a verification code.
+              </Typography>
+              <TextField
+                fullWidth
+                label="Email Address"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={!!errors.email}
+                helperText={errors.email}
+                margin="normal"
+              />
+              <Box sx={{ mt: 2, display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button
+                  onClick={handleSendCode}
+                  variant="contained"
+                  disabled={loading}
+                >
+                  {loading ? <CircularProgress size={24} /> : 'Send Code'}
+                </Button>
+              </Box>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <Typography variant="h6" gutterBottom>
+                Enter Verification Code
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                We&apos;ve sent a 6-digit code to {email}. Please check your email.
+              </Typography>
+              <TextField
+                fullWidth
+                label="Verification Code"
+                value={resetCode}
+                onChange={(e) => setResetCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                error={!!errors.resetCode}
+                helperText={errors.resetCode}
+                margin="normal"
+                inputProps={{ maxLength: 6 }}
+              />
+              <Box sx={{ mt: 2, display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                <Button onClick={() => setStep(1)}>Back</Button>
+                <Button
+                  onClick={handleVerifyCode}
+                  variant="contained"
+                  disabled={loading}
+                >
+                  {loading ? <CircularProgress size={24} /> : 'Verify Code'}
+                </Button>
+              </Box>
+            </>
+          )}
+
+          {step === 3 && (
+            <>
+              <Typography variant="h6" gutterBottom>
+                Set New Password
+              </Typography>
+              <TextField
+                fullWidth
+                label="New Password"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                error={!!errors.newPassword}
+                helperText={errors.newPassword}
+                margin="normal"
+              />
+              <TextField
+                fullWidth
+                label="Confirm Password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                error={!!errors.confirmPassword}
+                helperText={errors.confirmPassword}
+                margin="normal"
+              />
+              <Box sx={{ mt: 2, display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                <Button onClick={() => setStep(2)}>Back</Button>
+                <Button
+                  onClick={handleResetPassword}
+                  variant="contained"
+                  disabled={loading}
+                >
+                  {loading ? <CircularProgress size={24} /> : 'Reset Password'}
+                </Button>
+              </Box>
+            </>
+          )}
+        </Paper>
+      </Modal>
     </Grid>
   );
 }

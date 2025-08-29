@@ -1,4 +1,4 @@
-import { InputAdornment, Typography, IconButton, TextField, Button, Grid, Avatar, Box, Link } from '@mui/material';
+import { InputAdornment, Typography, IconButton, TextField, Button, Grid, Avatar, Box, Link, CircularProgress } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -7,7 +7,7 @@ import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Iconify } from 'src/components/iconify';
-import { signup } from 'src/redux/actions';
+import { signup, validateReferralCode } from 'src/redux/actions';
 import { AppDispatch } from 'src/redux/store';
 
 
@@ -21,12 +21,18 @@ export function Register() {
         password: "",
         gender: "Male",
         role: "",
-        address: ""
+        address: "",
+        referralCode: ""
     });
     const [avatar, setAvatar] = useState(null);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-
+    const [referralValidation, setReferralValidation] = useState({
+        isValid: false,
+        message: "",
+        referrerName: ""
+    });
+    const [validatingReferral, setValidatingReferral] = useState(false);
 
     const handleRegisterChange = (event: any) => {
         event.preventDefault(); // Prevent default form submission behavior
@@ -46,8 +52,55 @@ export function Register() {
         setRegisterData((prevData) => ({ ...prevData, number: phoneValue }));
     };
 
+    const handleReferralCodeChange = async (e: any) => {
+        const code = e.target.value;
+        setRegisterData((prevData) => ({ ...prevData, referralCode: code }));
+
+        // Validate referral code in real-time
+        if (code.length >= 6) {
+            setValidatingReferral(true);
+            try {
+                const result = await dispatch(validateReferralCode(code));
+                if (result.success) {
+                    setReferralValidation({
+                        isValid: true,
+                        message: `Valid referral code! You'll receive bonus points.`,
+                        referrerName: result.referrerName
+                    });
+                } else {
+                    setReferralValidation({
+                        isValid: false,
+                        message: result.message,
+                        referrerName: ""
+                    });
+                }
+            } catch (error) {
+                setReferralValidation({
+                    isValid: false,
+                    message: "Error validating referral code",
+                    referrerName: ""
+                });
+            } finally {
+                setValidatingReferral(false);
+            }
+        } else if (code.length === 0) {
+            setReferralValidation({
+                isValid: false,
+                message: "",
+                referrerName: ""
+            });
+        }
+    };
+
     const handleRegistration = useCallback(async (event: any) => {
         event.preventDefault();
+
+        // Validate referral code again before submission if provided
+        if (formRegisterData.referralCode && !referralValidation.isValid) {
+            toast.error("Please enter a valid referral code");
+            return;
+        }
+
         const formSignData = new FormData();
 
         // Append all form data
@@ -58,6 +111,7 @@ export function Register() {
         formSignData.append("role", formRegisterData.role);
         formSignData.append("gender", formRegisterData.gender);
         formSignData.append("address", formRegisterData.address);
+        formSignData.append("referralCode", formRegisterData.referralCode);
 
         // Append avatar if it exists
         if (avatar) {
@@ -69,6 +123,11 @@ export function Register() {
 
             if (result.status === 201) {
                 toast.success(result?.message);
+                // Show referral success if applicable
+                if (formRegisterData.referralCode) {
+                    toast.success(`You've received bonus points from ${referralValidation.referrerName}'s referral!`);
+                }
+
                 // Reset form and states
                 setRegisterData({
                     name: '',
@@ -76,9 +135,15 @@ export function Register() {
                     password: '',
                     role: '',
                     gender: 'Male',
-                    address:''
+                    address: '',
+                    referralCode: ''
                 });
-                setAvatar(null); // Clear avatar if using
+                setAvatar(null);
+                setReferralValidation({
+                    isValid: false,
+                    message: "",
+                    referrerName: ""
+                });
                 navigate("/sign-in");
             } else {
                 toast.error(result?.message);
@@ -86,7 +151,7 @@ export function Register() {
         } catch (error) {
             toast.error("Registration failed");
         }
-    }, [formRegisterData, navigate, avatar, dispatch, phoneNumber]);
+    }, [formRegisterData, navigate, avatar, dispatch, phoneNumber, referralValidation]);
 
     const renderSignupForm = (
         <Box
@@ -279,6 +344,36 @@ export function Register() {
                 sx={{ mt: 2 }}
             />
 
+            <TextField
+                fullWidth
+                name="referralCode"
+                type='text'
+                label="Referral Code (Optional)"
+                placeholder='Enter referral code for bonus points'
+                value={formRegisterData.referralCode}
+                onChange={handleReferralCodeChange}
+                InputLabelProps={{ shrink: true }}
+                sx={{ mt: 2 }}
+                error={formRegisterData.referralCode.length > 0 && !referralValidation.isValid}
+                helperText={
+                    validatingReferral ? "Validating..." :
+                        formRegisterData.referralCode.length > 0 ? referralValidation.message :
+                            "Enter a friend's referral code to get bonus points"
+                }
+                InputProps={{
+                    endAdornment: formRegisterData.referralCode.length > 0 && (
+                        <InputAdornment position="end">
+                            {validatingReferral ? (
+                                <CircularProgress size={20} />
+                            ) : referralValidation.isValid ? (
+                                <Iconify icon="ic:round-check" color="success.main" />
+                            ) : formRegisterData.referralCode.length > 0 ? (
+                                <Iconify icon="ic:round-close" color="error.main" />
+                            ) : null}
+                        </InputAdornment>
+                    )
+                }}
+            />
             {/* Register Button */}
             <LoadingButton
                 fullWidth

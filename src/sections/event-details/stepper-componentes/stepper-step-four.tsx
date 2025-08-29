@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { toast } from 'react-toastify';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from "react-redux";
+import { LoadingButton } from "@mui/lab";
 import { AppDispatch } from "src/redux/store";
 import { eventPublicationCreate } from "src/redux/actions/event.action";
 
@@ -11,7 +12,7 @@ export function StepperStepFour() {
     const dispatch = useDispatch<AppDispatch>();
     const [searchParams] = useSearchParams();
     const eventId = searchParams.get('eventId'); // Get existing eventId
-
+    const [loading, setLoading] = useState(false);
 
     const [publicationData, setPublicationData] = useState({
         visibilityType: "public", // default to public
@@ -52,7 +53,7 @@ export function StepperStepFour() {
     const handleEventCreate = useCallback(async (event: React.FormEvent, isDraft: boolean = false) => {
         event.preventDefault();
         const formEventPublicatinData = new FormData();
-
+        setLoading(true);
         // Update the status based on which button was clicked
         const submissionData = {
             ...publicationData,
@@ -80,6 +81,7 @@ export function StepperStepFour() {
 
             if (result?.status === 201) {
                 toast.success(result?.message);
+                setLoading(false);
                 navigate(`/`);
             } else {
                 toast.error(result?.message);
@@ -198,20 +200,21 @@ export function StepperStepFour() {
                         justifyContent="flex-start"
                     >
                         <Grid item xs={12} sm="auto">
-                            <Button
+                            <LoadingButton
                                 fullWidth
                                 type="submit"
                                 variant="contained"
+                                loading={loading}
                                 sx={{
                                     backgroundColor: "#0B2E4C",
                                     color: "white",
                                     borderRadius: 2,
                                     px: 5,
                                 }}
-                                onClick={(e) => handleEventCreate(e, false)} // Will set status to "publish"
+                                onClick={(e) => handleEventCreate(e, false)}
                             >
                                 Publish Event
-                            </Button>
+                            </LoadingButton>
                         </Grid>
                         <Grid item xs={12} sm="auto">
                             <Button

@@ -13,7 +13,7 @@ import { eventCustomizationCreate } from "src/redux/actions/event.action";
 export function StepperStepThree() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
-
+    const [loading, setLoading] = useState(false);
     const [eventLogo, setEventLogo] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFrame, setSelectedFrame] = useState('');
@@ -26,6 +26,11 @@ export function StepperStepThree() {
             setEventLogo(previewUrl);
         }
     };
+
+    useEffect(() => {
+        const timer = setTimeout(() => setLoading(false), 2500);
+        return () => clearTimeout(timer);
+    }, []);
 
     // Clean up object URLs when component unmounts
     useEffect(() => () => {
@@ -41,6 +46,7 @@ export function StepperStepThree() {
 
     const handleEventCustomize = useCallback(async (event: any) => {
         event.preventDefault();
+        setLoading(true);
         const formEventCustomizeData = new FormData();
         const files = fileInputRef.current?.files;
         // Append all form data
@@ -197,6 +203,7 @@ export function StepperStepThree() {
                     {/* Submit Button - Always full width */}
                     <LoadingButton
                         fullWidth
+                        loading={loading}
                         size="large"
                         type="submit"
                         color="inherit"

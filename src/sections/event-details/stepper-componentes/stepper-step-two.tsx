@@ -31,6 +31,7 @@ export function StepperStepTwo() {
     const [selectedRefundPolicy, setSelectedRefundPolicy] = useState("");
     const [refundEnabled, setRefundEnabled] = useState(false);
     const [payStatus, setPayStatus] = useState('paid');
+    const [loading, setLoading] = useState(false);
     const [ticketConfigData, setTicketConfigData] = useState({
         purchaseDeadlineDate: "",
         isPurchaseDeadlineEnabled: "true",
@@ -156,6 +157,7 @@ export function StepperStepTwo() {
 
     const handleTicketConfig = useCallback(async (event: any) => {
         event.preventDefault();
+        setLoading(true);
         const formEventData = new FormData();
 
         formEventData.append("tickets", JSON.stringify(ticketRows));
@@ -181,11 +183,14 @@ export function StepperStepTwo() {
             const eventId = searchParams.get('eventId');
 
             const res = await dispatch(ticketConfigCreate({ formEventData, eventId }));
+
             const ticketConfigId = res?.ticketConfigId;
 
             navigate(`?eventId=${eventId}&ticketConfigId=${ticketConfigId}`, { replace: true });
         } catch (error) {
             toast.error("Server Error");
+        } finally {
+            setLoading(false);
         }
     }, [
         navigate,
@@ -231,13 +236,13 @@ export function StepperStepTwo() {
                             onChange={(e) => handleTicketSelect(e.target.value)}
                             displayEmpty
                             size="small"
-                            sx={{ height: 40, textTransform:"capitalize" }}
+                            sx={{ height: 40, textTransform: "capitalize" }}
                         >
                             <MenuItem value="" disabled>
                                 Select existing ticket
                             </MenuItem>
                             {filteredTickets.map((ticket: any) => (
-                                <MenuItem key={ticket._id} value={ticket._id} sx={{textTransform:"capitalize"}}>
+                                <MenuItem key={ticket._id} value={ticket._id} sx={{ textTransform: "capitalize" }}>
                                     {ticket.name} ({ticket.price})
                                 </MenuItem>
                             ))}
@@ -310,7 +315,7 @@ export function StepperStepTwo() {
                                 <TextField
                                     fullWidth
                                     required
-                                    sx={{textTransform:"capitalize"}}
+                                    sx={{ textTransform: "capitalize" }}
                                     label="Price for each ticket"
                                     placeholder="0 XAF"
                                     value={row.price}
@@ -635,6 +640,7 @@ export function StepperStepTwo() {
                                 size="large"
                                 type="submit"
                                 variant="contained"
+                                loading={loading}
                                 sx={{ color: "black", backgroundColor: "#2295D4" }}
                             >
                                 {

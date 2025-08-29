@@ -16,8 +16,8 @@ export function PhotoFilterSection() {
 
   const frames = selectedEvent?.customPhotoFrame?.frameUrls || [];
   const frameList = Array.isArray(frames) ? frames : [frames];
-  console.log("Selected Event:", selectedEvent);
-  console.log("Frames:", selectedEvent?.customPhotoFrame);
+ console.log("Selected Event:", selectedEvent);
+console.log("Frames:", selectedEvent?.customPhotoFrame);
 
   // const [selectedFrame, setSelectedFrame] = useState<string | null>(null);
   const [customFilters, setCustomFilters] = useState({

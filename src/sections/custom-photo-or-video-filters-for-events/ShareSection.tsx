@@ -1,10 +1,16 @@
 import { Box, Button, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import PropTypes from 'prop-types';
 
-const ShareSection = () => {
+interface ShareSectionProps {
+  image: string | null;
+}
+
+const ShareSection: React.FC<ShareSectionProps> = ({ image }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
     <Box
       sx={{
@@ -21,7 +27,6 @@ const ShareSection = () => {
       <Box
         sx={{
           width: isMobile ? '100%' : '400px',
-
           height: 300,
           backgroundColor: '#d9d9d9',
           borderRadius: 2.5,
@@ -29,9 +34,29 @@ const ShareSection = () => {
           justifyContent: 'center',
           alignItems: 'center',
           margin: '0 auto 30px auto',
+          overflow: 'hidden',
         }}
       >
-        <HeadingCommon color="#888" variant="body2" title="No media selected" baseSize="14px" />
+        {image ? (
+          <Box
+            component="img"
+            src={image}
+            alt="Shared preview"
+            sx={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              borderRadius: 2.5,
+            }}
+          />
+        ) : (
+          <HeadingCommon
+            color="#888"
+            variant="body2"
+            title="No media selected"
+            baseSize="14px"
+          />
+        )}
       </Box>
 
       <Box
@@ -118,6 +143,10 @@ const ShareSection = () => {
       </Box>
     </Box>
   );
+};
+
+ShareSection.propTypes = {
+  image: PropTypes.string,
 };
 
 export default ShareSection;

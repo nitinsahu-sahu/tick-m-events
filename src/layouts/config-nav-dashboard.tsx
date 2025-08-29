@@ -237,12 +237,12 @@ export const navData: NavItem[] = [
     roles: ['admin'],
 
   },
-  // {
-  //   title: 'Marketplace & Service Provider Supervision',
-  //   path: '/marketplace-&-service-provider-supervision',
-  //   icon: icon('ic-analytics'),
-  //   roles: ['admin'],
-  // },
+  {
+    title: 'Referrals Program',
+    path: '/referrals',
+    icon: icon('ic_money_deposit'),
+    roles: ['participant'],
+  },
   {
     title: 'Profile & Services Management',
     path: '/profile-&-services-management',

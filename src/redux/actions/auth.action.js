@@ -191,3 +191,55 @@ export const isUserLoggedIn = () => async (dispatch) => {
         payload: token ? { token, user } : { message: "Failed to login!!!" },
     });
 };
+
+export const validateReferralCode = (code) => async (dispatch) => {
+    try {
+        const response = await axios.get(`/auth/validate-referral/${code}`);
+        return response.data;
+    } catch (error) {
+        return {
+            success: false,
+            message: error.response?.data?.message || 'Error validating referral code'
+        };
+    }
+};
+
+export const verifyResetCode = (email, code) => async (dispatch) => {
+    dispatch({ type: authConstants.VERIFY_CODE_REQUEST });
+    try {
+        const response = await axios.post('/auth/verify-reset-code', { email, code });
+        dispatch({ type: authConstants.VERIFY_CODE_SUCCESS, payload: response.data.message });
+    } catch (error) {
+        dispatch({ type: authConstants.VERIFY_CODE_FAILURE, payload: error.response?.data?.message || 'Error verifying code' });
+    }
+}
+export const resetPassword = (email, code, newPassword) => async (dispatch) => {
+    dispatch({ type: authConstants.RESET_PASSWORD_REQUEST });
+    try {
+        const response = await axios.post('/auth/reset-password', { email, code, newPassword });
+        dispatch({ type: authConstants.RESET_PASSWORD_SUCCESS, payload: response.data.message });
+    } catch (error) {
+        dispatch({ type: authConstants.RESET_PASSWORD_FAILURE, payload: error.response?.data?.message || 'Error resetting password' });
+    }
+}
+export const sendResetCode = (email) => async (dispatch) => {
+    dispatch({ type: authConstants.RESET_CODE_REQUEST });
+    try {
+        const response = await axios.post('/auth/send-reset-code', { email });
+        console.log(response);
+        dispatch({ type: authConstants.RESET_CODE_SUCCESS, payload: response.data.message });
+        return {
+            type: authConstants.RESET_CODE_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
+    } catch (error) {
+        console.log(error);
+        dispatch({ type: authConstants.RESET_CODE_FAILURE, payload: error.response?.data?.message || 'Error sending code' });
+        return {
+            type: authConstants.RESET_CODE_FAILURE,
+            status: error.status,
+            message: error?.data?.message
+        };
+    }
+}

@@ -30,6 +30,7 @@ export const EventSearchAndDetailsPage = lazy(() => import('src/pages/event-sear
 
 // ----------------------------Service Provider Routes------------------------------------------
 export const Projects = lazy(() => import('src/pages/projects/projects-view'));
+export const Referrel = lazy(() => import('src/pages/referrel'));
 export const ProjectSinglePage = lazy(() => import('src/pages/projects/single-project'));
 export const ProviderBidsPage = lazy(() => import('src/pages/projects/provider-bids-list'));
 export const HomePage = lazy(() => import('src/pages/home'));
@@ -109,6 +110,11 @@ export function Router() {
       ),
       children: [
         // Participant Route
+        
+        {
+          path: '/referrals',
+          element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><Referrel /></RoleProtectedRoute>
+        },
         {
           path: '/home-and-recommendations',
           element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><HomeAndRecommendationsPage /></RoleProtectedRoute>

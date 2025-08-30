@@ -16,6 +16,7 @@ import { fatchOrgEvents } from "src/redux/actions/organizer/pageEvents";
 import { AppDispatch, RootState } from "src/redux/store";
 import { EventBreadCrum } from "src/sections/entry-validation/event-status";
 import { useNavigate } from "react-router-dom";
+import { formatDateTimeCustom } from "src/hooks/formate-time";
 
 export function ListPlaceABid() {
     const { __events } = useSelector((state: RootState) => state.organizer);
@@ -194,11 +195,11 @@ function BidCard({ bid }: { bid: any }) {
                     Budget: {bid.orgBudget}
                 </Typography>
 
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Service Time: {bid.serviceTime}
+                <Typography variant="body2" fontWeight={600} gutterBottom>
+                    Service Time: <span style={{color:"#3CB1F1"}}>{formatDateTimeCustom(bid.serviceTime)}</span>
                 </Typography>
 
-                <Typography variant="body2" color="" gutterBottom>
+                <Typography variant="body2" fontWeight={600} gutterBottom>
                     Event Location: <span style={{color:"#3CB1F1"}}>{bid.eventLocation}</span>
                 </Typography>
                 

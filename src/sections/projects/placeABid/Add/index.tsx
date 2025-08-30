@@ -32,12 +32,10 @@ interface ApiResult {
 
 export function AddPlaceABid() {
     const { __events } = useSelector((state: RootState) => state.organizer);
-    
     const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
-
     const dispatch = useDispatch<AppDispatch>();
     const { categories } = useSelector((state: RootState) => state?.serviceReqCategories);
-    const [wordCounts, setWordCounts] = useState({
+    const [charCounts, setCharCounts] = useState({
         orgRequirement: 0,
         orgAdditionalRequirement: 0
     });
@@ -82,17 +80,17 @@ export function AddPlaceABid() {
 
     const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        const words = value.trim().split(/\s+/).filter(word => word.length > 0);
-        const count = words.length;
+        const count = value.length; // Count characters, not words
 
-        setWordCounts(prev => ({
+
+        setCharCounts(prev => ({
             ...prev,
             [name]: count
         }));
 
         setErrors(prev => ({
             ...prev,
-            [name]: count < 80
+            [name]: count < 100
         }));
 
         setFormData(prev => ({
@@ -112,14 +110,14 @@ export function AddPlaceABid() {
     const handleConfirm = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validate word counts before submission
-        if (wordCounts.orgRequirement < 80) {
-            toast.error("Full Description must contain at least 80 words");
+        // Validate character counts before submission
+        if (charCounts.orgRequirement < 100) {
+            toast.error("Full Description must contain at least 100 characters");
             return;
         }
 
-        if (formData.orgAdditionalRequirement && wordCounts.orgAdditionalRequirement < 80) {
-            toast.error("Additional Options must contain at least 80 words if provided");
+        if (formData.orgAdditionalRequirement && charCounts.orgAdditionalRequirement < 100) {
+            toast.error("Additional Options must contain at least 100 characters if provided");
             return;
         }
 
@@ -144,7 +142,7 @@ export function AddPlaceABid() {
                     orgRequirement: "",
                     orgAdditionalRequirement: ""
                 });
-                setWordCounts({
+                setCharCounts({
                     orgRequirement: 0,
                     orgAdditionalRequirement: 0
                 });
@@ -154,7 +152,7 @@ export function AddPlaceABid() {
         } catch (error) {
             toast.error("An unexpected error occurred");
         }
-    }, [dispatch, formData, selectedEvent, wordCounts]);
+    }, [dispatch, formData, selectedEvent, charCounts]);
 
 
 
@@ -276,7 +274,7 @@ export function AddPlaceABid() {
                                 error={errors.orgRequirement}
                                 helperText={
                                     <Typography variant="caption" color={errors.orgRequirement ? "error" : "textSecondary"}>
-                                        {wordCounts.orgRequirement} words (Minimum 80 words required)
+                                        {charCounts.orgRequirement} characters (Minimum 100 characters required)
                                     </Typography>
                                 }
                             />
@@ -294,11 +292,11 @@ export function AddPlaceABid() {
                                 helperText={
                                     formData.orgAdditionalRequirement.length > 0 ? (
                                         <Typography variant="caption" color={errors.orgAdditionalRequirement ? "error" : "textSecondary"}>
-                                            {wordCounts.orgAdditionalRequirement} words (Minimum 80 words required if provided)
+                                            {charCounts.orgAdditionalRequirement} characters (Minimum 100 characters required if provided)
                                         </Typography>
                                     ) : (
                                         <Typography variant="caption" color="textSecondary">
-                                            Optional - If provided, minimum 80 words required
+                                            Optional - If provided, minimum 100 characters required
                                         </Typography>
                                     )
                                 }

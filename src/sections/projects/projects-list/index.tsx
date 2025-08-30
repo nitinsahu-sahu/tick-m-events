@@ -1,15 +1,15 @@
 import { Typography, Box, Chip, Stack, Card, CardContent, IconButton } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 
 import { useDispatch, useSelector } from "react-redux";
 import StarIcon from '@mui/icons-material/Star';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+
 import { AppDispatch, RootState } from "src/redux/store";
 import { placeABidsFetch } from "src/redux/actions/provider/Home-Global-View/freelancer.action";
 import { NoDataFound } from "src/components/NoDataFound/no_project_found";
 import { DashboardContent } from "src/layouts/dashboard";
+import { TextWithShowMore } from "src/components/text-with-show-more";
 
 
 export function FreelancerJobCard({ project }: any) {
@@ -156,40 +156,3 @@ export function ProjectsList() {
     );
 }
 
-const TextWithShowMore = ({ text, wordLimit = 70 }: any) => {
-    const [expanded, setExpanded] = useState(false);
-
-    // Split text into words
-    const words = text?.split(/\s+/) || [];
-    const shouldTruncate = words.length > wordLimit;
-    const displayText = expanded ? text : words.slice(0, wordLimit).join(' ');
-
-    return (
-        <Box>
-            <Typography variant="body2" paragraph>
-                {displayText}
-                {shouldTruncate && !expanded && '...'}
-            </Typography>
-
-            {shouldTruncate && (
-                <IconButton
-                    size="small"
-                    onClick={() => setExpanded(!expanded)}
-                    sx={{
-                        ml: -1,
-                        color: 'text.secondary'
-                    }}
-                >
-                    {expanded ? (
-                        <ExpandLessIcon fontSize="small" />
-                    ) : (
-                        <ExpandMoreIcon fontSize="small" />
-                    )}
-                    <Typography variant="caption" sx={{ ml: 0.5 }}>
-                        {expanded ? 'Show Less' : 'Show More'}
-                    </Typography>
-                </IconButton>
-            )}
-        </Box>
-    );
-};

@@ -208,25 +208,47 @@ export const verifyResetCode = (email, code) => async (dispatch) => {
     dispatch({ type: authConstants.VERIFY_CODE_REQUEST });
     try {
         const response = await axios.post('/auth/verify-reset-code', { email, code });
+
         dispatch({ type: authConstants.VERIFY_CODE_SUCCESS, payload: response.data.message });
+        return {
+            type: authConstants.VERIFY_CODE_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
     } catch (error) {
         dispatch({ type: authConstants.VERIFY_CODE_FAILURE, payload: error.response?.data?.message || 'Error verifying code' });
+        return {
+            type: authConstants.VERIFY_CODE_FAILURE,
+            status: error.status,
+            error: error?.response?.data?.message
+        };
     }
 }
 export const resetPassword = (email, code, newPassword) => async (dispatch) => {
     dispatch({ type: authConstants.RESET_PASSWORD_REQUEST });
     try {
         const response = await axios.post('/auth/reset-password', { email, code, newPassword });
+        console.log(response);
+
         dispatch({ type: authConstants.RESET_PASSWORD_SUCCESS, payload: response.data.message });
+        return {
+            type: authConstants.RESET_PASSWORD_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
     } catch (error) {
         dispatch({ type: authConstants.RESET_PASSWORD_FAILURE, payload: error.response?.data?.message || 'Error resetting password' });
+        return {
+            type: authConstants.RESET_PASSWORD_FAILURE,
+            status: error.status,
+            error: error?.response?.data?.message
+        };
     }
 }
 export const sendResetCode = (email) => async (dispatch) => {
     dispatch({ type: authConstants.RESET_CODE_REQUEST });
     try {
         const response = await axios.post('/auth/send-reset-code', { email });
-        console.log(response);
         dispatch({ type: authConstants.RESET_CODE_SUCCESS, payload: response.data.message });
         return {
             type: authConstants.RESET_CODE_SUCCESS,
@@ -239,7 +261,7 @@ export const sendResetCode = (email) => async (dispatch) => {
         return {
             type: authConstants.RESET_CODE_FAILURE,
             status: error.status,
-            message: error?.data?.message
+            error: error?.response?.data?.message
         };
     }
 }

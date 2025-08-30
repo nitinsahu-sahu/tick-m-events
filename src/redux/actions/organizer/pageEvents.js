@@ -31,7 +31,6 @@ export const fatchOrgPlaceABids = (eventId) => async (dispatch) => {
 
     try {
         const response = await axios.get(`/o/event/${eventId}/bid-data`)
-        console.log('res', response);
 
         dispatch({
             type: organizerEventConstants.GET_PLACEABID_SUCCESS,

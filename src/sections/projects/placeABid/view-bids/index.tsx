@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import ChatIcon from '@mui/icons-material/Chat';
 import InfoIcon from "@mui/icons-material/Info";
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import StarIcon from '@mui/icons-material/Star';
 
 import {
     Typography, Box, Card, Grid, Chip, Button, Avatar, Divider,
@@ -12,6 +14,7 @@ import { ArrowBack, Schedule, Person, Work, LocationOn, Event } from "@mui/icons
 import { fatchOrgProjectBids } from "src/redux/actions/organizer/pageEvents";
 import { AppDispatch, RootState } from "src/redux/store";
 import { formatDateTimeCustom } from "src/hooks/formate-time";
+import { TextWithShowMore } from "src/components/text-with-show-more";
 import { BidActionDialog } from "./bidActionDialog";
 
 // Define TypeScript interfaces for better type safety
@@ -51,45 +54,6 @@ interface Bid {
     rejectionReason: string
 }
 
-interface Project {
-    _id: string;
-    eventId: {
-        _id: string;
-        eventName: string;
-        date: string;
-        time: string;
-        location: string;
-        description: string;
-    };
-    categoryId: {
-        _id: string;
-        name: string;
-    };
-    subcategoryId: {
-        _id: string;
-        name: string;
-    };
-    eventLocation: string;
-    createdBy: {
-        _id: string;
-        name: string;
-        email: string;
-    };
-    status: string;
-    orgBudget: string;
-    orgRequirement: string;
-    orgAdditionalRequirement: string;
-    providerHasProposed: boolean;
-    serviceTime: string;
-    createdAt: string;
-    updatedAt: string;
-    __v: number;
-    bidsCount: number;
-    avgBidAmount: number;
-    totalBidAmount: number;
-    bidStatus: string;
-}
-
 
 export function BidsOnPlaceABid() {
     const dispatch = useDispatch<AppDispatch>();
@@ -99,8 +63,6 @@ export function BidsOnPlaceABid() {
     const [dialogOpen, setDialogOpen] = useState(false);
     const { __projectWithBids } = useSelector((state: RootState) => state.organizer);
     const { projectId } = useParams();
-
-
 
     useEffect(() => {
         if (projectId) {
@@ -373,7 +335,7 @@ interface BidCardProps {
     onSelect: (bid: Bid) => void;
 }
 
-function BidCard({ bid, onSelect }: BidCardProps) {
+function BidCard({ bid, onSelect }: any) {
     const navigate = useNavigate();
 
     const handleChatClick = (e: React.MouseEvent) => {
@@ -390,7 +352,6 @@ function BidCard({ bid, onSelect }: BidCardProps) {
                 cursor: 'pointer',
                 '&:hover': { bgcolor: 'action.hover' }
             }}
-            onClick={() => onSelect(bid)}
         >
             <Grid container spacing={2} alignItems="center">
                 <Grid item xs={12} md={8}>
@@ -403,15 +364,28 @@ function BidCard({ bid, onSelect }: BidCardProps) {
                         </Avatar>
                         <Box>
                             <Typography variant="h6">{bid.providerId?.name || 'Unknown Provider'}</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {bid.providerId?.experience || 'No experience specified'}
-                            </Typography>
+                            <Box mt={1} display="flex" alignItems="center" gap={1}>
+                                <Box display="flex" alignItems="center">
+                                    {[...Array(5)].map((_, index) => (
+                                        <StarIcon
+                                            key={index}
+                                            fontSize="small"
+                                            sx={{
+                                                color: index < Math.floor(bid?.providerId?.averageRating || 0) ? '#f39c12' : '#ddd',
+                                            }}
+                                        />
+                                    ))}
+                                </Box>
+                                <Typography variant="body2">| {bid?.providerId?.reviewCount} Reviews</Typography>
+                                <Typography variant="body2">| 90% Completion</Typography>
+                                <Typography variant="body2" textTransform="capitalize">| {bid?.providerId?.address}</Typography>
+                            </Box>
                         </Box>
                     </Box>
 
-                    <Typography variant="body2" paragraph sx={{ mb: 1 }}>
-                        {bid.proposal.length > 150 ? `${bid.proposal.substring(0, 150)}...` : bid.proposal}
-                    </Typography>
+                    <Box onClick={(e) => e.stopPropagation()}>
+                        <TextWithShowMore text={bid.proposal} wordLimit={40} />
+                    </Box>
                 </Grid>
 
                 <Grid item xs={12} md={4}>
@@ -426,7 +400,7 @@ function BidCard({ bid, onSelect }: BidCardProps) {
                             {formatDateTimeCustom(bid.createdAt)}
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 1, justifyContent: "end", mt: 2, textTransform: "capitalize" }}>
-                            <Chip
+                            {/* <Chip
                                 label={bid.status}
                                 color={
                                     bid.status === 'accepted' ? 'success' :
@@ -444,7 +418,7 @@ function BidCard({ bid, onSelect }: BidCardProps) {
                                     ),
                                     onDelete: () => { } // Empty function to make the delete icon appear
                                 })}
-                            />
+                            /> */}
                             <Button
                                 variant="outlined"
                                 startIcon={<ChatIcon />}
@@ -452,6 +426,15 @@ function BidCard({ bid, onSelect }: BidCardProps) {
                                 size="small"
                             >
                                 Chat
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                sx={{ border: "1px solid green", color: "green" }}
+                                startIcon={<EmojiEventsIcon />}
+                                onClick={() => onSelect(bid)}
+                                size="small"
+                            >
+                                Award
                             </Button>
                         </Box>
                     </Box>

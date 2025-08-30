@@ -9,6 +9,7 @@ import { CheckCircle, Cancel, } from "@mui/icons-material";
 
 import { assignProjectToProvider } from "src/redux/actions/organizer/pageEvents";
 import { AppDispatch } from "src/redux/store";
+import { TextWithShowMore } from "src/components/text-with-show-more";
 
 export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
     const [actionType, setActionType] = useState(null); // 'reject' or 'accept'
@@ -126,13 +127,10 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
                             </Box>
 
                             <Typography variant="h6" gutterBottom>Proposal</Typography>
-                            <Typography variant="body1" paragraph>
-                                {selectedBid.proposal}
-                            </Typography>
 
                             {selectedBid.milestones && selectedBid.milestones.length > 0 && (
                                 <>
-                                    <Typography variant="h6" gutterBottom>Milestones</Typography>
+                                    <Typography variant="h6" gutterBottom>Provider Milestones</Typography>
                                     {selectedBid.milestones.map((milestone: any) => (
                                         <Box key={milestone._id} sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}>
                                             <Typography variant="body1">{milestone.milestorneName}</Typography>
@@ -162,7 +160,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
                         onClick={() => handleActionClick('accepted')}
                         disabled={selectedBid?.status !== 'pending'}
                     >
-                        Accept Bid
+                        Award and pay deposit
                     </Button>
                 </DialogActions>
             </Dialog>

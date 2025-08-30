@@ -29,7 +29,7 @@ export function SignInView() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [active, setActive] = useState("google");
-  const { authenticate, error, message } = useSelector(state => state.auth);
+  const { authenticate } = useSelector(state => state.auth);
   const [formData, setFormData] = useState({ email: 'participant.Christopher1@gmail.com', password: 'Yashi@123' });
   const [showPassword, setShowPassword] = useState(false);
   const [open, setOpen] = useState(false);
@@ -39,6 +39,8 @@ export function SignInView() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -58,6 +60,8 @@ export function SignInView() {
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = 'Email is invalid';
     }
+    setLoading(false)
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -95,11 +99,16 @@ export function SignInView() {
     if (validateEmail()) {
       const response = await dispatch(sendResetCode(email));
       if (response.status === 200) {
-        setStep(2);
+        setTimeout(() => {
+          setStep(2);
+        }, 2000)
         setLoading(false)
+        setMessage(response.message)
+        setError(null)
+
       } else {
         setLoading(false)
-
+        setError(response.error)
       }
 
     }
@@ -108,14 +117,39 @@ export function SignInView() {
   const handleVerifyCode = async () => {
     if (validateCode()) {
       const response = await dispatch(verifyResetCode(email, resetCode));
-      setStep(3);
+      if (response.status === 200) {
+        setTimeout(() => {
+          setStep(3)
+        }, 2000)
+        setLoading(false)
+        setMessage(response.message)
+        setError(null)
+
+      } else {
+        setLoading(false)
+        setError(response.error)
+        setMessage('')
+      }
     }
   };
 
   const handleResetPassword = async () => {
     if (validatePassword()) {
       const response = await dispatch(resetPassword(email, resetCode, newPassword));
-      // On success, you might want to automatically close the modal or show success message
+      if (response.status === 200) {
+        setTimeout(() => {
+          handleClose()
+          setError(null)
+          setMessage('')
+        }, 2000)
+        setLoading(false)
+        setMessage(response.message)
+
+      } else {
+        setLoading(false)
+        setError(response.error)
+        setMessage('')
+      }
     }
   };
 

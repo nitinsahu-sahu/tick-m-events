@@ -1,8 +1,6 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box, Typography, Avatar, Grid, Button, Paper, Divider, Tooltip,
-  Tabs, Tab
 } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import ChatIcon from '@mui/icons-material/Chat';
@@ -31,25 +29,6 @@ export function ProposalsCard({ proposals }: any) {
 
   // Sample data for demonstration - in a real app, this would come from props
   const manualBids = proposals || [];
-  const customBids = [
-    {
-      _id: 'custom1',
-      providerId: {
-        name: 'Custom Bid Provider',
-        username: 'customprovider',
-        isVerified: true,
-        avatar: { url: '' },
-        serviceCategory: 'Custom Development',
-        averageRating: 4.8,
-        reviewCount: 12,
-        address: 'remote',
-        experience: 'Specializing in custom solutions tailored to client needs'
-      },
-      orgBudget: 'Custom Quote',
-      isCustom: true
-    }
-  ];
-
   return (
     <Box>
       {manualBids?.length > 0 ? (

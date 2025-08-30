@@ -1,14 +1,14 @@
 import { Typography, Grid, Box, Paper, Button, IconButton, CircularProgress } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
+import { EmojiEvents, ConfirmationNumber } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { TicketCard } from 'src/components/event-card/event-card';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { AppDispatch, RootState } from 'src/redux/store';
-import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
+import { RootState } from 'src/redux/store';
 
 import { UpComingCard } from '../UpComingCard';
 import { PopularEvent } from '../PopularEvent';
@@ -38,13 +38,16 @@ export function HomeAndRecommendationsView() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const { _id } = useSelector((state: RootState) => state?.auth?.user);
   const [upcomingQrTicket, setUpcomingQrTicket] = useState<Ticket | null>(null);
-
+  const navigate = useNavigate();
+const handleClick = () => {
+    navigate('/our-event');
+  };
 
   useEffect(() => {
     async function fetchTickets() {
       try {
         const response = await axios.get(`/event-order/user/${_id}`);
-        
+
         const allTickets: Ticket[] = response.data;
         setTickets(allTickets);
 
@@ -82,35 +85,132 @@ export function HomeAndRecommendationsView() {
       <Box sx={{ width: '100%', overflowX: 'auto' }}>
         <HeadingCommon title="My Active Tickets" weight={600} baseSize="34px" variant="h5" />
 
-          {tickets?.length ? (
-            <Grid
-              container
-              spacing={3}
+        {tickets?.length ? (
+          <Grid
+            container
+            spacing={3}
+            sx={{
+              flexWrap: 'nowrap',
+              paddingBottom: '16px',
+              width: 'max-content',
+              direction: 'rtl',
+              '& > *': {
+                direction: 'ltr'
+              }
+            }}
+          >
+            {tickets?.slice()?.reverse()?.map((ticket, index) => (
+              <Grid item key={index} sx={{ minWidth: 400 }}>
+                <UpComingCard ticket={ticket} />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '400px',
+              padding: 3,
+              background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
+              borderRadius: 2,
+              textAlign: 'center'
+            }}
+          >
+            <Box
               sx={{
-                flexWrap: 'nowrap',
-                paddingBottom: '16px',
-                width: 'max-content',
-                direction: 'rtl',
-                '& > *': {
-                  direction: 'ltr'
-                }
+                position: 'relative',
+                marginBottom: 3
               }}
             >
-              {tickets?.slice()?.reverse()?.map((ticket, index) => (
-                <Grid item key={index} sx={{ minWidth: 400 }}>
-                  <UpComingCard ticket={ticket} />
-                </Grid>
-              ))}
-            </Grid>
-          ) : (
-            <Typography variant="body1" sx={{
-              textAlign: 'center',
-              padding: 3,
-              color: 'text.secondary'
-            }}>
-              No active tickets available
+              <ConfirmationNumber
+                sx={{
+                  fontSize: 80,
+                  color: '#e0e0e0',
+                  opacity: 0.7
+                }}
+              />
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)'
+                }}
+              >
+                <EmojiEvents
+                  sx={{
+                    fontSize: 40,
+                    color: '#ffd700'
+                  }}
+                />
+              </Box>
+            </Box>
+
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 600,
+                color: '#424242',
+                marginBottom: 1
+              }}
+            >
+              No Active Tickets
             </Typography>
-          )}
+
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'text.secondary',
+                marginBottom: 3,
+                maxWidth: '400px'
+              }}
+            >
+              You don&apos;t have any active tickets at the moment. Explore events and purchase tickets to get started!
+            </Typography>
+
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 2,
+                flexWrap: 'wrap',
+                justifyContent: 'center'
+              }}
+            >
+              <Button
+                variant="contained"
+                sx={{
+                  background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                  boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)',
+                  borderRadius: 2,
+                  padding: '10px 20px'
+                }}
+                      onClick={handleClick}
+
+              >
+                Browse Events
+              </Button>
+
+              {/* <Button
+                variant="outlined"
+                sx={{
+                  borderColor: '#2196F3',
+                  color: '#2196F3',
+                  borderRadius: 2,
+                  padding: '10px 20px',
+                  '&:hover': {
+                    borderColor: '#1976d2',
+                    backgroundColor: 'rgba(25, 118, 210, 0.04)'
+                  }
+                }}
+              >
+                View History
+              </Button> */}
+            </Box>
+          </Box>
+        )}
       </Box>
 
       {/* EventCard component */}

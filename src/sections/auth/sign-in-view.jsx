@@ -30,7 +30,12 @@ export function SignInView() {
   const navigate = useNavigate();
   const [active, setActive] = useState("google");
   const { authenticate } = useSelector(state => state.auth);
-  const [formData, setFormData] = useState({ email: 'participant.Christopher1@gmail.com', password: 'Yashi@123' });
+  const [formData, setFormData] = useState(
+    {
+      email: 'organizer.jos1@gmail.com',
+      password: 'John@123'
+
+    });
   const [showPassword, setShowPassword] = useState(false);
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1); // 1: email, 2: code verification, 3: new password
@@ -188,9 +193,8 @@ export function SignInView() {
 
   useEffect(() => {
     if (authenticate) {
-      navigate("/");
+      navigate("/", { replace: true });
     }
-    // navigate("/sign-in");
   }, [authenticate, navigate]);
 
   const renderForm = (

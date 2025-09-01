@@ -3,7 +3,7 @@ import {
   Box, Typography, TableContainer, Table, TableHead, TableRow, TableCell,
   TableBody, Paper, Chip, IconButton, Button, Dialog, DialogActions,
   DialogContent, DialogContentText, DialogTitle, Grid, Stack, TextField,
-  Divider, MenuItem, CircularProgress
+  Divider, MenuItem, CircularProgress, Collapse, Select, FormControl, InputLabel
 } from '@mui/material';
 import {
   Visibility as EyeIcon,
@@ -11,7 +11,9 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
-  Remove as RemoveIcon
+  Remove as RemoveIcon,
+  KeyboardArrowDown as ArrowDownIcon,
+  KeyboardArrowUp as ArrowUpIcon
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from 'src/redux/store';
@@ -23,7 +25,8 @@ import { ProviderOrganizerInfoModal } from 'src/components/modal/provider-orgniz
 export function ProviderBidsList() {
   const dispatch = useDispatch<AppDispatch>();
   const { _mybids } = useSelector((state: RootState) => state?.provider);
-
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [statusUpdates, setStatusUpdates] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedBid, setSelectedBid] = useState<any>(null);
@@ -143,6 +146,20 @@ export function ProviderBidsList() {
     setMilestones(milestones.map(m => m.id === id ? { ...m, [field]: value } : m));
   };
 
+  const handleStatusChange = (bidId: string, newStatus: string) => {
+    setStatusUpdates(prev => ({
+      ...prev,
+      [bidId]: newStatus
+    }));
+
+    // Here you would typically save the status change to your backend
+    console.log(`Updating bid ${bidId} status to:`, newStatus);
+    // dispatch(updateBidStatus(bidId, newStatus));
+  };
+
+  const toggleRowExpand = (bidId: string) => {
+    setExpandedRow(expandedRow === bidId ? null : bidId);
+  };
   return (
     <Box sx={{ p: 3 }}>
       {/* Withdraw Confirmation */}
@@ -298,101 +315,195 @@ export function ProviderBidsList() {
               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Actions Taken</TableCell>
               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Client Information</TableCell>
               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Chat Initiated</TableCell>
+              <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Details</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {_mybids?.map((bid: any, index: number) => (
-              <TableRow
-                key={index}
-                sx={{
-                  boxShadow: bid?.status === 'withdrawn' ? 'inset 0 0 8px rgba(244, 67, 54, 0.6)' : 'none',
-                  borderTop: '1px solid',
-                  borderColor: 'grey.700',
-                  '&:hover': { backgroundColor: 'grey.600' }
-                }}
-              >
-                <TableCell sx={{ py: 2 }}><Typography
-                  component={Link}
-                  to={`/project/${bid.projectId?._id}`}
+              <React.Fragment key={index}>
+                <TableRow
                   sx={{
-                    color: 'black',
-                    textDecoration: 'none',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      textDecoration: 'underline',
-                    }
+                    boxShadow: bid?.status === 'withdrawn' ? 'inset 0 0 8px rgba(244, 67, 54, 0.6)' : 'none',
+                    borderTop: '1px solid',
+                    borderColor: 'grey.700',
+                    '&:hover': { backgroundColor: 'grey.600' },
+                    cursor: 'pointer'
                   }}
+                  onClick={() => toggleRowExpand(bid._id)}
                 >
-                  {bid.projectId?.eventId?.eventName}
-                </Typography></TableCell>
-                <TableCell sx={{ py: 2 }}>{formatEventDate(bid?.createdAt)}</TableCell>
-                <TableCell sx={{ py: 2 }}>#{bid?.bidInfo?.yourBidRank} of {bid?.bidInfo?.totalBidsOnProject} bids</TableCell>
-                <TableCell sx={{ py: 2 }}>
-                  <Chip
-                    label={`${bid?.winningBid} XAF`}
-                    size="small"
-                    sx={{
-                      backgroundColor: 'primary.main',
-                      color: 'white',
-                      fontWeight: 'bold'
-                    }}
-                  />
-                </TableCell>
-                <TableCell sx={{ py: 2 }}>{bid?.bidAmount} XAF</TableCell>
-                <TableCell sx={{ py: 2 }}>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-
-                    <IconButton size="small" sx={{ color: 'green' }}
-                      disabled={bid?.status === 'withdrawn'} onClick={() => handleEditOpen(bid)}
+                  <TableCell sx={{ py: 2 }}>
+                    <Typography
+                      component={Link}
+                      to={`/project/${bid.projectId?._id}`}
+                      sx={{
+                        color: 'black',
+                        textDecoration: 'none',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          textDecoration: 'underline',
+                        }
+                      }}
                     >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
+                      {bid.projectId?.eventId?.eventName}
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>{formatEventDate(bid?.createdAt)}</TableCell>
+                  <TableCell sx={{ py: 2 }}>#{bid?.bidInfo?.yourBidRank} of {bid?.bidInfo?.totalBidsOnProject} bids</TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <Chip
+                      label={`${bid?.winningBid} XAF`}
                       size="small"
-                      sx={{ color: 'red' }}
-                      onClick={() => handleOpenDialog(bid)}
+                      sx={{
+                        backgroundColor: 'primary.main',
+                        color: 'white',
+                        fontWeight: 'bold'
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>{bid?.bidAmount} XAF</TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <IconButton size="small" sx={{ color: 'green' }}
+                        disabled={bid?.status === 'withdrawn'} onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditOpen(bid);
+                        }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        sx={{ color: 'red' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDialog(bid);
+                        }}
+                        disabled={bid?.status === 'withdrawn'}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      startIcon={<EyeIcon />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewOpenDialog(bid?.projectId?.createdBy);
+                      }}
                       disabled={bid?.status === 'withdrawn'}
+                      sx={{
+                        backgroundColor: bid.chat ? 'success.main' : 'grey.700',
+                        color: bid.chat ? 'white' : 'grey.400',
+                      }}
                     >
-                      <DeleteIcon fontSize="small" />
+                      View
+                    </Button>
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      startIcon={<ChatIcon />}
+                      disabled={bid?.status === 'withdrawn'}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate("/messaging-&-client-relationship");
+                        sessionStorage.setItem('currentChatProvider', JSON.stringify(bid.projectId?.createdBy?._id));
+                      }}
+                      sx={{
+                        backgroundColor: bid.chat ? 'success.main' : 'grey.700',
+                        color: bid.chat ? 'white' : 'grey.400',
+                      }}
+                    >
+                      Chat
+                    </Button>
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <IconButton size="small" sx={{ color: 'black' }}>
+                      {expandedRow === bid._id ? <ArrowUpIcon sx={{ color: "black" }} /> : <ArrowDownIcon />}
                     </IconButton>
-                  </Box>
-                </TableCell>
-                <TableCell sx={{ py: 2 }}>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    startIcon={<EyeIcon />}
-                    onClick={() => handleViewOpenDialog(bid?.projectId?.createdBy)}
-                    disabled={bid?.status === 'withdrawn'}
-                    sx={{
-                      backgroundColor: bid.chat ? 'success.main' : 'grey.700',
-                      color: bid.chat ? 'white' : 'grey.400',
+                  </TableCell>
+                </TableRow>
 
-                    }}
-                  >
-                    View
-                  </Button>
-                </TableCell>
-                <TableCell sx={{ py: 2 }}>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    startIcon={<ChatIcon />}
-                    disabled={bid?.status === 'withdrawn'}
-                    onClick={() => {
-                      navigate("/messaging-&-client-relationship");
-                      sessionStorage.setItem('currentChatProvider', JSON.stringify(bid.projectId?.createdBy?._id));
-                    }}
-                    sx={{
-                      backgroundColor: bid.chat ? 'success.main' : 'grey.700',
-                      color: bid.chat ? 'white' : 'grey.400',
+                {/* Expanded Row Content */}
+                <TableRow>
+                  <TableCell style={{ padding: 0 }} colSpan={9}>
+                    <Collapse in={expandedRow === bid._id} timeout="auto" unmountOnExit>
+                      <Box sx={{ p: 3, backgroundColor: 'grey.100' }}>
+                        <Typography variant="h6" gutterBottom>
+                          Bid Details: {bid.projectId?.eventId?.eventName}
+                        </Typography>
 
-                    }}
-                  >
-                    Chat
-                  </Button>
-                </TableCell>
-              </TableRow>
+                        <Grid container spacing={3}>
+                          <Grid item xs={12} md={6}>
+                            <Typography variant="subtitle2" gutterBottom>Project Information</Typography>
+                            <Typography><strong>Event:</strong> {bid.projectId?.eventId?.eventName}</Typography>
+                            <Typography><strong>Location:</strong> {bid.projectId?.eventLocation}</Typography>
+                            <Typography><strong>Budget Range:</strong> {bid.projectId?.orgBudget}</Typography>
+                            <Typography><strong>Service Time:</strong> {new Date(bid.projectId?.serviceTime).toLocaleString()}</Typography>
+                          </Grid>
+
+                          <Grid item xs={12} md={6}>
+                            <Typography variant="subtitle2" gutterBottom>Your Bid Information</Typography>
+                            <Typography><strong>Bid Amount:</strong> {bid.bidAmount} XAF</Typography>
+                            <Typography><strong>Delivery Time:</strong> {bid.deliveryTime} {bid.deliveryUnit}</Typography>
+                            <Typography><strong>Time to bid:</strong> {formatEventDate(bid?.createdAt)}</Typography>
+
+                            <Typography mt={2}><strong>Status:</strong>
+                              <FormControl size="small" sx={{ ml: 1, minWidth: 120 }}>
+                                <InputLabel>Status</InputLabel>
+                                <Select
+                                  value={statusUpdates[bid._id] || 'process'}
+                                  label="Status"
+                                  onChange={(e) => handleStatusChange(bid._id, e.target.value)}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <MenuItem value="process">Process</MenuItem>
+                                  <MenuItem value="ongoing">Ongoing</MenuItem>
+                                </Select>
+                              </FormControl>
+                            </Typography>
+                          </Grid>
+
+                          <Grid item xs={12}>
+                            <Typography variant="subtitle2" gutterBottom>Proposal</Typography>
+                            <Paper sx={{ p: 2, backgroundColor: 'white' }}>
+                              <Typography>{bid.proposal}</Typography>
+                            </Paper>
+                          </Grid>
+
+                          {bid.milestones && bid.milestones.length > 0 && (
+                            <Grid item xs={12}>
+                              <Typography variant="subtitle2" gutterBottom>Milestones</Typography>
+                              <Table size="small">
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell>Milestone Name</TableCell>
+                                    <TableCell align="right">Amount</TableCell>
+                                    <TableCell>Currency</TableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {bid.milestones.map((milestone: any, idx: number) => (
+                                    <TableRow key={idx}>
+                                      <TableCell>{milestone.milestorneName}</TableCell>
+                                      <TableCell align="right">{milestone.amount}</TableCell>
+                                      <TableCell>{milestone.currency}</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </Grid>
+                          )}
+                        </Grid>
+                      </Box>
+                    </Collapse>
+                  </TableCell>
+                </TableRow>
+              </React.Fragment>
             ))}
           </TableBody>
         </Table>
@@ -401,130 +512,3 @@ export function ProviderBidsList() {
   );
 }
 
-
-// Admin Bid Section
-//  <Box sx={{ p: 3 }}>
-//       <TableContainer
-//         component={Paper}
-//         sx={{
-
-//           boxShadow: 3
-//         }}
-//       >
-//         <Table sx={{ minWidth: 650 }} aria-label="bids table">
-//           <TableHead>
-//             <TableRow sx={{ backgroundColor: 'grey.800' }} >
-//               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Project</TableCell>
-//               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Time to bid</TableCell>
-//               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Bid Rank</TableCell>
-//               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Winning Bid</TableCell>
-//               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Your Bid</TableCell>
-//               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Actions Taken</TableCell>
-//               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Client Information</TableCell>
-//               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Chat Initiated</TableCell>
-//             </TableRow>
-//           </TableHead>
-//           <TableBody>
-//             {_mybids?.map((bid: any, index: any) => (
-//               <TableRow
-//                 key={index}
-//                 sx={{
-//                   borderTop: '1px solid',
-//                   borderColor: 'grey.700',
-//                   '&:hover': { backgroundColor: 'grey.600' }
-//                 }}
-//               >
-
-//                 <TableCell sx={{ py: 2 }}><Typography
-//                   component={Link}
-//                   to={`/project/${bid.projectId?._id}`}
-//                   sx={{
-//                     color: 'black',
-//                     textDecoration: 'none',
-//                     cursor: 'pointer',
-//                     '&:hover': {
-//                       textDecoration: 'underline',
-//                     }
-//                   }}
-//                 >
-//                   {bid.projectId?.eventId?.eventName}
-//                 </Typography></TableCell>
-//                 <TableCell sx={{ py: 2 }}>{formatEventDate(bid?.createdAt)}</TableCell>
-//                 <TableCell sx={{ py: 2 }}>#{bid?.bidInfo?.yourBidRank} of {bid?.bidInfo?.totalBidsOnProject} bids</TableCell>
-//                 <TableCell sx={{ py: 2 }}>
-//                   <Chip
-//                     label="SEALED"
-//                     size="small"
-//                     sx={{
-//                       backgroundColor: 'primary.main',
-//                       color: 'white',
-//                       fontWeight: 'bold'
-//                     }}
-//                   />
-//                 </TableCell>
-//                 <TableCell sx={{ py: 2 }}>{bid?.bidAmount} XAF</TableCell>
-//                 <TableCell sx={{ py: 2 }}>
-//                   <Box sx={{ display: 'flex', gap: 1 }}>
-//                     <IconButton size="small" sx={{ color: 'grey.400' }}>
-//                       <EyeIcon fontSize="small" />
-//                     </IconButton>
-//                     <IconButton size="small" sx={{ color: 'grey.400' }}>
-//                       <CheckIcon fontSize="small" />
-//                     </IconButton>
-//                     <IconButton size="small" sx={{ color: 'grey.400' }}>
-//                       <MinusIcon fontSize="small" />
-//                     </IconButton>
-//                   </Box>
-//                 </TableCell>
-//                 <TableCell sx={{ py: 2 }}>
-//                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-//                     {/* {bid.client.country && (
-//                       <Typography component="span" variant="body2">
-//                         Client Country Flag
-//                         IN
-//                       </Typography>
-//                     )} */}
-//                     <Typography component="span" variant="body2">
-//                       IN
-//                     </Typography>
-//                     <Typography component="span" variant="body2">
-//                       {/* Client Rating */}
-//                       2
-//                     </Typography>
-//                     <Typography component="span" variant="body2" color="grey.400">
-//                       💬 2
-//                     </Typography>
-//                     {/* {bid.client.reviews !== undefined && (
-//                       <Typography component="span" variant="body2" color="grey.400">
-//                         Client Review
-//                         💬 2
-//                       </Typography>
-//                     )} */}
-//                   </Box>
-//                 </TableCell>
-//                 <TableCell sx={{ py: 2 }}>
-//                   <Button
-//                     variant="contained"
-//                     size="small"
-//                     startIcon={<ChatIcon />}
-//                     onClick={() => {
-//                       navigate("/messaging-&-client-relationship");
-//                       sessionStorage.setItem('currentChatProvider', JSON.stringify(bid.projectId?.createdBy?._id));
-//                     }}
-//                     sx={{
-//                       backgroundColor: bid.chat ? 'success.main' : 'grey.700',
-//                       color: bid.chat ? 'white' : 'grey.400',
-//                       '&:hover': {
-//                         backgroundColor: bid.chat ? 'success.dark' : 'grey.600'
-//                       }
-//                     }}
-//                   >
-//                     Chat
-//                   </Button>
-//                 </TableCell>
-//               </TableRow>
-//             ))}
-//           </TableBody>
-//         </Table>
-//       </TableContainer>
-//     </Box>

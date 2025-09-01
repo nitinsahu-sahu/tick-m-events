@@ -321,7 +321,7 @@ function BidCard({ bid }: { bid: any }) {
                 }}
                     sx={{ py: 1 }}
                 >
-                    View Bids
+                    View Proposals
                 </Button>
             </Box>
         </Card>

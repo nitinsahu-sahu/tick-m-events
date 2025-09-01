@@ -81,7 +81,6 @@ export const assignProjectToProvider = (data,projectId, bidId) => async (dispatc
     dispatch({ type: organizerEventConstants.ASSIGN_PROJECT_REQUEST });
 
     try {
-        // /place-a-bid/:projectId/:bidId
         const response = await axios.put(`/o/place-a-bid/${projectId}/${bidId}`, {data})
         console.log(response);
 

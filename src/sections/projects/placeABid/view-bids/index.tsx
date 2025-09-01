@@ -433,6 +433,8 @@ function BidCard({ bid, onSelect }: any) {
                                 startIcon={<EmojiEventsIcon />}
                                 onClick={() => onSelect(bid)}
                                 size="small"
+                                disabled={bid?.status !== 'pending'}
+
                             >
                                 Award
                             </Button>

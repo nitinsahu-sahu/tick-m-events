@@ -1,14 +1,14 @@
 import { Typography, Grid, Box, Paper, Button, IconButton, CircularProgress } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { EmojiEvents, ConfirmationNumber } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
 
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
+import { TicketCard } from 'src/components/event-card/event-card';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { RootState } from 'src/redux/store';
+import { AppDispatch, RootState } from 'src/redux/store';
+import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
 
 import { UpComingCard } from '../UpComingCard';
 import { PopularEvent } from '../PopularEvent';
@@ -18,6 +18,7 @@ import axios from "../../../redux/helper/axios";
 interface EventDetails {
   eventName: string;
   date: string;
+  time?: string;
 }
 
 interface TicketItem {
@@ -26,22 +27,21 @@ interface TicketItem {
 
 // You can reuse this for each ticket in the list
 interface Ticket {
+  _id: string;
+  eventId: string;
   eventDetails?: EventDetails;
   tickets: TicketItem[];
   qrCode: string;
   verifyEntry: string;
+  eventDate?: string;
 }
-
 
 export function HomeAndRecommendationsView() {
   const { popularEvents, recommendedEvents } = useSelector((state: RootState) => state?.homeRecom);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const { _id } = useSelector((state: RootState) => state?.auth?.user);
   const [upcomingQrTicket, setUpcomingQrTicket] = useState<Ticket | null>(null);
-  const navigate = useNavigate();
-const handleClick = () => {
-    navigate('/our-event');
-  };
+  const [upcomingTickets, setUpcomingTickets] = useState<Ticket[]>([]);
 
   useEffect(() => {
     async function fetchTickets() {
@@ -77,6 +77,39 @@ const handleClick = () => {
     }
   }, [_id]);
 
+  function parseEventDate(ticket: Ticket): Date | null {
+    if (!ticket.eventDetails?.date) return null;
+    const date = ticket.eventDetails.date;   // "2025-09-03"
+    const time = ticket.eventDetails.time ?? "00:00"; // fallback
+    return new Date(`${date}T${time}:00`);
+  }
+
+function getTimeLeft(ticketList: Ticket[]): string {
+    if (!tickets || tickets.length === 0) return "No upcoming events";
+
+    const now = new Date();
+    const nextEvent = tickets.find(ticket => {
+      const date = parseEventDate(ticket);
+      return date && date > now;
+    });
+
+    if (!nextEvent) return "No upcoming events";
+
+    const eventDate = parseEventDate(nextEvent)!;
+    const diffMs = eventDate.getTime() - now.getTime();
+
+    if (diffMs <= 0) return "Your concert is live now!";
+
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (days > 0) return `Your concert starts in ${days}d ${hours}h ${minutes}m!`;
+    if (hours > 0) return `Your concert starts in ${hours}h ${minutes}m!`;
+    if (minutes > 0) return `Your concert starts in ${minutes}m!`;
+    return "Your concert is about to start!";
+  }
+
   return (
     <DashboardContent>
       <PageTitleSection title="Home & Recommendations" />
@@ -106,110 +139,13 @@ const handleClick = () => {
             ))}
           </Grid>
         ) : (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: '400px',
-              padding: 3,
-              background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
-              borderRadius: 2,
-              textAlign: 'center'
-            }}
-          >
-            <Box
-              sx={{
-                position: 'relative',
-                marginBottom: 3
-              }}
-            >
-              <ConfirmationNumber
-                sx={{
-                  fontSize: 80,
-                  color: '#e0e0e0',
-                  opacity: 0.7
-                }}
-              />
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)'
-                }}
-              >
-                <EmojiEvents
-                  sx={{
-                    fontSize: 40,
-                    color: '#ffd700'
-                  }}
-                />
-              </Box>
-            </Box>
-
-            <Typography
-              variant="h5"
-              sx={{
-                fontWeight: 600,
-                color: '#424242',
-                marginBottom: 1
-              }}
-            >
-              No Active Tickets
-            </Typography>
-
-            <Typography
-              variant="body1"
-              sx={{
-                color: 'text.secondary',
-                marginBottom: 3,
-                maxWidth: '400px'
-              }}
-            >
-              You don&apos;t have any active tickets at the moment. Explore events and purchase tickets to get started!
-            </Typography>
-
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                flexWrap: 'wrap',
-                justifyContent: 'center'
-              }}
-            >
-              <Button
-                variant="contained"
-                sx={{
-                  background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                  boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)',
-                  borderRadius: 2,
-                  padding: '10px 20px'
-                }}
-                      onClick={handleClick}
-
-              >
-                Browse Events
-              </Button>
-
-              {/* <Button
-                variant="outlined"
-                sx={{
-                  borderColor: '#2196F3',
-                  color: '#2196F3',
-                  borderRadius: 2,
-                  padding: '10px 20px',
-                  '&:hover': {
-                    borderColor: '#1976d2',
-                    backgroundColor: 'rgba(25, 118, 210, 0.04)'
-                  }
-                }}
-              >
-                View History
-              </Button> */}
-            </Box>
-          </Box>
+          <Typography variant="body1" sx={{
+            textAlign: 'center',
+            padding: 3,
+            color: 'text.secondary'
+          }}>
+            No active tickets available
+          </Typography>
         )}
       </Box>
 
@@ -317,7 +253,7 @@ const handleClick = () => {
             }}
           >
             {[
-              { text: 'Your concert starts in 2h!' },
+              { text: getTimeLeft(upcomingTickets) },
               { text: '-20% on VIP tickets today!' },
               { text: 'New date for Startup Summit 2025' },
               { text: 'A festival is happening 2km from you!', disabled: false },
@@ -392,3 +328,5 @@ const handleClick = () => {
     </DashboardContent>
   );
 }
+
+

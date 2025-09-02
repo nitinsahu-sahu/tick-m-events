@@ -43,9 +43,6 @@ interface BidErrors {
 }
 
 export function BidActionDialog({ open, selectedBid, onClose, onAction, project }: any) {
-    console.log('=======project=============================');
-    console.log(project);
-    console.log('====================================');
     const [actionType, setActionType] = useState(null); // 'reject' or 'accept'
     const [rejectionReason, setRejectionReason] = useState("");
     const [acceptedAmount, setAcceptedAmount] = useState(0);
@@ -78,7 +75,8 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
                 _id: milestone._id || index + 1,
                 milestorneName: milestone.milestorneName || "",
                 amount: milestone.amount?.toString() || "",
-                currency: milestone.currency || "XAF"
+                currency: milestone.currency || "XAF",
+                isReleased: milestone.isReleased || false
             }));
             setMilestones(initialMilestones);
         }
@@ -166,7 +164,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
 
     const handleActionClick = (type: any) => {
         setActionType(type);
-        if (type === 'accepted') {
+        if (type === 'isOrgnizerAccepted') {
             setAcceptedAmount(selectedBid?.bidAmount || 0);
         }
     };
@@ -194,7 +192,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
             newErrors.rejectionReason = 'Rejection reason is required';
         }
 
-        if (actionType === 'accepted' && (!acceptedAmount || acceptedAmount <= 0)) {
+        if (actionType === 'isOrgnizerAccepted' && (!acceptedAmount || acceptedAmount <= 0)) {
             newErrors.acceptedAmount = 'Valid amount is required';
         }
         // Check if there are any errors (if any error message is not empty)
@@ -259,11 +257,11 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
         // dispatch(updateBidStatus(bidId, newStatus));
     };
 
-    const handleReleaseMilestone = (milestoneId:any) => {
-  // API call to release funds for this milestone
-  console.log('Releasing funds for milestone:', milestoneId);
-  // Your release logic here
-};
+    const handleReleaseMilestone = (milestoneId: any) => {
+        // API call to release funds for this milestone
+        console.log('Releasing funds for milestone:', milestoneId);
+        // Your release logic here
+    };
 
     return (
         <>
@@ -558,7 +556,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
                         startIcon={<CheckCircle />}
                         variant="contained"
                         color="success"
-                        onClick={() => handleActionClick('accepted')}
+                        onClick={() => handleActionClick('isOrgnizerAccepted')}
                         disabled={selectedBid?.status !== 'pending' || isEditing}
                     >
                         Award Request
@@ -601,7 +599,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
             </Dialog>
 
             {/* Accept Confirmation Dialog */}
-            <Dialog open={actionType === 'accepted'} onClose={handleCancelAction} maxWidth="sm" fullWidth>
+            <Dialog open={actionType === 'isOrgnizerAccepted'} onClose={handleCancelAction} maxWidth="sm" fullWidth>
                 <DialogTitle>Confirm Acceptance</DialogTitle>
                 <DialogContent>
                     <Alert severity="info" sx={{ mb: 2 }}>

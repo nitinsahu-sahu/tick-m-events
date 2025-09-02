@@ -164,15 +164,23 @@ export function ProviderBidsList() {
     setExpandedRow(expandedRow === bidId ? null : bidId);
   };
 
-  const handleProviderAcceptance = async (bidId: any) => {
+  const handleProviderAcceptance = useCallback(async (bidId: any) => {
     try {
-      // API call to update provider acceptance status
-      // const response = await updateBidAcceptance(bidId, { isProviderAccepted: true });
-      // Update local state or refetch data
+      // const result = await dispatch(assignProjectToProvider(data, selectedBid?.projectId, selectedBid?._id));
+      // if (result?.status === 200) {
+      //   // Reset state
+      //   setActionType(null);
+      //   setRejectionReason("");
+      //   setAcceptedAmount(0);
+      //   setErrors({ acceptedAmount: "", rejectionReason: "", message: "" });
+      // } else {
+      //   setErrors({ acceptedAmount: "", rejectionReason: "", message: result?.message });
+
+      // }
     } catch (error) {
-      console.error('Error accepting bid:', error);
+      console.error("Verification error:", error);
     }
-  };
+  }, [])
 
   return (
     <Box sx={{ p: 3 }}>
@@ -460,42 +468,38 @@ export function ProviderBidsList() {
                             <Typography><strong>Service Time:</strong> {new Date(bid.projectId?.serviceTime).toLocaleString()}</Typography>
                             <Typography mt={2} sx={{ display: 'flex', alignItems: 'center' }}>
                               <strong>Status:</strong>
-                              {bid.projectId?.status === "process" ? (
-                                <span style={{ marginLeft: '8px', color: '#666' }}>
-                                  Process (Not Editable)
-                                </span>
-                              ) : (
-                                <>
-                                  <FormControl size="small" sx={{ ml: 1, minWidth: 120 }}>
-                                    <InputLabel>Project Status</InputLabel>
-                                    <Select
-                                      sx={{ width: 200, height: 30 }}
-                                      value={statusUpdates[bid._id] || bid.projectId?.status || 'process'}
-                                      label="Status"
-                                      onChange={(e) => handleStatusChange(bid._id, e.target.value)}
-                                      onClick={(e) => e.stopPropagation()}
-                                      disabled={!(bid.isProviderAccepted && bid.isOrgnizerAccepted)}
-                                    >
-                                      <MenuItem value="process">Process</MenuItem>
-                                      <MenuItem value="ongoing">Ongoing</MenuItem>
-                                    </Select>
-                                  </FormControl>
+                              <FormControl size="small" sx={{ ml: 1, minWidth: 120 }}>
+                                <InputLabel>Project Status</InputLabel>
+                                <Select
+                                  sx={{ width: 200, height: 30, textTransform: "capitalize" }}
+                                  value={bid.projectId?.status}
+                                  label="Status"
+                                  onChange={(e) => handleStatusChange(selectedBid._id, e.target.value)}
+                                  onClick={(e) => e.stopPropagation()}
+                                  disabled={!(bid.isProviderAccepted && bid.isOrgnizerAccepted)}
+                                >
+                                  <MenuItem value={bid.projectId?.status} disabled>
+                                    {bid.projectId?.status} (Current)
+                                  </MenuItem>
+                                  <MenuItem value="process">Mark as Process</MenuItem>
+                                  <MenuItem value="ongoing">Mark as Ongoing</MenuItem>
+                                </Select>
+                              </FormControl>
 
-                                  <Tooltip
-                                    title={
-                                      !(bid.isProviderAccepted && bid.isOrgnizerAccepted)
-                                        ? "Status can only be changed after both provider and organizer have accepted the project."
-                                        : "You can now change the project status, and the organizer is complete this project"
-                                    }
-                                    placement="right"
-                                    arrow
-                                  >
-                                    <IconButton size="small" sx={{ ml: 1, color: 'text.secondary' }}>
-                                      <InfoIcon fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                </>
-                              )}
+
+                              <Tooltip
+                                title={
+                                  !(bid.isProviderAccepted && bid.isOrgnizerAccepted)
+                                    ? "Status can only be changed after both provider and organizer have accepted the project."
+                                    : "You can now change the project status, and the organizer is complete this project"
+                                }
+                                placement="right"
+                                arrow
+                              >
+                                <IconButton size="small" sx={{ ml: 1, color: 'text.secondary' }}>
+                                  <InfoIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
                             </Typography>
                           </Grid>
 

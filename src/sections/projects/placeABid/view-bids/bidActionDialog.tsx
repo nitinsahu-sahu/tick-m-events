@@ -1,8 +1,10 @@
 import {
-    Typography, Box, TextField, Chip, Button, Avatar, CircularProgress,
-    Alert, Dialog, DialogTitle, Grid, MenuItem, SelectChangeEvent,
+    Typography, Box, TextField, Chip, Button, Avatar, FormControl, InputLabel,
+    Alert, Dialog, DialogTitle, Grid, MenuItem, SelectChangeEvent, Tooltip,
     DialogContent, DialogActions, Stack, Divider, IconButton, Select
 } from "@mui/material";
+import InfoIcon from '@mui/icons-material/Info'; // or your preferred info icon
+
 import { useState, useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { CheckCircle, Cancel, Edit, Save } from "@mui/icons-material";
@@ -11,12 +13,14 @@ import RemoveIcon from '@mui/icons-material/Remove';
 
 import { assignProjectToProvider } from "src/redux/actions/organizer/pageEvents";
 import { AppDispatch } from "src/redux/store";
+import { formatEventDate } from "src/hooks/formate-time";
 
 interface Milestone {
     _id: number;
     milestorneName: string;
     amount: string;
     currency: "XAF" | "USD";
+    isReleased: boolean
 }
 
 interface BidData {
@@ -38,8 +42,7 @@ interface BidErrors {
     [key: string]: string | undefined;
 }
 
-export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
-    
+export function BidActionDialog({ open, selectedBid, onClose, onAction, project }: any) {
     const [actionType, setActionType] = useState(null); // 'reject' or 'accept'
     const [rejectionReason, setRejectionReason] = useState("");
     const [acceptedAmount, setAcceptedAmount] = useState(0);
@@ -49,6 +52,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
     const [isEditing, setIsEditing] = useState(false);
     const [errorss, setErrorss] = useState<BidErrors>({});
     const [loading, setLoading] = useState(false);
+    const [statusUpdates, setStatusUpdates] = useState<Record<string, string>>({});
 
     const [bidData, setBidData] = useState<BidData>({
         bidAmount: '',
@@ -71,7 +75,8 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
                 _id: milestone._id || index + 1,
                 milestorneName: milestone.milestorneName || "",
                 amount: milestone.amount?.toString() || "",
-                currency: milestone.currency || "XAF"
+                currency: milestone.currency || "XAF",
+                isReleased: milestone.isReleased || false
             }));
             setMilestones(initialMilestones);
         }
@@ -94,7 +99,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
         if (milestones.length < 5) {
             setMilestones(prev => [
                 ...prev,
-                { _id: Date.now(), milestorneName: "", amount: "", currency: "XAF" }
+                { _id: Date.now(), milestorneName: "", amount: "", currency: "XAF", isReleased: false }
             ]);
         }
     };
@@ -159,7 +164,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
 
     const handleActionClick = (type: any) => {
         setActionType(type);
-        if (type === 'accepted') {
+        if (type === 'isOrgnizerAccepted') {
             setAcceptedAmount(selectedBid?.bidAmount || 0);
         }
     };
@@ -187,7 +192,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
             newErrors.rejectionReason = 'Rejection reason is required';
         }
 
-        if (actionType === 'accepted' && (!acceptedAmount || acceptedAmount <= 0)) {
+        if (actionType === 'isOrgnizerAccepted' && (!acceptedAmount || acceptedAmount <= 0)) {
             newErrors.acceptedAmount = 'Valid amount is required';
         }
         // Check if there are any errors (if any error message is not empty)
@@ -226,7 +231,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
         } catch (error) {
             console.error("Verification error:", error);
         }
-    }, [acceptedAmount, actionType,bidData,milestones, dispatch, onAction, rejectionReason, selectedBid]);
+    }, [acceptedAmount, actionType, bidData, milestones, dispatch, onAction, rejectionReason, selectedBid]);
 
     const handleCancelAction = () => {
         setActionType(null);
@@ -239,6 +244,23 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
         handleCancelAction();
         setIsEditing(false);
         onClose();
+    };
+
+    const handleStatusChange = (bidId: string, newStatus: string) => {
+        setStatusUpdates(prev => ({
+            ...prev,
+            [bidId]: newStatus
+        }));
+
+        // Here you would typically save the status change to your backend
+        console.log(`Updating bid ${bidId} status to:`, newStatus);
+        // dispatch(updateBidStatus(bidId, newStatus));
+    };
+
+    const handleReleaseMilestone = (milestoneId: any) => {
+        // API call to release funds for this milestone
+        console.log('Releasing funds for milestone:', milestoneId);
+        // Your release logic here
     };
 
     return (
@@ -275,23 +297,58 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
                 <DialogContent>
                     {selectedBid && (
                         <>
-                            <Box sx={{ mb: 3 }}>
-                                <Typography variant="h5" color="primary" gutterBottom>
-                                    {selectedBid.bidAmount} XAF
+                            <Grid item xs={12} md={12}>
+                                <Typography variant="subtitle2" gutterBottom>Bid Information</Typography>
+                                <Typography><strong>Bid Amount:</strong> {selectedBid.bidAmount} XAF</Typography>
+                                <Typography><strong>Delivery Time:</strong> {selectedBid.deliveryTime} {selectedBid.deliveryUnit}</Typography>
+                                <Typography><strong>Time to bid:</strong> {formatEventDate(selectedBid?.createdAt)}</Typography>
+                                {
+                                    selectedBid.isOrgnizerAccepted && (
+                                        <Typography sx={{ color: selectedBid.isProviderAccepted ? 'green' : 'red' }}>
+                                            <strong style={{ color: "black" }}>Provider Acceptance:</strong>
+                                            &nbsp;{selectedBid.isProviderAccepted ? "Accepted" : "Pending"}
+                                        </Typography>
+                                    )
+                                }
+                                <Typography sx={{ color: selectedBid.isOrgnizerAccepted ? 'green' : 'red' }}>
+                                    <strong style={{ color: "black" }}>Your Acceptance:</strong>
+                                    &nbsp;{selectedBid.isOrgnizerAccepted ? "Accepted" : "Pending"}
                                 </Typography>
-                                <Typography variant="body2" gutterBottom>
-                                    Delivery in {selectedBid.deliveryTime} {selectedBid.deliveryUnit}
+                                <Typography mt={2} sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <strong>Project Status:</strong>
+                                    <FormControl size="small" sx={{ ml: 1, minWidth: 120 }}>
+                                        <InputLabel>Project Status</InputLabel>
+                                        <Select
+                                            sx={{ width: 200, height: 30, textTransform: "capitalize" }}
+                                            value={project?.status}
+                                            label="Status"
+                                            onChange={(e) => handleStatusChange(selectedBid._id, e.target.value)}
+                                            onClick={(e) => e.stopPropagation()}
+                                            disabled={!(selectedBid.isProviderAccepted && selectedBid.isOrgnizerAccepted)}
+                                        >
+                                            <MenuItem value={project?.status} disabled>
+                                                {project?.status} (Current)
+                                            </MenuItem>
+                                            <MenuItem value="completed">Mark as Completed</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    <Tooltip
+                                        title={
+                                            !(selectedBid.isProviderAccepted && selectedBid.isOrgnizerAccepted)
+                                                ? "Status can only be changed after both provider and organizer have accepted the project"
+                                                : "You can now change the project status"
+                                        }
+                                        placement="right"
+                                        arrow
+                                    >
+                                        <IconButton size="small" sx={{ ml: 1, color: 'text.secondary' }}>
+                                            <InfoIcon fontSize="small" />
+                                        </IconButton>
+                                    </Tooltip>
                                 </Typography>
-                                <Chip
-                                    label={selectedBid.status}
-                                    color={
-                                        selectedBid.status === 'accepted' ? 'success' :
-                                            selectedBid.status === 'rejected' ? 'error' : 'default'
-                                    }
-                                    size="small"
-                                    sx={{ mt: 1, textTransform: "capitalize" }}
-                                />
-                            </Box>
+
+                            </Grid>
+
 
                             <Divider sx={{ my: 2 }} />
 
@@ -370,7 +427,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
 
                                     {milestones.map((milestone, index) => (
                                         <Grid container spacing={2} key={milestone._id} alignItems="center" mb={2}>
-                                            <Grid item xs={12} md={6}>
+                                            <Grid item xs={12} md={4}>
                                                 <TextField
                                                     fullWidth
                                                     placeholder={`Milestone ${index + 1} name`}
@@ -428,6 +485,30 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
                                                     <MenuItem value="USD">USD</MenuItem>
                                                 </TextField>
                                             </Grid>
+                                            <Grid item xs={12} md={2}>
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    size="small"
+                                                    disabled={milestone.isReleased}
+                                                    sx={{
+                                                        minWidth: '100px',
+                                                        backgroundColor: milestone.isReleased ? '#e0e0e0' : '#1976d2',
+                                                        color: milestone.isReleased ? '#9e9e9e' : 'white',
+                                                        '&:hover': {
+                                                            backgroundColor: milestone.isReleased ? '#e0e0e0' : '#1565c0',
+                                                        },
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: 600,
+                                                        borderRadius: '4px',
+                                                        textTransform: 'none',
+                                                        boxShadow: milestone.isReleased ? 'none' : '0 2px 4px rgba(0,0,0,0.2)',
+                                                    }}
+                                                    onClick={() => handleReleaseMilestone(milestone._id)}
+                                                >
+                                                    {milestone.isReleased ? 'Released' : 'Release Funds'}
+                                                </Button>
+                                            </Grid>
                                             {isEditing && (
                                                 <Grid item xs={12} md={1}>
                                                     <IconButton
@@ -475,10 +556,10 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
                         startIcon={<CheckCircle />}
                         variant="contained"
                         color="success"
-                        onClick={() => handleActionClick('accepted')}
+                        onClick={() => handleActionClick('isOrgnizerAccepted')}
                         disabled={selectedBid?.status !== 'pending' || isEditing}
                     >
-                        Award and pay deposit
+                        Award Request
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -518,7 +599,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction }: any) {
             </Dialog>
 
             {/* Accept Confirmation Dialog */}
-            <Dialog open={actionType === 'accepted'} onClose={handleCancelAction} maxWidth="sm" fullWidth>
+            <Dialog open={actionType === 'isOrgnizerAccepted'} onClose={handleCancelAction} maxWidth="sm" fullWidth>
                 <DialogTitle>Confirm Acceptance</DialogTitle>
                 <DialogContent>
                     <Alert severity="info" sx={{ mb: 2 }}>

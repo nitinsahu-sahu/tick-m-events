@@ -2,6 +2,42 @@
 import { activityConstants } from "./constants";
 import axios from "../helper/axios";
 
+export const fetchLatestEventCreatedActivity = () => async (dispatch) => {
+    dispatch({ type: activityConstants.FETCH_LATEST_EVENT_CREATED_REQUEST });
+ 
+    try {
+        const response = await axios.get('/activities/event-created/latest');
+ 
+        dispatch({
+            type: activityConstants.FETCH_LATEST_EVENT_CREATED_SUCCESS,
+            payload: response.data.data,
+        });
+ 
+        return {
+            type: activityConstants.FETCH_LATEST_EVENT_CREATED_SUCCESS,
+            status: response.status,
+            message: response.data.message,
+            payload: response.data.data,
+        };
+    } catch (error) {
+        dispatch({
+            type: activityConstants.FETCH_LATEST_EVENT_CREATED_FAILURE,
+            payload: {
+                message:
+                    error?.response?.data?.message || 'Failed to fetch latest event_created activity',
+                error: error?.response?.status || 500,
+            },
+        });
+ 
+        return {
+            type: activityConstants.FETCH_LATEST_EVENT_CREATED_FAILURE,
+            status: error?.response?.status || 500,
+            message:
+                error?.response?.data?.message || 'Failed to fetch latest event_created activity',
+        };
+    }
+};
+
 export const fetchLoginActivities = () => async (dispatch) => {
     dispatch({ type: activityConstants.FETCH_ACTIVITIES_REQUEST });
 

@@ -62,6 +62,7 @@ export function BidsOnPlaceABid() {
     const [selectedBid, setSelectedBid] = useState<Bid | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const { __projectWithBids } = useSelector((state: RootState) => state.organizer);
+   
     const { projectId } = useParams();
 
     useEffect(() => {
@@ -303,6 +304,7 @@ export function BidsOnPlaceABid() {
             <BidActionDialog
                 open={dialogOpen}
                 selectedBid={selectedBid}
+                project={__projectWithBids?.project}
                 onClose={handleDialogClose}
                 onAction={(bidId: any, actionType: any, data: any) => {
                     // Handle the action here
@@ -384,7 +386,7 @@ function BidCard({ bid, onSelect }: any) {
                     </Box>
 
                     <Box onClick={(e) => e.stopPropagation()}>
-                        <TextWithShowMore text={bid.proposal} wordLimit={40} />
+                        <TextWithShowMore text={bid.proposal} wordLimit={20} />
                     </Box>
                 </Grid>
 

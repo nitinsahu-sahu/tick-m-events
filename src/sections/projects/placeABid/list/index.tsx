@@ -155,8 +155,8 @@ function BidGrid({ bids }: { bids: any[] }) {
 }
 
 function BidCard({ bid }: { bid: any }) {
-          const navigate = useNavigate();
-    
+    const navigate = useNavigate();
+
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'pending': return 'warning';
@@ -196,13 +196,13 @@ function BidCard({ bid }: { bid: any }) {
                 </Typography>
 
                 <Typography variant="body2" fontWeight={600} gutterBottom>
-                    Service Time: <span style={{color:"#3CB1F1"}}>{formatDateTimeCustom(bid.serviceTime)}</span>
+                    Service Time: <span style={{ color: "#3CB1F1" }}>{formatDateTimeCustom(bid.serviceTime)}</span>
                 </Typography>
 
                 <Typography variant="body2" fontWeight={600} gutterBottom>
-                    Event Location: <span style={{color:"#3CB1F1"}}>{bid.eventLocation}</span>
+                    Event Location: <span style={{ color: "#3CB1F1" }}>{bid.eventLocation}</span>
                 </Typography>
-                
+
                 <Box sx={{ my: 2 }}>
                     <Typography variant="subtitle2" gutterBottom>
                         Category:
@@ -268,16 +268,18 @@ function BidCard({ bid }: { bid: any }) {
                     <Typography variant="subtitle2" gutterBottom>
                         Requirements:
                     </Typography>
-                    <Typography variant="body2" sx={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        color: 'text.secondary'
-                    }}>
-                        {bid.orgRequirement}
-                    </Typography>
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            color: 'text.secondary'
+                        }}
+                        dangerouslySetInnerHTML={{ __html: bid.orgRequirement }}
+                    />
                 </Box>
 
                 {bid.orgAdditionalRequirement && (
@@ -317,8 +319,8 @@ function BidCard({ bid }: { bid: any }) {
                     fullWidth
                     disabled={bid.bidsCount === 0}
                     onClick={() => {
-                    navigate(`/place-a-bid/bids/${bid?._id}`);
-                }}
+                        navigate(`/place-a-bid/bids/${bid?._id}`);
+                    }}
                     sx={{ py: 1 }}
                 >
                     View Proposals

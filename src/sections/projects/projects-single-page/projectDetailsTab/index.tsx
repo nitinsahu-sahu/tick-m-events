@@ -1,6 +1,6 @@
-import { Typography,Stack,Chip,Divider } from "@mui/material";
+import { Typography, Stack, Chip, Divider } from "@mui/material";
 
-export function ProjectDetailsTab({_project}:any) {
+export function ProjectDetailsTab({ _project }: any) {
     return (
         <>
             {/* Project Details */}
@@ -10,9 +10,11 @@ export function ProjectDetailsTab({_project}:any) {
             <Typography variant="body2" color="gray" mb={2}>
                 {_project?.orgBudget} XAF
             </Typography>
-            <Typography variant="body2" mb={2}>
-                {_project?.orgRequirement}
-            </Typography>
+            <Typography variant="body2" mb={2}
+                dangerouslySetInnerHTML={{ __html: _project?.orgRequirement }}
+            />
+            {/* {}
+            </Typography> */}
             <Typography variant="body2" mb={2}>
                 {_project?.orgAdditionalRequirement}
             </Typography>

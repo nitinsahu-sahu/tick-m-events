@@ -9,7 +9,8 @@ import { TicketCard } from 'src/components/event-card/event-card';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
-
+import { fetchLatestEventCreatedActivity } from 'src/redux/actions/activityActions';
+import { useNavigate } from 'react-router-dom';
 import { UpComingCard } from '../UpComingCard';
 import { PopularEvent } from '../PopularEvent';
 import { ExploreMoreSection } from '../ExploreMore';
@@ -37,11 +38,43 @@ interface Ticket {
 }
 
 export function HomeAndRecommendationsView() {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  const handleViewEvent = (eventId?: string) => {
+    if (eventId) {
+      navigate(`/our-event/${eventId}`);
+    }
+  };
+
   const { popularEvents, recommendedEvents } = useSelector((state: RootState) => state?.homeRecom);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const { _id } = useSelector((state: RootState) => state?.auth?.user);
+  const user = useSelector((state: RootState) => state?.auth?.user);
+  const notifications = user?.notifications || [];
   const [upcomingQrTicket, setUpcomingQrTicket] = useState<Ticket | null>(null);
   const [upcomingTickets, setUpcomingTickets] = useState<Ticket[]>([]);
+  const [latestEventActivity, setLatestEventActivity] = useState<any>(null);
+  const [hiddenNotifIds, setHiddenNotifIds] = useState<string[]>([]);
+
+  const latestChangeNotif = notifications
+    ?.slice()
+    ?.reverse()
+    ?.find((n: any) => {
+      const msg = n?.message?.toLowerCase();
+      return (
+        (msg.includes("location of") && msg.includes("has changed")) || // venue/location change
+        (msg.includes("date for") && msg.includes("has changed")) ||   // date change
+        (msg.includes("time for") && msg.includes("has changed"))      // time change
+      );
+    });
+
+
+  const latestChangeNotificationItem = {
+    text: latestChangeNotif?.message || "No recent event updates",
+    disabled: !latestChangeNotif,
+    eventId: latestChangeNotif?.eventId,
+  };
 
   useEffect(() => {
     async function fetchTickets() {
@@ -50,6 +83,7 @@ export function HomeAndRecommendationsView() {
 
         const allTickets: Ticket[] = response.data;
         setTickets(allTickets);
+        console.log("All", allTickets);
 
         const upcomingTicket = allTickets
           .filter(ticket => {
@@ -77,6 +111,37 @@ export function HomeAndRecommendationsView() {
     }
   }, [_id]);
 
+  useEffect(() => {
+    async function fetchLatestEventActivity() {
+      try {
+        const response = await dispatch(fetchLatestEventCreatedActivity()) as any;
+        if (response?.payload) {
+          setLatestEventActivity(response.payload);
+        }
+      } catch (err) {
+        console.error("Failed to fetch latest event_created activity:", err);
+      }
+    }
+
+    fetchLatestEventActivity();
+  }, [dispatch]);
+
+  const latestEventText = latestEventActivity
+    ? `${latestEventActivity.userId?.name || 'Someone'} created a new event: "${latestEventActivity.eventName || 'Untitled'}"`
+    : 'A new event was just created!';
+
+  // Pull ALL unread notifications
+  const unreadNotifications = notifications
+    ?.slice()
+    ?.reverse()
+    ?.filter((n: any) => !n.read)
+    ?.map((n: any) => ({
+      _id: n._id,
+      text: n.message,
+      eventId: n.eventId,
+      disabled: false,
+    }));
+
   function parseEventDate(ticket: Ticket): Date | null {
     if (!ticket.eventDetails?.date) return null;
     const date = ticket.eventDetails.date;   // "2025-09-03"
@@ -84,7 +149,7 @@ export function HomeAndRecommendationsView() {
     return new Date(`${date}T${time}:00`);
   }
 
-function getTimeLeft(ticketList: Ticket[]): string {
+  function getTimeLeft(ticketList: Ticket[]): string {
     if (!tickets || tickets.length === 0) return "No upcoming events";
 
     const now = new Date();
@@ -109,6 +174,41 @@ function getTimeLeft(ticketList: Ticket[]): string {
     if (minutes > 0) return `Your concert starts in ${minutes}m!`;
     return "Your concert is about to start!";
   }
+
+  const markAsRead = async (notifId?: string, index?: number) => {
+    if (!notifId) {
+      // Non-ID notification → just hide locally
+      setHiddenNotifIds(prev => [...prev, String(index)]);
+      return;
+    }
+
+    try {
+      await axios.patch(`/auth/users/${_id}/notifications/${notifId}/read`);
+
+      const updatedNotifications = notifications.map((n: any) =>
+        n._id === notifId ? { ...n, read: true } : n
+      );
+
+      dispatch({
+        type: "auth/updateUser",
+        payload: { ...user, notifications: updatedNotifications }
+      });
+
+      // Hide after marking
+      setHiddenNotifIds(prev => [...prev, notifId]);
+    } catch (err) {
+      console.error("Failed to mark notification as read:", err);
+    }
+  };
+
+  const visibleNotifications = [
+    ...unreadNotifications,
+    { text: getTimeLeft(upcomingTickets), eventId: upcomingQrTicket?.eventId },
+    { text: latestEventText, eventId: latestEventActivity?.metadata?.params?.eventId },
+    // { text: 'A festival is happening 2km from you!', disabled: false },
+    // { text: 'Reminder: DJ Party this weekend!' },
+    // { text: 'Exclusive Pass offer expires soon!' },
+  ].filter((item, index) => !hiddenNotifIds.includes(item._id || String(index)));
 
   return (
     <DashboardContent>
@@ -252,79 +352,93 @@ function getTimeLeft(ticketList: Ticket[]): string {
               },
             }}
           >
-            {[
-              { text: getTimeLeft(upcomingTickets) },
-              { text: '-20% on VIP tickets today!' },
-              { text: 'New date for Startup Summit 2025' },
-              { text: 'A festival is happening 2km from you!', disabled: false },
-              { text: 'Reminder: DJ Party this weekend!' },
-              { text: 'Exclusive Pass offer expires soon!' },
-              { text: 'Your venue has changed!' },
-            ].map((item, index) => (
-              <Box
-                key={index}
-                sx={{
-                  display: 'flex',
-                  flexDirection: { xs: 'column', sm: 'row' },
-                  justifyContent: 'space-between',
-                  alignItems: { xs: 'flex-start', sm: 'center' },
-                  borderRadius: 1,
-                  backgroundColor: item.disabled ? '#f9f9f9' : '#F3F3F3',
-                  color: item.disabled ? 'text.disabled' : 'text.primary',
-                  p: 2,
-                  mb: 2,
-                  opacity: item.disabled ? 0.5 : 1,
-                }}
-              >
-                {/* Message */}
-                <Typography sx={{ fontWeight: 500, mb: { xs: 1, sm: 0 } }}>{item.text}</Typography>
-                <Box
-                  mt={{ xs: 1, sm: 0 }}
+            <Box
+              sx={{
+                maxHeight: { xs: '250px', sm: '300px' },
+                overflowY: 'auto',
+                // ...styles
+              }}
+            >
+              {visibleNotifications.length > 0 ? (
+                visibleNotifications.map((item, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: 'flex',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      justifyContent: 'space-between',
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                      borderRadius: 1,
+                      backgroundColor: item.disabled ? '#f9f9f9' : '#F3F3F3',
+                      color: item.disabled ? 'text.disabled' : 'text.primary',
+                      p: 2,
+                      mb: 2,
+                      opacity: item.disabled ? 0.5 : 1,
+                    }}
+                  >
+                    <Typography sx={{ fontWeight: 500, mb: { xs: 1, sm: 0 } }}>{item.text}</Typography>
+                    <Box
+                      mt={{ xs: 1, sm: 0 }}
+                      sx={{
+                        width: { xs: '100%', sm: 'auto' },
+                        display: 'flex',
+                        justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+                        flexGrow: 1,
+                      }}
+                    >
+                      <Grid container spacing={1} sx={{ maxWidth: { sm: 360, md: 400 } }}>
+                        {[{ text: 'View Event', color: 'primary' as const }, { text: 'Mark as Read', custom: true }].map(
+                          ({ text: buttonText, color, custom }) => (
+                            <Grid item xs={12} sm={4} key={buttonText}>
+                              <Button
+                                fullWidth
+                                size="small"
+                                variant="contained"
+                                color={color || undefined}
+                                disabled={item.disabled || (!item.eventId && buttonText === 'View Event')}
+                                onClick={() => {
+                                  if (buttonText === 'View Event') {
+                                    handleViewEvent(item.eventId);
+                                  } else if (buttonText === 'Mark as Read') {
+                                    markAsRead(item._id, index);
+                                  }
+                                }}
+                                sx={{
+                                  fontSize: { xs: '10px', sm: '12px' },
+                                  fontWeight: 500,
+                                  textTransform: 'none',
+                                  backgroundColor: custom ? '#0b2e4c' : undefined,
+                                  '&:hover': {
+                                    backgroundColor: custom ? '#093047' : undefined,
+                                  },
+                                }}
+                              >
+                                {buttonText}
+                              </Button>
+                            </Grid>
+                          )
+                        )}
+                      </Grid>
+                    </Box>
+                  </Box>
+                ))
+              ) : (
+                <Typography
+                  variant="body1"
                   sx={{
-                    width: { xs: '100%', sm: 'auto' },
-                    display: 'flex',
-                    justifyContent: { xs: 'flex-start', sm: 'flex-end' },
-                    flexGrow: 1,
+                    textAlign: 'center',
+                    color: 'text.secondary',
+                    p: 2,
                   }}
                 >
-                  <Grid container spacing={1} sx={{ maxWidth: { sm: 360, md: 400 } }}>
-                    {[
-                      { text: 'View Event', color: 'primary' as const },
-                      { text: 'Mark as Read', custom: true },
-                    ].map(({ text, color, custom }) => (
-                      <Grid item xs={12} sm={4} key={text}>
-                        <Button
-                          fullWidth
-                          size="small"
-                          variant="contained"
-                          color={color || undefined}
-                          disabled={item.disabled}
-                          sx={{
-                            fontSize: { xs: '10px', sm: '12px' },
-                            fontWeight: 500,
-                            textTransform: 'none',
-                            backgroundColor: custom ? '#0b2e4c' : undefined,
-                            '&:hover': {
-                              backgroundColor: custom ? '#093047' : undefined,
-                            },
-                          }}
-                        >
-                          {text}
-                        </Button>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-
-              </Box>
-            ))}
+                  No notifications at the moment.
+                </Typography>
+              )}
+            </Box>
           </Box>
         </Paper>
       </Box>
-
-
       <ExploreMoreSection />
-
     </DashboardContent>
   );
 }

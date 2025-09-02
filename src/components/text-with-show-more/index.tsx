@@ -13,11 +13,9 @@ export function TextWithShowMore({ text, wordLimit = 70 }: any) {
 
     return (
         <Box>
-            <Typography variant="body2" paragraph>
-                {displayText}
-                {shouldTruncate && !expanded && '...'}
-            </Typography>
-
+            <Typography variant="body2" paragraph
+                dangerouslySetInnerHTML={{ __html: displayText }}
+            />
             {shouldTruncate && (
                 <IconButton
                     size="small"

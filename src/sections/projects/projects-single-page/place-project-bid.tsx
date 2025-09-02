@@ -5,7 +5,8 @@ import {
     Alert, CircularProgress, Card, CardContent
 } from "@mui/material";
 import { Link } from 'react-router-dom';
-
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -51,14 +52,6 @@ interface Project {
     bidStatus: string
 }
 
-interface MyBidResponse {
-    success: boolean;
-    hasBid: boolean;
-    message: string;
-    data?: any;
-}
-
-// Main component
 export function PlaceBidOnProject({ project }: { project: Project }) {
     const [bidData, setBidData] = useState<BidData>({
         bidAmount: "",
@@ -80,7 +73,6 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
     const [loadingBidCheck, setLoadingBidCheck] = useState(true);
     const [bidCheckError, setBidCheckError] = useState("");
     const [hasExistingBidThisProject, setHasExistingBidThisProject] = useState<any>(null);
-
 
     // Use useCallback to memoize the function and prevent infinite re-renders
     const checkExistingBid = useCallback(async () => {
@@ -112,8 +104,6 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
         checkExistingBid();
     }, [checkExistingBid]);
 
-
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
 
@@ -133,7 +123,13 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
         }
     };
 
-
+    const handleDescriptionChange = (value: string) => {
+        setBidData(prev => ({ ...prev, proposal: value }));
+        // Clear error when user starts typing
+        if (errors.proposal) {
+            setErrors(prev => ({ ...prev, proposal: undefined }));
+        }
+    };
 
     const addMilestone = () => {
         if (milestones.length < 5) {
@@ -161,46 +157,46 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
     };
 
     const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
+        const newErrors: FormErrors = {};
 
-    const bidAmountNum = Number(bidData.bidAmount);
-    if (!bidData.bidAmount || Number.isNaN(bidAmountNum) || bidAmountNum <= 0) {
-        newErrors.bidAmount = "Please enter a valid bid amount";
-    }
-
-    const deliveryTimeNum = parseInt(bidData.deliveryTime, 10);
-    if (!bidData.deliveryTime || Number.isNaN(deliveryTimeNum) || deliveryTimeNum <= 0) {
-        newErrors.deliveryTime = "Please enter a valid delivery time";
-    }
-
-    if (!bidData.proposal || bidData.proposal.length < 100) {
-        newErrors.proposal = "Proposal must be at least 100 characters";
-    }
-
-    // Track milestone total and mark only the violating milestone
-    let runningTotal = 0;
-    milestones.forEach((milestone, index) => {
-        const name = milestone.milestorneName.trim();
-        const amountNum = Number(milestone.amount);
-
-        if (!name) {
-            newErrors[`milestone_${index}_milestorneName`] = "Milestone name is required";
+        const bidAmountNum = Number(bidData.bidAmount);
+        if (!bidData.bidAmount || Number.isNaN(bidAmountNum) || bidAmountNum <= 0) {
+            newErrors.bidAmount = "Please enter a valid bid amount";
         }
 
-        if (!milestone.amount || Number.isNaN(amountNum) || amountNum <= 0) {
-            newErrors[`milestone_${index}_amount`] = "Valid amount is required";
-        } else {
-            runningTotal += amountNum;
+        const deliveryTimeNum = parseInt(bidData.deliveryTime, 10);
+        if (!bidData.deliveryTime || Number.isNaN(deliveryTimeNum) || deliveryTimeNum <= 0) {
+            newErrors.deliveryTime = "Please enter a valid delivery time";
+        }
 
-            if (bidAmountNum > 0 && runningTotal > bidAmountNum) {
-                newErrors[`milestone_${index}_amount`] = "Milestone exceeds the total bid amount";
+        if (!bidData.proposal || bidData.proposal.length < 100) {
+            newErrors.proposal = "Proposal must be at least 100 characters";
+        }
+
+        // Track milestone total and mark only the violating milestone
+        let runningTotal = 0;
+        milestones.forEach((milestone, index) => {
+            const name = milestone.milestorneName.trim();
+            const amountNum = Number(milestone.amount);
+
+            if (!name) {
+                newErrors[`milestone_${index}_milestorneName`] = "Milestone name is required";
             }
-        }
-    });
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-};
+            if (!milestone.amount || Number.isNaN(amountNum) || amountNum <= 0) {
+                newErrors[`milestone_${index}_amount`] = "Valid amount is required";
+            } else {
+                runningTotal += amountNum;
+
+                if (bidAmountNum > 0 && runningTotal > bidAmountNum) {
+                    newErrors[`milestone_${index}_amount`] = "Milestone exceeds the total bid amount";
+                }
+            }
+        });
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
 
     const handleSubmit = async (e: any) => {
@@ -439,29 +435,22 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
                         <Typography variant="subtitle2" mb={1}>
                             Describe your proposal (minimum 100 characters)
                         </Typography>
-                        <TextField
-                            fullWidth
-                            multiline
-                            minRows={4}
-                            name="proposal"
-                            placeholder="What makes you the best candidate for this project?"
-                            variant="outlined"
+                        <ReactQuill
+                            theme="snow"
                             value={bidData.proposal}
-                            onChange={handleInputChange}
-                            error={!!errors.proposal}
-                            helperText={
-                                <Typography variant="caption" color={errors.proposal ? "error" : "textSecondary"}>
-                                    {charCount} characters (Minimum 100 characters required)
-                                    {errors.proposal && ` - ${errors.proposal}`}
-                                </Typography>
-                            }
-                            sx={{
-                                mb: 2,
-                                "& .MuiOutlinedInput-root": {
-                                    borderRadius: 1
-                                }
+                            onChange={handleDescriptionChange}
+                            className="custom-quill"
+                            placeholder="Full Description of Requirements (minimum 80 characters)"
+                            modules={{
+                                toolbar: [
+                                    [{ 'header': [1, 2, false] }],
+                                    ['bold', 'italic', 'underline', 'strike'],
+                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                    ['link', 'clean']
+                                ]
                             }}
                         />
+                       
 
                         {/* Milestone Payment */}
                         <Divider sx={{ my: 2 }} />

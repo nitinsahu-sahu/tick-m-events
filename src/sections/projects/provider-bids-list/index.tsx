@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box, Typography, TableContainer, Table, TableHead, TableRow, TableCell,
-  TableBody, Paper, Chip, IconButton, Button, Dialog, DialogActions,
+  TableBody, Paper, Chip, IconButton, Button, Dialog, DialogActions, Tooltip,
   DialogContent, DialogContentText, DialogTitle, Grid, Stack, TextField,
   Divider, MenuItem, CircularProgress, Collapse, Select, FormControl, InputLabel
 } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info'; // or your preferred info icon
+
 import {
   Visibility as EyeIcon,
   Chat as ChatIcon,
@@ -21,6 +23,7 @@ import { getMyBids, withdrawnMyBids, updateBid } from 'src/redux/actions/provide
 import { Link, useNavigate } from 'react-router-dom';
 import { formatEventDate } from 'src/hooks/formate-time';
 import { ProviderOrganizerInfoModal } from 'src/components/modal/provider-orgnizer-info-modal';
+import { TextWithShowMore } from 'src/components/text-with-show-more';
 
 export function ProviderBidsList() {
   const dispatch = useDispatch<AppDispatch>();
@@ -160,6 +163,17 @@ export function ProviderBidsList() {
   const toggleRowExpand = (bidId: string) => {
     setExpandedRow(expandedRow === bidId ? null : bidId);
   };
+
+  const handleProviderAcceptance = async (bidId: any) => {
+    try {
+      // API call to update provider acceptance status
+      // const response = await updateBidAcceptance(bidId, { isProviderAccepted: true });
+      // Update local state or refetch data
+    } catch (error) {
+      console.error('Error accepting bid:', error);
+    }
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       {/* Withdraw Confirmation */}
@@ -444,6 +458,45 @@ export function ProviderBidsList() {
                             <Typography><strong>Location:</strong> {bid.projectId?.eventLocation}</Typography>
                             <Typography><strong>Budget Range:</strong> {bid.projectId?.orgBudget}</Typography>
                             <Typography><strong>Service Time:</strong> {new Date(bid.projectId?.serviceTime).toLocaleString()}</Typography>
+                            <Typography mt={2} sx={{ display: 'flex', alignItems: 'center' }}>
+                              <strong>Status:</strong>
+                              {bid.projectId?.status === "process" ? (
+                                <span style={{ marginLeft: '8px', color: '#666' }}>
+                                  Process (Not Editable)
+                                </span>
+                              ) : (
+                                <>
+                                  <FormControl size="small" sx={{ ml: 1, minWidth: 120 }}>
+                                    <InputLabel>Project Status</InputLabel>
+                                    <Select
+                                      sx={{ width: 200, height: 30 }}
+                                      value={statusUpdates[bid._id] || bid.projectId?.status || 'process'}
+                                      label="Status"
+                                      onChange={(e) => handleStatusChange(bid._id, e.target.value)}
+                                      onClick={(e) => e.stopPropagation()}
+                                      disabled={!(bid.isProviderAccepted && bid.isOrgnizerAccepted)}
+                                    >
+                                      <MenuItem value="process">Process</MenuItem>
+                                      <MenuItem value="ongoing">Ongoing</MenuItem>
+                                    </Select>
+                                  </FormControl>
+
+                                  <Tooltip
+                                    title={
+                                      !(bid.isProviderAccepted && bid.isOrgnizerAccepted)
+                                        ? "Status can only be changed after both provider and organizer have accepted the project."
+                                        : "You can now change the project status, and the organizer is complete this project"
+                                    }
+                                    placement="right"
+                                    arrow
+                                  >
+                                    <IconButton size="small" sx={{ ml: 1, color: 'text.secondary' }}>
+                                      <InfoIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </>
+                              )}
+                            </Typography>
                           </Grid>
 
                           <Grid item xs={12} md={6}>
@@ -451,28 +504,26 @@ export function ProviderBidsList() {
                             <Typography><strong>Bid Amount:</strong> {bid.bidAmount} XAF</Typography>
                             <Typography><strong>Delivery Time:</strong> {bid.deliveryTime} {bid.deliveryUnit}</Typography>
                             <Typography><strong>Time to bid:</strong> {formatEventDate(bid?.createdAt)}</Typography>
+                            <Typography sx={{ color: bid.isOrgnizerAccepted ? 'green' : 'red' }}><strong style={{ color: "black" }}>Orgnizer Acceptance:</strong> {bid.isOrgnizerAccepted ? "Accepted" : "Pending"}</Typography>
+                            {
+                              bid.isOrgnizerAccepted && (<Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <strong>Your Acceptance:</strong>
+                                {bid.isProviderAccepted ? (
+                                  "Accepted"
+                                ) : (
+                                  <Button
+                                    sx={{ height: 22 }}
+                                    variant="contained"
+                                    color="primary"
+                                    size="small"
+                                    onClick={() => handleProviderAcceptance(bid._id)}
+                                  >
+                                    Accept
+                                  </Button>
+                                )}
+                              </Typography>)
+                            }
 
-                            <Typography mt={2}><strong>Status:</strong>
-                              <FormControl size="small" sx={{ ml: 1, minWidth: 120 }}>
-                                <InputLabel>Status</InputLabel>
-                                <Select
-                                  value={statusUpdates[bid._id] || 'process'}
-                                  label="Status"
-                                  onChange={(e) => handleStatusChange(bid._id, e.target.value)}
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <MenuItem value="process">Process</MenuItem>
-                                  <MenuItem value="ongoing">Ongoing</MenuItem>
-                                </Select>
-                              </FormControl>
-                            </Typography>
-                          </Grid>
-
-                          <Grid item xs={12}>
-                            <Typography variant="subtitle2" gutterBottom>Proposal</Typography>
-                            <Paper sx={{ p: 2, backgroundColor: 'white' }}>
-                              <Typography>{bid.proposal}</Typography>
-                            </Paper>
                           </Grid>
 
                           {bid.milestones && bid.milestones.length > 0 && (
@@ -484,20 +535,31 @@ export function ProviderBidsList() {
                                     <TableCell>Milestone Name</TableCell>
                                     <TableCell align="right">Amount</TableCell>
                                     <TableCell>Currency</TableCell>
+                                    <TableCell>Status</TableCell>
                                   </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                  {bid.milestones.map((milestone: any, idx: number) => (
+                                  {bid.milestones?.map((milestone: any, idx: number) => (
                                     <TableRow key={idx}>
                                       <TableCell>{milestone.milestorneName}</TableCell>
                                       <TableCell align="right">{milestone.amount}</TableCell>
                                       <TableCell>{milestone.currency}</TableCell>
+                                      <TableCell sx={{ fontWeight: 700, color: milestone.isReleased ? 'green' : 'red' }}>
+                                        {milestone.isReleased ? 'Released' : 'Pending'}
+                                      </TableCell>
                                     </TableRow>
                                   ))}
                                 </TableBody>
                               </Table>
                             </Grid>
                           )}
+
+                          <Grid item xs={12}>
+                            <Typography variant="subtitle2" gutterBottom>Proposal</Typography>
+                            <Paper sx={{ p: 2, backgroundColor: 'white' }}>
+                              <TextWithShowMore text={bid.proposal} />
+                            </Paper>
+                          </Grid>
                         </Grid>
                       </Box>
                     </Collapse>

@@ -76,8 +76,6 @@ export const fatchOrgProjectBids = (projectId) => async (dispatch) => {
 };
 
 export const assignProjectToProvider = (data,projectId, bidId) => async (dispatch) => {
-     console.log("response", projectId, bidId, data);
-
     dispatch({ type: organizerEventConstants.ASSIGN_PROJECT_REQUEST });
 
     try {

@@ -262,6 +262,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
         console.log('Releasing funds for milestone:', milestoneId);
         // Your release logic here
     };
+console.log(project,'project');
 
     return (
         <>
@@ -324,7 +325,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
                                             label="Status"
                                             onChange={(e) => handleStatusChange(selectedBid._id, e.target.value)}
                                             onClick={(e) => e.stopPropagation()}
-                                            disabled={!(selectedBid.isProviderAccepted && selectedBid.isOrgnizerAccepted)}
+                                            disabled={project?.status === "pending" || project?.status === "process"}
                                         >
                                             <MenuItem value={project?.status} disabled>
                                                 {project?.status} (Current)
@@ -333,11 +334,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
                                         </Select>
                                     </FormControl>
                                     <Tooltip
-                                        title={
-                                            !(selectedBid.isProviderAccepted && selectedBid.isOrgnizerAccepted)
-                                                ? "Status can only be changed after both provider and organizer have accepted the project"
-                                                : "You can now change the project status"
-                                        }
+                                        title="When a project moves into the Ongoing stage, the status select box will automatically open so that you can mark as complete this project."
                                         placement="right"
                                         arrow
                                     >
@@ -557,7 +554,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
                         variant="contained"
                         color="success"
                         onClick={() => handleActionClick('isOrgnizerAccepted')}
-                        disabled={selectedBid?.status !== 'pending' || isEditing}
+                        disabled={selectedBid?.status !== 'accepted' || isEditing}
                     >
                         Award Request
                     </Button>

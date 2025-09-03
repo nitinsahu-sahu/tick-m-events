@@ -24,6 +24,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { formatEventDate } from 'src/hooks/formate-time';
 import { ProviderOrganizerInfoModal } from 'src/components/modal/provider-orgnizer-info-modal';
 import { TextWithShowMore } from 'src/components/text-with-show-more';
+import { confirmAcceptanceProvider } from 'src/redux/actions/organizer/pageEvents';
 
 export function ProviderBidsList() {
   const dispatch = useDispatch<AppDispatch>();
@@ -35,7 +36,9 @@ export function ProviderBidsList() {
   const [selectedBid, setSelectedBid] = useState<any>(null);
   const [openViewDialog, setOpenViewDialog] = useState(false);
   const [selectedOrg, setSelectedOrg] = useState<any>({});
-
+console.log('====================================');
+console.log(_mybids);
+console.log('====================================');
   const handleViewOpenDialog = (bid: any) => {
     setSelectedOrg(bid);
     setOpenViewDialog(true);
@@ -164,23 +167,18 @@ export function ProviderBidsList() {
     setExpandedRow(expandedRow === bidId ? null : bidId);
   };
 
-  const handleProviderAcceptance = useCallback(async (bidId: any) => {
+  const handleProviderAcceptance = useCallback(async (bid: any) => {
+    const data={
+      status:"isProviderAccepted"
+    }
+  
     try {
-      // const result = await dispatch(assignProjectToProvider(data, selectedBid?.projectId, selectedBid?._id));
-      // if (result?.status === 200) {
-      //   // Reset state
-      //   setActionType(null);
-      //   setRejectionReason("");
-      //   setAcceptedAmount(0);
-      //   setErrors({ acceptedAmount: "", rejectionReason: "", message: "" });
-      // } else {
-      //   setErrors({ acceptedAmount: "", rejectionReason: "", message: result?.message });
-
-      // }
+      await dispatch(confirmAcceptanceProvider(data, bid?.projectId?._id, bid?._id));
+   
     } catch (error) {
       console.error("Verification error:", error);
     }
-  }, [])
+  }, [dispatch])
 
   return (
     <Box sx={{ p: 3 }}>
@@ -520,7 +518,7 @@ export function ProviderBidsList() {
                                     variant="contained"
                                     color="primary"
                                     size="small"
-                                    onClick={() => handleProviderAcceptance(bid._id)}
+                                    onClick={() => handleProviderAcceptance(bid)}
                                   >
                                     Accept
                                   </Button>

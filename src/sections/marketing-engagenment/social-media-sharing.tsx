@@ -65,8 +65,9 @@ export function SocialMediaSharing({ selEvent }: any) {
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             setSelectedFile(e.target.files[0]);
-            const imageUrl = URL.createObjectURL(e.target.files[0]);
-            setEventImage(imageUrl);
+            const file = e.target.files[0];
+            const fileUrl = URL.createObjectURL(file);
+            setEventImage(fileUrl);
         }
     };
 
@@ -109,12 +110,12 @@ export function SocialMediaSharing({ selEvent }: any) {
         }
     };
 
-     const handleShare = () => {
+    const handleShare = () => {
         if (!savedPostData) {
             alert("Please save the post first");
             return;
         }
- 
+
         const {
             description: savedDescription,
             reservationLink: savedReservationLink,
@@ -122,10 +123,10 @@ export function SocialMediaSharing({ selEvent }: any) {
             imageUrl,
             eventId
         } = savedPostData;
- 
+
         const fullMsg = `${savedDescription}\nReservation: ${savedReservationLink}\n${savedHashtag}\nImage: ${imageUrl}`;
         const encodedMsg = encodeURIComponent(fullMsg);
- 
+
         switch (selectedPlatform.label) {
             case 'WhatsApp':
                 window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
@@ -153,11 +154,11 @@ export function SocialMediaSharing({ selEvent }: any) {
                 window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`, '_blank');
                 break;
             }
- 
+
             default:
                 break;
         }
- 
+
     };
 
 
@@ -188,7 +189,21 @@ export function SocialMediaSharing({ selEvent }: any) {
                 {eventImage && (
                     <Card sx={{ mb: 3, p: 2, borderRadius: '10px', backgroundColor: '#e0f7fa', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <CardContent sx={{ flex: 1 }}>
-                            <img src={eventImage} alt="Event" style={{ maxWidth: 100, borderRadius: 10, marginBottom: 8 }} />
+                            {selectedFile?.type.startsWith("video/") ? (
+                                <video src={eventImage} controls style={{ maxWidth: 200, borderRadius: 10 }}>
+                                    <track
+                                        kind="captions"
+                                        src="/captions/sample.vtt"
+                                        srcLang="en"
+                                        label="English captions"
+                                        default
+                                    />
+                                    Your browser does not support the video tag.
+                                </video>
+
+                            ) : (
+                                <img src={eventImage} alt="Event" style={{ maxWidth: 200, borderRadius: 10 }} />
+                            )}
                             <Typography variant="subtitle1" fontWeight="bold">{description}</Typography>
 
                             {/* New: Event Name and Date */}
@@ -218,9 +233,14 @@ export function SocialMediaSharing({ selEvent }: any) {
                 {/* Edit Form */}
                 <Paper sx={{ p: 2, borderRadius: '10px', background: '#f5f5f5' }}>
                     <Typography variant="subtitle1" fontWeight="bold" mb={1}>Edit Your Post</Typography>
-
-                    <Typography variant="body2" fontWeight="bold" mb={1}>Event Image</Typography>
-                    <TextField type="file" fullWidth onChange={handleImageChange} sx={{ mb: 2 }} />
+                    <Typography variant="body2" fontWeight="bold" mb={1}>Event Media (Image/Video)</Typography>
+                    <TextField
+                        type="file"
+                        inputProps={{ accept: "image/*,video/*" }}   // allow images and videos
+                        fullWidth
+                        onChange={handleImageChange}
+                        sx={{ mb: 2 }}
+                    />
 
                     <Typography variant="body2" fontWeight="bold" mb={1}>
                         Description ({selectedPlatform.maxLength === Infinity ? 'Unlimited' : `Max ${selectedPlatform.maxLength} chars`})

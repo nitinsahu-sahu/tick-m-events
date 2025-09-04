@@ -201,7 +201,8 @@ export function BidsOnPlaceABid() {
                     <Grid item xs={12} md={8}>
                         <Typography variant="h6" gutterBottom>Project Requirements</Typography>
                         <Typography variant="body1" paragraph>
-                            {project.orgRequirement}
+                            <TextWithShowMore text={project.orgRequirement} wordLimit={150}/>
+                            
                         </Typography>
 
                         {project.orgAdditionalRequirement && (

@@ -6,12 +6,12 @@ import { HeadingCommon } from "src/components/multiple-responsive-heading/headin
 import { TicketReservationManagementTable } from "src/components/tables/ticket-reservation-management-table";
 import { TicketCreationAndConfiguration } from "./ticket-creation-&-onfiguration";
 
-export function TicketManagement({ tickets }: any) {
+export function TicketManagement({ tickets, selectedEvent }: any) {
     const [showTicketCreation, setShowTicketCreation] = useState(false);
 
     const ticketManagementTableHeaders = ["Ticket Name", "Price", "Quantity Available", "Ticket Description", "Remaining Stock", "Actions"];
 
-const handleTicketCreationSuccess = () => {
+    const handleTicketCreationSuccess = () => {
         setShowTicketCreation(false);
     };
     return (
@@ -28,6 +28,7 @@ const handleTicketCreationSuccess = () => {
                         width: "90%",
                         '&:hover': { backgroundColor: '#2196F3' }
                     }}
+                    disabled={!selectedEvent}
                     onClick={() => setShowTicketCreation((prev) => !prev)}
                 >
                     {showTicketCreation ? "Cancel Adding Ticket" : "Add a Ticket"}
@@ -36,7 +37,8 @@ const handleTicketCreationSuccess = () => {
 
             {showTicketCreation && (
                 <Box mt={4}>
-                    <TicketCreationAndConfiguration onSuccess={handleTicketCreationSuccess} />
+                    <TicketCreationAndConfiguration onSuccess={handleTicketCreationSuccess}
+                        eventId={selectedEvent._id} />
                 </Box>
             )}
         </Box>

@@ -15,23 +15,22 @@ import { LoadingButton } from '@mui/lab';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
-
 import { AppDispatch, RootState } from 'src/redux/store';
 import { Iconify } from 'src/components/iconify';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { ticketConfigCreate } from 'src/redux/actions/event.action';
-import { fetchTicketType } from 'src/redux/actions/ticket-&-reservation-management.action';
+import { fetchTicketType, createTicketType } from 'src/redux/actions/ticket-&-reservation-management.action';
 
 
 export function StepperStepTwo() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const { tickets } = useSelector((state: RootState) => state?.ticketReservationMang);
     const [selectedTicket, setSelectedTicket] = useState<string>("");
     const [selectedRefundPolicy, setSelectedRefundPolicy] = useState("");
     const [refundEnabled, setRefundEnabled] = useState(false);
     const [payStatus, setPayStatus] = useState('paid');
-    const [loading, setLoading] = useState(false);
     const [ticketConfigData, setTicketConfigData] = useState({
         purchaseDeadlineDate: "",
         isPurchaseDeadlineEnabled: "true",
@@ -63,13 +62,22 @@ export function StepperStepTwo() {
     });
 
     useEffect(() => {
-        dispatch(fetchTicketType());
+        const searchParams = new URLSearchParams(window.location.search);
+        const eventId = searchParams.get("eventId");
+
+        if (!eventId) {
+            return undefined; // explicitly return, satisfies ESLint
+        }
+
+        dispatch(fetchTicketType(eventId));
+
         const interval = setInterval(() => {
-            dispatch(fetchTicketType());
+            dispatch(fetchTicketType(eventId));
         }, 20000);
 
-        return () => clearInterval(interval);
+        return () => clearInterval(interval); // cleanup
     }, [dispatch]);
+
 
     const handleTicketSelect = (ticketId: string) => {
         setSelectedTicket(ticketId);
@@ -155,39 +163,127 @@ export function StepperStepTwo() {
         }
     };
 
+    // const handleTicketConfig = useCallback(async (event: any) => {
+    //     event.preventDefault();
+    //     setLoading(true);
+    //     const formEventData = new FormData();
+    //     formEventData.append("tickets", JSON.stringify(ticketRows));
+    //     formEventData.append("purchaseDeadlineDate", ticketConfigData.purchaseDeadlineDate);
+    //     formEventData.append("isPurchaseDeadlineEnabled", ticketConfigData.isPurchaseDeadlineEnabled);
+    //     formEventData.append("paymentMethods", ticketConfigData.paymentMethods);
+    //     formEventData.append("isRefundPolicyEnabled", refundEnabled.toString());
+    //     formEventData.append("payStatus", payStatus);
+
+    //     if (selectedRefundPolicy === "fullRefund") {
+    //         formEventData.append("fullRefundCheck", "true");
+    //         formEventData.append("fullRefundDaysBefore", ticketConfigData.fullRefundDaysBefore);
+    //     } else if (selectedRefundPolicy === "partialRefund") {
+    //         formEventData.append("partialRefundCheck", "true");
+    //         formEventData.append("partialRefundPercent", ticketConfigData.partialRefundPercent);
+    //     } else if (selectedRefundPolicy === "noRefundDate") {
+    //         formEventData.append("noRefundAfterDateCheck", "true");
+    //         formEventData.append("noRefundDate", ticketConfigData.noRefundDate);
+    //     }
+
+    //     try {
+    //         const searchParams = new URLSearchParams(window.location.search);
+    //         const eventId = searchParams.get('eventId');
+
+    //         const res = await dispatch(ticketConfigCreate({ formEventData, eventId }));
+
+    //         const ticketConfigId = res?.ticketConfigId;
+
+    //         navigate(`?eventId=${eventId}&ticketConfigId=${ticketConfigId}`, { replace: true });
+    //     } catch (error) {
+    //         toast.error("Server Error");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+
+    // }, [
+    //     navigate,
+    //     payStatus,
+    //     dispatch,
+    //     ticketRows,
+    //     ticketConfigData,
+    //     refundEnabled,
+    //     selectedRefundPolicy
+    // ]);
+
     const handleTicketConfig = useCallback(async (event: any) => {
         event.preventDefault();
         setLoading(true);
-        const formEventData = new FormData();
-
-        formEventData.append("tickets", JSON.stringify(ticketRows));
-        formEventData.append("purchaseDeadlineDate", ticketConfigData.purchaseDeadlineDate);
-        formEventData.append("isPurchaseDeadlineEnabled", ticketConfigData.isPurchaseDeadlineEnabled);
-        formEventData.append("paymentMethods", ticketConfigData.paymentMethods);
-        formEventData.append("isRefundPolicyEnabled", refundEnabled.toString());
-        formEventData.append("payStatus", payStatus);
-
-        if (selectedRefundPolicy === "fullRefund") {
-            formEventData.append("fullRefundCheck", "true");
-            formEventData.append("fullRefundDaysBefore", ticketConfigData.fullRefundDaysBefore);
-        } else if (selectedRefundPolicy === "partialRefund") {
-            formEventData.append("partialRefundCheck", "true");
-            formEventData.append("partialRefundPercent", ticketConfigData.partialRefundPercent);
-        } else if (selectedRefundPolicy === "noRefundDate") {
-            formEventData.append("noRefundAfterDateCheck", "true");
-            formEventData.append("noRefundDate", ticketConfigData.noRefundDate);
-        }
 
         try {
             const searchParams = new URLSearchParams(window.location.search);
-            const eventId = searchParams.get('eventId');
+            const eventId = searchParams.get("eventId");
+            if (!eventId) {
+                toast.error("Event ID missing");
+                return;
+            }
 
+            // 1️⃣ Create ticket types first and collect their ObjectIds
+            const createdTickets = await Promise.all(
+                ticketRows.map(async (row) => {
+                    const res: any = await dispatch(
+                        createTicketType({
+                            eventId,
+                            name: row.ticketType,
+                            quantity: String(row.totalTickets),
+                            ticketDescription: row.description,
+                            price: payStatus === "free" ? "0" : String(row.price),
+                            validity: ticketConfigData.purchaseDeadlineDate
+                                ? new Date(ticketConfigData.purchaseDeadlineDate).toISOString()
+                                : "",
+                            options: {
+                                transferableTicket: false,
+                                personalizedTicket: false,
+                                activationCode: false,
+                            },
+                        })
+                    );
+
+                    return {
+                        ticketType: row.ticketType,
+                        id: res?.ticketTypeId, // 👈 backend must return TicketType._id
+                        price: payStatus === "free" ? "0" : String(row.price),
+                        totalTickets: row.totalTickets,
+                        description: row.description,
+                        isLimitedSeat: row.isLimitedSeat ?? true,
+                        isLinkPramotion: row.isLinkPramotion ?? false,
+                    };
+                })
+            );
+
+            // 2️⃣ Build FormData with valid ObjectIds for tickets
+            const formEventData = new FormData();
+            formEventData.append("tickets", JSON.stringify(createdTickets));
+            formEventData.append("purchaseDeadlineDate", ticketConfigData.purchaseDeadlineDate);
+            formEventData.append("isPurchaseDeadlineEnabled", ticketConfigData.isPurchaseDeadlineEnabled);
+            formEventData.append("paymentMethods", ticketConfigData.paymentMethods);
+            formEventData.append("isRefundPolicyEnabled", refundEnabled.toString());
+            formEventData.append("payStatus", payStatus);
+
+            if (selectedRefundPolicy === "fullRefund") {
+                formEventData.append("fullRefundCheck", "true");
+                formEventData.append("fullRefundDaysBefore", ticketConfigData.fullRefundDaysBefore);
+            } else if (selectedRefundPolicy === "partialRefund") {
+                formEventData.append("partialRefundCheck", "true");
+                formEventData.append("partialRefundPercent", ticketConfigData.partialRefundPercent);
+            } else if (selectedRefundPolicy === "noRefundDate") {
+                formEventData.append("noRefundAfterDateCheck", "true");
+                formEventData.append("noRefundDate", ticketConfigData.noRefundDate);
+            }
+
+            // 3️⃣ Now create TicketConfiguration with those ids
             const res = await dispatch(ticketConfigCreate({ formEventData, eventId }));
-
             const ticketConfigId = res?.ticketConfigId;
 
             navigate(`?eventId=${eventId}&ticketConfigId=${ticketConfigId}`, { replace: true });
+
+            toast.success("Tickets saved successfully!");
         } catch (error) {
+            console.error(error);
             toast.error("Server Error");
         } finally {
             setLoading(false);
@@ -199,7 +295,7 @@ export function StepperStepTwo() {
         ticketRows,
         ticketConfigData,
         refundEnabled,
-        selectedRefundPolicy
+        selectedRefundPolicy,
     ]);
 
     const handlePayStatus = (newValue: any) => {

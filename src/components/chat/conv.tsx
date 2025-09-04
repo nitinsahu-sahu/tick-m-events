@@ -2,6 +2,7 @@ import {
   Box, Avatar, Typography, TextField, Button, List, ListItem, ListItemAvatar, ListItemText,
   InputAdornment, IconButton, MenuItem, Menu
 } from '@mui/material';
+import Videocam from '@mui/icons-material/Videocam';
 import CallIcon from '@mui/icons-material/Call';
 import VideoCallIcon from '@mui/icons-material/VideoCall';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -14,12 +15,11 @@ import EmojiPicker from 'emoji-picker-react';
 
 import { fetchConversation, fetchConversationUserList, fetchMessagesbyConvId } from 'src/redux/actions/message.action';
 import { AppDispatch, RootState } from 'src/redux/store';
-import { formatTimeToAMPM } from 'src/hooks/formate-time';
 
 import axios from '../../redux/helper/axios'
 import { HeadingCommon } from '../multiple-responsive-heading/heading';
-import { SelectedUser, ConversationUser, UnreadCounts, MessagesState, ConversationData } from './utills';
-import { Iconify } from '../iconify';
+import { SelectedUser, ConversationUser, UnreadCounts, MessagesState, ConversationData, formatFileSize, downloadFile } from './utills';
+import { MessageBubble } from './message-bubble';
 
 export function ChatPanel() {
   const [selectedOption, setSelectedOption] = useState<SelectedUser>();
@@ -41,7 +41,9 @@ export function ChatPanel() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const documentInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
   const handleClick = (event: any) => {
@@ -114,6 +116,7 @@ export function ChatPanel() {
           email: string;
           profile: string;
         };
+        files: any,
         type: string;
         updatedAt?: string;
       }) => {
@@ -125,6 +128,7 @@ export function ChatPanel() {
               ...prev.messages,
               {
                 user: data.user,
+                files: data.files,
                 message: data.message,
                 updatedAt: data.updatedAt,
                 type: data.type,
@@ -301,13 +305,8 @@ export function ChatPanel() {
 
   useEffect(() => {
     const fetchConversations = async () => {
-      try {
-        await axios.get(`/conv/conversations?userId=${convUser?.organizerId?._id || selectedOption}`);
-      } catch (error) {
-        console.log("Conversation not found");
-      }
+      await axios.get(`/conv/conversations?userId=${convUser?.organizerId?._id || selectedOption}`);
     };
-
     fetchConversations();
   }, [messages, convUser?.organizerId?._id, selectedOption]);
 
@@ -316,26 +315,28 @@ export function ChatPanel() {
   };
 
   // Trigger file input click
-  const triggerFileInput = (type: 'image' | 'document') => {
-    if (fileInputRef.current) {
-      fileInputRef.current.accept = type === 'image'
-        ? 'image/jpeg,image/png,image/gif'
-        : 'application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-      fileInputRef.current.click();
+  const triggerFileInput = (type: 'image' | 'document' | 'video') => {
+    if (type === 'image' && imageInputRef.current) {
+      imageInputRef.current.click();
+    } else if (type === 'document' && documentInputRef.current) {
+      documentInputRef.current.click();
+    } else if (type === 'video' && videoInputRef.current) {
+      videoInputRef.current.click();
     }
   };
 
-  // File input handler
-  const handleFileInputChange = (type: 'image' | 'document' | 'video') => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+  // Update the handleUpload function
+  const handleUpload = async (file: File, type: 'image' | 'document' | 'video') => {
 
-    const file = files[0];
+    if (!selectedOption) {
+      alert('Please select a conversation first');
+      return;
+    }
 
     // Validate file type
     const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     const validDocumentTypes = ['application/pdf', 'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
     const validVideoTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
 
     if (type === 'image' && !validImageTypes.includes(file.type)) {
@@ -344,7 +345,7 @@ export function ChatPanel() {
     }
 
     if (type === 'document' && !validDocumentTypes.includes(file.type)) {
-      alert('Please select a valid document file (PDF, DOC, DOCX)');
+      alert('Please select a valid document file (PDF, DOC, DOCX, TXT)');
       return;
     }
 
@@ -353,97 +354,117 @@ export function ChatPanel() {
       return;
     }
 
-    handleUpload(file, type);
-    e.target.value = ''; // Reset input
-  };
-
-  // Upload file to Cloudinary
-  const handleUpload = async (file: File, type: 'image' | 'document' | 'video') => {
-    if (!selectedOption) {
-      alert('Please select a conversation first');
-      return;
-    }
-
     setUploading(true);
 
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const config = {
+
+      // Upload file to backend
+      const result = await axios.post(`/conv/upload-file`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
-      };
-      const result = await axios.post(`/conv/upload-file`, formData, config);
+      });
 
-      if (result.data.status === 200) {
-        // Send the URL via chat
+      if (result.data) {
         const receiverId = typeof messages?.receiver === 'string'
           ? messages?.receiver
           : messages?.receiver?.receiverId;
-        const tempMessageId = Date.now().toString(); // Temporary ID for optimistic update
 
         const messageData = {
           conversationId: messages?.conversationId,
           senderId: user?._id,
-          message,
-          file: {
+          message, // Include text message if any
+          files: [{
             public_id: result.data.public_id,
-            url: result.data.secure_url
-          },
+            url: result.data.secure_url,
+            fileType: type,
+            fileName: file.name,
+            fileSize: file.size
+          }],
           receiverId,
           type: "file"
         };
-        // // Optimistic update
-        // setMessages(prev => ({
-        //   ...prev,
-        //   messages: [
-        //     ...prev.messages,
-        //     {
-        //       user: {
-        //         _id: user?._id,
-        //         name: user?.name,
-        //         email: user?.email,
-        //         profile: user?.profile
-        //       },
-        //       file: {
-        //         public_id: data.public_id,
-        //         url: data.secure_url
-        //       },
-        //       message,
-        //       updatedAt: new Date().toISOString(),
-        //       type,
-        //       tempId: tempMessageId
-        //     }
-        //   ]
-        // }));
 
-        // // Emit socket event
-        // socket?.emit('sendMessage', {
-        //   ...messageData,
-        //   user: {
-        //     _id: user?._id,
-        //     name: user?.name,
-        //     email: user?.email,
-        //     profile: user?.profile
-        //   },
-        //   updatedAt: new Date().toISOString()
-        // });
+        // Optimistic update
+        const tempMessageId = Date.now().toString();
+        setMessages(prev => ({
+          ...prev,
+          messages: [
+            ...prev.messages,
+            {
+              user: {
+                _id: user?._id,
+                name: user?.name,
+                email: user?.email,
+                profile: user?.profile
+              },
+              files: messageData.files,
+              message: messageData.message,
+              updatedAt: new Date().toISOString(),
+              type: "file",
+              tempId: tempMessageId
+            }
+          ]
+        }));
+
+        setMessage(''); // Clear text message
+
+        // Emit socket event
+        socket?.emit('sendMessage', {
+          ...messageData,
+          user: {
+            _id: user?._id,
+            name: user?.name,
+            email: user?.email,
+            profile: user?.profile
+          },
+          updatedAt: new Date().toISOString()
+        });
 
         // Send to server
-        const res = await axios.post(`/conv/message`, messageData);
-        console.log('====================================');
-        console.log('res', res);
-        console.log('====================================');
+        await axios.post(`/conv/message`, messageData);
       }
     } catch (error) {
-      console.error('Upload failed:', error.message);
       alert('File upload failed. Please try again.');
     } finally {
       setUploading(false);
     }
   };
 
+  // Update the file input change handler
+  const handleFileInputChange = (type: 'image' | 'document' | 'video') => (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('type', type);
+
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    handleUpload(file, type);
+    e.target.value = ''; // Reset input
+  };
+
+  const handleImageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    handleUpload(files[0], 'image');
+    e.target.value = '';
+  };
+
+  const handleDocumentInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    handleUpload(files[0], 'document');
+    e.target.value = '';
+  };
+
+  const handleVideoInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    handleUpload(files[0], 'video');
+    e.target.value = '';
+  };
   useEffect(() => {
     // When conversations are loaded, check if we need to update the selected conversation
     if (selectedOption?.conversationId === 'new' && conv) {
@@ -815,12 +836,29 @@ export function ChatPanel() {
                 </Box>
               )}
               {/* Hidden file inputs */}
+              {/* Hidden file inputs for each type */}
               <input
                 type="file"
-                ref={fileInputRef}
-                onChange={handleFileInputChange('image')}
+                ref={imageInputRef}
+                onChange={handleImageInputChange}
+                accept="image/jpeg,image/png,image/gif,image/webp"
                 style={{ display: 'none' }}
               />
+              <input
+                type="file"
+                ref={documentInputRef}
+                onChange={handleDocumentInputChange}
+                accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
+                style={{ display: 'none' }}
+              />
+              <input
+                type="file"
+                ref={videoInputRef}
+                onChange={handleVideoInputChange}
+                accept="video/mp4,video/webm,video/quicktime"
+                style={{ display: 'none' }}
+              />
+
               {/* Attachment menu */}
               <Menu
                 id="attachment-menu"
@@ -847,11 +885,18 @@ export function ChatPanel() {
                   Image
                 </MenuItem>
                 <MenuItem onClick={() => {
-                  console.log('Document selected');
+                  triggerFileInput('document');
                   handleClose();
                 }}>
                   <InsertDriveFile fontSize="small" sx={{ mr: 1 }} />
                   Document
+                </MenuItem>
+                <MenuItem onClick={() => {
+                  triggerFileInput('video');
+                  handleClose();
+                }}>
+                  <Videocam fontSize="small" sx={{ mr: 1 }} />
+                  Video
                 </MenuItem>
               </Menu>
 
@@ -904,113 +949,3 @@ export function ChatPanel() {
 };
 
 
-const MessageBubble = ({ message, isCurrentUser }: any) => {
-  const { type, message: content, updatedAt } = message;
-  const bubbleStyle = {
-    display: 'flex',
-    justifyContent: isCurrentUser ? 'flex-end' : 'flex-start',
-    mb: 1
-  };
-
-  const contentBoxStyle = {
-    backgroundColor: isCurrentUser ? '#032D4F' : '#e0e0e0',
-    borderRadius: isCurrentUser ? '18px 18px 0 18px' : '18px 18px 18px 0',
-    overflow: 'hidden',
-    maxWidth: '70%'
-  };
-
-  const captionStyle = {
-    display: 'block',
-    textAlign: 'right',
-    color: isCurrentUser ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)',
-    p: 1
-  };
-
-  const textContentStyle = {
-    ...contentBoxStyle,
-    color: isCurrentUser ? 'white' : 'black',
-    px: 2,
-    py: 1,
-  };
-
-  if (type === 'image') {
-    return (
-      <Box sx={bubbleStyle}>
-        <Box sx={contentBoxStyle}>
-          <img
-            src={content}
-            alt="Uploaded content"
-            style={{
-              maxWidth: '100%',
-              maxHeight: '300px',
-              display: 'block'
-            }}
-          />
-          <Typography variant="caption" fontSize={10} sx={captionStyle}>
-            {formatTimeToAMPM(updatedAt)}
-          </Typography>
-        </Box>
-      </Box>
-    );
-  }
-
-  if (type === 'document') {
-    return (
-      <Box sx={bubbleStyle}>
-        <Box sx={textContentStyle}>
-          <a
-            href={content}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              color: isCurrentUser ? 'white' : '#032D4F',
-              textDecoration: 'underline'
-            }}
-          >
-            View Document
-          </a>
-          <Typography variant="caption" fontSize={10} sx={captionStyle}>
-            {formatTimeToAMPM(updatedAt)}
-          </Typography>
-        </Box>
-      </Box>
-    );
-  }
-
-  if (type === 'video') {
-    return (
-      <Box sx={bubbleStyle}>
-        <Box sx={contentBoxStyle}>
-          <video
-            controls
-            style={{
-              maxWidth: '100%',
-              maxHeight: '300px',
-              display: 'block'
-            }}
-            aria-label="Video message"
-          >
-            <source src={content} type="video/mp4" />
-            <track kind="captions" src="" srcLang="en" label="English" />
-            Your browser does not support the video tag.
-          </video>
-          <Typography variant="caption" fontSize={10} sx={captionStyle}>
-            {formatTimeToAMPM(updatedAt)}
-          </Typography>
-        </Box>
-      </Box>
-    );
-  }
-
-  // Default text message
-  return (
-    <Box sx={bubbleStyle}>
-      <Box sx={textContentStyle}>
-        <Typography fontSize={14}>{content}</Typography>
-        <Typography variant="caption" fontSize={10} sx={captionStyle}>
-          {formatTimeToAMPM(updatedAt)}
-        </Typography>
-      </Box>
-    </Box>
-  );
-};

@@ -245,7 +245,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   (hiddenTransectionPayment.some(path => pathname.includes(path)) ||
                     hiddenMessageClientRel.some(path => pathname.includes(path))) && (
                     <Typography fontWeight={600} fontSize={{ xs: 14, sm: 16, md: 18 }} color="#3CB1F1">
-                      Balance: <span style={{ color: "#757575" }}>$2,500</span>
+                      Balance: <span style={{ color: "#757575" }}>2,500 XAF</span>
                     </Typography>
                   )
                 }

@@ -17,6 +17,11 @@ import { RefundAndCancellationManangement } from "../refund-&-cancellation-manag
 
 import("../style.css")
 
+interface Event {
+  _id: string;
+  eventName: string;
+}
+
 export function TicketAndReservationManagementView() {
   const location = useLocation();
   const locationSelectedEvent = location.state?.selectedEvent;
@@ -33,9 +38,14 @@ export function TicketAndReservationManagementView() {
 
   useEffect(() => {
     dispatch(fatchOrgEvents());
-    dispatch(fetchTicketType());
     dispatch(eventFetch());
   }, [dispatch]);
+ 
+  useEffect(() => {
+  if (selectedEvent?._id) {
+    dispatch(fetchTicketType(selectedEvent._id));
+  }
+}, [dispatch, selectedEvent]);
 
   useEffect(() => {
     if (locationSelectedEvent) {
@@ -65,7 +75,7 @@ export function TicketAndReservationManagementView() {
           title="Ticket & Reservation Management"
           desc=""
         />
-        <TicketManagement tickets={tickets} />
+        <TicketManagement tickets={tickets} selectedEvent={selectedEvent}/>
         {/* <TicketCreationAndConfiguration /> */}
         <SalesAndStockTracking tickets={tickets} />
         {/* {selectedEvent && <ReservationManagement orderList={selectedEvent} />} */}

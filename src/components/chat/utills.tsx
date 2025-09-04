@@ -102,3 +102,24 @@ export interface SelectedUser {
   user: User;
   conversationId: string;
 }
+
+// Add this utility function
+export const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes';
+  
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return `${parseFloat((bytes / (k ** i)).toFixed(2))} ${sizes[i]}`;
+};
+
+// Add this to your utilities
+export const downloadFile = (url:any, filename:any) => {
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename || 'download';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};

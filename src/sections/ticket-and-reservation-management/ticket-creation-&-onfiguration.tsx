@@ -14,7 +14,8 @@ export interface TicketFormData {
     ticketDescription: string;
     price: string;
     validity: string;
-    options: any
+    options: any,
+     eventId: string;
 }
 
 interface ApiResponse {
@@ -23,7 +24,7 @@ interface ApiResponse {
     data?: any;
 }
 
-export function TicketCreationAndConfiguration({ onSuccess }: any) {
+export function TicketCreationAndConfiguration({ onSuccess, eventId }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const [isFree, setIsFree] = useState(false);
     const [isUnlimited, setIsUnlimited] = useState(false);
@@ -91,7 +92,8 @@ export function TicketCreationAndConfiguration({ onSuccess }: any) {
             ticketDescription: ticketTypeData.description,
             price: isFree ? "Free" : ticketTypeData.price,
             validity: ticketTypeData.validity,
-            options: ticketTypeOption // Make sure this matches the TicketFormData options interface
+            options: ticketTypeOption,// Make sure this matches the TicketFormData options interface
+            eventId
         };
 
         try {
@@ -122,7 +124,7 @@ export function TicketCreationAndConfiguration({ onSuccess }: any) {
         } catch (error) {
             toast.error('An unexpected error occurred' as ToastContent);
         }
-    }, [dispatch, ticketTypeOption,onSuccess, isUnlimited, isFree, ticketTypeData]);
+    }, [dispatch, ticketTypeOption, onSuccess, isUnlimited, isFree, ticketTypeData,eventId]);
 
     return (
         <Box boxShadow={3} borderRadius={3} mt={3}>

@@ -2,6 +2,36 @@
 import { paymentSettings } from "./constants";
 import axios from "../helper/axios";
 
+export const deletePaymentSetting = (id) => async (dispatch) => {
+  dispatch({ type: paymentSettings.DELETE_PAYMENT_SETTING_REQUEST });
+ 
+  try {
+    const response = await axios.delete(`/settings/deletePaymentSetting/${id}`);
+ 
+    dispatch({
+      type: paymentSettings.DELETE_PAYMENT_SETTING_SUCCESS,
+      payload: id, // can be used to filter out from state
+    });
+ 
+    return {
+      type: paymentSettings.DELETE_PAYMENT_SETTING_SUCCESS,
+      status: response.status,
+      message: response?.data?.message,
+    };
+  } catch (error) {
+    dispatch({
+      type: paymentSettings.DELETE_PAYMENT_SETTING_FAILURE,
+      payload: error?.response?.data?.message || "Server error",
+    });
+ 
+    return {
+      type: paymentSettings.DELETE_PAYMENT_SETTING_FAILURE,
+      status: error?.response?.status,
+      message: error?.response?.data?.message || "Server error",
+    };
+  }
+};
+
 export const savePaymentSettings = (paymentData) => async (dispatch) => {
   try {
     dispatch({ type: paymentSettings.SAVE_PAYMENT_SETTINGS_REQUEST });

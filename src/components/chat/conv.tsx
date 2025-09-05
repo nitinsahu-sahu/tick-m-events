@@ -366,6 +366,7 @@ export function ChatPanel() {
           'Content-Type': 'multipart/form-data'
         }
       });
+      console.log('re', result);
 
       if (result.data) {
         const receiverId = typeof messages?.receiver === 'string'
@@ -427,6 +428,8 @@ export function ChatPanel() {
         await axios.post(`/conv/message`, messageData);
       }
     } catch (error) {
+      console.log('error', error);
+
       alert('File upload failed. Please try again.');
     } finally {
       setUploading(false);

@@ -20,6 +20,7 @@ import axios from '../../redux/helper/axios'
 import { HeadingCommon } from '../multiple-responsive-heading/heading';
 import { SelectedUser, ConversationUser, UnreadCounts, MessagesState, ConversationData, formatFileSize, downloadFile } from './utills';
 import { MessageBubble } from './message-bubble';
+import {FullScreenAvatar} from './full-screen-avatar';
 
 export function ChatPanel() {
   const [selectedOption, setSelectedOption] = useState<SelectedUser>();
@@ -45,6 +46,9 @@ export function ChatPanel() {
   const documentInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+// Inside your ChatPanel component, add state for the avatar modal
+const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+const [selectedAvatar, setSelectedAvatar] = useState('');
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -366,7 +370,6 @@ export function ChatPanel() {
           'Content-Type': 'multipart/form-data'
         }
       });
-      console.log('re', result);
 
       if (result.data) {
         const receiverId = typeof messages?.receiver === 'string'
@@ -428,8 +431,6 @@ export function ChatPanel() {
         await axios.post(`/conv/message`, messageData);
       }
     } catch (error) {
-      console.log('error', error);
-
       alert('File upload failed. Please try again.');
     } finally {
       setUploading(false);
@@ -437,17 +438,6 @@ export function ChatPanel() {
   };
 
   // Update the file input change handler
-  const handleFileInputChange = (type: 'image' | 'document' | 'video') => (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('type', type);
-
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-    handleUpload(file, type);
-    e.target.value = ''; // Reset input
-  };
-
   const handleImageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -482,6 +472,17 @@ export function ChatPanel() {
       }
     }
   }, [conv, selectedOption, fetchMessages]);
+
+  // Add the handler functions
+  const handleAvatarClick = (avatarUrl: string) => {
+    setSelectedAvatar(avatarUrl);
+    setAvatarModalOpen(true);
+  };
+
+  const handleAvatarClose = () => {
+    setAvatarModalOpen(false);
+    setSelectedAvatar('');
+  };
 
   return (
     <Box sx={{
@@ -732,9 +733,25 @@ export function ChatPanel() {
                 <Avatar
                   src={selectedOption?.user?.avatar}
                   alt={selectedOption?.user?.name}
+                  onClick={() => handleAvatarClick(selectedOption?.user?.avatar)}
+                  sx={{
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s ease',
+                    '&:hover': {
+                      transform: 'scale(1.1)'
+                    }
+                  }}
                 />
                 <Typography variant="h6">{selectedOption?.user?.name}</Typography>
               </Box>
+
+              {/* // Add the FullScreenAvatar component at the end of your JSX */}
+              <FullScreenAvatar
+                src={selectedAvatar}
+                alt={selectedOption?.user?.name || 'User avatar'}
+                open={avatarModalOpen}
+                onClose={handleAvatarClose}
+              />
 
               {/* Call and Video Call Icons */}
               <Box display="flex" gap={1}>
@@ -810,9 +827,9 @@ export function ChatPanel() {
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => console.log('Camera clicked')}>
+                      {/* <IconButton onClick={() => console.log('Camera clicked')}>
                         <CameraAlt fontSize="small" />
-                      </IconButton>
+                      </IconButton> */}
                       <IconButton
                         onClick={handleClick}
                         aria-controls={open ? 'attachment-menu' : undefined}

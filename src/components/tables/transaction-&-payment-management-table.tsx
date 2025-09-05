@@ -15,6 +15,7 @@ type TransactionAndPaymentManagementTableProps = {
   type: string;
   data: any[];
   onEdit?: (id: string) => void;
+  onDelete?: (id: string) => void;
 };
 
 export function TransactionAndPaymentManagementTable({
@@ -22,17 +23,19 @@ export function TransactionAndPaymentManagementTable({
   data,
   type,
   onEdit,
+  onDelete,
 }: TransactionAndPaymentManagementTableProps) {
 
   const theme = useTheme();
   const handleClick = (action: string, rowId: string, index: number) => () => {
     if (action === "Update" && onEdit && rowId) {
-      onEdit(rowId); // <-- Call parent edit handler with ID
+      onEdit(rowId); // call parent edit handler
+    } else if (action === "Remove" && onDelete && rowId) {
+      onDelete(rowId); // call parent delete handler
     } else {
       console.log(`${action} clicked for row ${index + 1}`);
     }
   };
-
 
   return (
     <TableContainer component={Paper}>

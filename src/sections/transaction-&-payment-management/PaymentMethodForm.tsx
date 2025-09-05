@@ -1,4 +1,4 @@
-import { Box, Button, Paper, Typography, TextField, MenuItem, Select } from "@mui/material";
+import { Box, Button, Paper, Typography, TextField, MenuItem, Select,Dialog,DialogActions,DialogContent,DialogTitle} from "@mui/material";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -6,7 +6,7 @@ import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import { AppDispatch, RootState } from 'src/redux/store';
 import { TransactionAndPaymentManagementTable } from "src/components/tables/transaction-&-payment-management-table";
 import { transactionsPaymentHistoryTableData, bankingHeaders, mobileMoneyHeaders, cardHeaders } from "./utills";
-import { savePaymentSettings, getPaymentSettings, getPaymentSettingById, updatePaymentSetting } from "../../redux/actions/paymentSettingActions";
+import { savePaymentSettings, getPaymentSettings, getPaymentSettingById, updatePaymentSetting,deletePaymentSetting} from "../../redux/actions/paymentSettingActions";
 
 interface FormValues {
     currency: string;
@@ -49,6 +49,9 @@ export function PaymentMethodForm() {
     const [showForm, setShowForm] = useState(false);
     const [focusedField, setFocusedField] = useState<string | null>(null);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+
     const isEditMode = Boolean(editingId);
     const dispatch = useDispatch<AppDispatch>();
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -253,7 +256,6 @@ export function PaymentMethodForm() {
                                 formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
                             }, 300);
                         }}
-
                     />
                 </Box>
             )}
@@ -273,6 +275,10 @@ export function PaymentMethodForm() {
                                 setTimeout(() => {
                                     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
                                 }, 300);
+                            }}
+                            onDelete={(id) => {
+                                setDeleteId(id);
+                                setOpenDeleteDialog(true);
                             }}
                         />
                     </Box>
@@ -298,6 +304,31 @@ export function PaymentMethodForm() {
                     />
                 </Box>
             )}
+            <Dialog
+                open={openDeleteDialog}
+                onClose={() => setOpenDeleteDialog(false)}
+            >
+                <DialogTitle>Remove Payment Setting</DialogTitle>
+                <DialogContent>
+                    <Typography>Are you sure you want to remove this payment setting?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
+                    <Button
+                        color="error"
+                        onClick={() => {
+                            if (deleteId) {
+                                dispatch(deletePaymentSetting(deleteId));
+                                toast.success("Payment setting removed successfully!");
+                            }
+                            setOpenDeleteDialog(false);
+                        }}
+                    >
+                        Remove
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
 
             <Typography variant="h6" fontWeight="bold" mt={1}>
                 Banking Information Update

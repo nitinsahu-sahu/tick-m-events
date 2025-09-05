@@ -141,7 +141,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
   return (
     <>
       <Logo />
-      <HeadingCommon baseSize="13px" title={`Account ID: ${user._id}`} />
+      <HeadingCommon baseSize="13px" title={`Account ID: ${user?.__id || user?.name}`} />
       {/* Account ID: TM-{user._id} */}
       {slots?.topArea}
       <DashboardHF title="MAIN MENU" />

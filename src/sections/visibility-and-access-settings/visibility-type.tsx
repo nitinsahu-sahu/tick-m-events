@@ -182,7 +182,7 @@ export function VisibilityType({ eventId, visibility }: any) {
         </Box>
       </Box>
 
-      <Box mt={3}>
+      {/* <Box mt={3}>
         <Typography variant="subtitle1" mb={2}>
           Promotion Settings
         </Typography>
@@ -204,7 +204,7 @@ export function VisibilityType({ eventId, visibility }: any) {
           }
           label="Auto share on social media"
         />
-      </Box>
+      </Box> */}
 
       {/* Save Button - Disabled until event is selected */}
       <Box mt={4}>

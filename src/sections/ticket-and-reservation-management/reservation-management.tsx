@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import { validateViewUpdate } from "../../redux/actions/event.action";
 import { chartRealTimeOptions, ListViewMethod, reservationManagementTableHeaders, ValidationOptions } from "./utills";
 
+
 export function ReservationManagement({ orderList }: any) {
 
     const { order,  validationOptions: initialValidationOptions } = orderList
@@ -117,6 +118,13 @@ export function ReservationManagement({ orderList }: any) {
             fieldNames: ['name', 'email', 'createdAt', 'paymentStatus', 'ticketType']
         });
     };
+
+     const stats = getTicketStats(orderList);
+ 
+    const chartOptions = {
+        ...chartRealTimeOptions,
+        series: [stats.sold, stats.validated, stats.remaining],
+    }
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
             <HeadingCommon
@@ -264,9 +272,26 @@ export function ReservationManagement({ orderList }: any) {
 
                 {/* Center: Chart */}
                 <Box flex={2} minWidth="300px">
-                    <Chart options={chartRealTimeOptions} series={chartRealTimeOptions.series} type="donut" width="100%" height={250} />
+                    <Chart options={chartOptions} series={chartRealTimeOptions.series} type="donut" width="100%" height={250} />
                 </Box>
             </Box>
         </Box>
     )
+}
+
+function getTicketStats(orderList: any) {
+    const totalCapacity = Number(orderList?.ticketQuantity || 0);
+ 
+    const ticketsSold = orderList?.order?.length || 0;
+    const validated = orderList?.order?.filter(
+        (o: any) => o?.entryStatus === "validated"
+    ).length || 0;
+ 
+    const remaining = Math.max(totalCapacity - ticketsSold, 0);
+ 
+    return {
+        sold: ticketsSold,
+        validated,
+        remaining,
+    };
 }

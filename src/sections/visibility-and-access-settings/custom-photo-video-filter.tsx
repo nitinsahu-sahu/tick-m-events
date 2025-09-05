@@ -37,6 +37,7 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
   ]);
   const [frameAspectRatio, setFrameAspectRatio] = useState<number | null>(null);
   const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
+  const [isCustomFilterEnabled, setIsCustomFilterEnabled] = useState(false);
   const [selectedSocial, setSelectedSocial] = useState<SocialPlatforms>({
     facebook: false,
     instagram: false,
@@ -224,241 +225,249 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
       {/* Enable Checkbox */}
       <Box mb={2}>
         <FormControlLabel
-          control={<Checkbox />}
+          control={<Checkbox
+            checked={isCustomFilterEnabled}
+            onChange={(e) => setIsCustomFilterEnabled(e.target.checked)} />}
           label="Enable Custom Filters"
         />
       </Box>
 
-      {/* Filter Templates */}
-      <Box mb={3}>
-        <Typography variant="subtitle1" fontSize={{ xs: 12, sm: 16, md: 20 }} fontWeight={500} gutterBottom>
-          Choose Filter Template
-        </Typography>
-        <Grid container spacing={2}>
-
-
+      <Box
+        sx={{
+          opacity: isCustomFilterEnabled ? 1 : 0.5,
+          pointerEvents: isCustomFilterEnabled ? "auto" : "none",
+        }}>
+        {/* Filter Templates */}
+        <Box mb={3}>
+          <Typography variant="subtitle1" fontSize={{ xs: 12, sm: 16, md: 20 }} fontWeight={500} gutterBottom>
+            Choose Filter Template
+          </Typography>
           <Grid container spacing={2}>
-            {filterImages.map((filename, index) => (
-              <Grid item xs={6} sm={3} mt={3} key={index}>
-                <Box
-                  sx={{
-                    position: 'relative',
-                    borderRadius: 2,
-                    overflow: 'hidden',
-                    border: selectedFilter === filename ? '3px solid #0B2E4C' : 'none',
-                    cursor: 'pointer',
-                  }}
-                >
+
+
+            <Grid container spacing={2}>
+              {filterImages.map((filename, index) => (
+                <Grid item xs={6} sm={3} mt={3} key={index}>
                   <Box
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      const isUploadedUrl = filename.startsWith('http') || filename.includes('/uploads/');
-                      if (isUploadedUrl && __events?._id) {
-                        try {
-                          const res = await axios.delete("/custom-frame/delete-frame", {
-                            params: {
-                              eventId: __events?._id,
-                              frameUrl: filename,
-                            },
-                          });
-                          if (res.status === 200) {
-                            toast.success("Filter deleted .");
-                          } else {
-                            toast.error("Failed to delete filter.");
-                          }
-                        } catch (error) {
-                          toast.error("Error deleting filter.");
-                          console.error(error);
-                        }
-                      }
-
-                      setFilterImages((prev) => prev.filter((_, i) => i !== index));
-                      const updatedFiles = [...filesToUpload];
-                      updatedFiles.splice(index, 1);
-                      setFilesToUpload(updatedFiles);
-
-                      if (fileInputRef.current) {
-                        fileInputRef.current.value = "";
-                      }
-
-                      if (selectedFilter === filename) {
-                        setSelectedFilter(null);
-                      }
-                    }}
                     sx={{
-                      position: 'absolute',
-                      top: 5,
-                      right: 5,
-                      background: '#fff',
-                      borderRadius: '50%',
-                      width: 24,
-                      height: 24,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 'bold',
-                      color: '#333',
-                      zIndex: 3,
+                      position: 'relative',
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      border: selectedFilter === filename ? '3px solid #0B2E4C' : 'none',
                       cursor: 'pointer',
-                      boxShadow: 1,
                     }}
                   >
-                    ×
-                  </Box>
+                    <Box
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        const isUploadedUrl = filename.startsWith('http') || filename.includes('/uploads/');
+                        if (isUploadedUrl && __events?._id) {
+                          try {
+                            const res = await axios.delete("/custom-frame/delete-frame", {
+                              params: {
+                                eventId: __events?._id,
+                                frameUrl: filename,
+                              },
+                            });
+                            if (res.status === 200) {
+                              toast.success("Filter deleted .");
+                            } else {
+                              toast.error("Failed to delete filter.");
+                            }
+                          } catch (error) {
+                            toast.error("Error deleting filter.");
+                            console.error(error);
+                          }
+                        }
 
-                  {/* Image */}
-                  <Box onClick={() => setSelectedFilter(filename)}>
-                    <img
-                      src={filename}
-                      alt={`Filter ${index + 1}`}
-                      style={{ width: '100%', height: 'auto' }}
-                    />
+                        setFilterImages((prev) => prev.filter((_, i) => i !== index));
+                        const updatedFiles = [...filesToUpload];
+                        updatedFiles.splice(index, 1);
+                        setFilesToUpload(updatedFiles);
+
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = "";
+                        }
+
+                        if (selectedFilter === filename) {
+                          setSelectedFilter(null);
+                        }
+                      }}
+                      sx={{
+                        position: 'absolute',
+                        top: 5,
+                        right: 5,
+                        background: '#fff',
+                        borderRadius: '50%',
+                        width: 24,
+                        height: 24,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 'bold',
+                        color: '#333',
+                        zIndex: 3,
+                        cursor: 'pointer',
+                        boxShadow: 1,
+                      }}
+                    >
+                      ×
+                    </Box>
+
+                    {/* Image */}
+                    <Box onClick={() => setSelectedFilter(filename)}>
+                      <img
+                        src={filename}
+                        alt={`Filter ${index + 1}`}
+                        style={{ width: '100%', height: 'auto' }}
+                      />
+                    </Box>
                   </Box>
-                </Box>
-              </Grid>
-            ))}
+                </Grid>
+              ))}
+
+            </Grid>
 
           </Grid>
-
-        </Grid>
-      </Box>
-
-      {/* Upload Custom Filter */}
-      <Box mb={3}>
-        <Typography variant="subtitle1" fontSize={{ xs: 12, sm: 16, md: 20 }} fontWeight={500} gutterBottom>
-          Upload Custom Filter
-        </Typography>
-
-        {/* 🆕 Instruction Text */}
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          fontSize={{ xs: 12, sm: 14 }}
-          mb={1}
-        >
-          Please upload <strong>PNG images with a transparent background</strong>.
-        </Typography>
-
-        <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2} alignItems="center">
-          <Input
-            inputRef={fileInputRef}
-            type="file"
-            inputProps={{ multiple: true }}
-            onChange={handleFileUpload}
-            disableUnderline
-            sx={{ border: "1px solid black", padding: "8px", borderRadius: 2 }}
-          />
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "#0B2E4C",
-              color: "#fff",
-              padding: "11px",
-              width: "70%",
-            }}
-            onClick={handleApplyFilter}
-          >
-            Apply Upload Filter
-          </Button>
         </Box>
-      </Box>
 
-      {/* Live Preview */}
-      <Box mb={3}>
-        <Typography
-          variant="subtitle1"
-          fontSize={{ xs: 12, sm: 16, md: 20 }}
-          fontWeight={500}
-          gutterBottom
-        >
-          Live Preview
-        </Typography>
+        {/* Upload Custom Filter */}
+        <Box mb={3}>
+          <Typography variant="subtitle1" fontSize={{ xs: 12, sm: 16, md: 20 }} fontWeight={500} gutterBottom>
+            Upload Custom Filter
+          </Typography>
 
-        <Box
-          bgcolor="#E5E5E5"
-          borderRadius={2}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          position="relative"
-          overflow="hidden"
-          sx={{
-            aspectRatio: frameAspectRatio ? `${frameAspectRatio}` : '1 / 1',
-            maxWidth: 320,
-            mx: 'auto',
-            width: '100%',
-          }}
-        >
+          {/* 🆕 Instruction Text */}
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            fontSize={{ xs: 12, sm: 14 }}
+            mb={1}
+          >
+            Please upload <strong>PNG images with a transparent background</strong>.
+          </Typography>
 
-          {selectedFilter ? (
-            <Box
+          <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2} alignItems="center">
+            <Input
+              inputRef={fileInputRef}
+              type="file"
+              inputProps={{ multiple: true }}
+              onChange={handleFileUpload}
+              disableUnderline
+              sx={{ border: "1px solid black", padding: "8px", borderRadius: 2 }}
+            />
+            <Button
+              variant="contained"
               sx={{
-                position: 'relative',
-                width: '100%',
-                height: '100%',
-                maxWidth: 300,
-                maxHeight: 300,
+                backgroundColor: "#0B2E4C",
+                color: "#fff",
+                padding: "11px",
+                width: "70%",
               }}
+              onClick={handleApplyFilter}
             >
-              <img
-                src={eventCoverImage}
-                alt="Base Preview"
-                style={{
-                  width: '45%',
-                  height: '70%',
-                  objectFit: 'cover',
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 1,
-                }}
-              />
+              Apply Upload Filter
+            </Button>
+          </Box>
+        </Box>
 
-              {/* Frame overlay */}
-              <img
-                src={selectedFilter}
-                alt="Frame Overlay"
-                onLoad={(e) => {
-                  const img = e.currentTarget;
-                  const ratio = img.naturalWidth / img.naturalHeight;
-                  setFrameAspectRatio(ratio);
-                }}
-                style={{
+        {/* Live Preview */}
+        <Box mb={3}>
+          <Typography
+            variant="subtitle1"
+            fontSize={{ xs: 12, sm: 16, md: 20 }}
+            fontWeight={500}
+            gutterBottom
+          >
+            Live Preview
+          </Typography>
+
+          <Box
+            bgcolor="#E5E5E5"
+            borderRadius={2}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            position="relative"
+            overflow="hidden"
+            sx={{
+              aspectRatio: frameAspectRatio ? `${frameAspectRatio}` : '1 / 1',
+              maxWidth: 320,
+              mx: 'auto',
+              width: '100%',
+            }}
+          >
+
+            {selectedFilter ? (
+              <Box
+                sx={{
+                  position: 'relative',
                   width: '100%',
                   height: '100%',
-                  objectFit: 'cover',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  zIndex: 2,
-                  pointerEvents: 'none',
+                  maxWidth: 300,
+                  maxHeight: 300,
                 }}
-              />
+              >
+                <img
+                  src={eventCoverImage}
+                  alt="Base Preview"
+                  style={{
+                    width: '45%',
+                    height: '70%',
+                    objectFit: 'cover',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 1,
+                  }}
+                />
 
-            </Box>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              No filter selected
-            </Typography>
-          )}
+                {/* Frame overlay */}
+                <img
+                  src={selectedFilter}
+                  alt="Frame Overlay"
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    const ratio = img.naturalWidth / img.naturalHeight;
+                    setFrameAspectRatio(ratio);
+                  }}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    zIndex: 2,
+                    pointerEvents: 'none',
+                  }}
+                />
+
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No filter selected
+              </Typography>
+            )}
+          </Box>
         </Box>
+        <Button
+          fullWidth
+          variant="contained"
+          sx={{
+            backgroundColor: '#072F4A',
+            color: 'white',
+            py: 1.5,
+            borderRadius: 3,
+            textTransform: 'none',
+            fontWeight: 'bold',
+          }}
+          onClick={applySelectedFilter}
+        >
+          Apply Filters
+        </Button>
       </Box>
-      <Button
-        fullWidth
-        variant="contained"
-        sx={{
-          backgroundColor: '#072F4A',
-          color: 'white',
-          py: 1.5,
-          borderRadius: 3,
-          textTransform: 'none',
-          fontWeight: 'bold',
-        }}
-        onClick={applySelectedFilter}
-      >
-        Apply Filters
-      </Button>
     </Box>
   );
 };

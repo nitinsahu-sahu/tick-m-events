@@ -15,6 +15,13 @@ export const paymentSettingsReducer = (state, action) => {
     }
 
     switch (action.type) {
+        case paymentSettings.DELETE_PAYMENT_SETTING_SUCCESS:
+            return {
+                ...state,
+                settings: state.settings.filter(
+                    (setting) => setting._id !== action.payload
+                ),
+            };
         case paymentSettings.SAVE_PAYMENT_SETTINGS_REQUEST:
             return { ...state, loading: true, success: false, error: null };
 

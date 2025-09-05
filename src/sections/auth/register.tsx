@@ -25,6 +25,7 @@ export function Register() {
         referralCode: ""
     });
     const [avatar, setAvatar] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [referralValidation, setReferralValidation] = useState({
@@ -94,10 +95,13 @@ export function Register() {
 
     const handleRegistration = useCallback(async (event: any) => {
         event.preventDefault();
+        setIsLoading(true); // Start loading
 
         // Validate referral code again before submission if provided
         if (formRegisterData.referralCode && !referralValidation.isValid) {
             toast.error("Please enter a valid referral code");
+            setIsLoading(false); // Stop loading on validation error
+
             return;
         }
 
@@ -150,6 +154,8 @@ export function Register() {
             }
         } catch (error) {
             toast.error("Registration failed");
+        } finally {
+            setIsLoading(false); // Stop loading regardless of success or error
         }
     }, [formRegisterData, navigate, avatar, dispatch, phoneNumber, referralValidation]);
 
@@ -382,6 +388,7 @@ export function Register() {
                 color="inherit"
                 variant="contained"
                 sx={{ mt: 2 }}
+                loading={isLoading} // Add this prop
             >
                 Register
             </LoadingButton>

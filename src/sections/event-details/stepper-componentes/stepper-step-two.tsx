@@ -4,7 +4,7 @@ import {
     IconButton,
     FormControl,
     ToggleButtonGroup, MenuItem,
-    ToggleButton, Select
+    ToggleButton, Select, FormGroup
 } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import PaymentIcon from '@mui/icons-material/Payment';
@@ -21,6 +21,15 @@ import { HeadingCommon } from 'src/components/multiple-responsive-heading/headin
 import { ticketConfigCreate } from 'src/redux/actions/event.action';
 import { fetchTicketType, createTicketType } from 'src/redux/actions/ticket-&-reservation-management.action';
 
+interface TicketConfigData {
+    purchaseDeadlineDate: string;
+    isPurchaseDeadlineEnabled: string;
+    paymentMethods: string[];
+    fullRefundDaysBefore: string;
+    partialRefundPercent: string;
+    noRefundDate: string;
+    isRefundPolicyEnabled: boolean;
+}
 
 export function StepperStepTwo() {
     const dispatch = useDispatch<AppDispatch>();
@@ -31,15 +40,16 @@ export function StepperStepTwo() {
     const [selectedRefundPolicy, setSelectedRefundPolicy] = useState("");
     const [refundEnabled, setRefundEnabled] = useState(false);
     const [payStatus, setPayStatus] = useState('paid');
-    const [ticketConfigData, setTicketConfigData] = useState({
+    const [ticketConfigData, setTicketConfigData] = useState<TicketConfigData>({
         purchaseDeadlineDate: "",
         isPurchaseDeadlineEnabled: "true",
-        paymentMethods: "Cash",
+        paymentMethods: [],
         fullRefundDaysBefore: "",
         partialRefundPercent: "",
-        noRefundDate: '',
+        noRefundDate: "",
         isRefundPolicyEnabled: false,
     });
+
 
     // State to manage ticket rows
     const [ticketRows, setTicketRows] = useState([
@@ -134,11 +144,26 @@ export function StepperStepTwo() {
             }
         }
     };
-    const handleTickteConfigChange = (event: any) => {
-        event.preventDefault(); // Prevent default form submission behavior
-        const { name, value } = event.target;
-        setTicketConfigData((prevData) => ({ ...prevData, [name]: value }));
+    // const handleTickteConfigChange = (event: any) => {
+    //     event.preventDefault(); // Prevent default form submission behavior
+    //     const { name, value } = event.target;
+    //     setTicketConfigData((prevData) => ({ ...prevData, [name]: value }));
+    // };
+    const handleTickteConfigChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value, checked } = event.target;
+
+        if (name === "paymentMethods") {
+            setTicketConfigData((prev) => {
+                const updated = checked
+                    ? [...(prev.paymentMethods || []), value] // ✅ add method
+                    : (prev.paymentMethods || []).filter((v) => v !== value); // ❌ remove method
+                return { ...prev, paymentMethods: updated };
+            });
+        } else {
+            setTicketConfigData((prev) => ({ ...prev, [name]: value }));
+        }
     };
+
     // Add a new row
     const addRow = () => {
         setTicketRows([
@@ -245,7 +270,7 @@ export function StepperStepTwo() {
 
                     return {
                         ticketType: row.ticketType,
-                        id: res?.ticketTypeId, // 👈 backend must return TicketType._id
+                        id: res?.ticketTypeId, 
                         price: payStatus === "free" ? "0" : String(row.price),
                         totalTickets: row.totalTickets,
                         description: row.description,
@@ -260,7 +285,7 @@ export function StepperStepTwo() {
             formEventData.append("tickets", JSON.stringify(createdTickets));
             formEventData.append("purchaseDeadlineDate", ticketConfigData.purchaseDeadlineDate);
             formEventData.append("isPurchaseDeadlineEnabled", ticketConfigData.isPurchaseDeadlineEnabled);
-            formEventData.append("paymentMethods", ticketConfigData.paymentMethods);
+            formEventData.append("paymentMethods", JSON.stringify(ticketConfigData.paymentMethods));
             formEventData.append("isRefundPolicyEnabled", refundEnabled.toString());
             formEventData.append("payStatus", payStatus);
 
@@ -314,7 +339,8 @@ export function StepperStepTwo() {
         setTicketConfigData({
             purchaseDeadlineDate: "",
             isPurchaseDeadlineEnabled: "true",
-            paymentMethods: newValue === 'free' ? '' : "Cash",
+            // paymentMethods: newValue === 'free' ? '' : "Cash",
+            paymentMethods: [] as string[],
             fullRefundDaysBefore: "",
             partialRefundPercent: "",
             noRefundDate: '',
@@ -417,7 +443,7 @@ export function StepperStepTwo() {
                                     value={row.price}
                                     onChange={(e) => handleChange(row.id, 'price', e.target.value)}
                                 />
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                     <FormControlLabel
                                         control={
                                             <Checkbox
@@ -436,7 +462,7 @@ export function StepperStepTwo() {
                                             mr: 1,
                                         }}
                                     />
-                                </Box>
+                                </Box> */}
                             </Grid>
                         }
 
@@ -449,6 +475,7 @@ export function StepperStepTwo() {
                                 placeholder="100"
                                 value={row.totalTickets}
                                 onChange={(e) => handleChange(row.id, 'totalTickets', e.target.value)}
+                                disabled={!row.isLimitedSeat}
                             />
                             <Box key={row.id} sx={{ width: "100%" }}>
                                 <RadioGroup
@@ -528,13 +555,16 @@ export function StepperStepTwo() {
                     <Grid container spacing={3}>
                         {/* Purchase Deadline */}
                         <Grid item xs={12} md={payStatus === 'free' ? 12 : 3}>
-                            <Typography fontWeight="bold">Purchase deadline</Typography>
+                            <Typography fontWeight="bold">
+                                {payStatus === "free" ? "Reservation deadline" : "Purchase deadline"}
+                            </Typography>
                             <Box display="flex" flexDirection="column" mt={1}>
                                 <TextField
                                     value={ticketConfigData.purchaseDeadlineDate}
                                     onChange={handleTickteConfigChange}
                                     fullWidth
-                                    required
+                                    required={ticketConfigData.isPurchaseDeadlineEnabled === "true"} // only required if enabled
+                                    disabled={ticketConfigData.isPurchaseDeadlineEnabled === "false"} // disable when "Disabled" is selected
                                     name="purchaseDeadlineDate"
                                     type="date"
                                     label="Select Date"
@@ -573,7 +603,7 @@ export function StepperStepTwo() {
                         </Grid>
 
                         {/* Accepted Payment Methods */}
-                        {
+                        {/* {
                             payStatus === 'free' ? null : <Grid item xs={12} md={3}>
                                 <Typography fontWeight="bold">Accepted payment methods</Typography>
                                 <Box
@@ -641,7 +671,60 @@ export function StepperStepTwo() {
                                     </FormControl>
                                 </Box>
                             </Grid>
-                        }
+                        } */}
+                        {/* Accepted Payment Methods */}
+                        {payStatus === "free" ? null : (
+                            <Grid item xs={12} md={3}>
+                                <Typography fontWeight="bold">Accepted payment methods</Typography>
+                                <Box
+                                    border={1}
+                                    borderRadius={2}
+                                    p={2}
+                                    mt={1}
+                                    sx={{ borderColor: "#ccc", minHeight: "150px" }}
+                                >
+                                    <FormControl component="fieldset">
+                                        <FormGroup>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        size="small"
+                                                        name="paymentMethods"
+                                                        value="Mobile Money"
+                                                        checked={ticketConfigData.paymentMethods.includes("Mobile Money")}
+                                                        onChange={handleTickteConfigChange}
+                                                    />
+                                                }
+                                                label={
+                                                    <Box display="flex" alignItems="center">
+                                                        <PaymentIcon sx={{ mr: 1 }} />
+                                                        <HeadingCommon baseSize="14px" title="Mobile Money" />
+                                                    </Box>
+                                                }
+                                            />
+
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        size="small"
+                                                        name="paymentMethods"
+                                                        value="Cash"
+                                                        checked={ticketConfigData.paymentMethods.includes("Cash")}
+                                                        onChange={handleTickteConfigChange}
+                                                    />
+                                                }
+                                                label={
+                                                    <Box display="flex" alignItems="center">
+                                                        <MoneyIcon sx={{ mr: 1 }} />
+                                                        <HeadingCommon baseSize="14px" title="Cash" />
+                                                    </Box>
+                                                }
+                                            />
+                                        </FormGroup>
+                                    </FormControl>
+                                </Box>
+                            </Grid>
+                        )}
 
                         {/* Refund Policy */}
                         {
@@ -749,7 +832,8 @@ export function StepperStepTwo() {
                 </Box>
             </form>
             {/* Physical Sales Points */}
-            <Box mt={6}>
+
+            {/* <Box mt={6}>
                 <Typography variant="h6" fontWeight="bold" gutterBottom>
                     Physical Ticket Sales Points
                 </Typography>
@@ -798,7 +882,7 @@ export function StepperStepTwo() {
                         </Button>
                     </Grid>
                 </Grid>
-            </Box>
+            </Box> */}
         </Box>
     );
 }

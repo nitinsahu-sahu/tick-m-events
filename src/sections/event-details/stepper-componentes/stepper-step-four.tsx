@@ -1,9 +1,9 @@
 import { Box, Typography, Card, CardContent, Grid, FormControlLabel, Radio, TextField, Switch, Button, RadioGroup } from "@mui/material";
 import { useCallback, useState } from "react";
+import { LoadingButton } from "@mui/lab";
 import { toast } from 'react-toastify';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from "react-redux";
-import { LoadingButton } from "@mui/lab";
 import { AppDispatch } from "src/redux/store";
 import { eventPublicationCreate } from "src/redux/actions/event.action";
 
@@ -11,8 +11,8 @@ export function StepperStepFour() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const [searchParams] = useSearchParams();
-    const eventId = searchParams.get('eventId'); // Get existing eventId
     const [loading, setLoading] = useState(false);
+    const eventId = searchParams.get('eventId'); // Get existing eventId
 
     const [publicationData, setPublicationData] = useState({
         visibilityType: "public", // default to public
@@ -22,9 +22,17 @@ export function StepperStepFour() {
         status: "publish"
     });
 
-    const link = publicationData.visibilityType === "private" ?
-        `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${eventId}` :
-        `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event`;
+  const rawBaseUrl = import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app';
+// remove trailing slash if present
+const baseUrl = rawBaseUrl.replace(/\/$/, "");
+
+// always generate with single slash
+const link = `${baseUrl}/our-event/${eventId}`;
+
+
+    // const link = publicationData.visibilityType === "private" ?
+    //     `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${eventId}` :
+    //     `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event`;
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = event.target;
@@ -39,10 +47,11 @@ export function StepperStepFour() {
         const { value } = event.target;
 
         // Generate the appropriate URL based on the selected visibility type
-        const newUrl = value === "private"
-            ? `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${eventId}`
-            : `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event`;
+        // const newUrl = value === "private"
+        //     ? `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${eventId}`
+        //     : `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event`;
 
+          const newUrl = `${baseUrl}/our-event/${eventId}`;
         setPublicationData(prevData => ({
             ...prevData,
             visibilityType: value, // 'public' or 'private'
@@ -52,6 +61,7 @@ export function StepperStepFour() {
 
     const handleEventCreate = useCallback(async (event: React.FormEvent, isDraft: boolean = false) => {
         event.preventDefault();
+        setLoading(true);
         const formEventPublicatinData = new FormData();
         setLoading(true);
         // Update the status based on which button was clicked
@@ -153,7 +163,7 @@ export function StepperStepFour() {
                         <Typography variant="body2">{link}</Typography>
                     </Box>
 
-                    <Grid container spacing={2} mt={1}>
+                    {/* <Grid container spacing={2} mt={1}>
                         <Grid item xs={12} sm={12}>
                             <Box display="flex" alignItems="center">
                                 <Switch
@@ -189,7 +199,7 @@ export function StepperStepFour() {
                                 </Typography>
                             </Box>
                         </Grid>
-                    </Grid>
+                    </Grid> */}
 
                     {/* Action Buttons */}
                     <Grid
@@ -215,22 +225,6 @@ export function StepperStepFour() {
                             >
                                 Publish Event
                             </LoadingButton>
-                        </Grid>
-                        <Grid item xs={12} sm="auto">
-                            <Button
-                                type="button"
-                                fullWidth
-                                variant="contained"
-                                sx={{
-                                    backgroundColor: "#B3B3B3",
-                                    color: "white",
-                                    borderRadius: 2,
-                                    px: 5,
-                                }}
-                                onClick={(e) => handleEventCreate(e, true)} // Will set status to "draft"
-                            >
-                                Save as Draft
-                            </Button>
                         </Grid>
                     </Grid>
                 </form>

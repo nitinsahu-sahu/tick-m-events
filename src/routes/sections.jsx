@@ -224,7 +224,7 @@ export function Router() {
 
         {
           path: '/profile-&-services-management',
-          element: <RoleProtectedRoute allowedRoles={['provider', 'admin', 'participant']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
+          element: <RoleProtectedRoute allowedRoles={['provider']} currentRole={currentRole}><ProfileAndServicesManagementPage /></RoleProtectedRoute>
         },
         {
           path: '/confirmed-service-calendar',

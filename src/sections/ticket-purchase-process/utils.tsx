@@ -1,38 +1,24 @@
 export const processOneTableHeaders = ["#", "Ticket Type ", "Unit Price (XAF)", "Included Benefits", "Selection"];
-
+ 
 export interface PaymentOption {
-    src: string;
-    name: string;
-    value: string;
+  src: string;
+  name: string;
+  value: string;
 }
-export const paymentOptions: PaymentOption[] = [
-    {
-        src: "./assets/images/payment-gateway-logo/mtn-mobile-money.png",
-        name: "MTN Mobile Money",
-        value: 'mmm'
-    },
-    {
-        src: "./assets/images/payment-gateway-logo/orange-money.png",
-        name: "Orange Money",
-        value: 'om'
-
-    },
-    {
-        src: "./assets/images/payment-gateway-logo/bank-card.jpg",
-        name: "Bank Card",
-        value: 'bc'
-
-    },
-    {
-        src: "./assets/images/payment-gateway-logo/bank-transfer.png",
-        name: "Bank Transfer",
-        value: 'bt'
-
-    },
-    {
-        src: "./assets/images/payment-gateway-logo/bank-transfer.png",
-        name: "Cash on Delivery",
-        value: 'cod'
-
-    },
-];
+ 
+const paymentIcons: Record<string, string> = {
+  "Mobile Money": "./assets/images/payment-gateway-logo/mtn-mobile-money.png",
+  "Cash": "./assets/images/payment-gateway-logo/bank-transfer.png",
+  "Orange Money": "./assets/images/payment-gateway-logo/orange-money.png",
+  "Bank Card": "./assets/images/payment-gateway-logo/bank-card.jpg",
+  "Bank Transfer": "./assets/images/payment-gateway-logo/bank-transfer.png",
+  "Cash on Delivery": "./assets/images/payment-gateway-logo/bank-transfer.png",
+};
+ 
+export function getPaymentOptions(methods: string[]): PaymentOption[] {
+  return methods.map((method) => ({
+    src: paymentIcons[method] || "./assets/images/payment-gateway-logo/default.png",
+    name: method,
+    value: method.toLowerCase().replace(/\s+/g, "_"), // e.g. "Mobile Money" → "mobile_money"
+  }));
+}

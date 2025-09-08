@@ -1,57 +1,150 @@
-import { Card, CardContent, Button, Box, Grid } from '@mui/material';
+import { Card, CardContent, Button,keyframes, Box, Grid, Typography, ButtonProps } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { styled } from '@mui/material/styles';
+
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { formatTimeTo12Hour } from 'src/hooks/formate-time';
+
+// Define interface for custom button props
+interface CustomButtonProps extends ButtonProps {
+  customcolor?: {
+    bg?: string;
+    hover?: string;
+    text?: string;
+  };
+}
+
+// Styled component for the card with gradient background
+const GradientCard = styled(Card)(({ theme }: any) => ({
+  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  color: 'white',
+  borderRadius: '16px',
+  overflow: 'visible',
+  position: 'relative',
+  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
+}));
+
+// Styled button component with proper TypeScript typing
+const CustomButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== 'customcolor',
+})<CustomButtonProps>(({ theme, customcolor }: any) => ({
+  fontWeight: 600,
+  borderRadius: '8px',
+  textTransform: 'none',
+  padding: '8px 5px',
+  fontSize: '12px',
+  background: customcolor?.bg || '#6c5ce7',
+  color: customcolor?.text || 'white',
+  '&:hover': {
+    background: customcolor?.hover || '#5649c9',
+    transform: 'translateY(-2px)',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+  },
+  transition: 'all 0.3s ease',
+}));
+
+const shimmer = keyframes`
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+`;
 
 export function UpComingCard({ ticket }: any) {
   const navigate = useNavigate();
   return (
-    <Card sx={{ height: '100%' }}>
-
-      <CardContent>
-        <HeadingCommon variant="h6" color="#0B2E4C" weight={600} baseSize="25px" title={ticket.eventDetails?.eventName} />
-        <HeadingCommon variant="body2" weight={400} baseSize="16px" title={`${ticket.eventDetails?.location} | ${ticket.eventDetails?.date} | ${formatTimeTo12Hour(ticket.eventDetails?.time)}`} />
-
-        <Box mt={2}>
-          <Grid container spacing={1}>
-            {[
-              { text: 'View Ticket', color: 'primary' as 'primary' },
-              { text: 'Explore More', custom: true },
-              { text: 'Share', custom: true },
-            ].map(({ text, color, custom }) => (
-              <Grid item xs={4} key={text}>
-                <Button
-                  fullWidth
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (text === "Explore More") {
-                      window.open("/our-event", "_blank"); // Opens in new tab
-                    }
-                    if (text === "View Ticket") {
-                      navigate("/ticket-validation-at-entry"); // Opens in new tab
-                    }
-                  }}
-                  variant="contained"
-                  color={color || undefined}
-                  sx={{
-                    fontSize: { xs: '10px', sm: '12px' },
-                    fontWeight: 500,
-                    backgroundColor: custom ? '#0b2e4c' : undefined,
-                    '&:hover': {
-                      backgroundColor: custom ? '#093047' : undefined,
-                    },
-                  }}
-                >
-                  {text}
-                </Button>
-              </Grid>
-            ))}
-          </Grid>
+    <GradientCard sx={{ height: '100%' }}>
+      <CardContent sx={{ padding: 3, position: 'relative' }}>
+        {/* Decorative elements */}
+        <Box
+          sx={{
+            color: 'transparent',
+            background: 'linear-gradient(120deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C)',
+            backgroundSize: '200% 100%',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            animation: `${shimmer} 3s infinite linear`,
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            fontSize: 48,
+            filter: 'drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.3))',
+            // ...props.sx,
+          }}
+        >
+          🎫
         </Box>
 
-      </CardContent>
-    </Card>
-  )
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            width: 120,
+            height: 120,
+            opacity: 0.05,
+            background: 'radial-gradient(circle, transparent 20%, #667eea 20%, #667eea 80%, transparent 80%, transparent), radial-gradient(circle, transparent 20%, #667eea 20%, #667eea 80%, transparent 80%, transparent) 25px 25px',
+            backgroundSize: '50px 50px',
+            transform: 'rotate(30deg)',
+          }}
+        />
 
+        {/* Event title */}
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 700,
+            mb: 2,
+            textShadow: '1px 1px 2px rgba(0,0,0,0.3)',
+            fontSize: { xs: '1.3rem', sm: '1.5rem' }
+          }}
+        >
+          {ticket.eventDetails?.eventName}
+        </Typography>
+
+        {/* Event details */}
+        <Typography
+          variant="body2"
+          sx={{
+            mb: 3,
+            opacity: 0.9,
+            fontSize: { xs: '0.8rem', sm: '0.9rem' }
+          }}
+        >
+          {ticket.eventDetails?.location} | {ticket.eventDetails?.date} | {formatTimeTo12Hour(ticket.eventDetails?.time)}
+        </Typography>
+
+        {/* Buttons */}
+        <Grid container spacing={1}>
+          {[
+            { text: 'View Ticket', color: { bg: '#6c5ce7', hover: '#5649c9', text: 'white' } },
+            { text: 'Explore More', color: { bg: '#00b894', hover: '#00a382', text: 'white' } },
+            { text: 'Share', color: { bg: '#fd79a8', hover: '#e6679b', text: 'white' } },
+          ].map(({ text, color }: any) => (
+            <Grid item xs={4} key={text}>
+              <CustomButton
+                fullWidth
+                size="small"
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.stopPropagation();
+                  if (text === "Explore More") {
+                    window.open("/our-event", "_blank");
+                  }
+                  if (text === "View Ticket") {
+                    navigate("/ticket-validation-at-entry");
+                  }
+                }}
+                variant="contained"
+                customcolor={color}
+              >
+                {text}
+              </CustomButton>
+            </Grid>
+          ))}
+        </Grid>
+      </CardContent>
+    </GradientCard>
+  );
 }

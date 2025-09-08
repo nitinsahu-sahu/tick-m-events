@@ -40,14 +40,7 @@ interface Ticket {
 export function HomeAndRecommendationsView() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-
-  const handleViewEvent = (eventId?: string) => {
-    if (eventId) {
-      navigate(`/our-event/${eventId}`);
-    }
-  };
-
-  const { popularEvents, recommendedEvents } = useSelector((state: RootState) => state?.homeRecom);
+const { popularEvents, recommendedEvents } = useSelector((state: RootState) => state?.homeRecom);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const { _id } = useSelector((state: RootState) => state?.auth?.user);
   const user = useSelector((state: RootState) => state?.auth?.user);
@@ -56,6 +49,12 @@ export function HomeAndRecommendationsView() {
   const [upcomingTickets, setUpcomingTickets] = useState<Ticket[]>([]);
   const [latestEventActivity, setLatestEventActivity] = useState<any>(null);
   const [hiddenNotifIds, setHiddenNotifIds] = useState<string[]>([]);
+
+  const handleViewEvent = (eventId?: string) => {
+    if (eventId) {
+      navigate(`/our-event/${eventId}`);
+    }
+  };
 
   const latestChangeNotif = notifications
     ?.slice()
@@ -69,13 +68,6 @@ export function HomeAndRecommendationsView() {
       );
     });
 
-
-  const latestChangeNotificationItem = {
-    text: latestChangeNotif?.message || "No recent event updates",
-    disabled: !latestChangeNotif,
-    eventId: latestChangeNotif?.eventId,
-  };
-
   useEffect(() => {
     async function fetchTickets() {
       try {
@@ -83,8 +75,6 @@ export function HomeAndRecommendationsView() {
 
         const allTickets: Ticket[] = response.data;
         setTickets(allTickets);
-        console.log("All", allTickets);
-
         const upcomingTicket = allTickets
           .filter(ticket => {
             const dateStr = ticket.eventDetails?.date;
@@ -233,7 +223,7 @@ export function HomeAndRecommendationsView() {
             }}
           >
             {tickets?.slice()?.reverse()?.map((ticket, index) => (
-              <Grid item key={index} sx={{ minWidth: 400 }}>
+              <Grid item key={index} sx={{ minWidth: 400}}>
                 <UpComingCard ticket={ticket} />
               </Grid>
             ))}

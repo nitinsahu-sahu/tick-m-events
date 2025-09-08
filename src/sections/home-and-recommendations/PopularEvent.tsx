@@ -8,6 +8,7 @@ import { formatTimeTo12Hour } from 'src/hooks/formate-time';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { eventAddToWishlist } from 'src/redux/actions/event.action';
 import { Link, useNavigate } from 'react-router-dom';
+import { PromotionBadge } from './promotionBadge';
 
 interface ApiResult {
   status: number;
@@ -66,8 +67,11 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
 
       }}
     >
-      {event.viewPromo && (
-        <Box
+      <Box sx={{ position: 'relative' }}>
+        <PromotionBadge promotions={event?.promotion} />
+      </Box>
+      
+      {/* <Box
           sx={{
             position: 'absolute',
             top: 0,
@@ -100,8 +104,7 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
           >
             View Promo
           </Box>
-        </Box>
-      )}
+        </Box> */}
       <CardContent sx={{ textAlign: 'center', position: 'relative' }}>
         <Link to={`/our-event/${event._id}`} target='__blank' style={{ textDecoration: 'none' }}>
 
@@ -123,10 +126,12 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
 
           <Typography
             variant="body2"
-            fontSize={{ xs: '8px', sm: '12px', md: '16px' }}
-            sx={{ color: event.statusColor, fontWeight: 700, mt: 1 }}
+            fontWeight={700}
+            textTransform="capitalize"
+            fontSize={{ xs: '8px', sm: '12px', md: '18px' }}
+            sx={{ color: event.payStatus==='free'?'green':'pink', fontWeight: 700, mt: 1 }}
           >
-            {event.status}
+            {event?.payStatus}
           </Typography>
           {/* Star Rating */}
           <Box

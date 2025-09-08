@@ -58,9 +58,11 @@ export const PaymentSettingTableData = [
 ];
 
 export interface Order {
-  paymentStatus: string; 
+  paymentStatus: string;
   totalAmount: number;
-  
+  paymentMethod?: string;
+  transactionId:number;
+ 
 }
 export interface EventData {
   _id: string;

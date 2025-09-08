@@ -19,10 +19,10 @@ export function PageTitleSection({ title, desc, rightCom }: any) {
                     variant="h4"
                     sx={{
                         mb: { xs: 1, sm: 2, md: 3 },
-                        fontWeight: "bold",
+                        fontWeight: 600,
                         color: "#000",
                         fontFamily: "Poppins, sans-serif",
-                        fontSize: { xs: "15px", sm: "18px", md: "34px" }, // Responsive size
+                        fontSize: { xs: "15px", sm: "18px", md: "30px" }, // Responsive size
                         lineHeight: { xs: "20px" }, // Responsive size
                     }}
                 >

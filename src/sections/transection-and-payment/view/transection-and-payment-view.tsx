@@ -69,7 +69,7 @@ export function TransectionAndPaymentView() {
         {/* Refund Management History */}
         <RefundManagementHistory selectedEvent={selectedEvent} />
         {/* Invoice History */}
-        <InvoiceHistory />
+        <InvoiceHistory selectedEvent={selectedEvent}/>
 
         {/* Payment Setting and Prefrence History */}
         <PaymentSettingAndPrefrenceHistory />

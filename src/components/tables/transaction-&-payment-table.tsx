@@ -68,6 +68,10 @@ export function TransactionAndPaymentTable({ headers = [], data = [], type }: an
                                                 ...(row[key] === 'Pending' && {
                                                     color: '#ff9800',
                                                 }),
+                                                ...(row[key] === 'Confirmed' && {
+                                                    color: '#4caf50',
+                                                }),
+
                                             }),
                                         }}
                                     >
@@ -113,35 +117,37 @@ export function TransactionAndPaymentTable({ headers = [], data = [], type }: an
                                             </Box>
                                         ) : key === "action" && type === "3" ? (
                                             <Box sx={{ gap: 1 }}>
-                                                {row[key].map((action: string, actionIdx: number) => (
-                                                    <Button
-                                                        key={actionIdx}
-                                                        variant="contained"
-                                                        disabled={row.status === "Pending"}
-                                                        sx={{
-                                                            backgroundColor: action.includes('PDF')
-                                                                ? '#1C8BC8' // Red for PDF
-                                                                : '#67C81C', // Green for Excel
-                                                            color: 'white',
-                                                            "&:hover": {
-                                                                backgroundColor: action.includes('PDF')
-                                                                    ? '#c62828' // Darker red
-                                                                    : '#2e7d32' // Darker green
-                                                            },
-                                                            fontSize: { xs: "0.7rem", sm: "0.8rem" },
-                                                            px: 2,
-                                                            textTransform: 'none',
-                                                            minWidth: { xs: '100px', sm: '120px' }
-                                                        }}
-                                                        startIcon={
-                                                            action.includes('PDF')
-                                                                ? <PictureAsPdfIcon />
-                                                                : <GridOnIcon />
-                                                        }
-                                                    >
-                                                        {action}
-                                                    </Button>
-                                                ))}
+                                                {row[key].map((action: any, actionIdx: number) => {
+                                                    const isObject = typeof action === 'object' && action !== null;
+                                                    const label = isObject ? action.label : action;
+                                                    const onClick = isObject ? action.onClick : undefined;
+
+                                                    return (
+                                                        <Button
+                                                            key={actionIdx}
+                                                            variant="contained"
+                                                            disabled={row.status === "Pending"}
+                                                            onClick={onClick}
+                                                            sx={{
+                                                                backgroundColor: label.includes('PDF') ? '#1C8BC8' : '#67C81C',
+                                                                color: 'white',
+                                                                "&:hover": {
+                                                                    backgroundColor: label.includes('PDF') ? '#c62828' : '#2e7d32'
+                                                                },
+                                                                fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                                                                px: 2,
+                                                                textTransform: 'none',
+                                                                minWidth: { xs: '100px', sm: '120px' }
+                                                            }}
+                                                            startIcon={
+                                                                label.includes('PDF') ? <PictureAsPdfIcon /> : <GridOnIcon />
+                                                            }
+                                                        >
+                                                            {label}
+                                                        </Button>
+                                                    );
+                                                })}
+
                                             </Box>
                                         ) : key === "action" && type === "5" ? (
                                             <Box sx={{ display: 'flex', gap: 1, justifyContent: "center" }}>
@@ -189,3 +195,45 @@ export function TransactionAndPaymentTable({ headers = [], data = [], type }: an
         </TableContainer>
     );
 }
+
+// const handleDownloadPDF = (row: any) => {
+//     const htmlContent = `
+//     <html>
+//       <head>
+//         <title>Invoice</title>
+//         <style>
+//           body { font-family: Arial, sans-serif; padding: 20px; }
+//           h2 { text-align: center; }
+//           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+//           th, td { border: 1px solid #333; padding: 10px; text-align: left; }
+//           th { background-color: #0B2E4C; color: white; }
+//         </style>
+//       </head>
+//       <body>
+//         <h2>Invoice</h2>
+//         <table>
+//           <tbody>
+//             ${Object.entries(row).map(([key, value]) => {
+//         if (key === 'action') return ''; // Skip action buttons
+//         return `
+//                 <tr>
+//                   <th>${key.charAt(0).toUpperCase() + key.slice(1)}</th>
+//                   <td>${value}</td>
+//                 </tr>
+//               `;
+//     }).join('')}
+//           </tbody>
+//         </table>
+//       </body>
+//     </html>
+//   `;
+//     const blob = new Blob([htmlContent], { type: 'text/html' });
+//     const fileName = `invoice-${row.invoiceId || 'document'}-${new Date().toISOString().split('T')[0]}.html`;
+//     const link = document.createElement('a');
+//     link.href = URL.createObjectURL(blob);
+//     link.download = fileName;
+//     document.body.appendChild(link);
+//     link.click();
+//     document.body.removeChild(link);
+//     URL.revokeObjectURL(link.href);
+// };

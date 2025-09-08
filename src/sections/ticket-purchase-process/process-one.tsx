@@ -31,6 +31,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
     const [promoError, setPromoError] = useState('');
     const [searchParams] = useSearchParams();
     const eventIdFromUrl = searchParams.get('eventId');
+    const rawPaymentMethods = eventWithDetails?.tickets?.[0]?.paymentMethods;
     // Memoized event data
     const eventId = useMemo(() => eventWithDetails?._id || '', [eventWithDetails]);
     const tickets = useMemo(() => eventWithDetails?.tickets || [], [eventWithDetails]);
@@ -250,14 +251,44 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
 
     // Effect for sending selection updates
     useEffect(() => {
+        let parsedPaymentMethods: string[] = [];
+ 
+        try {
+            if (Array.isArray(rawPaymentMethods)) {
+                parsedPaymentMethods = rawPaymentMethods;
+            } else if (typeof rawPaymentMethods === "string") {
+                // Try to parse only if it looks like JSON
+                if (rawPaymentMethods.trim().startsWith("[") || rawPaymentMethods.trim().startsWith("{")) {
+                    parsedPaymentMethods = JSON.parse(rawPaymentMethods);
+                } else {
+                    parsedPaymentMethods = [rawPaymentMethods]; // wrap plain string in array
+                }
+            } else {
+                parsedPaymentMethods = [];
+            }
+        } catch (error) {
+            console.warn("Failed to parse paymentMethods:", error);
+            parsedPaymentMethods = [];
+        }
+ 
         const selection = {
             tickets: getSelectedTickets(),
             totalAmount: calculateTotal(),
             eventId,
-            ticketCount: totalTicketsSelected
+            ticketCount: totalTicketsSelected,
+            paymentMethods: parsedPaymentMethods, // ✅ Always array
         };
+ 
         onTicketsSelected(selection);
-    }, [ticketQuantities, eventId, getSelectedTickets, calculateTotal, onTicketsSelected, totalTicketsSelected]);
+    }, [
+        ticketQuantities,
+        eventId,
+        getSelectedTickets,
+        calculateTotal,
+        onTicketsSelected,
+        totalTicketsSelected,
+        rawPaymentMethods,
+    ]);
 
 
     return (

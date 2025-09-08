@@ -247,7 +247,7 @@ export const navData: NavItem[] = [
     title: 'Profile & Services Management',
     path: '/profile-&-services-management',
     icon: icon('ic_profile_service'),
-    roles: ['provider', 'admin', 'participant'],
+    roles: ['provider'],
   },
   {
     title: 'Statistics',

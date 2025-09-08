@@ -15,6 +15,7 @@ interface Ticket {
 }
 
 interface TicketWrapper {
+    paymentMethods?: string[];
     tickets: Ticket[];
     totalAmount: number;
     eventId: string;
@@ -32,7 +33,8 @@ export function TicketPurchaseProcessView() {
         tickets: [],
         totalAmount: 0,
         eventId: '',
-        ticketCount: 0
+        ticketCount: 0,
+        paymentMethods: []
     });
 
     const [orderDetails, setOrderDetails] = useState<OrderDetails>({});
@@ -44,14 +46,14 @@ export function TicketPurchaseProcessView() {
         setActiveStep((prev) => Math.max(prev - 1, 0));
     }, []);
 
- const handleTicketsUpdate = useCallback((data: TicketWrapper) => {
-  setSelectedTickets((prev) => {
-    if (JSON.stringify(prev) !== JSON.stringify(data)) {
-      return data;
-    }
-    return prev;
-  });
-}, []);
+    const handleTicketsUpdate = useCallback((data: TicketWrapper) => {
+        setSelectedTickets((prev) => {
+            if (JSON.stringify(prev) !== JSON.stringify(data)) {
+                return data;
+            }
+            return prev;
+        });
+    }, []);
 
 
     const handleOrderDetailsUpdate = useCallback((details: OrderDetails) => {

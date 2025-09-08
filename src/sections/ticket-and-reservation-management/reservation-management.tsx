@@ -16,12 +16,12 @@ import { chartRealTimeOptions, ListViewMethod, reservationManagementTableHeaders
 
 export function ReservationManagement({ orderList }: any) {
 
-    const { order,  validationOptions: initialValidationOptions } = orderList
- 
+    const { order, validationOptions: initialValidationOptions } = orderList
+
     const dispatch = useDispatch<AppDispatch>();
     const exportToExcel = useExcelExport();
     const exportToCSV = useCSVExport();
-     // Initialize state with either the existing options or defaults
+    // Initialize state with either the existing options or defaults
     const [validationOption, setValidationOption] = useState<ValidationOptions>(
         initialValidationOptions || {  // Remove .validationOptions here
             selectedView: 'scan',
@@ -32,7 +32,7 @@ export function ReservationManagement({ orderList }: any) {
     const [error, setError] = useState<string | null>(null);
 
     const handleViewChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value as 'scan' | 'list';
+        const value = event.target.value as 'scan' | 'list' | 'both';
         setValidationOption(prev => ({
             ...prev,
             selectedView: value,
@@ -44,7 +44,7 @@ export function ReservationManagement({ orderList }: any) {
     };
 
     // Reset form when initialValidationOptions changes
-     useEffect(() => {
+    useEffect(() => {
         if (initialValidationOptions) {  // Remove .validationOptions here
             setValidationOption(initialValidationOptions);
             setIsModified(false);
@@ -89,8 +89,10 @@ export function ReservationManagement({ orderList }: any) {
     // 1. Scan view is selected (default has isModified true)
     // 2. Or list view is selected with at least one method
     const isSaveEnabled = isModified &&
-        (validationOption.selectedView === 'scan' ||
-            (validationOption.selectedView === 'list' && validationOption.listViewMethods.length > 0));
+        (
+            validationOption.selectedView === 'scan' || validationOption.selectedView === 'both' ||
+            (validationOption.selectedView === 'list' && validationOption.listViewMethods.length > 0)
+        );
 
     const transformDataForExport = (orders: any[]) =>
         orders.map(
@@ -119,8 +121,8 @@ export function ReservationManagement({ orderList }: any) {
         });
     };
 
-     const stats = getTicketStats(orderList);
- 
+    const stats = getTicketStats(orderList);
+
     const chartOptions = {
         ...chartRealTimeOptions,
         series: [stats.sold, stats.validated, stats.remaining],
@@ -185,40 +187,47 @@ export function ReservationManagement({ orderList }: any) {
                                 control={<Radio />}
                                 label="List View"
                             />
+                            {validationOption.selectedView === 'list' && (
+                                <Box ml={4} display="flex" flexDirection="column" gap={1}>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                checked={validationOption.listViewMethods.includes('manualCode')}
+                                                onChange={() => handleListViewMethodChange('manualCode')}
+                                            />
+                                        }
+                                        label="Manual Entry of Unique Code"
+                                    />
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                checked={validationOption.listViewMethods.includes('nameList')}
+                                                onChange={() => handleListViewMethodChange('nameList')}
+                                            />
+                                        }
+                                        label="Validation via Name List"
+                                    />
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                checked={validationOption.listViewMethods.includes('accountId')}
+                                                onChange={() => handleListViewMethodChange('accountId')}
+                                            />
+                                        }
+                                        label="Validation via Account ID"
+                                    />
+                                </Box>
+                            )}
+                            {/* List View Option */}
+                            <FormControlLabel
+                                value="both"
+                                control={<Radio />}
+                                label="Both scan and list view"
+                            />
                         </RadioGroup>
 
                         {/* List View Sub-options (only visible if listView is selected) */}
-                        {validationOption.selectedView === 'list' && (
-                            <Box ml={4} display="flex" flexDirection="column" gap={1}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={validationOption.listViewMethods.includes('manualCode')}
-                                            onChange={() => handleListViewMethodChange('manualCode')}
-                                        />
-                                    }
-                                    label="Manual Entry of Unique Code"
-                                />
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={validationOption.listViewMethods.includes('nameList')}
-                                            onChange={() => handleListViewMethodChange('nameList')}
-                                        />
-                                    }
-                                    label="Validation via Name List"
-                                />
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={validationOption.listViewMethods.includes('accountId')}
-                                            onChange={() => handleListViewMethodChange('accountId')}
-                                        />
-                                    }
-                                    label="Validation via Account ID"
-                                />
-                            </Box>
-                        )}
+
 
                         {error && (
                             <Typography color="error" variant="body2" mt={1}>
@@ -272,7 +281,7 @@ export function ReservationManagement({ orderList }: any) {
 
                 {/* Center: Chart */}
                 <Box flex={2} minWidth="300px">
-                    <Chart options={chartOptions} series={chartRealTimeOptions.series} type="donut" width="100%" height={250} />
+                    <Chart options={chartOptions} series={chartOptions.series as number[]} type="donut" width="100%" height={250} />
                 </Box>
             </Box>
         </Box>
@@ -281,14 +290,14 @@ export function ReservationManagement({ orderList }: any) {
 
 function getTicketStats(orderList: any) {
     const totalCapacity = Number(orderList?.ticketQuantity || 0);
- 
+
     const ticketsSold = orderList?.order?.length || 0;
     const validated = orderList?.order?.filter(
         (o: any) => o?.entryStatus === "validated"
     ).length || 0;
- 
+
     const remaining = Math.max(totalCapacity - ticketsSold, 0);
- 
+
     return {
         sold: ticketsSold,
         validated,

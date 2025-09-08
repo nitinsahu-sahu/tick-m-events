@@ -59,7 +59,7 @@ export const realTimeSalseTrackingTableHeaders = ["Ticket Type", "Price", "Total
 export type ListViewMethod = 'manualCode' | 'nameList' | 'accountId';
 
 export interface ValidationOptions {
- selectedView: 'scan' | 'list';
+ selectedView: 'scan' | 'list' | 'both';
   listViewMethods: ListViewMethod[];
 }
 

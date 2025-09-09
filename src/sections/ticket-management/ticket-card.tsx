@@ -95,6 +95,12 @@ export function TicketCard({ ticket }: any) {
         }
     };
 
+    const handleViewEvent = (eventId?: string) => {
+        if (eventId) {
+            navigate(`/our-event/${eventId}`);
+        }
+    };
+
     return (
         <Card
             onClick={() => {
@@ -227,7 +233,8 @@ export function TicketCard({ ticket }: any) {
 
                 </Grid>
 
-                <Button onClick={(e) => e.stopPropagation()} fullWidth variant="contained" sx={{ mt: 2, backgroundColor: "#0a2540", color: "white" }}>
+                <Button onClick={() =>
+                    handleViewEvent(ticket.eventDetails?._id)} fullWidth variant="contained" sx={{ mt: 2, backgroundColor: "#0a2540", color: "white" }}>
                     View Details
                 </Button>
             </CardContent>

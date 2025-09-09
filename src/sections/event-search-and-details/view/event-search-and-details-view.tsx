@@ -24,12 +24,10 @@ export function EventSearchAndDetailsView() {
 
       <FindYourEvent handleEventDetails={handleEventDetails} />
 
-      {/* urban festival 2025 */}
       {
         Object.keys(selectedEvent).length === 0 ? null : <MusicFestival selectedEvent={selectedEvent} />
       }
 
-      {/* share this event */}
       {
         Object.keys(selectedEvent).length === 0 ? null : <EventShare selectedEvent={selectedEvent} />
       }

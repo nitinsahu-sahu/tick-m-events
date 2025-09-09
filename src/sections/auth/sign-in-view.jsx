@@ -32,8 +32,8 @@ export function SignInView() {
   const { authenticate } = useSelector(state => state.auth);
   const [formData, setFormData] = useState(
     {
-      email: 'organizer.jos1@gmail.com',
-      password: 'John@123'
+      email: 'participant.sam2@gmail.com',
+      password: 'SamCurran@123'
 
     });
   const [showPassword, setShowPassword] = useState(false);

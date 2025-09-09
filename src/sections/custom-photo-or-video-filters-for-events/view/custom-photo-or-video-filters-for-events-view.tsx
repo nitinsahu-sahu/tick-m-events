@@ -5,23 +5,23 @@ import { useState } from 'react';
 import { FilterGrid } from '../FilterGrid';
 import ShareSection from '../ShareSection';
 import { PhotoFilterSection } from '../PhotoFilterSection';
-import {FrameProvider} from './FrameContext';
+import { FrameProvider } from './FrameContext';
 
 export function CustomPhotoAndVideoFiltersforEventsView() {
-   const [sharedImage, setSharedImage] = useState<string | null>(null);
-   
+  const [sharedImage, setSharedImage] = useState<string | null>(null);
+
   return (
-      <FrameProvider>
-    <DashboardContent>
-      <PageTitleSection title="Custom Photo or Video Filter" />
-      <PhotoFilterSection />
-      <Box mt={4}>
-          <FilterGrid onShare={(img) => setSharedImage(img)} />
-      </Box>
-      <Box mt={4}>
+    <FrameProvider>
+      <DashboardContent>
+        <PageTitleSection title="Custom Photo or Video Filter" />
+        <PhotoFilterSection />
+        <Box mt={4}>
+         <FilterGrid onShare={(img) => setSharedImage(img)}  frameSize={{ width: 400, height: 300}}  />
+        </Box>
+        {/* <Box mt={4}>
        <ShareSection image={sharedImage} />
-      </Box>
-    </DashboardContent>
+      </Box> */}
+      </DashboardContent>
     </FrameProvider>
   );
 }

@@ -4,6 +4,7 @@ import { HeadingCommon } from 'src/components/multiple-responsive-heading/headin
 import axios from 'src/redux/helper/axios';
 import { useSelector } from 'react-redux';
 import { RootState } from 'src/redux/store';
+import { toast } from 'react-toastify';
 import { useFrame } from './view/FrameContext';
 
 export function PhotoFilterSection() {
@@ -13,11 +14,13 @@ export function PhotoFilterSection() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<string>('none');
   const [isCustom, setIsCustom] = useState(false);
-
+  const [userFrames, setUserFrames] = useState<string[]>([]);
   const frames = selectedEvent?.customPhotoFrame?.frameUrls || [];
   const frameList = Array.isArray(frames) ? frames : [frames];
- console.log("Selected Event:", selectedEvent);
-console.log("Frames:", selectedEvent?.customPhotoFrame);
+  const allFrames = [...frameList, ...userFrames];
+
+  console.log("Selected Event:", selectedEvent);
+  console.log("Frames:", selectedEvent?.customPhotoFrame);
 
   // const [selectedFrame, setSelectedFrame] = useState<string | null>(null);
   const [customFilters, setCustomFilters] = useState({
@@ -28,6 +31,7 @@ console.log("Frames:", selectedEvent?.customPhotoFrame);
     sepia: 0,
   });
   const { selectedFrame, setSelectedFrame } = useFrame();
+  const [frameSize, setFrameSize] = useState({ width: 400, height: 300 }); // default fallback
   const buildCustomFilter = () => {
     const { brightness, contrast, blur, grayscale, sepia } = customFilters;
     return `brightness(${brightness}%) contrast(${contrast}%) blur(${blur}px) grayscale(${grayscale}%) sepia(${sepia}%)`;
@@ -35,13 +39,59 @@ console.log("Frames:", selectedEvent?.customPhotoFrame);
 
   const appliedFilter = isCustom ? buildCustomFilter() : selectedFilter;
 
+
+
+  const handleFrameUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type === 'image/png') {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
+
+          ctx.drawImage(img, 0, 0);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+
+          let hasTransparency = false;
+          for (let i = 3; i < data.length; i += 4) {
+            if (data[i] < 255) {
+              hasTransparency = true;
+              break;
+            }
+          }
+
+          if (hasTransparency) {
+            const frameUrl = URL.createObjectURL(file);
+            setUserFrames((prev) => [...prev, frameUrl]);
+            toast.success('Frame uploaded successfully!');
+          } else {
+            toast.error('Only PNGs with transparency are allowed.');
+          }
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      toast.warning('Only PNG files are allowed.');
+    }
+  };
+
+  const handleDeleteFrame = (frameUrl: string) => {
+    setUserFrames((prev) => prev.filter((url) => url !== frameUrl));
+  };
+
   useEffect(() => {
     async function fetchEvents() {
       try {
         const response = await axios.get(`/event-order/user/${_id}`);
         const tickets = response.data;
-        console.log("Tickets:", tickets);
-
         const uniqueEvents = Array.from(
           new Map(
             tickets.map((ticket: any) => {
@@ -86,6 +136,18 @@ console.log("Frames:", selectedEvent?.customPhotoFrame);
     { label: 'Contrast', value: 'contrast(200%)' },
     { label: 'Custom', value: 'custom' },
   ];
+ 
+
+
+useEffect(() => {
+  if (!selectedFrame) return;
+
+  const img = new Image();
+  img.onload = () => {
+    setFrameSize({ width: img.naturalWidth, height: img.naturalHeight });
+  };
+  img.src = selectedFrame;
+}, [selectedFrame]);
 
   return (
     <Box
@@ -121,108 +183,81 @@ console.log("Frames:", selectedEvent?.customPhotoFrame);
       </Box>
       <Box sx={{ maxWidth: 600, mx: 'auto' }}>
         <HeadingCommon variant="h5" title="Custom Photo or Video Filter" weight={600} />
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
-          {frameList.length > 0 ? (
-            frameList.map((frameUrl: string, index: number) => (
-              <Box
-                key={index}
-                component="img"
-                src={frameUrl}
-                alt={`Frame ${index + 1}`}
-                onClick={() => setSelectedFrame(frameUrl)} // ✅ sets selected frame globally
-                sx={{
-                  width: 120,
-                  height: 140,
-                  objectFit: 'cover',
-                  borderRadius: 2,
-                  boxShadow: '0 0 6px rgba(0,0,0,0.1)',
-                  border: selectedFrame === frameUrl ? '3px solid #0B2E4C' : 'none',
-                  cursor: 'pointer',
-                }}
-              />
-            ))
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2, flexWrap: 'wrap' }}>
+          {allFrames.length > 0 ? (
+            allFrames.map((frameUrl: string, index: number) => {
+              const isUserFrame = userFrames.includes(frameUrl);
+              return (
+                <Box
+                  key={index}
+                  sx={{ position: "relative", display: "inline-block" }}
+                >
+                  <Box
+                    component="img"
+                    src={frameUrl}
+                    alt={`Frame ${index + 1}`}
+                    onClick={() => setSelectedFrame(frameUrl)}
+                    sx={{
+                      width: 120,
+                      height: 140,
+                      objectFit: "contain",
+                      borderRadius: 2,
+                      boxShadow: "0 0 6px rgba(0,0,0,0.1)",
+                      border: selectedFrame === frameUrl ? "3px solid #0B2E4C" : "none",
+                      cursor: "pointer",
+                    }}
+                  />
+                  {isUserFrame && (
+                    <Button
+                      onClick={() => handleDeleteFrame(frameUrl)}
+                      sx={{
+                        position: "absolute",
+                        top: -8,
+                        right: -8,
+                        minWidth: "24px",
+                        height: "24px",
+                        borderRadius: "50%",
+                        background: "#fff",
+                        color: "#000",
+                        fontWeight: "bold",
+                        padding: 0,
+                        lineHeight: 1,
+                        boxShadow: "0 0 4px rgba(0,0,0,0.3)",
+                        "&:hover": { background: "#f5f5f5" },
+                      }}
+                    >
+                      ✕
+                    </Button>
+                  )}
+                </Box>
+              );
+            })
           ) : (
-            <Typography variant="body2" color="#888" sx={{ zIndex: 2 }}>
-              No Filter or Frame Available
+            <Typography variant="body2" color="#888">
+              No Frame Available
             </Typography>
           )}
 
-          {uploadedImage && (
-            <Box
-              component="img"
-              src={URL.createObjectURL(uploadedImage)}
-              alt="Uploaded"
-              sx={{
-                position: 'absolute',
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                filter: appliedFilter,
-                zIndex: 0,
-              }}
-            />
-          )}
+
+          {/* Upload new frame option */}
+          <Button
+            component="label"
+            variant="outlined"
+            sx={{ width: 120, height: 140, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            + Add Frame
+            <input type="file" hidden accept="image/png" onChange={handleFrameUpload} />
+          </Button>
         </Box>
 
 
-        <Button component="label" variant="outlined" sx={{ mt: 1 }}>
+
+        {/* <Button component="label" variant="outlined" sx={{ mt: 1 }}>
           Upload Image
           <input type="file" hidden accept="image/*" onChange={handleImageUpload} />
-        </Button>
+        </Button> */}
 
-        {uploadedImage && (
-          <>
-            <Stack direction="row" spacing={1} justifyContent="center" mt={2} flexWrap="wrap">
-              {filterOptions.map((f) => (
-                <Button
-                  key={f.value}
-                  size="small"
-                  variant={
-                    selectedFilter === f.value || (isCustom && f.value === 'custom')
-                      ? 'contained'
-                      : 'outlined'
-                  }
-                  onClick={() => {
-                    setSelectedFilter(f.value);
-                    setIsCustom(f.value === 'custom');
-                  }}
-                >
-                  {f.label}
-                </Button>
-              ))}
-            </Stack>
 
-            {isCustom && (
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="subtitle2" mb={1}>
-                  Adjust Filters:
-                </Typography>
-
-                <Stack direction="row" spacing={4} flexWrap="wrap" justifyContent="center">
-                  {Object.entries(customFilters).map(([key, value]) => (
-                    <Box key={key} sx={{ width: 160 }}>
-                      <Typography
-                        variant="caption"
-                        sx={{ fontWeight: 500, textAlign: 'center', display: 'block', mb: 0.5 }}
-                      >
-                        {key.charAt(0).toUpperCase() + key.slice(1)}: {value}
-                      </Typography>
-                      <Slider
-                        value={value}
-                        min={key === 'blur' ? 0 : 0}
-                        max={key === 'blur' ? 10 : 200}
-                        step={key === 'blur' ? 0.5 : 1}
-                        onChange={(_, newVal) =>
-                          setCustomFilters((prev) => ({ ...prev, [key]: newVal as number }))
-                        }
-                      />
-                    </Box>
-                  ))}
-                </Stack>
-              </Box>
-            )}
-          </>
-        )}
       </Box>
     </Box>
   );

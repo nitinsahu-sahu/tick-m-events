@@ -1,28 +1,23 @@
 import {
-  Checkbox,
-  FormControlLabel,
-  MenuItem,
-  Select,
-  Grid,
-  FormControl,
-  InputLabel,
-  IconButton,
-  Box,
-  TextField,
-  Button,Collapse
+  Checkbox, FormControlLabel, MenuItem, Select, Grid, FormControl,
+  InputLabel, IconButton, Box, ListSubheader, TextField, Button, Collapse,
+  Drawer, Typography, Divider
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import { useCallback, useEffect, useState } from 'react';
-
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { useSelector } from 'react-redux';
-import { RootState } from 'src/redux/store';
-import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { PopularEvent } from '../home-and-recommendations/PopularEvent';
+import CloseIcon from '@mui/icons-material/Close';
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { AppDispatch, RootState } from 'src/redux/store';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { fetchAllCategories } from 'src/redux/actions/event.action';
+
+import { PopularEvent } from '../home-and-recommendations/PopularEvent';
 
 export function FindYourEvent({ handleEventDetails }: any) {
   const { fullData } = useSelector((state: RootState) => state?.event);
+  const dispatch = useDispatch<AppDispatch>();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -31,22 +26,30 @@ export function FindYourEvent({ handleEventDetails }: any) {
     category: '',
     date: '',
     location: '',
-    price: '',
+    payStatus: '',
     popularity: '',
     availableTickets: false,
   });
-  const [filteredEvents, setFilteredEvents] = useState(fullData);
-  const [visibleEvents, setVisibleEvents] = useState(2);
+  const { categories } = useSelector((state: RootState) => state.event);
+
+  const [filteredEvents, setFilteredEvents] = useState(fullData || []);
+  const [visibleEvents, setVisibleEvents] = useState(6);
 
   // Combined filter function
   const applyFilters = useCallback(() => {
+    if (!fullData || fullData.length === 0) {
+      setFilteredEvents([]);
+      return;
+    }
+
     let results = [...fullData];
     const today = new Date();
 
+    // Search filter
     if (searchTerm) {
       results = results.filter(
         (event) =>
-          event.eventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          event.eventName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           (event.description &&
             event.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
           (event.location && event.location.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -59,39 +62,28 @@ export function FindYourEvent({ handleEventDetails }: any) {
     // Apply category filter
     if (filters.category) {
       results = results.filter(
-        (event) => event.category.toLowerCase() === filters.category.toLowerCase()
+        (event) => event.category === filters.category
       );
     }
 
     // Apply location filter
     if (filters.location) {
       results = results.filter((event) =>
-        event.location.toLowerCase().includes(filters.location.toLowerCase())
+        event.location?.toLowerCase().includes(filters.location.toLowerCase())
       );
     }
 
     // Apply price filter
-    if (filters.price === 'paid') {
-      results = results.filter((event) =>
-        event.tickets?.some((ticketGroup: any) =>
-          ticketGroup.tickets?.some(
-            (ticket: any) => ticket.price && ticket.price !== '0' && ticket.price !== 'Free'
-          )
-        )
-      );
-    } else if (filters.price === 'free') {
-      results = results.filter((event) =>
-        event.tickets?.some((ticketGroup: any) =>
-          ticketGroup.tickets?.some(
-            (ticket: any) => !ticket.price || ticket.price === '0' || ticket.price === 'Free'
-          )
-        )
-      );
+    if (filters.payStatus === 'paid') {
+      results = results.filter((event) => event.payStatus === 'paid');
+    } else if (filters.payStatus === 'free') {
+      results = results.filter((event) => event.payStatus === 'free');
     }
 
-    // Apply date filter (simplified example)
+    // Apply date filter
     if (filters.date) {
       results = results.filter((event) => {
+        if (!event.date) return false;
         const eventDate = new Date(event.date);
 
         switch (filters.date) {
@@ -118,17 +110,35 @@ export function FindYourEvent({ handleEventDetails }: any) {
 
     // Apply available tickets filter
     if (filters.availableTickets) {
-      results = results.filter((event) =>
-        event.tickets?.some((ticketGroup: any) =>
-          ticketGroup.tickets?.some(
-            (ticket: any) => ticket.isLimitedSeat && parseInt(ticket.totalTickets, 10) > 0
-          )
-        )
-      );
+      results = results.filter((event) => {
+        const totalTickets = parseInt(event.ticketQuantity || '0', 10);
+        return totalTickets > 0;
+      });
+    }
+
+    // Apply popularity/sorting filter
+    if (filters.popularity) {
+      switch (filters.popularity) {
+        case 'tickets_sold':
+          // Assuming you have a ticketsSold field in your data
+          results.sort((a, b) => (b.ticketsSold || 0) - (a.ticketsSold || 0));
+          break;
+        case 'ratings':
+          results.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+          break;
+        case 'date_asc':
+          results.sort((a, b) => new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime());
+          break;
+        case 'date_desc':
+          results.sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+          break;
+        default:
+          break;
+      }
     }
 
     setFilteredEvents(results);
-    setVisibleEvents(2); // Reset visible events when filters change
+    setVisibleEvents(6); // Reset visible events when filters change
   }, [fullData, searchTerm, filters]);
 
   // Update filters when they change
@@ -144,13 +154,30 @@ export function FindYourEvent({ handleEventDetails }: any) {
     applyFilters();
   }, [applyFilters]);
 
+  useEffect(() => {
+    dispatch(fetchAllCategories());
+  }, [dispatch]);
+
   // Load more events
   const loadMoreEvents = () => {
     setVisibleEvents((prev) => prev + 2); // Show 2 more events
   };
+  
   const toggleFilters = () => {
     setShowFilters(!showFilters);
   };
+
+  const clearFilters = () => {
+    setFilters({
+      category: '',
+      date: '',
+      location: '',
+      payStatus: '',
+      popularity: '',
+      availableTickets: false,
+    });
+  };
+
   return (
     <Box boxShadow={3} borderRadius={3} mt={3}>
       {/* Event Search Bar */}
@@ -174,78 +201,69 @@ export function FindYourEvent({ handleEventDetails }: any) {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </Box>
-        {hasSearched && (
-          <IconButton sx={{ ml: 1, color: '#fff' }} onClick={toggleFilters}>
-            <FilterListIcon />
-          </IconButton>
-        )}
+        <IconButton sx={{ ml: 1, color: '#fff' }} onClick={toggleFilters}>
+          <FilterListIcon />
+        </IconButton>
       </Box>
 
-      {/* Event Filter - Collapsible */}
-      <Collapse in={showFilters}>
-        <Box sx={{ mx: 3, my: 3 }}>
-          <HeadingCommon title="Find Your Event" weight={600} baseSize="34px" />
-
+      {/* Filter Drawer */}
+      <Drawer
+        anchor="right"
+        open={showFilters}
+        onClose={toggleFilters}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            p: 2,
+          },
+        }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6" fontWeight="bold">
+            Filters
+          </Typography>
+          <IconButton onClick={toggleFilters}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        
+        <Divider sx={{ mb: 2 }} />
+        
+        <Box sx={{ overflowY: 'auto', height: 'calc(100% - 100px)' }}>
           <Grid container spacing={2}>
             {/* Category Filter */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel
-                  id="category-label"
-                  sx={{ color: 'black', '&.Mui-focused': { color: 'black' }, fontWeight: 500 }}
-                >
-                  Category
-                </InputLabel>
+                <InputLabel id="event-category-label">Event Category</InputLabel>
                 <Select
-                  labelId="category-label"
+                  labelId="event-category-label"
                   value={filters.category}
                   onChange={(e) => handleFilterChange('category', e.target.value)}
-                  sx={{
-                    mt: 2,
-                    borderRadius: 1,
-                    bgcolor: '#fff',
-                    color: 'black',
-                    '.MuiOutlinedInput-notchedOutline': { borderColor: '#ccc' },
-                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#aaa' },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#000' },
-                    '.MuiSvgIcon-root': { color: 'black' },
-                    fontSize: 16,
-                  }}
+                  label="Event Category"
                 >
                   <MenuItem value="">All Categories</MenuItem>
-                  <MenuItem value="concert">Concerts</MenuItem>
-                  <MenuItem value="sports">Sports</MenuItem>
-                  <MenuItem value="comedy">Comedy</MenuItem>
-                  <MenuItem value="festival">Festival</MenuItem>
-                  <MenuItem value="conference">Conference</MenuItem>
+                  {categories.map((parent: any) => (
+                    parent.subcategories?.length > 0 && [
+                      <ListSubheader key={`header-${parent._id}`}>{parent.name}</ListSubheader>,
+                      ...parent.subcategories.map((child: any) => (
+                        <MenuItem key={child._id} value={child._id}>
+                          {child.name}
+                        </MenuItem>
+                      ))
+                    ]
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
-
+            
             {/* Date Filter */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel
-                  id="date-label"
-                  sx={{ color: 'black', '&.Mui-focused': { color: 'black' }, fontWeight: 500 }}
-                >
-                  Date
-                </InputLabel>
+                <InputLabel id="date-label">Date</InputLabel>
                 <Select
                   labelId="date-label"
                   value={filters.date}
                   onChange={(e) => handleFilterChange('date', e.target.value)}
-                  sx={{
-                    mt: 2,
-                    borderRadius: 1,
-                    bgcolor: '#fff',
-                    color: 'black',
-                    '.MuiOutlinedInput-notchedOutline': { borderColor: '#ccc' },
-                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#aaa' },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#000' },
-                    '.MuiSvgIcon-root': { color: 'black' },
-                    fontSize: 16,
-                  }}
                 >
                   <MenuItem value="">All Dates</MenuItem>
                   <MenuItem value="today">Today</MenuItem>
@@ -256,61 +274,25 @@ export function FindYourEvent({ handleEventDetails }: any) {
             </Grid>
 
             {/* Location Filter */}
-            <Grid item xs={12} sm={6} md={3}>
-              <FormControl fullWidth>
-                <InputLabel
-                  shrink
-                  sx={{ color: 'black', '&.Mui-focused': { color: 'black' }, fontWeight: 500 }}
-                >
-                  Location
-                </InputLabel>
-                <TextField
-                  placeholder="Enter City"
-                  variant="outlined"
-                  fullWidth
-                  value={filters.location}
-                  onChange={(e) => handleFilterChange('location', e.target.value)}
-                  sx={{
-                    mt: 2,
-                    bgcolor: '#fff',
-                    borderRadius: 1,
-                    fontSize: 16,
-                    '& .MuiOutlinedInput-root': {
-                      color: 'black',
-                      borderRadius: 1,
-                      '& fieldset': { borderColor: 'black' },
-                      '&:hover fieldset': { borderColor: 'black' },
-                      '&.Mui-focused fieldset': { borderColor: 'black' },
-                    },
-                  }}
-                />
-              </FormControl>
+            <Grid item xs={12}>
+              <TextField
+                label="Location"
+                placeholder="Enter City"
+                variant="outlined"
+                fullWidth
+                value={filters.location}
+                onChange={(e) => handleFilterChange('location', e.target.value)}
+              />
             </Grid>
 
             {/* Price Filter */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel
-                  id="price-label"
-                  sx={{ color: 'black', '&.Mui-focused': { color: 'black' }, fontWeight: 500 }}
-                >
-                  Price
-                </InputLabel>
+                <InputLabel id="price-label">Price</InputLabel>
                 <Select
                   labelId="price-label"
-                  value={filters.price}
-                  onChange={(e) => handleFilterChange('price', e.target.value)}
-                  sx={{
-                    mt: 2,
-                    borderRadius: 1,
-                    bgcolor: '#fff',
-                    color: 'black',
-                    '.MuiOutlinedInput-notchedOutline': { borderColor: '#ccc' },
-                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#aaa' },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#000' },
-                    '.MuiSvgIcon-root': { color: 'black' },
-                    fontSize: 16,
-                  }}
+                  value={filters.payStatus}
+                  onChange={(e) => handleFilterChange('payStatus', e.target.value)}
                 >
                   <MenuItem value="">All Prices</MenuItem>
                   <MenuItem value="free">Free</MenuItem>
@@ -320,29 +302,13 @@ export function FindYourEvent({ handleEventDetails }: any) {
             </Grid>
 
             {/* Popularity Filter */}
-            <Grid item xs={12} sm={6} md={8}>
+            <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel
-                  id="popularity-label"
-                  sx={{ color: 'black', '&.Mui-focused': { color: 'black' }, fontWeight: 500 }}
-                >
-                  Sort By
-                </InputLabel>
+                <InputLabel id="popularity-label">Sort By</InputLabel>
                 <Select
                   labelId="popularity-label"
                   value={filters.popularity}
                   onChange={(e) => handleFilterChange('popularity', e.target.value)}
-                  sx={{
-                    mt: 2,
-                    borderRadius: 1,
-                    bgcolor: '#fff',
-                    color: 'black',
-                    '.MuiOutlinedInput-notchedOutline': { borderColor: '#ccc' },
-                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#aaa' },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#000' },
-                    '.MuiSvgIcon-root': { color: 'black' },
-                    fontSize: 16,
-                  }}
                 >
                   <MenuItem value="">Default</MenuItem>
                   <MenuItem value="tickets_sold">Tickets Sold</MenuItem>
@@ -354,66 +320,67 @@ export function FindYourEvent({ handleEventDetails }: any) {
             </Grid>
 
             {/* Available Tickets Checkbox */}
-            <Grid item xs={12} sm={6} md={4}>
-              <Box
-                sx={{
-                  border: '1px solid #ccc',
-                  borderRadius: 1,
-                  bgcolor: '#fff',
-                  padding: '1px 16px',
-                  mt: 2,
-                }}
-              >
-                <HeadingCommon
-                  variant="subtitle2"
-                  title="Available Tickets"
-                  weight={400}
-                  baseSize="16px"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={filters.availableTickets}
-                      onChange={(e) => handleFilterChange('availableTickets', e.target.checked)}
-                    />
-                  }
-                  label="Only show available tickets"
-                />
-              </Box>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={filters.availableTickets}
+                    onChange={(e) => handleFilterChange('availableTickets', e.target.checked)}
+                  />
+                }
+                label="Only show available tickets"
+              />
             </Grid>
           </Grid>
         </Box>
-      </Collapse>
+        
+        <Box sx={{ mt: 'auto', pt: 2 }}>
+          <Button 
+            variant="outlined" 
+            fullWidth 
+            onClick={clearFilters}
+            sx={{ mb: 1 }}
+          >
+            Clear Filters
+          </Button>
+          <Button 
+            variant="contained" 
+            fullWidth 
+            onClick={toggleFilters}
+            sx={{ backgroundColor: '#002244', '&:hover': { backgroundColor: '#003366' } }}
+          >
+            Apply Filters
+          </Button>
+        </Box>
+      </Drawer>
 
       {/* Events Grid */}
-      {hasSearched && (
-        <Box mt={2} p={{ xs: 1, md: 1, lg: 2 }}>
-          <Grid container spacing={3}>
-            {filteredEvents.slice(0, visibleEvents).map((item: any) => (
-              <Grid item xs={12} sm={6} md={6} key={item._id}>
-                <PopularEvent event={item} handleEventDetails={handleEventDetails} flag="search" />
-              </Grid>
-            ))}
-          </Grid>
-          {filteredEvents.length > visibleEvents && (
-            <Box display="flex" justifyContent="center" mt={3}>
-              <Button
-                variant="contained"
-                onClick={loadMoreEvents}
-                sx={{
-                  backgroundColor: '#002244',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: '#003366',
-                  },
-                }}
-              >
-                Load More
-              </Button>
-            </Box>
-          )}
-        </Box>
-      )}
+      <Box mt={2} p={{ xs: 1, md: 1, lg: 2 }}>
+        <Grid container spacing={3}>
+          {filteredEvents.slice(0, visibleEvents).map((item: any) => (
+            <Grid item xs={12} sm={6} md={6} key={item._id}>
+              <PopularEvent event={item} handleEventDetails={handleEventDetails} flag="search" />
+            </Grid>
+          ))}
+        </Grid>
+        {filteredEvents.length > visibleEvents && (
+          <Box display="flex" justifyContent="center" mt={3}>
+            <Button
+              variant="contained"
+              onClick={loadMoreEvents}
+              sx={{
+                backgroundColor: '#002244',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#003366',
+                },
+              }}
+            >
+              Load More
+            </Button>
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 }

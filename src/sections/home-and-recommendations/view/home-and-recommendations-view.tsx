@@ -11,10 +11,12 @@ import { AppDispatch, RootState } from 'src/redux/store';
 import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
 import { fetchLatestEventCreatedActivity } from 'src/redux/actions/activityActions';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
 import { UpComingCard } from '../UpComingCard';
 import { PopularEvent } from '../PopularEvent';
 import { ExploreMoreSection } from '../ExploreMore';
 import axios from "../../../redux/helper/axios";
+
 
 interface EventDetails {
   eventName: string;
@@ -26,7 +28,11 @@ interface TicketItem {
   ticketType: string;
 }
 
-// You can reuse this for each ticket in the list
+interface ParticipantDetail {
+  name: string;
+  [key: string]: any;
+}
+
 interface Ticket {
   _id: string;
   eventId: string;
@@ -35,12 +41,13 @@ interface Ticket {
   qrCode: string;
   verifyEntry: string;
   eventDate?: string;
+  participantDetails?: ParticipantDetail[];
 }
 
 export function HomeAndRecommendationsView() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-const { popularEvents, recommendedEvents } = useSelector((state: RootState) => state?.homeRecom);
+  const { popularEvents, recommendedEvents } = useSelector((state: RootState) => state?.homeRecom);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const { _id } = useSelector((state: RootState) => state?.auth?.user);
   const user = useSelector((state: RootState) => state?.auth?.user);
@@ -49,6 +56,9 @@ const { popularEvents, recommendedEvents } = useSelector((state: RootState) => s
   const [upcomingTickets, setUpcomingTickets] = useState<Ticket[]>([]);
   const [latestEventActivity, setLatestEventActivity] = useState<any>(null);
   const [hiddenNotifIds, setHiddenNotifIds] = useState<string[]>([]);
+  const [selectedTicketForTransfer, setSelectedTicketForTransfer] = useState<Ticket | null>(null);
+  const [beneficiaryId, setBeneficiaryId] = useState('');
+  const [beneficiaryNames, setBeneficiaryNames] = useState<string[]>([]);
 
   const handleViewEvent = (eventId?: string) => {
     if (eventId) {
@@ -223,8 +233,16 @@ const { popularEvents, recommendedEvents } = useSelector((state: RootState) => s
             }}
           >
             {tickets?.slice()?.reverse()?.map((ticket, index) => (
-              <Grid item key={index} sx={{ minWidth: 400}}>
-                <UpComingCard ticket={ticket} />
+              <Grid item key={index} sx={{ minWidth: 400 }}>
+                <UpComingCard
+                  ticket={ticket}
+                  onShareClick={() => {
+                    setSelectedTicketForTransfer(ticket);
+                    setBeneficiaryId('');
+                    setBeneficiaryNames(ticket.participantDetails?.map((p: any) => p.name || "") || []);
+                  }}
+                />
+
               </Grid>
             ))}
           </Grid>
@@ -429,6 +447,141 @@ const { popularEvents, recommendedEvents } = useSelector((state: RootState) => s
         </Paper>
       </Box>
       <ExploreMoreSection />
+      {selectedTicketForTransfer && (
+        <Box
+          onClick={() => setSelectedTicketForTransfer(null)}
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.6)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1300, // HIGH z-index to overlay all
+            p: 2,
+          }}
+        >
+          <Box
+            onClick={(e) => e.stopPropagation()}
+            sx={{
+              backgroundColor: "#fff",
+              borderRadius: 6,
+              boxShadow: "0 10px 40px rgba(0,0,0,0.3)",
+              p: 4,
+              width: { xs: "95%", sm: "80%", md: "60%" },
+              maxHeight: "90vh",
+              overflowY: "auto",
+            }}
+          >
+            <Typography
+              variant="h6"
+              mb={3}
+              fontWeight={700}
+              sx={{ color: "#0B2E4C", fontSize: "1.6rem" }}
+            >
+              🎟 Transfer Ticket
+            </Typography>
+
+            <input
+              type="text"
+              placeholder="Beneficiary Account ID"
+              value={beneficiaryId}
+              onChange={(e) => setBeneficiaryId(e.target.value)}
+              style={{
+                marginBottom: "15px",
+                width: "100%",
+                padding: "14px",
+                borderRadius: "8px",
+                border: "1px solid #ccc",
+                fontSize: "15px",
+              }}
+            />
+
+            {beneficiaryNames.map((name, idx) => (
+              <input
+                key={idx}
+                type="text"
+                placeholder={`Beneficiary Name ${idx + 1}`}
+                value={name}
+                onChange={(e) => {
+                  const updated = [...beneficiaryNames];
+                  updated[idx] = e.target.value;
+                  setBeneficiaryNames(updated);
+                }}
+                style={{
+                  marginBottom: "12px",
+                  width: "100%",
+                  padding: "14px",
+                  borderRadius: "8px",
+                  border: "1px solid #ccc",
+                  fontSize: "15px",
+                }}
+              />
+            ))}
+
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "#0B2E4C",
+                color: "#fff",
+                width: "100%",
+                py: 1.6,
+                fontWeight: 600,
+                borderRadius: "8px",
+              }}
+              onClick={async () => {
+                if (!beneficiaryId) {
+                  toast.error("⚠️ Please enter a beneficiary ID");
+                  return;
+                }
+
+                try {
+                  const payload = {
+                    orderId: selectedTicketForTransfer._id,
+                    beneficiaryId,
+                    participantDetails: beneficiaryNames.map((name, idx) => ({
+                      ...(selectedTicketForTransfer.participantDetails?.[idx] || {}),
+                      name,
+                    })),
+                  };
+
+                  const response = await axios.post("/event-order/transfer-ticket", payload);
+
+                  if (response.data.success) {
+                    toast.success(response.data.message || "✅ Ticket transferred successfully!");
+                    setSelectedTicketForTransfer(null);
+                    setTimeout(() => window.location.reload(), 1500);
+                  } else {
+                    toast.error(response.data.message || "❌ Transfer failed");
+                  }
+                } catch (error: any) {
+                  console.error("Transfer failed:", error);
+                  toast.error(error.response?.data?.message || "❌ Transfer failed");
+                }
+              }}
+            >
+              Confirm Transfer
+            </Button>
+
+            <Button
+              onClick={() => setSelectedTicketForTransfer(null)}
+              variant="outlined"
+              sx={{
+                mt: 2,
+                width: "100%",
+                py: 1.6,
+                borderRadius: "8px",
+              }}
+            >
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      )}
+
     </DashboardContent>
   );
 }

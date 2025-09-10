@@ -3,6 +3,7 @@ import { HeadingCommon } from "src/components/multiple-responsive-heading/headin
 import { formatTimeTo12Hour } from "src/hooks/formate-time";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
 import axios from "../../redux/helper/axios";
 
 
@@ -38,7 +39,12 @@ export function TicketCard({ ticket }: any) {
     const [openRefundModal, setOpenRefundModal] = useState(false);
     const [isRefunding, setIsRefunding] = useState(false);
     const [refundMessage, setRefundMessage] = useState('');
-
+    // Share button
+    const [openShareModal, setOpenShareModal] = useState(false);
+    const [beneficiaryId, setBeneficiaryId] = useState("");
+    const [beneficiaryNames, setBeneficiaryNames] = useState(
+        ticket.participantDetails?.map((p: any) => p.name || "") || []
+    );
     const handleDownloadTicket = async (orderId: string) => {
         try {
             const response = await axios.get(`/event-order/ticket/${orderId}`, {
@@ -100,6 +106,47 @@ export function TicketCard({ ticket }: any) {
             navigate(`/our-event/${eventId}`);
         }
     };
+
+
+    const handleNameChange = (index: number, value: string) => {
+        const updated = [...beneficiaryNames];
+        updated[index] = value;
+        setBeneficiaryNames(updated);
+    };
+
+    const handleTransfer = async () => {
+        if (!beneficiaryId) {
+            toast.error("⚠️ Please enter a beneficiary ID");
+            return;
+        }
+
+        try {
+            const payload = {
+                orderId: ticket._id,
+                beneficiaryId,
+                participantDetails: beneficiaryNames.map((name:string, idx:number) => ({
+                    ...ticket.participantDetails[idx],
+                    name,
+                })),
+            };
+
+            const response = await axios.post("/event-order/transfer-ticket", payload);
+
+            if (response.data.success) {
+                toast.success(response.data.message || "✅ Ticket transferred successfully!");
+                setOpenShareModal(false);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                toast.error(response.data.message || "❌ Transfer failed");
+            }
+        } catch (error: any) {
+            console.error("Transfer failed:", error);
+            toast.error(error.response?.data?.message || "❌ Transfer failed");
+        }
+    };
+
 
     return (
         <Card
@@ -207,7 +254,10 @@ export function TicketCard({ ticket }: any) {
                             <Button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    if (label === "Request Refund" && !ticket.verifyEntry) {
+                                    if (label === "Share") {
+                                        setOpenShareModal(true);
+                                    }
+                                    else if (label === "Request Refund" && !ticket.verifyEntry) {
                                         setOpenRefundModal(true);
                                     }
                                 }}
@@ -280,6 +330,87 @@ export function TicketCard({ ticket }: any) {
                     >
                         Close QR Code
                     </Button>
+                </Box>
+            )}
+            {openShareModal && (
+                <Box
+                    onClick={(e) => e.stopPropagation()}
+                    sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(255,255,255,0.95)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        zIndex: 20,
+                        p: 2,
+                    }}
+                >
+                    <Box
+                        sx={{
+                            backgroundColor: "#fff",
+                            borderRadius: 4,
+                            boxShadow: 6,
+                            p: 4,
+                            width: "100%",
+                            maxWidth: 420,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Typography variant="h6" mb={2} fontWeight={700} color="primary">
+                            Transfer Ticket
+                        </Typography>
+                        <input
+                            type="text"
+                            placeholder="Beneficiary Account ID"
+                            value={beneficiaryId}
+                            onChange={(e) => setBeneficiaryId(e.target.value)}
+                            style={{
+                                marginBottom: "12px",
+                                width: "100%",
+                                padding: "10px",
+                                borderRadius: "6px",
+                                border: "1px solid #ccc",
+                            }}
+                        />
+                        {beneficiaryNames.map((name:string, idx:number) => (
+                            <input
+                                key={idx}
+                                type="text"
+                                placeholder={`Beneficiary Name ${idx + 1}`}
+                                value={name}
+                                onChange={(e) => handleNameChange(idx, e.target.value)}
+                                style={{
+                                    marginBottom: "12px",
+                                    width: "100%",
+                                    padding: "10px",
+                                    borderRadius: "6px",
+                                    border: "1px solid #ccc",
+                                }}
+                            />
+                        ))}
+
+
+                        <Button
+                            variant="contained"
+                            sx={{ backgroundColor: "#0B2E4C", color: "#fff", width: "100%" }}
+                            onClick={handleTransfer}
+                        >
+                            Confirm Transfer
+                        </Button>
+                        <Button
+                            onClick={() => setOpenShareModal(false)}
+                            variant="outlined"
+                            sx={{ mt: 2, width: "100%" }}
+                        >
+                            Cancel
+                        </Button>
+                    </Box>
                 </Box>
             )}
             {openRefundModal && (
@@ -399,8 +530,6 @@ export function TicketCard({ ticket }: any) {
                     </Box>
                 </Box>
             )}
-
-
         </Card>
     )
 }

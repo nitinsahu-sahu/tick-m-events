@@ -7,10 +7,10 @@ import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { MatrixThreeCard } from 'src/components/matrix-three-cards/matrix-three-cards';
 import { RootState } from 'src/redux/store';
-
+import { all } from 'axios';
+import axios from "../../../redux/helper/axios";
 import { TicketHistoryCancelRefundCard } from '../t-h-c-r';
 import { TicketCard } from '../ticket-card';
-import axios from "../../../redux/helper/axios";
 
 
 interface EventDetails {
@@ -22,12 +22,23 @@ interface EventDetails {
 interface TicketItem {
   ticketType: string;
 }
+interface RefundPolicy {
+  fullRefund: boolean;
+  fullRefundDaysBefore?: string;
+  partialRefund: boolean;
+  partialRefundPercent?: string;
+  noRefundAfterDate: boolean;
+  noRefundDate?: string | null;
+  _id: string;
+}
 
 interface Ticket {
   eventDetails?: EventDetails;
   tickets: TicketItem[];
   qrCode: string;
   verifyEntry?: boolean;
+  refundPolicy?: RefundPolicy;
+  isRefundPolicyEnabled?: boolean;
 }
 interface RefundRequest {
   orderId: string;
@@ -66,7 +77,7 @@ export function TicketManagementView() {
         const response = await axios.get(`/event-order/user/${_id}`);
         const allTickets: Ticket[] = response.data;
         setTickets(allTickets);
-
+        console.log("All", allTickets);
         const upcomingTicket = allTickets
           .filter(ticket => {
             const dateStr = ticket.eventDetails?.date;
@@ -240,6 +251,22 @@ export function TicketManagementView() {
       button: refund.refundStatus === 'pending' && !isExpired ? ['Cancel Request'] : [],
     };
   });
+
+  // Only consider tickets that have refundPolicy enabled
+  const eventPoliciesMap: { [eventId: string]: Ticket } = {};
+
+  tickets.forEach(ticket => {
+    if (ticket.eventDetails && ticket.isRefundPolicyEnabled) {
+      const eventId = ticket.eventDetails._id;
+      // Save only the first ticket for each event
+      if (!eventPoliciesMap[eventId]) {
+        eventPoliciesMap[eventId] = ticket;
+      }
+    }
+  });
+
+  // Convert to array
+  const eventPolicies = Object.values(eventPoliciesMap);
 
   return (
     <DashboardContent>
@@ -427,27 +454,43 @@ export function TicketManagementView() {
             )}
           </Grid>
 
-          <Grid container mt={3}>
+          <Grid container mt={3} spacing={2}>
             <Grid item xs={12}>
-              <Card sx={{ borderRadius: 3, boxShadow: 3, p: 2 }}>
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    fontWeight={500}
-                    fontSize={{ xs: '16px', sm: '20px', md: '24px' }}
-                  >
-                    Refund Policy
-                  </Typography>
+              <Card sx={{ borderRadius: 3, boxShadow: 3, p: 3 }}>
+                <Typography variant="h5" fontWeight={600} mb={2}>
+                  Refund Policy
+                </Typography>
+
+                {eventPolicies.length > 0 ? (
                   <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                    <li>Free cancellation up to 7 days before the event.</li>
-                    <li>Partial refund (-20%) between 7 and 3 days before the event.</li>
-                    <li>No refund after purchasing a ticket.</li>
-                    <li>No refund if canceled within 48 hours of the event.</li>
+                    {eventPolicies.map((ticket, idx) => {
+                      const policy = ticket.refundPolicy;
+                      const event = ticket.eventDetails;
+
+                      const policies = [];
+                      if (policy?.fullRefund) policies.push(`Full refund if canceled ${policy.fullRefundDaysBefore} days before`);
+                      if (policy?.partialRefund) policies.push(`Partial refund (${policy.partialRefundPercent || 'N/A'}%)`);
+                      if (policy?.noRefundAfterDate && policy.noRefundDate) {
+                        const formattedDate = new Date(policy.noRefundDate).toISOString().split('T')[0]; // "2025-09-01"
+                        policies.push(`No refund after ${formattedDate}.`);
+                      }
+
+                      return (
+                        <li key={idx} style={{ marginBottom: '12px' }}>
+                          <strong>{event?.eventName}:</strong> {policies.join(' | ')}
+                        </li>
+                      );
+                    })}
                   </ul>
-                </CardContent>
+                ) : (
+                  <Typography variant="body1" color="textSecondary" mt={2}>
+                    No refund policies available.
+                  </Typography>
+                )}
               </Card>
             </Grid>
           </Grid>
+
         </Box>
       )}
 

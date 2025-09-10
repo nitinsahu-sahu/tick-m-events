@@ -52,7 +52,7 @@ const shimmer = keyframes`
   }
 `;
 
-export function UpComingCard({ ticket }: any) {
+export function UpComingCard({ ticket, onShareClick }: { ticket: any; onShareClick?: () => void }) {
   const navigate = useNavigate();
   return (
     <GradientCard sx={{ height: '100%' }}>
@@ -134,6 +134,9 @@ export function UpComingCard({ ticket }: any) {
                   }
                   if (text === "View Ticket") {
                     navigate("/ticket-validation-at-entry");
+                  }
+                  if (text === "Share" && onShareClick) {
+                    onShareClick();
                   }
                 }}
                 variant="contained"

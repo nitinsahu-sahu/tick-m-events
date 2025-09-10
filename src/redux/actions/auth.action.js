@@ -108,6 +108,7 @@ export const login = (data) => async (dispatch) => {
     try {
         const response = await axios.post("/auth/login", { email, password });
         const { token, user, message, expiresIn } = response.data;
+console.log('login',response);
 
         // Calculate expiration time (current time + expiresIn)
         const expirationTime = Date.now() + expiresIn;

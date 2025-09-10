@@ -15,6 +15,7 @@ const initialState = {
     cover: "",
     isVerified: false,
     isAdmin: false,
+    referralCode:""
   },
   authenticate: false,
   authenticating: false,

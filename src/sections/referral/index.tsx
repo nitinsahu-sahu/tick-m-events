@@ -22,10 +22,13 @@ import {
     Redeem
 } from "@mui/icons-material";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/store";
 
 export function Referral() {
+    const { user } = useSelector((state: RootState) => state?.auth);
     const [copied, setCopied] = useState(false);
-    const referralLink = `https://tick-m-events.vercel.app?referrelCode=abc`
+    const referralLink = `https://tick-m-events.vercel.app?referrelCode=${user?.referralCode}`
     const userPoints = 450; // Example current points
     const earnedFromReferrals = 300; // Example points earned from referrals
 

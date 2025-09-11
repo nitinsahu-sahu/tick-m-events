@@ -1,19 +1,22 @@
 import { InputAdornment, Typography, IconButton, TextField, Button, Grid, Avatar, Box, Link, CircularProgress } from '@mui/material';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import LoadingButton from '@mui/lab/LoadingButton';
 import PhoneInput from 'react-phone-number-input'
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Iconify } from 'src/components/iconify';
 import { signup, validateReferralCode } from 'src/redux/actions';
 import { AppDispatch } from 'src/redux/store';
 
-
 export function Register() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    
+    // Get referral code from URL parameter
+    const referralCodeFromUrl = searchParams.get('referrelCode') || '';
 
     const [formRegisterData, setRegisterData] = useState({
         name: "",
@@ -22,7 +25,7 @@ export function Register() {
         gender: "Male",
         role: "",
         address: "",
-        referralCode: ""
+        referralCode: referralCodeFromUrl // Pre-fill with URL parameter
     });
     const [avatar, setAvatar] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -34,21 +37,59 @@ export function Register() {
         referrerName: ""
     });
     const [validatingReferral, setValidatingReferral] = useState(false);
+    const [hasValidatedUrlReferral, setHasValidatedUrlReferral] = useState(false);
+
+    // Validate referral code from URL on component mount
+    useEffect(() => {
+        const validateUrlReferralCode = async () => {
+            if (referralCodeFromUrl && !hasValidatedUrlReferral) {
+                setValidatingReferral(true);
+                try {
+                    const result = await dispatch(validateReferralCode(referralCodeFromUrl));
+                    if (result.success) {
+                        setReferralValidation({
+                            isValid: true,
+                            message: `Valid referral code from URL! You'll receive bonus points.`,
+                            referrerName: result.referrerName
+                        });
+                    } else {
+                        setReferralValidation({
+                            isValid: false,
+                            message: "Invalid referral code in URL",
+                            referrerName: ""
+                        });
+                        toast.error("The referral code in the URL is invalid");
+                    }
+                } catch (error) {
+                    setReferralValidation({
+                        isValid: false,
+                        message: "Error validating referral code from URL",
+                        referrerName: ""
+                    });
+                } finally {
+                    setValidatingReferral(false);
+                    setHasValidatedUrlReferral(true);
+                }
+            }
+        };
+
+        validateUrlReferralCode();
+    }, [referralCodeFromUrl, dispatch, hasValidatedUrlReferral]);
 
     const handleRegisterChange = (event: any) => {
-        event.preventDefault(); // Prevent default form submission behavior
+        event.preventDefault();
         const { name, value } = event.target;
         setRegisterData((prevData) => ({ ...prevData, [name]: value }));
     };
 
     const handleAvatar = (e: any) => {
-        if (e.target.files?.[0]) { // Check if a file exists
-            setAvatar(e.target.files[0]); // Store the File object directly
+        if (e.target.files?.[0]) {
+            setAvatar(e.target.files[0]);
         }
     };
 
     const handlePhoneChange = (value: any) => {
-        const phoneValue = value; // or String(value)
+        const phoneValue = value;
         setPhoneNumber(phoneValue);
         setRegisterData((prevData) => ({ ...prevData, number: phoneValue }));
     };
@@ -95,13 +136,12 @@ export function Register() {
 
     const handleRegistration = useCallback(async (event: any) => {
         event.preventDefault();
-        setIsLoading(true); // Start loading
+        setIsLoading(true);
 
         // Validate referral code again before submission if provided
         if (formRegisterData.referralCode && !referralValidation.isValid) {
             toast.error("Please enter a valid referral code");
-            setIsLoading(false); // Stop loading on validation error
-
+            setIsLoading(false);
             return;
         }
 
@@ -127,7 +167,6 @@ export function Register() {
 
             if (result.status === 201) {
                 toast.success(result?.message);
-                // Show referral success if applicable
                 if (formRegisterData.referralCode) {
                     toast.success(`You've received bonus points from ${referralValidation.referrerName}'s referral!`);
                 }
@@ -155,7 +194,7 @@ export function Register() {
         } catch (error) {
             toast.error("Registration failed");
         } finally {
-            setIsLoading(false); // Stop loading regardless of success or error
+            setIsLoading(false);
         }
     }, [formRegisterData, navigate, avatar, dispatch, phoneNumber, referralValidation]);
 
@@ -215,6 +254,7 @@ export function Register() {
                 InputLabelProps={{ shrink: true }}
                 sx={{ mt: 2 }}
             />
+            
             {/* Gender Radio Buttons */}
             <Box sx={{ width: '100%' }} mt={2}>
                 <Box display="flex" gap={2} alignItems="center">
@@ -231,7 +271,7 @@ export function Register() {
                                 value={gender}
                                 checked={formRegisterData.gender === gender}
                                 onChange={handleRegisterChange}
-                                required={formRegisterData.gender === ''} // Show required only if nothing selected
+                                required={formRegisterData.gender === ''}
                                 style={{ marginRight: 8 }}
                             />
                             <label htmlFor={`gender-${gender}`}>
@@ -306,6 +346,7 @@ export function Register() {
                     placeholder="Enter phone number"
                 />
             </Box>
+            
             {/* Role Select */}
             <TextField
                 fullWidth
@@ -364,7 +405,8 @@ export function Register() {
                 helperText={
                     validatingReferral ? "Validating..." :
                         formRegisterData.referralCode.length > 0 ? referralValidation.message :
-                            "Enter a friend's referral code to get bonus points"
+                            referralCodeFromUrl ? "Referral code from URL has been pre-filled" :
+                                "Enter a friend's referral code to get bonus points"
                 }
                 InputProps={{
                     endAdornment: formRegisterData.referralCode.length > 0 && (
@@ -380,6 +422,7 @@ export function Register() {
                     )
                 }}
             />
+            
             {/* Register Button */}
             <LoadingButton
                 fullWidth
@@ -388,7 +431,7 @@ export function Register() {
                 color="inherit"
                 variant="contained"
                 sx={{ mt: 2 }}
-                loading={isLoading} // Add this prop
+                loading={isLoading}
             >
                 Register
             </LoadingButton>
@@ -404,7 +447,7 @@ export function Register() {
                 md={6}
                 sx={{
                     display: { xs: "none", md: "block" },
-                    backgroundImage: `url('./assets/images/login-banner.png')`, // replace with actual image path
+                    backgroundImage: `url('./assets/images/login-banner.png')`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                 }}
@@ -426,14 +469,13 @@ export function Register() {
                     <Box display="flex" alignItems="center" justifyContent="space-between" gap={2}>
                         <Button
                             size="small"
-                            variant="contained" // Changed from "h6" to "contained", "text", or "outlined"
+                            variant="contained"
                             sx={{
                                 backgroundColor: "#1F8FCD",
                                 color: "white",
                                 textTransform: "none",
                                 fontWeight: 600,
-                                fontSize: '12', // This will make it h6 size
-                                // Additional h6 styling if needed
+                                fontSize: '12',
                                 lineHeight: 1.6,
                                 letterSpacing: '0.0075em'
                             }}
@@ -443,7 +485,7 @@ export function Register() {
                         {
                             avatar ? (
                                 <Avatar
-                                    src={URL.createObjectURL(avatar)} // avatar is a File object
+                                    src={URL.createObjectURL(avatar)}
                                     alt="Preview"
                                     sx={{ width: 56, height: 56, mt: 2 }}
                                 />
@@ -452,8 +494,6 @@ export function Register() {
                             )
                         }
                     </Box>
-
-
 
                     <form encType='multipart/form-data' onSubmit={handleRegistration}>
                         {renderSignupForm}

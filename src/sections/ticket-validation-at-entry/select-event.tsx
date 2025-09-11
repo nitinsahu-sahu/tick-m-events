@@ -21,6 +21,7 @@ export interface Order {
     verifyEntry: boolean;
     ticketCode: string;
     createdAt: string;
+     qrCode?: string | null; 
 }
 
 interface Ticket {
@@ -40,7 +41,6 @@ interface SelectTicketsProps {
 export function SelectTickets({ events, onEventSelectOrder, selectedEventOrder }: SelectTicketsProps) {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [orders, setOrders] = useState<Order[]>([]);
-
     const handleEventChange = (eventId: string) => {
         const selected = events.find(e => e._id === eventId) || null;
         setSelectedEvent(selected);

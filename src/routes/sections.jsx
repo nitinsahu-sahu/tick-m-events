@@ -67,6 +67,7 @@ export const ProfileAndServicesManagementPage = lazy(() => import('src/pages/pro
 export const MessageingRelationshipPage = lazy(() => import('src/pages/messageing-relationship'));
 export const EventEditPage = lazy(() => import('src/pages/evets-edit'));
 export const ContactPage = lazy(() => import('src/pages/contact'));
+export const SingleProfilePage = lazy(() => import('src/pages/single-profile'));
 
 
 // ----------------------------------------------------------------------
@@ -321,6 +322,12 @@ export function Router() {
       path: '/category/:categoryId',
       element: (
         <SingleCategoryPage />
+      ),
+    },
+    {
+      path: '/profile/:id',
+      element: (
+        <SingleProfilePage />
       ),
     },
     {

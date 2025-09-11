@@ -132,9 +132,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 {
                   hiddenMessageClientRel.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Messaging & Client Relationship" />
                 }
-                {
-                  hiddenStatisticsPerform.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title={name} />
-                }
+     
                 {
                   hiddenGlobalOverview.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Global Overview & General Statistics" />
                 }
@@ -230,12 +228,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                     </>
                   )
                 }
-                {
-                  hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
-                  <Typography fontWeight={600} fontSize={{ xs: 14, sm: 16, md: 18 }} color="#3CB1F1">
-                    Performance: <span style={{ color: "black" }}>Excellent</span>
-                  </Typography>
-                }
+                
                 {
                   hiddenLoyaltyProgram.some(path => pathname.includes(path)) &&
                   <HeadingCommon title="500" weight={700} color="#0B2E4C" />

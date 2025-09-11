@@ -28,9 +28,7 @@ import { RootState } from "src/redux/store";
 export function Referral() {
     const { user } = useSelector((state: RootState) => state?.auth);
     const [copied, setCopied] = useState(false);
-    const referralLink = `https://tick-m-events.vercel.app?referrelCode=${user?.referralCode}`
-    const userPoints = 450; // Example current points
-    const earnedFromReferrals = 300; // Example points earned from referrals
+    const referralLink = `${import.meta.env.VITE_FRONT_URL || 'https://tick-m-events.vercel.app'}/register?referrelCode=${user?.referralCode}`
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(referralLink);
@@ -109,7 +107,7 @@ export function Referral() {
                                         textOverflow: 'ellipsis'
                                     }}
                                 >
-                                    {referralLink}
+                                    <Typography fontSize={13}>{referralLink}</Typography>
                                 </Paper>
                                 <Button
                                     variant="contained"
@@ -181,7 +179,7 @@ export function Referral() {
                                     }}>
                                         <People sx={{ fontSize: 30 }} />
                                         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                                            3
+                                            {user?.referralCount || 0}
                                         </Typography>
                                         <Typography variant="body2">
                                             Friends Joined
@@ -204,18 +202,18 @@ export function Referral() {
                                         Points from Referrals
                                     </Typography>
                                     <Typography variant="h4" color="success.main" sx={{ fontWeight: 'bold' }}>
-                                        {earnedFromReferrals} pts
+                                        {user.rewardPoints || 0} pts
                                     </Typography>
                                 </Box>
 
-                                <Box sx={{ mb: 3 }}>
+                                {/* <Box sx={{ mb: 3 }}>
                                     <Typography variant="body2" color="text.secondary" gutterBottom>
                                         Total Points
                                     </Typography>
                                     <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                                         {userPoints} pts
                                     </Typography>
-                                </Box>
+                                </Box> */}
 
                                 <Divider sx={{ my: 2 }} />
 
@@ -224,7 +222,7 @@ export function Referral() {
                                         Next Reward at
                                     </Typography>
                                     <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                        5 referrals • 500 pts
+                                        {user?.referralCount || 0} referrals • {user?.rewardPoints||0} pts
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
                                         Unlock exclusive benefits

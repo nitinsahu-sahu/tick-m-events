@@ -131,7 +131,7 @@ export function ProfileAndServicesManagementView() {
       {updateAval === true && (
         <>
           {/* Client review section */}
-          <ClientReview providerId={user._id}/>
+          <ClientReview providerId={user?._id}/>
 
           {/* Avability section */}
           <ProviderAvailability />

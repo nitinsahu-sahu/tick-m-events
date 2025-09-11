@@ -49,7 +49,7 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
     };
 
     const copyProfileLink = () => {
-        const profileUrl = `${import.meta.env.VITE_Live_URL}/pro/${user?._id}`;
+        const profileUrl = `${import.meta.env.VITE_FRONT_URL || 'https://tick-m-events.vercel.app' }/profile/${user?._id}`;
         navigator.clipboard.writeText(profileUrl);
         setCopySuccess(true);
         handleShareClose();
@@ -57,7 +57,7 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
     };
 
     const shareOnSocialMedia = (platform: string) => {
-        const profileUrl = `${import.meta.env.VITE_Live_URL}/pro/${user?._id}`;
+        const profileUrl = `${import.meta.env.VITE_FRONT_URL || 'https://tick-m-events.vercel.app' }/profile/${user?._id}`;
         const message = `Check out my profile on EventHub: ${profileUrl}`;
 
         let url = '';

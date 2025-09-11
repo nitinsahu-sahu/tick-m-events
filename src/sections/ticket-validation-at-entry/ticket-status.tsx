@@ -17,6 +17,7 @@ interface Order {
     verifyEntry: boolean;
     ticketCode: string;
     createdAt: string;
+    qrCode?: string | null;
 }
 
 interface TicketsStatusProps {

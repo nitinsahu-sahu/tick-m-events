@@ -2,38 +2,38 @@ import { Box, Button, Grid, SelectChangeEvent, MenuItem, Paper, Select, Typograp
 import { useState } from "react";
 import { toast } from 'react-toastify';
 import { useDispatch } from "react-redux";
- 
+
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { AppDispatch } from "src/redux/store";
 import { eventOrderCreate } from "src/redux/actions/eventOrder";
- 
+
 import { HeadProcess } from "./head-process";
 import { PaymentOption, getPaymentOptions } from "./utils";
- 
+
 export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
     const dispatch = useDispatch<AppDispatch>();
     // Normalize paymentMethods: always array
     const rawMethods = tickets?.paymentMethods;
     const normalizedMethods = Array.isArray(rawMethods) ? rawMethods : rawMethods ? [rawMethods] : [];
- 
+
     const paymentOptions: PaymentOption[] = getPaymentOptions(normalizedMethods);
- 
+
     const [selectedPayment, setSelectedPayment] = useState<PaymentOption>(
         paymentOptions[0] || { src: "", name: "", value: "" }
     );
- 
+
     const handlePaymentChange = (event: SelectChangeEvent<string>) => {
         const selectedValue = event.target.value;
         const selectedOption = paymentOptions.find((option) => option.value === selectedValue);
- 
+
         if (selectedOption) {
             setSelectedPayment(selectedOption);
         }
     };
- 
+
     const handleSubmit = async (event: React.FormEvent) => {
- 
         event.preventDefault();
+
         const orderFormEntry = new FormData();
         orderFormEntry.append("eventId", tickets.eventId);
         orderFormEntry.append("orderAddress", JSON.stringify(orderDetails.orderAddress));
@@ -42,21 +42,36 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
         orderFormEntry.append("deviceUsed", getDeviceType());
         orderFormEntry.append("totalAmount", tickets?.totalAmount);
         orderFormEntry.append("paymentMethod", selectedPayment?.value);
- 
+
         try {
- 
             const result = await dispatch(eventOrderCreate(orderFormEntry));
+
+            // ✅ Handle success
             if (result?.status === 201) {
-                toast.success(result?.message);
-                onNext()
+                toast.success(result.message || "Order created successfully");
+
+                const paymentUrl = result?.paymentUrl; // Get this if you're returning it
+
+                if (
+                    paymentUrl &&
+                    ["mtn", "orange", "mobile_money"].includes(selectedPayment?.value.toLowerCase())
+                ) {
+                    // ✅ Redirect to Fapshi payment gateway
+                    window.location.href = paymentUrl;
+                    return;
+                }
+
+                // Other payment types
+                onNext();
             } else {
-                toast.error(result?.message);
+                toast.error(result?.message || "Something went wrong");
             }
- 
+
         } catch (error) {
             toast.error("Event creation failed");
         }
     };
+
     return (
         <Box mt={3}>
             <Paper sx={{ width: "100%", p: 4, boxShadow: 3, borderRadius: 3, position: "relative" }}>
@@ -88,7 +103,7 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
                             </MenuItem>
                         ))}
                     </Select>
- 
+
                     {/* Payment Details Box */}
                     <Box p={3} borderRadius={3} bgcolor="#F8F9FA" display="flex" alignItems="center" justifyContent="space-between">
                         <Box display="flex" alignItems="center">
@@ -107,7 +122,7 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
                         </Box>
                         <HeadingCommon title={`Total: ${tickets?.totalAmount || 0.00} XAF`} baseSize="15px" />
                     </Box>
- 
+
                     <Grid container spacing={2} mt={3}>
                         <Grid item xs={12}>
                             <Button
@@ -125,16 +140,16 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
         </Box>
     )
 }
- 
+
 function getDeviceType(): string {
     const ua = navigator.userAgent;
- 
+
     if (/Mobi|Android/i.test(ua)) return "Smartphones";
     if (/Tablet|iPad/i.test(ua)) return "Tablets";
     if (/Macintosh|Windows|Linux/i.test(ua)) {
         if (window.innerWidth < 1024) return "Laptops";
         return "Desktops";
     }
- 
+
     return "Unknown";
 }

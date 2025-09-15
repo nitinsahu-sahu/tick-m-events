@@ -1,5 +1,5 @@
 import {
-  Button, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead,
+  Button, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, Typography,
 } from "@mui/material";
 import { useCallback, useState } from "react";
@@ -162,7 +162,7 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                       >
                         {row.status === "accepted" ? 'Signed' : 'Contract Sign'}
 
-                      </Button> : <Button
+                      </Button> : <Box><Button
                         variant="contained"
                         size="small"
                         disabled={row.status==='accepted'}
@@ -176,6 +176,21 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                       >
                         Cancel
                       </Button>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        disabled={row.status==='accepted'}
+                        onClick={() => handleCancelReqByOrg(row)}
+                        sx={{
+                          marginX: 0.5,
+                          borderColor: "gray",
+                          backgroundColor: "#48b71cff",
+                          color: 'white',
+                        }}
+                      >
+                        Signed
+                      </Button>
+                      </Box>
                     }
 
                   </TableCell>

@@ -56,13 +56,13 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
                     paymentUrl &&
                     ["mtn", "orange", "mobile_money"].includes(selectedPayment?.value.toLowerCase())
                 ) {
-                    // ✅ Redirect to Fapshi payment gateway
+                    // ✅ Redirect only for online payments
                     window.location.href = paymentUrl;
-                    return;
+                } else {
+                    // ✅ For cash / COD / credit card → move to next step
+                    onNext();
                 }
 
-                // Other payment types
-                onNext();
             } else {
                 toast.error(result?.message || "Something went wrong");
             }

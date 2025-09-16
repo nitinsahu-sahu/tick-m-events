@@ -235,7 +235,12 @@ export const navData: NavItem[] = [
     path: '/ticketing-&-transactions-supervision',
     icon: icon('ic_supervision'),
     roles: ['admin'],
-
+  },
+    {
+    title: 'WithDrawal',
+    path: '/withdrawal',
+    icon: icon('ic_supervision'),
+    roles: ['admin'],
   },
   {
     title: 'Referrals Program',

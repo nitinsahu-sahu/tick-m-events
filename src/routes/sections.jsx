@@ -68,7 +68,7 @@ export const MessageingRelationshipPage = lazy(() => import('src/pages/messagein
 export const EventEditPage = lazy(() => import('src/pages/evets-edit'));
 export const ContactPage = lazy(() => import('src/pages/contact'));
 export const SingleProfilePage = lazy(() => import('src/pages/single-profile'));
-
+export const WithDrawlPage = lazy(() => import('src/pages/withdrawl'));
 
 // ----------------------------------------------------------------------
 
@@ -260,7 +260,10 @@ export function Router() {
           path: '/ticketing-&-transactions-supervision',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><TicketingAndTransactionsSupervisionPage /></RoleProtectedRoute>
         },
-
+{
+          path: '/withdrawal',
+          element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><WithDrawlPage /></RoleProtectedRoute>
+        },
         // -----------------------**************-------------------------
 
         {

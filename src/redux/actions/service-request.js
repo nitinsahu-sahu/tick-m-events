@@ -210,6 +210,31 @@ export const updateOrganizerDecision = (id, status, contractStatus) => async (di
   }
 };
 
+export const updateAcceptProviderStatus = (row, proStatus) => async (dispatch) => {
+  dispatch({ type: serviceRequestConstants.ACCEPT_PROVIDER_REQUEST });
+  try {
+    const res = await axios.put(`/event-requests/p/${row?._id}/status`, {
+      proStatus,
+    });
+
+    dispatch({
+      type: serviceRequestConstants.ACCEPT_PROVIDER_SUCCESS,
+      payload: {
+        message: res.data.message,
+        updatedRequest: res.data.data,
+      },
+    });
+    dispatch(getRequestsByProvider())
+  } catch (error) {
+    dispatch({
+      type: serviceRequestConstants.ACCEPT_PROVIDER_FAILURE,
+      payload: {
+        message: error.response?.data?.message || 'Something went wrong',
+      },
+    });
+  }
+};
+
 export const markRequestAsCompleted = (eventRequestId) => async (dispatch) => {
   dispatch({ type: serviceRequestConstants.MARK_REQUEST_AS_COMPLETED_REQUEST });
 

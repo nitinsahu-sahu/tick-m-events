@@ -74,29 +74,6 @@ interface DetailsModalProps {
 }
 
 export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) => {
-  console.log('==========ef==========================');
-  console.log(data);
-  console.log('====================================');
-  const { user: loggedInUser } = useSelector((state: RootState) => state.auth);
-  const dispatch = useDispatch<AppDispatch>()
-  const [loading, setLoading] = useState(false);
-
-  const handleDecision = async (decision: 'accept' | 'reject') => {
-    const status = decision === 'accept' ? 'accepted-by-organizer' : 'rejected-by-organizer';
-    const contractStatus = decision === 'accept' ? 'ongoing' : 'pending';
-
-    setLoading(true);
-    try {
-      await dispatch(updateOrganizerDecision(data._id, status, contractStatus));
-      toast.success(`Proposal ${decision === 'accept' ? 'accepted' : 'rejected'} successfully`);
-      onClose();
-    } catch (error) {
-      toast.error('Failed to update decision. Please try again.');
-    } finally {
-      setLoading(false); // Ensure loading ends
-    }
-  };
-
   if (!data) return null;
 
   return (
@@ -197,13 +174,15 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
             </DetailItem>
 
             <DetailItem>
-              <DetailLabel variant="body2">Status:</DetailLabel>
+              <DetailLabel variant="body2">Organizer Status:</DetailLabel>
               <DetailValue variant="body2">
                 <Chip
-                  label={data.status}
+                  sx={{textTransform:'capitalize'}}
+
+                  label={data.orgStatus}
                   color={
-                    data.status === 'accepted' ? 'success' :
-                      data.status === 'rejected' ? 'error' : 'info'
+                    data.orgStatus === 'accepted' ? 'success' :
+                      data.orgStatus === 'rejected' ? 'error' : data.orgStatus === 'request' ? 'info' : 'info'
                   }
                 />
               </DetailValue>
@@ -230,6 +209,20 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                   <DetailValue variant="body2">
                     {data.providerProposal?.days} days
                   </DetailValue>
+                </DetailItem>
+                
+                <DetailItem>
+                  <DetailLabel variant="body2">Status:</DetailLabel>
+                  <DetailValue variant="body2">
+                  <Chip
+                  sx={{textTransform:'capitalize'}}
+                    label={data.providerStatus}
+                    color={
+                      data.providerStatus === 'accepted' ? 'success' :
+                        data.providerStatus === 'rejected' ? 'error' : data.providerStatus === 'request' ? 'info' : 'info'
+                    }
+                  />
+                </DetailValue>
                 </DetailItem>
               </>
             )}
@@ -270,56 +263,6 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
 
           </Box>
         </Box>
-
-        {/* <Box display="flex" justifyContent="flex-end" mt={4} gap={2}>
-        
-          <Button 
-            variant="contained" 
-            sx={{ 
-              backgroundColor: "#0B2E4C",
-              '&:hover': {
-                backgroundColor: "#1a3d5c"
-              }
-            }}
-          >
-            Contact Organizer
-          </Button>
-        </Box> */}
-        {loggedInUser?.role === "organizer" &&
-          data.providerHasProposed &&
-          data.status !== 'rejected-by-organizer' && (
-            <Box display="flex" justifyContent="flex-end" mt={4} gap={2}>
-              <Button
-                variant="contained"
-                onClick={() => handleDecision('reject')}
-                disabled={loading}
-                sx={{
-                  backgroundColor: '#d32f2f',
-                  '&:hover': {
-                    backgroundColor: '#b71c1c',
-                  },
-                }}
-              >
-                Reject
-              </Button>
-              {data.status !== 'accepted-by-organizer' && (
-                <Button
-                  variant="contained"
-                  onClick={() => handleDecision('accept')}
-                  disabled={loading}
-                  sx={{
-                    backgroundColor: '#4CAF50',
-                    '&:hover': {
-                      backgroundColor: '#388e3c',
-                    },
-                  }}
-                >
-                  Accept Proposal
-                </Button>
-              )}
-
-            </Box>
-          )}
       </ModalContainer>
     </Modal>
   );

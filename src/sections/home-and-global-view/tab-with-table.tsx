@@ -66,9 +66,9 @@ export function TabWithTableView() {
 
     useEffect(() => {
         if (tabValue === 0) {
-            dispatch(getRequestsByProvider({ status: "requested-by-organizer" }));
+            dispatch(getRequestsByProvider({ orgStatus: "request" }));
         } else if (tabValue === 1) {
-            dispatch(getRequestsByProvider({ status: "accepted-by-organizer" }));
+            dispatch(getRequestsByProvider({ orgStatus: "accepted-by-organizer" }));
         }
     }, [tabValue, dispatch]);
 

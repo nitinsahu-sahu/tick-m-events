@@ -1,16 +1,12 @@
 import {
-    TableContainer,
-    Typography,
-    Table,
-    TableRow,
-    TableBody,
-    Paper,
-    TableHead,
-    TableCell, Button,
-    Box
+    TableContainer, Typography, Table, TableRow, TableBody, Paper,
+    TableHead, TableCell, Button, Box
 } from "@mui/material";
+import { useDispatch } from "react-redux";
 import { useTheme } from "@mui/material/styles";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { updateAcceptProviderStatus } from "src/redux/actions/service-request";
+import { AppDispatch } from "src/redux/store";
 import { ServiceRequestModal } from "../modal/service-request-modal";
 
 export function HomeAndGlobalTable({
@@ -28,6 +24,7 @@ export function HomeAndGlobalTable({
     onViewDetails?: (row: any) => void;
     onMarkCompleted?: (row: any) => void;
 }) {
+    const dispatch = useDispatch<AppDispatch>();
 
     const theme = useTheme();
     const [selectedItem, setSelectedItem] = useState<any>(null);
@@ -45,6 +42,9 @@ export function HomeAndGlobalTable({
         setSelectedItem(null);
     };
 
+    const proStatusChage = useCallback(async (row: any, proStatus: string) => {
+        await dispatch(updateAcceptProviderStatus(row, proStatus))
+    }, [dispatch])
     return (
         <>
             <TableContainer component={Paper}>
@@ -132,7 +132,7 @@ export function HomeAndGlobalTable({
                                         )
                                     }
                                     {type === "1" && (
-                                        <TableCell align="center" sx={{ width: "24%" }}>
+                                        <TableCell align="center" sx={{ width: "35%" }}>
                                             <Button
                                                 variant="outlined"
                                                 size="small"
@@ -161,19 +161,58 @@ export function HomeAndGlobalTable({
                                                     Edit
                                                 </Button>
                                             ) : (
-                                                <Button
-                                                    onClick={() => onApply?.(row)}
-                                                    variant="outlined"
-                                                    size="small"
-                                                    sx={{
-                                                        marginX: 0.5,
-                                                        color: "white",
-                                                        borderColor: "gray",
-                                                        backgroundColor: "#0B2E4C"
-                                                    }}
-                                                >
-                                                    Apply
-                                                </Button>
+                                                <>
+                                                    {
+                                                        row?.providerStatus === 'accepted' && (
+                                                            <Button
+                                                                onClick={() => onApply?.(row)}
+                                                                variant="outlined"
+                                                                size="small"
+                                                                sx={{
+                                                                    marginX: 0.5,
+                                                                    color: "white",
+                                                                    borderColor: "gray",
+                                                                    backgroundColor: "#0B2E4C"
+                                                                }}
+                                                            >
+                                                                Apply
+                                                            </Button>
+                                                        )
+                                                    }
+                                                    {
+                                                        row?.providerStatus === 'pending' && (
+                                                            <>
+                                                                <Button
+                                                                    onClick={() => proStatusChage?.(row, "accepted")}
+                                                                    variant="outlined"
+                                                                    size="small"
+                                                                    sx={{
+                                                                        marginX: 0.5,
+                                                                        color: "white",
+                                                                        borderColor: "gray",
+                                                                        backgroundColor: "#3ab354ff"
+                                                                    }}
+                                                                >
+                                                                    Accepted
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={() => proStatusChage?.(row, 'rejected')}
+                                                                    variant="outlined"
+                                                                    size="small"
+                                                                    sx={{
+                                                                        marginX: 0.5,
+                                                                        color: "white",
+                                                                        borderColor: "gray",
+                                                                        backgroundColor: "#a01723ff"
+                                                                    }}
+                                                                >
+                                                                    Rejected
+                                                                </Button>
+                                                            </>
+                                                        )
+                                                    }
+
+                                                </>
                                             )}
 
                                         </TableCell>

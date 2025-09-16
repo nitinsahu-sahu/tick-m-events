@@ -96,3 +96,30 @@ export const getAllWithdrawals = () => async (dispatch) => {
     });
   }
 };
+
+export const processWithdrawalPayout = (withdrawalId) => async (dispatch) => {
+  dispatch({ type: transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_REQUEST });
+ 
+  try {
+    const response = await axios.post(`/transaction-payment/withdrawals/${withdrawalId}/payout`);
+ 
+    dispatch({
+      type: transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_SUCCESS,
+      payload: {
+        withdrawalId,
+        message: response.data.message
+      }
+    });
+ 
+    // Optionally refresh all withdrawals
+    dispatch(getAllWithdrawals());
+ 
+  } catch (error) {
+    console.error("❌ Error processing payout:", error);
+ 
+    dispatch({
+      type: transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_FAILURE,
+      payload: error?.response?.data?.message || "Server error"
+    });
+  }
+};

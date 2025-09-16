@@ -9,12 +9,33 @@ const initialState = {
 };
 
 const transactionPaymentReducer = (state, action) => {
-   if (state === undefined) {
-        state = initialState; // Assign initial state here
-    }
+  if (state === undefined) {
+    state = initialState; // Assign initial state here
+  }
 
   switch (action.type) {
     // CREATE WITHDRAWAL
+    case transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_REQUEST:
+      return {
+        ...state,
+        payoutProcessing: true,
+        payoutError: null
+      };
+
+    case transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_SUCCESS:
+      return {
+        ...state,
+        payoutProcessing: false,
+        payoutSuccess: true
+      };
+
+    case transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_FAILURE:
+      return {
+        ...state,
+        payoutProcessing: false,
+        payoutError: action.payload
+      };
+
     case transactionPaymentConstants.CREATE_WITHDRAWAL_REQUEST:
       return {
         ...state,

@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 
 import { serviceEventReqDelete } from "src/redux/actions/service-request";
 import { AppDispatch } from "src/redux/store";
+import { formatDateTimeCustom } from "src/hooks/formate-time";
 
 import { serviceRequestTableHeaders } from "../../sections/search-&-select-service-providers/Utills";
 import { ServiceRequestModal } from "../modal/service-request-modal";
@@ -48,6 +49,10 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedRequest(null);
+  };
+  const handleViewDetails = (row: any) => {
+    setSelectedRequest(row);
+    setOpenModal(true);
   };
   // serviceReqDelete
   return (
@@ -94,12 +99,12 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                   <TableCell align="center" sx={{ textTransform: "capitalize" }}>
                     {row.providerId?.name || "-"}
                   </TableCell>
-                  <TableCell align="center">
+                  <TableCell align="center" sx={{fontWeight:600}}>
                     {`${row.providerProposal?.amount} XAF` || row.orgBudget || "-"}
                   </TableCell>
                   <TableCell align="center">
                     {row.eventId?.date
-                      ? new Date(row.eventId.date).toLocaleDateString()
+                      ? formatDateTimeCustom(row.serviceTime)
                       : "-"}
                   </TableCell>
                   <TableCell align="center">
@@ -108,15 +113,14 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                         textTransform: "capitalize",
                         marginX: 0.5,
                         borderColor: "gray",
-                        color: row.status === 'rejected-by-organizer' ? '#b71c1c' : '#2e7d32',
+                        color: row.providerStatus === 'rejected' ? '#b71c1c' :
+                          row.providerStatus === 'accepted' ? '#2e7d32' : '#2e4e7dff',
                       }}
                     >
-                      {row.status === 'requested-by-organizer' ? "Pending" :
-                        row.status === 'rejected-by-organizer' ? "Cancelled" :
-                          row.status === 'accepted-by-provider' ? 'Accepted' : row.status}
+                      {row.providerStatus}
                     </Typography>
                   </TableCell>
-                  <TableCell align="center">
+                  {/* <TableCell align="center">
                     <Typography
                       sx={{
                         textTransform: "capitalize",
@@ -127,7 +131,7 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                     >
                       {row.contractStatus}
                     </Typography>
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell align="center">
                     {
                       row.status === "rejected-by-organizer" ? <Button
@@ -146,7 +150,7 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                       </Button> : type === '2' ? <Button
                         variant="contained"
                         size="small"
-                        disabled={row.status==='accepted'}
+                        disabled={row.status === 'accepted'}
                         sx={{
                           marginX: 0.5,
                           borderColor: "gray",
@@ -162,35 +166,29 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                       >
                         {row.status === "accepted" ? 'Signed' : 'Contract Sign'}
 
-                      </Button> : <Box><Button
-                        variant="contained"
-                        size="small"
-                        disabled={row.status==='accepted'}
-                        onClick={() => handleCancelReqByOrg(row)}
-                        sx={{
-                          marginX: 0.5,
-                          borderColor: "gray",
-                          backgroundColor: "#b71c1c",
-                          color: 'white',
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        disabled={row.status==='accepted'}
-                        onClick={() => handleCancelReqByOrg(row)}
-                        sx={{
-                          marginX: 0.5,
-                          borderColor: "gray",
-                          backgroundColor: "#48b71cff",
-                          color: 'white',
-                        }}
-                      >
-                        Signed
-                      </Button>
-                      </Box>
+                      </Button> : <TableCell align="center" width={200}>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() => {
+                            onActionClick?.(row);
+                            handleViewDetails(row);
+                          }}
+
+                          sx={{
+                            marginX: 0.5,
+                            borderColor: "gray",
+                            backgroundColor: row.providerHasProposed ? '#0B2E4E' : '#ff9800',
+                            color: 'white',
+                            '&:hover': {
+                              backgroundColor: row.providerHasProposed ? '#2e7d32' : '#b71c1c',
+                            },
+
+                          }}
+                        >
+                          {row.providerHasProposed ? 'View Details' : 'Pending'}
+                        </Button>
+                      </TableCell>
                     }
 
                   </TableCell>

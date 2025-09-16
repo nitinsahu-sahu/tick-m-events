@@ -430,7 +430,6 @@ export function ServiceCard({ event, service, onRequest, eventId, disabled = fal
               color: disabled ? '#9e9e9e' : 'white'
             }
           }}
-          disabled={disabled || service.status !== 'active'}
         >
           {disabled ? 'Select an event first' :
             service.status === 'active' ? 'Request Service' : 'Not Available'}

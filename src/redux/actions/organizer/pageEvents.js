@@ -1,6 +1,7 @@
 import { organizerEventConstants } from "../constants";
 import axios from "../../helper/axios";
 import { getMyBids } from "../provider/projects/place-a-bd.action";
+import { getRequestsByOrganizer } from "../service-request";
 
 export const fatchOrgEvents = () => async (dispatch) => {
     dispatch({ type: organizerEventConstants.GET_ORGANIZR_EVENTS_REQUEST });
@@ -24,6 +25,64 @@ export const fatchOrgEvents = () => async (dispatch) => {
                 error: error.status
             },
         });
+    }
+};
+
+export const updateAwardedBid = (id, status) => async (dispatch) => {
+    dispatch({ type: organizerEventConstants.ASSIGN_PROJECT_REQUEST });
+
+    try {
+        const response = await axios.put(`/event-requests/${id}/awarded`, { status })
+        dispatch({
+            type: organizerEventConstants.ASSIGN_PROJECT_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+            },
+
+        });
+        dispatch(fatchOrgEvents())
+    } catch (error) {
+        dispatch({
+            type: organizerEventConstants.ASSIGN_PROJECT_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
+            },
+        });
+    }
+};
+
+export const updateServiceProjectStatus = (id, newStatus) => async (dispatch) => {
+    dispatch({ type: organizerEventConstants.SERVICE_STATUS_REQUEST });
+    try {
+        const response = await axios.put(`/event-requests/${id}/projectUpdate`, { newStatus })
+        console.log(response);
+        
+        dispatch({
+            type: organizerEventConstants.SERVICE_STATUS_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+            },
+        });
+        dispatch(getRequestsByOrganizer())
+        return {
+            type: organizerEventConstants.SERVICE_STATUS_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
+    } catch (error) {
+        dispatch({
+            type: organizerEventConstants.SERVICE_STATUS_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
+            },
+        });
+        return {
+            type: organizerEventConstants.SERVICE_STATUS_FAILURE,
+            status: error.status,
+            message: error?.data?.message
+        };
     }
 };
 

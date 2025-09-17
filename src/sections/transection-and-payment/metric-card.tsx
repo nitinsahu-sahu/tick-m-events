@@ -12,7 +12,6 @@ type MetricCardProps = {
 };
 
 export function MetricCard({ selectedEvent }: MetricCardProps) {
-    console.log(selectedEvent);
   const theme = useTheme();
 
   // Helper to format money
@@ -40,7 +39,9 @@ export function MetricCard({ selectedEvent }: MetricCardProps) {
     .reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0);
 
   // 4. Available Balance = Total Sales - Refunded Amount
-  const availableBalance = totalSales - refundedAmount;
+   const commission = totalSales * 0.10;
+  const netSales = totalSales - refundedAmount;
+  const availableBalance = netSales * 0.90;
 
   // Final metrics array
   const metrics = [

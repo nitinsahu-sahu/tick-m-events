@@ -101,25 +101,31 @@ export const processWithdrawalPayout = (withdrawalId) => async (dispatch) => {
   dispatch({ type: transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_REQUEST });
  
   try {
-    const response = await axios.post(`/transaction-payment/withdrawals/${withdrawalId}/payout`);
+    const { data } = await axios.post(`/transaction-payment/withdrawals/${withdrawalId}/payout`);
  
     dispatch({
       type: transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_SUCCESS,
       payload: {
         withdrawalId,
-        message: response.data.message
+        message: data.message
       }
     });
  
-    // Optionally refresh all withdrawals
     dispatch(getAllWithdrawals());
  
   } catch (error) {
-    console.error("❌ Error processing payout:", error);
+    // 🧠 Smart error message selection
+    const errorMessage =
+      error?.response?.data?.data?.message ||  // <- From Fapshi
+      error?.response?.data?.message ||        // <- From your own API
+      error?.message ||                        // <- Axios / generic error
+      "Payout failed";
  
     dispatch({
       type: transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_FAILURE,
-      payload: error?.response?.data?.message || "Server error"
+      payload: errorMessage
     });
+ 
+    throw new Error(errorMessage);
   }
 };

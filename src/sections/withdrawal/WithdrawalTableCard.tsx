@@ -18,8 +18,10 @@ import {
 } from '@mui/material';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllWithdrawals,processWithdrawalPayout  } from 'src/redux/actions/transactionPaymentActions';
+import { getAllWithdrawals, processWithdrawalPayout } from 'src/redux/actions/transactionPaymentActions';
 import { AppDispatch, RootState } from 'src/redux/store';
+import { toast } from "react-toastify";
+import { formatDateTimeCustom } from 'src/hooks/formate-time';
 
 type Withdrawal = {
   _id: string;
@@ -51,6 +53,7 @@ export function WithdrawalTableCard() {
     dispatch(getAllWithdrawals());
   }, [dispatch]);
 
+
   const filteredData =
     withdrawals?.filter((row: Withdrawal) => {
       const matchesSearch =
@@ -67,7 +70,7 @@ export function WithdrawalTableCard() {
 
   return (
     <Box display="flex">
-      <Card sx={{ width: '100%'}}>
+      <Card sx={{ width: '100%' }}>
         <CardContent>
           <Box display="flex" justifyContent="space-between" mb={2} gap={2}>
             <TextField
@@ -107,6 +110,7 @@ export function WithdrawalTableCard() {
                   <TableCell align="center">Method</TableCell>
                   <TableCell align="center">Amount</TableCell>
                   <TableCell align="center">Status</TableCell>
+                  <TableCell align="center">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -114,7 +118,7 @@ export function WithdrawalTableCard() {
                   filteredData.map((row: Withdrawal) => (
                     <TableRow key={row._id}>
                       <TableCell align="center">{row.withdrawalId}</TableCell>
-                      <TableCell align="center">{formatDate(row.createdAt)}</TableCell>
+                      <TableCell align="center">{formatDateTimeCustom(row.createdAt)}</TableCell>
                       <TableCell align="center">{row.user || 'Unknown User'}</TableCell>
                       <TableCell align="center">
                         {row.payment?.method?.toUpperCase() || 'N/A'}
@@ -122,25 +126,45 @@ export function WithdrawalTableCard() {
 
                       <TableCell align="center">{row.amount} XAF</TableCell>
                       <TableCell align="center">
-                        {row.status === 'pending' ? (
-                          <button type='button'
-                            onClick={() => dispatch(processWithdrawalPayout(row._id))}
-                            style={{ backgroundColor: '#4caf50', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px' }}
-                          >
-                            Pay Now
-                          </button>
-                        ) : (
-                          <Typography
-                            color={
-                              row.status === 'approved' ? 'green' :
-                                row.status === 'rejected' ? 'red' : 'orange'
-                            }
-                          >
-                            {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
-                          </Typography>
-                        )}
-                      </TableCell>
+                        <Typography
+                          color={
+                            row.status === 'approved'
+                              ? 'green'
+                              : row.status === 'rejected'
+                                ? 'red'
+                                : 'orange'
+                          }
+                        >
+                          {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+                        </Typography>
 
+                      </TableCell>
+                      <TableCell align="center">
+                        <button
+                          type="button"
+                          disabled={row.status !== 'pending'}
+                          onClick={async () => {
+                            try {
+                              await dispatch(processWithdrawalPayout(row._id));
+                              toast.success("Payout processed successfully!");
+                            } catch (err) {
+                              toast.error(err.message || "Failed to process payout.");
+                            }
+                          }}
+
+                          style={{
+                            backgroundColor:
+                              row.status === 'pending' ? '#4caf50' : '#9e9e9e',
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '4px',
+                            cursor: row.status === 'pending' ? 'pointer' : 'not-allowed',
+                          }}
+                        >
+                          {row.status === 'pending' ? 'Pay Now' : 'Processed'}
+                        </button>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
@@ -159,18 +183,4 @@ export function WithdrawalTableCard() {
   );
 }
 
-function formatDate(dateString?: string) {
-  if (!dateString) return '-';
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
 
-  let hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const ampm = hours >= 12 ? 'pm' : 'am';
-  hours = hours % 12 || 12; // convert 0 -> 12
-  const formattedHours = String(hours).padStart(2, '0');
-
-  return `${year}-${month}-${day} ${formattedHours}:${minutes}${ampm}`;
-}

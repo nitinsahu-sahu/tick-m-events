@@ -5,18 +5,28 @@ import {
 } from '@mui/material';
 import { useCallback, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-
 import StarIcon from '@mui/icons-material/Star';
 import ChatIcon from '@mui/icons-material/Chat';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import { useDispatch } from 'react-redux';
 
+import { updateAwardedBid } from 'src/redux/actions/organizer/pageEvents';
+import { AppDispatch } from 'src/redux/store';
 import { SocialLinks } from './socialLinks';
 
+interface StatusUpdateResponse {
+  status: number;
+  // Add other properties that might be in the response
+  data?: any;
+  message?: string;
+}
+
 export function ProposalsCard({ proposals }: any) {
-  const navigate = useNavigate();
-  const [selectedProposal, setSelectedProposal] = useState(null);
+
+  const dispatch = useDispatch<AppDispatch>();
+  const [selectedProposal, setSelectedProposal] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleAwardClick = (proposal: any) => {
@@ -29,11 +39,13 @@ export function ProposalsCard({ proposals }: any) {
     setSelectedProposal(null);
   };
 
-  const handleAwardedProject = useCallback((status: any) => {
+  const handleAwardedProject = useCallback(async (id: any, status: any) => {
     // Handle accept logic here
-    console.log('Accepting proposal:', selectedProposal);
-    handleDialogClose();
-  }, [selectedProposal])
+    const res = await dispatch(updateAwardedBid(id, status))as unknown as StatusUpdateResponse;;
+    if (res?.status === 200) {
+      handleDialogClose();
+    }
+  }, [dispatch])
 
   const manualBids = proposals || [];
 
@@ -70,7 +82,7 @@ export function ProposalsCard({ proposals }: any) {
           <Button
             variant="outlined"
             color="error"
-            onClick={() => handleAwardedProject('rejected')}
+            onClick={() => handleAwardedProject(selectedProposal?._id, 'rejected')}
             sx={{ minWidth: 120 }}
           >
             Reject Request
@@ -78,7 +90,7 @@ export function ProposalsCard({ proposals }: any) {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => handleAwardedProject('accepted')}
+            onClick={() => handleAwardedProject(selectedProposal?._id, 'accepted')}
             sx={{ minWidth: 120 }}
           >
             Award Request
@@ -92,16 +104,6 @@ export function ProposalsCard({ proposals }: any) {
 // Component for individual proposal item
 function ProposalItem({ proposal, onAwardClick }: any) {
   const navigate = useNavigate();
-  const [selectedBid, setSelectedBid] = useState(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const handleBidSelect = (bid: any) => {
-    setSelectedBid(bid);
-    setDialogOpen(true);
-  };
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-    setSelectedBid(null);
-  };
   return (
     <Paper elevation={3} sx={{
       borderRadius: 2.5,
@@ -220,7 +222,9 @@ function ProposalItem({ proposal, onAwardClick }: any) {
                   size="small"
                   disabled={proposal?.isSigned}
                 >
-                  Award
+                  {
+                    proposal?.isSigned ? 'Awarded' : 'Award'
+                  }
                 </Button>
               </Box>
             </Grid>

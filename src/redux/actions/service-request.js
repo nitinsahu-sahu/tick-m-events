@@ -2,16 +2,13 @@ import { eventServiceConstants, serviceRequestConstants } from "./constants";
 import axios from "../helper/axios";
 
 
-export const getRequestsByProvider = (params) => async (dispatch) => {
+export const getRequestsByProvider = (data) => async (dispatch) => {
   dispatch({ type: serviceRequestConstants.GET_REQUESTED_SERVICE_REQUEST });
 
   try {
-    // Convert params object to query string
-    const queryString = new URLSearchParams(params).toString();
 
     // Append query string to URL
-    const response = await axios.get(`/event-requests?${queryString}`);
-
+    const response = await axios.get(`/event-requests?orgStatus=${data?.orgStatus}&isSigned=${data?.isSigned}&projectStatus=${data?.projectStatus}`);
     dispatch({
       type: serviceRequestConstants.GET_REQUESTED_SERVICE_SUCCESS,
       payload: {
@@ -324,7 +321,7 @@ export const getAccepedByProiver = () => async (dispatch) => {
 export const getActiveContractsByProvider = () => async (dispatch) => {
   try {
     dispatch({ type: serviceRequestConstants.ACTIVE_CONTRACTS_REQUEST });
- 
+
     const result = await axios.get(`/event-requests/active-contracts`);
     dispatch({
       type: serviceRequestConstants.ACTIVE_CONTRACTS_SUCCESS,

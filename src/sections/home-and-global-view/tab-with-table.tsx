@@ -8,7 +8,6 @@ import { AppDispatch, RootState } from "src/redux/store";
 import { RequestTabSection } from "./request-tab-section";
 import { metrics, availableProjectsTableHeaders } from "./utills";
 import { SignedTab } from "./projectsTabs/signed";
-import { OngoingTab } from "./projectsTabs/ongoing";
 import { ConfirmedTab } from "./projectsTabs/confirmed";
 
 interface Project {
@@ -57,7 +56,7 @@ export function TabWithTableView() {
     const [tabValue, setTabValue] = useState(0);
     const { requests } = useSelector((state: RootState) => state?.serviceRequest);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-    const tabLabels = ["Available Projects", "Signed Projects", "Ongoing Projects", "Confirmed Services"];
+    const tabLabels = ["Available Projects", "Awarded Projects", "Confirmed Services"];
     const [amount, setAmount] = useState('');
     const [days, setDays] = useState('');
     const [description, setDescription] = useState('');
@@ -65,11 +64,7 @@ export function TabWithTableView() {
     const dispatch = useDispatch<AppDispatch>()
 
     useEffect(() => {
-        if (tabValue === 0) {
-            dispatch(getRequestsByProvider({ orgStatus: "request" }));
-        } else if (tabValue === 1) {
-            dispatch(getRequestsByProvider({ orgStatus: "accepted-by-organizer" }));
-        }
+        dispatch(getRequestsByProvider({ orgStatus: "request", isSigned: false, projectStatus: "pending" }));
     }, [tabValue, dispatch]);
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -120,11 +115,11 @@ export function TabWithTableView() {
                     ))}
                 </Tabs>
             </Paper>
-            
-           
+
+
             {tabValue === 0 && (
                 <>
-                <MatrixOneCard metrics={metrics} />
+                    <MatrixOneCard metrics={metrics} />
                     <RequestTabSection
                         title="Available Projects (Organizer Requests)"
                         description=""
@@ -302,9 +297,6 @@ export function TabWithTableView() {
                 <SignedTab />
             )}
             {tabValue === 2 && (
-                <OngoingTab />
-            )}
-            {tabValue === 3 && (
                 <ConfirmedTab />
             )}
         </>

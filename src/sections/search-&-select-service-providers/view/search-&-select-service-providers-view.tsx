@@ -22,7 +22,6 @@ export function SearchAndSelectServiceProvidersView() {
   const { providersList } = useSelector((state: RootState) => state?.providers);
   const { organizerRequests } = useSelector((state: RootState) => state?.serviceRequest);
   const [select, setSelected] = useState<any>({})
-
   const { __events } = useSelector((state: RootState) => state.organizer);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);

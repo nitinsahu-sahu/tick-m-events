@@ -1,39 +1,20 @@
 import {
     TableContainer,
     Typography,
-    Table,
+    Table, Chip,
     TableRow,
     TableBody,
     Paper,
     TableHead,
     TableCell, Button,
-    Box
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { StatusConfirmationModal } from "src/components/modal/contract-confirmation-modal";
 import { ContractDetailsModal } from "src/components/modal/contractModal";
+import { formatDateTimeCustom } from "src/hooks/formate-time";
 import { updateContractStatus } from "src/redux/actions/homeAndGlobal.action";
 import { AppDispatch } from "src/redux/store";
-
-export const formatDateTime = (dateTimeString: string) => {
-    if (!dateTimeString) return "-";
-
-    const date = new Date(dateTimeString);
-
-    // Format options
-    const options: Intl.DateTimeFormatOptions = {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-    };
-
-    return date.toLocaleString('en-US', options);
-};
 
 export function ContractTable({
     headers,
@@ -51,7 +32,7 @@ export function ContractTable({
     const [modalOpen, setModalOpen] = useState(false);
     const [statusModalOpen, setStatusModalOpen] = useState(false);
     const [selectedContractForStatus, setSelectedContractForStatus] = useState<any>(null);
-   
+
     const dispatch = useDispatch<AppDispatch>();
 
     const handleViewContract = (contract: any) => {
@@ -114,13 +95,26 @@ export function ContractTable({
                                         backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#e0e0e0",
                                     }}
                                 >
-                                    <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.service}</TableCell>
+                                    <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.serviceRequestId?.serviceType}</TableCell>
                                     <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.eventId?.eventName}</TableCell>
-                                    <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.location}</TableCell>
-                                    <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.finalBudget}</TableCell>
-                                    <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.contractStatus}</TableCell>
-                                    <TableCell align="center" sx={{ textTransform: "capitalize" }}>{formatDateTime(row.eventTime)}</TableCell>
-                                    <TableCell align="center" sx={{ textTransform: "capitalize", display: "flex", justifyContent: "center" }}>
+                                    <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.eventLocation}</TableCell>
+                                    <TableCell align="center" sx={{ textTransform: "capitalize" }}>{row.providerProposal?.amount} XAF</TableCell>
+                                    <TableCell align="center" sx={{ textTransform: "capitalize" }}>
+                                        <Chip
+                                            label={row?.isSigned ? "Signed" : "Pending"}
+                                            color={row?.isSigned ? "success" : "warning"}
+                                            size="small"
+                                            sx={{
+                                                fontWeight: 600,
+                                                textTransform: 'uppercase',
+                                                fontSize: '0.65rem',
+                                                backdropFilter: 'blur(4px)',
+                                                backgroundColor: row?.isSigned ? 'rgba(46, 125, 50, 0.9)' : 'rgba(237, 108, 2, 0.9)',
+                                                color: 'white'
+                                            }}
+                                        /></TableCell>
+                                    <TableCell align="center" sx={{ textTransform: "capitalize" }}>{formatDateTimeCustom(row.serviceTime)}</TableCell>
+                                    <TableCell width={200} align="center" sx={{ textTransform: "capitalize", display: "flex", justifyContent: "center" }}>
                                         <Button
                                             onClick={() => handleViewContract(row)}
                                             variant="outlined"
@@ -134,22 +128,6 @@ export function ContractTable({
                                         >
                                             View Contract
                                         </Button>
-
-                                        {type !== "2" && (
-                                            <Button
-                                                onClick={() => handleStatusChangeClick(row)}
-                                                variant="outlined"
-                                                size="small"
-                                                sx={{
-                                                    marginX: 0.5,
-                                                    color: "white",
-                                                    borderColor: "gray",
-                                                    backgroundColor: "#0B2E4C"
-                                                }}
-                                            >
-                                                Change Status
-                                            </Button>
-                                        )}
                                     </TableCell>
 
                                 </TableRow>
@@ -162,12 +140,7 @@ export function ContractTable({
                         onClose={() => setModalOpen(false)}
                         contract={selectedContract}
                     />
-                    <StatusConfirmationModal
-                        open={statusModalOpen}
-                        onClose={() => setStatusModalOpen(false)}
-                        onConfirm={handleStatusConfirm}
-                        currentStatus={selectedContractForStatus?.contractStatus || "ongoing"}
-                    />
+
                 </Table>
             </TableContainer>
         </>

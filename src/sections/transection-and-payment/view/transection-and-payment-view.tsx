@@ -32,12 +32,13 @@ export function TransectionAndPaymentView() {
       setSelectedEvent(null);
       return;
     }
-
+ 
     // Calculate availableBalance by summing confirmed orders
-    const availableBalance = event.orders
+    const totalConfirmedSales = event.orders
       ?.filter(order => order.paymentStatus === "confirmed")
       .reduce((sum, order) => sum + order.totalAmount, 0) || 0;
-
+ 
+    const availableBalance = totalConfirmedSales * 0.9;
     setSelectedEvent({
       ...event,
       availableBalance,

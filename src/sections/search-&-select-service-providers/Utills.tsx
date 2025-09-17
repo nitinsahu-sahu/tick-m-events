@@ -28,6 +28,6 @@ export const serviceRequestTableHeaders = [
   { label: "Provider Budget", key: "budget" },
   { label: "Date", key: "date" },
   { label: "Provider Status", key: "provider-status" },
-//   { label: "Contract Status", key: "contractStatus" },
+  { label: "Project Status", key: "projectStatus" },
   { label: "Action", key: "action" },
 ];

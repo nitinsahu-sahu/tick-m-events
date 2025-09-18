@@ -64,7 +64,7 @@ export function TabWithTableView() {
     const dispatch = useDispatch<AppDispatch>()
 
     useEffect(() => {
-        dispatch(getRequestsByProvider({ orgStatus: "request", isSigned: false, projectStatus: "pending" }));
+        dispatch(getRequestsByProvider({ statusType: "request", isSigned: false, projectStatus: "pending" }));
     }, [tabValue, dispatch]);
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -115,7 +115,6 @@ export function TabWithTableView() {
                     ))}
                 </Tabs>
             </Paper>
-
 
             {tabValue === 0 && (
                 <>
@@ -293,9 +292,11 @@ export function TabWithTableView() {
                 </>
 
             )}
+
             {tabValue === 1 && (
                 <SignedTab />
             )}
+
             {tabValue === 2 && (
                 <ConfirmedTab />
             )}

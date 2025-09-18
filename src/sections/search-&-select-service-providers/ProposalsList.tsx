@@ -155,7 +155,7 @@ function ProposalItem({ proposal, onAwardClick }: any) {
                   {proposal.providerStatus}
                 </Typography> : <Box>
                   <Typography variant="h6" color="primary">
-                    {proposal?.providerProposal.amount} XAF
+                    {proposal?.providerProposal?.amount} XAF
                   </Typography>
                   <Typography variant="subtitle2" color="#2e7d32" fontSize={10} textTransform="capitalize">
                     {proposal.providerStatus}

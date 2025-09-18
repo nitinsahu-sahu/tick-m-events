@@ -193,7 +193,7 @@ export function HomeAndGlobalTable({
                                                                         backgroundColor: "#3ab354ff"
                                                                     }}
                                                                 >
-                                                                    Accepted
+                                                                    Accept
                                                                 </Button>
                                                                 <Button
                                                                     onClick={() => proStatusChage?.(row, 'rejected')}
@@ -206,7 +206,7 @@ export function HomeAndGlobalTable({
                                                                         backgroundColor: "#a01723ff"
                                                                     }}
                                                                 >
-                                                                    Rejected
+                                                                    Reject
                                                                 </Button>
                                                             </>
                                                         )

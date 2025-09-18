@@ -13,6 +13,7 @@ export function ConfirmedTab() {
     const { requests } = useSelector((state: RootState) => state?.serviceRequest);
 
     useEffect(() => {
+        
         dispatch(getRequestsByProvider({ orgStatus: "accepted", isSigned: true, projectStatus: "completed" }));
     }, [dispatch]);
     return (

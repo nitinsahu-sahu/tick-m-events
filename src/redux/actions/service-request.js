@@ -7,8 +7,9 @@ export const getRequestsByProvider = (data) => async (dispatch) => {
 
   try {
 
-    // Append query string to URL
-    const response = await axios.get(`/event-requests?orgStatus=${data?.orgStatus}&isSigned=${data?.isSigned}&projectStatus=${data?.projectStatus}`);
+    const response = await axios.get(`/event-requests?statusType=${data?.statusType}`);
+console.log(response);
+
     dispatch({
       type: serviceRequestConstants.GET_REQUESTED_SERVICE_SUCCESS,
       payload: {
@@ -221,7 +222,8 @@ export const updateAcceptProviderStatus = (row, proStatus) => async (dispatch) =
         updatedRequest: res.data.data,
       },
     });
-    dispatch(getRequestsByProvider())
+    dispatch(getRequestsByProvider({ orgStatus: "request", isSigned: false, projectStatus: "pending" }));
+
   } catch (error) {
     dispatch({
       type: serviceRequestConstants.ACCEPT_PROVIDER_FAILURE,

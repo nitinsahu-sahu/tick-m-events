@@ -5,7 +5,7 @@ const initialState = {
     success: false,
     error: null,
     paymentSettings: null,
-    settings: [],
+    withDrawalGateway: [],
     paymentSettingDetail: null,
 };
 
@@ -42,7 +42,7 @@ export const paymentSettingsReducer = (state, action) => {
             return {
                 ...state,
                 loading: false,
-                settings: action.payload,
+                withDrawalGateway: action.payload.withDrawalGateway,
             };
 
         case paymentSettings.GET_PAYMENT_SETTINGS_FAIL:

@@ -82,8 +82,6 @@ export const getAllWithdrawals = () => async (dispatch) => {
   try {
     const response = await axios.get("/transaction-payment/get-withdrawals");
 
-    console.log("✅ Fetched withdrawals:", response.data.data);
-
     dispatch({
       type: transactionPaymentConstants.GET_USER_WITHDRAWALS_SUCCESS,
       payload: response.data.data // this must be the array

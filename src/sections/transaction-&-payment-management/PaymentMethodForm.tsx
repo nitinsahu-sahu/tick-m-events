@@ -58,17 +58,11 @@ export function PaymentMethodForm() {
         setTabValue(newValue);
     };
 
-    const { loading, error, success, settings } = useSelector((state: RootState) => state.paymentSettings);
+    const { loading, error, success, withDrawalGateway } = useSelector((state: RootState) => state.paymentSettings);
     const { paymentSettingDetail } = useSelector((s: RootState) => s.paymentSettings);
-
-    const handleAddPayment = () => {
-        setShowForm(true);
-        setEditingId(null);
-        setFormValues({ currency: "XAF", paymentMethod: "", fields: {} });
-    };
+   
     useEffect(() => {
         if (success) {
-            toast.success("Payment settings saved successfully!");
             dispatch(getPaymentSettings()); // <-- Fetch updated list
             setFormValues({
                 currency: "XAF",
@@ -77,7 +71,7 @@ export function PaymentMethodForm() {
             });
         }
         if (error) {
-            console.log(`Error: ${error}`);
+             toast.error(error);
         }
     }, [success, error, dispatch]);
 
@@ -193,8 +187,8 @@ export function PaymentMethodForm() {
     };
 
 
-    const bankingData = settings
-        .filter((item: PaymentSetting) => item.paymentMethod === "bank_transfer")
+    const bankingData = withDrawalGateway
+        ?.filter((item: PaymentSetting) => item.paymentMethod === "bank_transfer")
         .map((item: PaymentSetting) => ({
             id: item._id,
             accountHolder: item.details["Account Holder Name"] || "",
@@ -205,7 +199,7 @@ export function PaymentMethodForm() {
         }));
 
 
-    const mobileMoneyData = settings
+    const mobileMoneyData = withDrawalGateway
         .filter((item: PaymentSetting) => item.paymentMethod === "mobile_money")
         .map((item: PaymentSetting) => ({
             id: item._id,
@@ -215,7 +209,7 @@ export function PaymentMethodForm() {
         }));
 
 
-    const cardData = settings
+    const cardData = withDrawalGateway
         .filter((item: PaymentSetting) => item.paymentMethod === "credit_card")
         .map((item: PaymentSetting) => ({
             id: item._id,

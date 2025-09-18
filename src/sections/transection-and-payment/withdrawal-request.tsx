@@ -8,18 +8,47 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { createWithdrawal, verifyWithdrawalOTP, sendWithdrawalOTP } from "src/redux/actions/transactionPaymentActions";
 import { AppDispatch, RootState } from 'src/redux/store';
+import { getPaymentSettings } from "src/redux/actions/paymentSettingActions";
 
 type WithdrawalRequestProps = {
     availableBalance: number;
 };
 
+type PaymentMethod = {
+    _id: string;
+    userId: string;
+    paymentMethod: string;
+    method: string;
+    details: Record<string, string>;
+};
+
 export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) {
-    console.log("avia",availableBalance);
+    const dispatch = useDispatch<AppDispatch>();
+    const { loading, error, success, withDrawalGateway } = useSelector((state: RootState) => state.paymentSettings);
+    const { user } = useSelector((state: RootState) => state?.auth);
+    console.log(withDrawalGateway);
+
+    useEffect(() => {
+        dispatch(getPaymentSettings())
+    }, [dispatch]);
+
+    // Group payment methods by type
+    const groupedPaymentMethods = (withDrawalGateway || []).reduce((acc: Record<string, PaymentMethod[]>, method: PaymentMethod) => {
+        if (!acc[method.paymentMethod]) {
+            acc[method.paymentMethod] = [];
+        }
+        acc[method.paymentMethod].push(method);
+        return acc;
+    }, {});
+
+    // Get available payment method types
+    const availablePaymentTypes = Object.keys(groupedPaymentMethods);
+
     const [amount, setAmount] = useState("");
-    const [paymentMethod, setPaymentMethod] = useState("credit_card");
+    const [paymentMethod, setPaymentMethod] = useState(availablePaymentTypes[0] || "");
+    const [selectedMethodId, setSelectedMethodId] = useState("");
     const [withdrawalCode, setWithdrawalCode] = useState("");
 
-    const dispatch = useDispatch<AppDispatch>();
     // Bank Transfer Fields
     const [bankName, setBankName] = useState("");
     const [accountNumber, setAccountNumber] = useState("");
@@ -36,12 +65,49 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
     const [cardNumber, setCardNumber] = useState("");
     const [cardExpiry, setCardExpiry] = useState("");
     const [cardCvv, setCardCvv] = useState("");
-
     const [cardHolderName, setCardHolderName] = useState("");
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const { user } = useSelector((state: RootState) => state?.auth);
-    const newErrors: { [key: string]: string } = {};
+
+    // Effect to auto-select the first method when payment method changes
+    useEffect(() => {
+        if (paymentMethod && groupedPaymentMethods[paymentMethod]?.length > 0) {
+            const firstMethod = groupedPaymentMethods[paymentMethod][0];
+            setSelectedMethodId(firstMethod._id);
+            fillFormFields(firstMethod);
+        }
+    }, [paymentMethod,groupedPaymentMethods]);
+
+    // Effect to update form fields when a specific method is selected
+    useEffect(() => {
+        if (selectedMethodId) {
+            const selectedMethod = (withDrawalGateway || []).find((method: PaymentMethod) => method._id === selectedMethodId);
+            if (selectedMethod) {
+                fillFormFields(selectedMethod);
+            }
+        }
+    }, [selectedMethodId,withDrawalGateway]);
+
+  const fillFormFields = (method: PaymentMethod) => {
+    const details = method.details || {};
+
+    if (method.paymentMethod === "bank_transfer") {
+        setBankName(details["Bank Name"] || "");
+        setAccountNumber(details["Account Number"] || "");
+        setBeneficiaryName(details["Account Holder Name"] || details["Beneficiary Name"] || "");
+        setSwiftCode(details["SWIFT Code"] || details["CIF Number"] || "");
+        setCountry(details.Country || "");
+    } else if (method.paymentMethod === "mobile_money") {
+        setMobileNetwork(method.method === "mtn" ? "mtn" : "orange");
+        setMobileNumber(details["Phone Number"] || "");
+    } else if (method.paymentMethod === "credit_card") {
+        setCardType(method.method.includes("visa") ? "visa" : "mastercard");
+        setCardHolderName(details["Cardholder Name"] || "");
+        setCardNumber(details["Card Number"] || "");
+        setCardExpiry(details["Expiry Date"] || "");
+        setCardCvv(details.CVV || "");
+    }
+};
 
     const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let value = e.target.value.replace(/\D/g, ""); // remove non-digit characters
@@ -54,19 +120,23 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
 
         setCardExpiry(value);
     };
+
     const handleSendOTP = async () => {
-    try {
-        const res = await sendWithdrawalOTP(user._id);
-      if (res?.success) {
-        toast.success("OTP sent to your email.", { toastId: "otp-toast" });
-      } else {
-        toast.error(res?.message || "Failed to send OTP");
-      }
-    } catch (error) {
-      toast.error("An error occurred while sending OTP.");
-    }
-  };
+        try {
+            const res = await sendWithdrawalOTP(user._id);
+            if (res?.success) {
+                toast.success("OTP sent to your email.", { toastId: "otp-toast" });
+            } else {
+                toast.error(res?.message || "Failed to send OTP");
+            }
+        } catch (errorss) {
+            toast.error("An error occurred while sending OTP.");
+        }
+    };
+
     const handleWithdrawalSubmit = async () => {
+        const newErrors: { [key: string]: string } = {};
+
         if (!amount) newErrors.amount = "Amount is required";
         if (!withdrawalCode) newErrors.withdrawalCode = "Withdrawal code is required";
 
@@ -101,10 +171,7 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
             } else if (!/^\d{3}$/.test(cardCvv)) {
                 newErrors.cardCvv = "CVV must be exactly 3 digits";
             }
-
-            if (!cardCvv) newErrors.cardCvv = "Card CVV is required";
         }
-
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -164,12 +231,6 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                 }
             };
         }
-        setCardType("");
-        setCardNumber("");
-        setCardExpiry("");
-        setCardCvv("");
-        setCardHolderName("");
-
 
         const withdrawalData = {
             userId: user?._id,
@@ -183,11 +244,6 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
         if (result?.type === "CREATE_WITHDRAWAL_SUCCESS") {
             toast.success("Withdrawal request submitted successfully!");
             setAmount("");
-            setBankName("");
-            setAccountNumber("");
-            setBeneficiaryName("");
-            setSwiftCode("");
-            setCountry("");
             setWithdrawalCode("");
         } else {
             toast.error("Something went wrong.");
@@ -204,7 +260,7 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                 <Paper sx={{ p: 3 }}>
                     {/* Available Amount */}
                     <Typography fontWeight="bold">Available Amount</Typography>
-                    <TextField fullWidth variant="outlined"  value={`${availableBalance} XAF`} sx={{ mt: 1 }} />
+                    <TextField fullWidth variant="outlined" value={`${availableBalance} XAF`} sx={{ mt: 1 }} />
                     <Typography sx={{ fontSize: "0.9rem", mt: 1, color: "gray" }}>
                         Minimum Withdrawal Amount: 50 XAF
                     </Typography>
@@ -234,12 +290,16 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                         onChange={(e) => setPaymentMethod(e.target.value)}
                         sx={{ mt: 1 }}
                     >
-                        <MenuItem value="credit_card">Credit Card (Visa / Mastercard)</MenuItem>
-                        <MenuItem value="mobile_money">Mobile Money (MTN MoMo / Orange Money)</MenuItem>
-                        <MenuItem value="bank_transfer">Bank Transfer</MenuItem>
+                        {availablePaymentTypes.map(type => (
+                            <MenuItem key={type} value={type}>
+                                {type === "credit_card" && "Credit Card (Visa / Mastercard)"}
+                                {type === "mobile_money" && "Mobile Money (MTN MoMo / Orange Money)"}
+                                {type === "bank_transfer" && "Bank Transfer"}
+                            </MenuItem>
+                        ))}
                     </Select>
 
-                       {/* Credit Card Details */}
+                    {/* Credit Card Details */}
                     {paymentMethod === "credit_card" && (
                         <Grid container spacing={2} sx={{ mt: 3 }}>
                             <Grid item xs={12} sm={6} md={3}>
@@ -260,7 +320,7 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                                     )}
                                 </FormControl>
                             </Grid>
- 
+
                             <Grid item xs={12} sm={6} md={3}>
                                 <TextField
                                     fullWidth
@@ -271,7 +331,7 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                                     helperText={errors.cardHolderName}
                                 />
                             </Grid>
- 
+
                             <Grid item xs={12} sm={6} md={3}>
                                 <TextField
                                     fullWidth
@@ -286,7 +346,7 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                                     helperText={errors.cardNumber}
                                 />
                             </Grid>
- 
+
                             <Grid item xs={6} sm={3} md={1.5}>
                                 <TextField
                                     fullWidth
@@ -297,7 +357,7 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                                     helperText={errors.cardExpiry}
                                 />
                             </Grid>
- 
+
                             <Grid item xs={6} sm={3} md={1.5}>
                                 <TextField
                                     fullWidth
@@ -313,7 +373,7 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                             </Grid>
                         </Grid>
                     )}
- 
+
                     {/* Bank Transfer Fields */}
                     {paymentMethod === "bank_transfer" && (
                         <Grid container spacing={2} sx={{ mt: 3 }}>
@@ -329,7 +389,7 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                                     helperText={errors.bankName}
                                 />
                             </Grid>
- 
+
                             <Grid item xs={12} sm={6} md={4}>
                                 <TextField
                                     fullWidth
@@ -342,7 +402,7 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                                     helperText={errors.accountNumber}
                                 />
                             </Grid>
- 
+
                             <Grid item xs={12} sm={6} md={4}>
                                 <TextField
                                     fullWidth
@@ -355,7 +415,7 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                                     helperText={errors.beneficiaryName}
                                 />
                             </Grid>
- 
+
                             <Grid item xs={12} sm={6} md={4}>
                                 <TextField
                                     fullWidth
@@ -366,7 +426,7 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                                     onChange={(e) => setSwiftCode(e.target.value)}
                                 />
                             </Grid>
- 
+
                             <Grid item xs={12} sm={6} md={4}>
                                 <TextField
                                     fullWidth
@@ -381,29 +441,35 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                             </Grid>
                         </Grid>
                     )}
- 
+
                     {paymentMethod === "mobile_money" && (
                         <Grid container spacing={2} sx={{ mt: 3 }}>
-                            <Grid item xs={12} sm={6} md={4}>
+                            <Grid item xs={12} sm={6} md={6}>
                                 <FormControl fullWidth error={!!errors.mobileNetwork}>
                                     <InputLabel>Mobile Network</InputLabel>
                                     <Select
-                                        value={mobileNetwork}
-                                        onChange={(e) => setMobileNetwork(e.target.value)}
-                                        label="Mobile Network"
+                                        fullWidth
+                                        value={selectedMethodId}
+                                        onChange={(e) => setSelectedMethodId(e.target.value)}
                                     >
-                                        <MenuItem value="mtn">MTN MoMo</MenuItem>
-                                        <MenuItem value="orange">Orange Money</MenuItem>
+                                        {groupedPaymentMethods[paymentMethod].map((method: PaymentMethod) => (
+                                            <MenuItem key={method._id} value={method._id}>
+                                                {method.paymentMethod === "bank_transfer" &&
+                                                    `${method.details["Bank Name"]} - ${method.details["Account Number"]}`
+                                                }
+                                                {method.paymentMethod === "mobile_money" &&
+                                                    `${method.method === "MTN MoMo" ? "MTN MoMo" : "Orange Money"} - ${method.details["Phone Number"]}`
+                                                }
+                                                {method.paymentMethod === "credit_card" &&
+                                                    `${method.method.includes("visa") ? "Visa" : "Mastercard"} - ${method.details["Card Number"]?.slice(-4)}`
+                                                }
+                                            </MenuItem>
+                                        ))}
                                     </Select>
-                                    {errors.mobileNetwork && (
-                                        <Typography sx={{ color: 'red', fontSize: '0.75rem', mt: 0.5 }}>
-                                            {errors.mobileNetwork}
-                                        </Typography>
-                                    )}
                                 </FormControl>
                             </Grid>
- 
-                            <Grid item xs={12} sm={6} md={4}>
+
+                            <Grid item xs={12} sm={6} md={6}>
                                 <TextField
                                     fullWidth
                                     label="Mobile Number"
@@ -417,7 +483,6 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                             </Grid>
                         </Grid>
                     )}
-
 
                     {/* Withdrawal Code */}
                     <Typography fontWeight="bold" sx={{ mt: 3 }}>
@@ -436,12 +501,10 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
 
                         <Button
                             variant="outlined"
-                           onClick={handleSendOTP}
+                            onClick={handleSendOTP}
                         >
                             Send OTP
                         </Button>
-
-
                     </Box>
 
                     {/* Submit Button */}

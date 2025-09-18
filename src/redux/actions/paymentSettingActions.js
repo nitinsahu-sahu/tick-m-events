@@ -60,11 +60,13 @@ export const getPaymentSettings = () => async (dispatch) => {
   try {
     dispatch({ type: paymentSettings.GET_PAYMENT_SETTINGS_REQUEST });
 
-    const { data } = await axios.get("/settings/getPaymentSetting");
-
+    const response = await axios.get("/settings/getPaymentSetting");
     dispatch({
       type: paymentSettings.GET_PAYMENT_SETTINGS_SUCCESS,
-      payload: data.data, // `data` contains: { message, data: [...] }
+      payload: {
+        withDrawalGateway:response.data.settings,
+        message:response.data.message
+      }, 
     });
   } catch (error) {
     dispatch({

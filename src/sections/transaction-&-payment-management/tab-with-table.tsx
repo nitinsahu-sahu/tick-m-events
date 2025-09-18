@@ -47,26 +47,17 @@ const methodValueToLabelMap: { [key: string]: string } = {
 };
 
 export function TabWithTableView() {
-    const formRef = useRef<HTMLDivElement | null>(null);
     const [tabValue, setTabValue] = useState(0);
-    const [showForm, setShowForm] = useState(false);
-    const [focusedField, setFocusedField] = useState<string | null>(null);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const isEditMode = Boolean(editingId);
     const dispatch = useDispatch<AppDispatch>();
     const tabLabels = ["Transactions", "Payment Settings"];
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
     };
 
-    const { loading, error, success, settings } = useSelector((state: RootState) => state.paymentSettings);
+    const { loading, error, success, withDrawalGateway } = useSelector((state: RootState) => state.paymentSettings);
     const { paymentSettingDetail } = useSelector((s: RootState) => s.paymentSettings);
 
-    const handleAddPayment = () => {
-        setShowForm(true);
-        setEditingId(null);
-        setFormValues({ currency: "XAF", paymentMethod: "", fields: {} });
-    };
     useEffect(() => {
         if (success) {
             toast.success("Payment settings saved successfully!");
@@ -115,114 +106,7 @@ export function TabWithTableView() {
         const matchService = serviceFilter === "All" || item.requestedService === serviceFilter;
         return matchStatus && matchService;
     });
-    const handleFieldChange = (field: string, value: string) => {
-        let formattedValue = value;
-
-        // Format Expiry Date with auto-slash
-        if (field === "Expiry Date") {
-            // Remove non-digits and existing slashes
-            const digits = value.replace(/\D/g, "");
-
-            if (digits.length <= 2) {
-                formattedValue = digits;
-            } else if (digits.length <= 4) {
-                formattedValue = `${digits.slice(0, 2)}/${digits.slice(2)}`;
-            } else {
-                formattedValue = `${digits.slice(0, 2)}/${digits.slice(2, 4)}`;
-            }
-        }
-
-        // Allow only up to 3 digits for CVV
-        if (field === "CVV") {
-            formattedValue = value.replace(/\D/g, "").slice(0, 3);
-        }
-
-        setFormValues((prev) => ({
-            ...prev,
-            fields: {
-                ...prev.fields,
-                [field]: formattedValue,
-            },
-        }));
-    };
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        if (!formValues.paymentMethod) {
-            toast.error("Please select a payment method.");
-            return;
-        }
-
-        const requiredFields = methodFields[formValues.paymentMethod];
-
-        const missingField = requiredFields.find(
-            (field) => !formValues.fields[field] || formValues.fields[field].trim() === ""
-        );
-
-        if (missingField) {
-            toast.error(`Please enter ${missingField}.`);
-            return;
-        }
-
-
-        const methodKeyMap: { [key: string]: string } = {
-            "Mobile Money (MTN MoMo, Orange Money)": "mobile_money",
-            "Bank Transfer": "bank_transfer",
-            "Credit/Debit Card (Visa/MasterCard)": "credit_card",
-        };
-
-        const methodValueMap: { [key: string]: string } = {
-            "Mobile Money (MTN MoMo, Orange Money)": formValues.fields.Provider || "",
-            "Bank Transfer": "bank_transfer",
-            "Credit/Debit Card (Visa/MasterCard)": "visa_mastercard",
-        };
-
-        const methodKey = methodKeyMap[formValues.paymentMethod];
-        const methodValue = methodValueMap[formValues.paymentMethod];
-
-        const paymentData: PaymentSetting = {
-            paymentMethod: methodKey,
-            method: methodValue,
-            details: formValues.fields,
-        };
-
-        if (isEditMode) {
-            dispatch(updatePaymentSetting(editingId!, paymentData));
-        } else {
-            dispatch(savePaymentSettings(paymentData));
-        }
-    };
-
-
-    const bankingData = settings
-        .filter((item: PaymentSetting) => item.paymentMethod === "bank_transfer")
-        .map((item: PaymentSetting) => ({
-            id: item._id,
-            accountHolder: item.details["Account Holder Name"] || "",
-            accountNumber: item.details["Account Number"] || "",
-            bankName: item.details["Bank Name"] || "",
-            cifNumber: item.details["CIF Number"] || "",
-            actions: ["Update", "Remove"],
-        }));
-
-
-    const mobileMoneyData = settings
-        .filter((item: PaymentSetting) => item.paymentMethod === "mobile_money")
-        .map((item: PaymentSetting) => ({
-            id: item._id,
-            momoNumber: item.details["Phone Number"],
-            provider: item.details.Provider,
-            actions: ["Update", "Remove"]
-        }));
-
-
-    const cardData = settings
-        .filter((item: PaymentSetting) => item.paymentMethod === "credit_card")
-        .map((item: PaymentSetting) => ({
-            id: item._id,
-            details: item.details,
-            actions: ["Update", "Remove"],
-        }));
+   
     return (
         <>
             <Box

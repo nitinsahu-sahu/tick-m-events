@@ -12,6 +12,7 @@ import { getPaymentSettings } from "src/redux/actions/paymentSettingActions";
 
 type WithdrawalRequestProps = {
     availableBalance: number;
+    eventId?: string;
 };
 
 type PaymentMethod = {
@@ -22,7 +23,7 @@ type PaymentMethod = {
     details: Record<string, string>;
 };
 
-export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) {
+export function WithdrawalRequest({ availableBalance, eventId }: WithdrawalRequestProps) {
     const dispatch = useDispatch<AppDispatch>();
     const { loading, error, success, withDrawalGateway } = useSelector((state: RootState) => state.paymentSettings);
     const { user } = useSelector((state: RootState) => state?.auth);
@@ -70,13 +71,18 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     // Effect to auto-select the first method when payment method changes
+
     useEffect(() => {
         if (paymentMethod && groupedPaymentMethods[paymentMethod]?.length > 0) {
-            const firstMethod = groupedPaymentMethods[paymentMethod][0];
-            setSelectedMethodId(firstMethod._id);
-            fillFormFields(firstMethod);
+
+            if (!selectedMethodId || !groupedPaymentMethods[paymentMethod].some((m: PaymentMethod) => m._id === selectedMethodId)) {
+                const firstMethod = groupedPaymentMethods[paymentMethod][0];
+                setSelectedMethodId(firstMethod._id);
+                fillFormFields(firstMethod);
+            }
         }
-    }, [paymentMethod,groupedPaymentMethods]);
+    }, [paymentMethod, groupedPaymentMethods, selectedMethodId]);
+
 
     // Effect to update form fields when a specific method is selected
     useEffect(() => {
@@ -86,28 +92,28 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                 fillFormFields(selectedMethod);
             }
         }
-    }, [selectedMethodId,withDrawalGateway]);
+    }, [selectedMethodId, withDrawalGateway]);
 
-  const fillFormFields = (method: PaymentMethod) => {
-    const details = method.details || {};
+    const fillFormFields = (method: PaymentMethod) => {
+        const details = method.details || {};
 
-    if (method.paymentMethod === "bank_transfer") {
-        setBankName(details["Bank Name"] || "");
-        setAccountNumber(details["Account Number"] || "");
-        setBeneficiaryName(details["Account Holder Name"] || details["Beneficiary Name"] || "");
-        setSwiftCode(details["SWIFT Code"] || details["CIF Number"] || "");
-        setCountry(details.Country || "");
-    } else if (method.paymentMethod === "mobile_money") {
-        setMobileNetwork(method.method === "mtn" ? "mtn" : "orange");
-        setMobileNumber(details["Phone Number"] || "");
-    } else if (method.paymentMethod === "credit_card") {
-        setCardType(method.method.includes("visa") ? "visa" : "mastercard");
-        setCardHolderName(details["Cardholder Name"] || "");
-        setCardNumber(details["Card Number"] || "");
-        setCardExpiry(details["Expiry Date"] || "");
-        setCardCvv(details.CVV || "");
-    }
-};
+        if (method.paymentMethod === "bank_transfer") {
+            setBankName(details["Bank Name"] || "");
+            setAccountNumber(details["Account Number"] || "");
+            setBeneficiaryName(details["Account Holder Name"] || details["Beneficiary Name"] || "");
+            setSwiftCode(details["SWIFT Code"] || details["CIF Number"] || "");
+            setCountry(details.Country || "");
+        } else if (method.paymentMethod === "mobile_money") {
+            setMobileNetwork(method.method === "mtn" ? "mtn" : "orange");
+            setMobileNumber(details["Phone Number"] || "");
+        } else if (method.paymentMethod === "credit_card") {
+            setCardType(method.method.includes("visa") ? "visa" : "mastercard");
+            setCardHolderName(details["Cardholder Name"] || "");
+            setCardNumber(details["Card Number"] || "");
+            setCardExpiry(details["Expiry Date"] || "");
+            setCardCvv(details.CVV || "");
+        }
+    };
 
     const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let value = e.target.value.replace(/\D/g, ""); // remove non-digit characters
@@ -231,12 +237,13 @@ export function WithdrawalRequest({ availableBalance }: WithdrawalRequestProps) 
                 }
             };
         }
-
         const withdrawalData = {
             userId: user?._id,
             amount: parseFloat(amount),
             withdrawalCode,
-            payment
+            payment,
+            eventId,
+            balance: availableBalance,
         };
 
         const result = await dispatch(createWithdrawal(withdrawalData));

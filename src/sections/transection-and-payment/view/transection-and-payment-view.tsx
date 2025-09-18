@@ -38,7 +38,10 @@ export function TransectionAndPaymentView() {
       ?.filter(order => order.paymentStatus === "confirmed")
       .reduce((sum, order) => sum + order.totalAmount, 0) || 0;
  
-    const availableBalance = totalConfirmedSales * 0.9;
+    const baseBalance = totalConfirmedSales * 0.9;
+    const withdrawals = event.totalApprovedWithdrawals || 0;
+ 
+    const availableBalance = baseBalance - withdrawals;
     setSelectedEvent({
       ...event,
       availableBalance,

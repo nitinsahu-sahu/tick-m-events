@@ -45,15 +45,6 @@ export function ContractTable({
         setStatusModalOpen(true);
     };
 
-    const handleStatusConfirm = async (newStatus: string) => {
-        try {
-            await dispatch(updateContractStatus({ id: selectedContractForStatus?._id, newStatus, eventReqId: selectedContractForStatus?.eventReqId?._id }))
-        } catch (error) {
-            console.error('Error updating status:', error);
-        }
-    };
-
-
     return (
         <>
             <TableContainer component={Paper}>
@@ -114,13 +105,14 @@ export function ContractTable({
                                             }}
                                         /></TableCell>
                                     <TableCell align="center" sx={{ textTransform: "capitalize" }}>{formatDateTimeCustom(row.serviceTime)}</TableCell>
-                                    <TableCell width={200} align="center" sx={{ textTransform: "capitalize", display: "flex", justifyContent: "center" }}>
+                                    <TableCell width={200} align="center"
+                                        sx={{ textTransform: "capitalize", display: "flex", justifyContent: "center" }}
+                                    >
                                         <Button
                                             onClick={() => handleViewContract(row)}
                                             variant="outlined"
                                             size="small"
                                             sx={{
-                                                marginX: 0.5,
                                                 color: "white",
                                                 borderColor: "gray",
                                                 backgroundColor: "#0B2E4C"

@@ -46,9 +46,7 @@ const FormTextField = ({ name, type = 'text', value, onChange, placeholder, tran
                     borderColor: 'black', // Border color when focused
                 },
             },
-            '& input': {
-                textTransform: "capitalize"
-            }
+          
         }}
     />
 );

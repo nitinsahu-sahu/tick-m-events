@@ -30,6 +30,7 @@ export function SearchAndSelectServiceProvidersView() {
   const tabLabels = ["Global Search", "List of Providers", "Proposals", "Requested Sevice"];
   const [offerList, setOfferList] = useState({})
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+console.log('selectedEvent',selectedEvent);
 
   const handleSelct = (row: any) => {
     setSelected(row)

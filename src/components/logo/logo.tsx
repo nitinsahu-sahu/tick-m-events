@@ -39,8 +39,8 @@ export const Logo = forwardRef<HTMLDivElement, LogoProps>(
         alt="Single logo"
         component="img"
         src={singleLogoPath}
-        width="100%"
-        height="100%"
+        width="59px"
+        height="41px"
         style={{ objectFit: "cover" }}
       />
     );

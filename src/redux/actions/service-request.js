@@ -7,14 +7,16 @@ export const getRequestsByProvider = (data) => async (dispatch) => {
 
   try {
 
-    const response = await axios.get(`/event-requests?statusType=${data?.statusType}`);
-console.log(response);
+    const response = await axios.get(`/event-requests`);
 
     dispatch({
       type: serviceRequestConstants.GET_REQUESTED_SERVICE_SUCCESS,
       payload: {
         message: response?.data?.message,
-        requests: response?.data?.requests,
+        completedRequests: response?.data?.completedRequests,
+        signedReqests: response?.data?.signedReqests,
+        pendingRequests: response?.data?.pendingRequests,
+        totalRequests: response?.data?.totalRequests
       },
     });
   } catch (error) {

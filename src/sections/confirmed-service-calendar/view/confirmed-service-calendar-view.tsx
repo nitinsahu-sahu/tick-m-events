@@ -7,17 +7,11 @@ import { MatrixThreeCard } from "src/components/matrix-three-cards/matrix-three-
 import { TabWithTableView } from "../tab-with-table";
 
 export function ConfirmedServiceCalendarView() {
-    const { requests } = useSelector((state: RootState) => state.serviceRequest);
-  
+    const { completedRequests, signedReqests } = useSelector((state: RootState) => state?.serviceRequest);
     // Filter confirmed services
-    const confirmedCount = requests.filter(
-        (r: any) => r.contractStatus === "ongoing" || r.contractStatus === "signed"
-    ).length;
-
+     const confirmedCount =(signedReqests?.length || 0) + (completedRequests?.length || 0);
     const stats = [
         { title: 'Confirmed Services', value: confirmedCount },
-        // { title: 'Upcoming Dates', value: 5 },
-        // { title: 'Available Slots', value: 8 },
     ];
 
     return (

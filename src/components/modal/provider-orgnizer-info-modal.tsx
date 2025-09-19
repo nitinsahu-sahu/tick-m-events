@@ -25,6 +25,7 @@ interface PhoneNumberDisplayProps {
 }
 
 export function ProviderOrganizerInfoModal({ isModalOpen, selectedEvent, handleCloseModal, select }: any) {
+ 
     const [showDetails, setShowDetails] = useState(false);
     const [shareAnchorEl, setShareAnchorEl] = useState<null | HTMLElement>(null);
     const openShareMenu = Boolean(shareAnchorEl);
@@ -538,7 +539,7 @@ export function ProviderOrganizerInfoModal({ isModalOpen, selectedEvent, handleC
                                                     eventId={selectedEvent?._id}
                                                     event={selectedEvent}
                                                     service={service}
-                                                    // onRequest={() => onRequestService(service._id)}
+                                                    providerId={select}
                                                     disabled={!selectedEvent?._id} // Disable if no event selected
                                                 />
                                             </Grid>

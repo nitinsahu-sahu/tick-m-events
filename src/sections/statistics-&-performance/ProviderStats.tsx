@@ -5,18 +5,21 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import StarRateIcon from '@mui/icons-material/StarRate';
 import { AppDispatch, RootState } from 'src/redux/store';
-import { getActiveContractsByProvider } from '../../redux/actions/service-request';
+import { getRequestsByProvider } from '../../redux/actions/service-request';
 
 const ProviderStats = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { activeContracts } = useSelector((state: RootState) => state?.serviceRequest);
+  const { completedRequests } = useSelector((state: RootState) => state?.serviceRequest);
+  const { averageRating } = useSelector((state: RootState) => state?.auth?.user);
 
+ 
   useEffect(() => {
-    dispatch(getActiveContractsByProvider());
+    dispatch(getRequestsByProvider());
   }, [dispatch]);
 
-  const contractCount = activeContracts?.length || 0;
-     
+  const contractCount = completedRequests?.length || 0;
+console.log();
+
   const stats = [
     {
       title: 'Contracts Obtained',
@@ -30,7 +33,7 @@ const ProviderStats = () => {
     },
     {
       title: 'Customer Ratings',
-      value: '4.8/5', // You can make this dynamic
+      value: `${averageRating||0}/5`, // You can make this dynamic
       icon: <StarRateIcon sx={{ fontSize: 40, color: '#0099E5' }} />,
     },
   ];

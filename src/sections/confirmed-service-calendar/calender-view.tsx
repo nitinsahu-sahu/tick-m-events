@@ -10,39 +10,50 @@ import { HeadingCommon } from "src/components/multiple-responsive-heading/headin
 import { getRequestsByProvider } from "src/redux/actions/service-request";
 
 import { ServiceRequestModal } from "../../components/modal/service-request-modal";
-import "./index.css"
+import "./index.css";
 
 const options = ["View Details", "Contact Organizer", "Modify Availability"];
 
 export const CalenderView = () => {
-    const { requests } = useSelector((state: RootState) => state?.serviceRequest);
+    const {
+        completedRequests = [],
+        signedReqests = [],
+    } = useSelector((state: RootState) => state?.serviceRequest || {});
+
     const dispatch = useDispatch<AppDispatch>();
     useEffect(() => {
-        dispatch(getRequestsByProvider({ status: "accepted-by-organizer" }));
-    }, [ dispatch]);
+        dispatch(getRequestsByProvider());
+    }, [dispatch]);
+
     const [selectedRequest, setSelectedRequest] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const eventDays: { [key: string]: string } = {};
-    requests.forEach((r: any) => {
-        const eventDateKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
-        if (r.contractStatus === "completed") {
+
+    // ✅ Completed requests → mark as gold
+    completedRequests.forEach((r: any) => {
+        if (r?.projectStatus === "completed" && r?.isSigned) {
+            const eventDateKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
             eventDays[eventDateKey] = "gold";
-        } else if (r.status === "accepted-by-organizer" && r.contractStatus === "ongoing") {
+        }
+    });
+    
+    // ✅ Signed requests (isSigned = true) → mark as red
+    signedReqests.forEach((r: any) => {
+        if (r?.isSigned) {
+            const eventDateKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
             eventDays[eventDateKey] = "red";
         }
     });
 
-
-    // Returns the start of the week (Sunday)
+    // ------------------ Utility Functions ------------------
     const getWeekStart = (date: Date): Date => {
         const newDate = new Date(date);
-        const day = newDate.getDay(); // 0 (Sun) to 6 (Sat)
+        const day = newDate.getDay();
         newDate.setDate(newDate.getDate() - day);
         return newDate;
     };
 
-    // Returns the end of the week (Saturday)
     const getWeekEnd = (date: Date): Date => {
         const start = getWeekStart(date);
         const newDate = new Date(start);
@@ -50,7 +61,6 @@ export const CalenderView = () => {
         return newDate;
     };
 
-    // Returns all dates of the current week
     const getCurrentWeekDates = (date: Date): Date[] => {
         const start = getWeekStart(date);
         return Array.from({ length: 7 }, (_, i) => {
@@ -66,27 +76,30 @@ export const CalenderView = () => {
     const [value, setValue] = useState(new Date());
     const [viewType, setViewType] = useState<"month" | "week" | "day">("month");
 
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [popupDate, setPopupDate] = useState("");
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+    // 🔎 Match clicked date with signed/completed requests
     const handleTileClick = (date: Date, event: any) => {
         const key = date.toLocaleDateString("en-CA");
 
-        const matchedRequest = requests.find((r: any) => {
-            const eventKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
-            return eventKey === key;
-        });
+        const matchedRequest =
+            signedReqests.find((r: any) => {
+                const eventKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
+                return eventKey === key && r?.isSigned;
+            }) ||
+            completedRequests.find((r: any) => {
+                const eventKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
+                return eventKey === key;
+            });
 
         if (matchedRequest) {
             setSelectedRequest(matchedRequest);
-            setPopupDate(key);
             setAnchorEl(event.currentTarget);
         } else {
             setSelectedRequest(null);
             setAnchorEl(null);
         }
     };
-
 
     const handleClose = () => setAnchorEl(null);
     const open = Boolean(anchorEl);
@@ -101,29 +114,6 @@ export const CalenderView = () => {
         const newDate = new Date(value);
         newDate.setMonth(value.getMonth() + 1);
         setValue(newDate);
-    };
-
-    const tileContent = ({ date }: { date: Date }) => {
-        const key = date.toISOString().split("T")[0];
-        if (eventDays[key]) {
-            return (
-                <Box
-                    sx={{
-                        width: "100%",
-                        height: "100%",
-                        backgroundColor: eventDays[key],
-                        borderRadius: "6px",
-                        color: "white",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center"
-                    }}
-                >
-                    {date.getDate()}
-                </Box>
-            );
-        }
-        return null;
     };
 
     const handleViewChange = (type: "month" | "week" | "day") => {
@@ -141,16 +131,41 @@ export const CalenderView = () => {
                 bgcolor="#1F8FCD"
                 p={2}
             >
-                <HeadingCommon baseSize="26px" variant="h6" weight={600} title="Service Calendar View" color="white" />
+                <HeadingCommon
+                    baseSize="26px"
+                    variant="h6"
+                    weight={600}
+                    title="Service Calendar View"
+                    color="white"
+                />
 
                 <Box display="flex" alignItems="center" gap={2}>
-                    <Button onClick={handlePrev} sx={{ borderRadius: 3, color: "black", backgroundColor: "white", p: "5px", minWidth: "38px" }}>
+                    <Button
+                        onClick={handlePrev}
+                        sx={{
+                            borderRadius: 3,
+                            color: "black",
+                            backgroundColor: "white",
+                            p: "5px",
+                            minWidth: "38px",
+                        }}
+                    >
                         <ArrowBack />
                     </Button>
                     <Typography variant="h6" color="white">
-                        {value.toLocaleString("default", { month: "long" })} {value.getFullYear()}
+                        {value.toLocaleString("default", { month: "long" })}{" "}
+                        {value.getFullYear()}
                     </Typography>
-                    <Button onClick={handleNext} sx={{ borderRadius: 3, color: "black", backgroundColor: "white", p: "5px", minWidth: "38px" }}>
+                    <Button
+                        onClick={handleNext}
+                        sx={{
+                            borderRadius: 3,
+                            color: "black",
+                            backgroundColor: "white",
+                            p: "5px",
+                            minWidth: "38px",
+                        }}
+                    >
                         <ArrowForward />
                     </Button>
                 </Box>
@@ -181,21 +196,20 @@ export const CalenderView = () => {
                         Day
                     </Button>
                 </Box>
-
             </Box>
 
             {/* Calendar */}
             {viewType === "month" && (
                 <Box
                     sx={{
-                        overflowX: 'auto',
-                        '.react-calendar__tile': {
+                        overflowX: "auto",
+                        ".react-calendar__tile": {
                             height: 65,
                             width: 212,
-                            maxWidth: 'none !important',
+                            maxWidth: "none !important",
                         },
-                        '.react-calendar': {
-                            width: '100%',
+                        ".react-calendar": {
+                            width: "100%",
                         },
                     }}
                 >
@@ -214,22 +228,30 @@ export const CalenderView = () => {
                     <Popover
                         open={Boolean(anchorEl)}
                         anchorEl={anchorEl}
-                        onClose={() => setAnchorEl(null)}
+                        onClose={handleClose}
                         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                     >
                         {selectedRequest ? (
                             <Box sx={{ p: 2, maxWidth: 300 }}>
                                 <Typography variant="subtitle1" fontWeight={600}>
-                                    {selectedRequest.eventId?.name || "No Title"}
+                                    {selectedRequest.eventId?.eventName || "No Title"}
                                 </Typography>
                                 <Typography variant="body2">
-                                    Date: {new Date(selectedRequest.eventId?.date).toLocaleDateString()}
+                                    Date:{" "}
+                                    {new Date(selectedRequest.eventId?.date).toLocaleDateString()}
                                 </Typography>
                                 <Typography variant="body2">
-                                    Time: {new Date(selectedRequest.eventId?.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    Time:{" "}
+                                    {selectedRequest.eventId?.time ||
+                                        new Date(selectedRequest.eventId?.date).toLocaleTimeString(
+                                            [],
+                                            { hour: "2-digit", minute: "2-digit" }
+                                        )}
                                 </Typography>
                                 <Typography variant="body2">
-                                    Status: {selectedRequest.contractStatus}
+                                    Status:{" "}
+                                    {selectedRequest.contractStatus ||
+                                        selectedRequest.projectStatus}
                                 </Typography>
                             </Box>
                         ) : (
@@ -238,14 +260,15 @@ export const CalenderView = () => {
                             </Box>
                         )}
                     </Popover>
-
                 </Box>
             )}
 
+            {/* Week View */}
             {viewType === "week" && (
                 <Box p={2}>
                     <Typography variant="h6" mb={2}>
-                        Week of {getWeekStart(value).toDateString()} - {getWeekEnd(value).toDateString()}
+                        Week of {getWeekStart(value).toDateString()} -{" "}
+                        {getWeekEnd(value).toDateString()}
                     </Typography>
 
                     <Box
@@ -256,11 +279,11 @@ export const CalenderView = () => {
                             border: "1px solid #ccc",
                             borderRadius: "8px",
                             p: 2,
-                            backgroundColor: "#f9f9f9"
+                            backgroundColor: "#f9f9f9",
                         }}
                     >
                         {getCurrentWeekDates(value).map((date) => {
-                            const key = date.toISOString().split("T")[0];
+                            const key = date.toLocaleDateString("en-CA");
                             const eventColor = eventDays[key];
                             const isToday = date.toDateString() === new Date().toDateString();
 
@@ -279,7 +302,8 @@ export const CalenderView = () => {
                                         display: "flex",
                                         flexDirection: "column",
                                         justifyContent: "space-between",
-                                        color: isToday ? "white" : bgColor !== "#fff" ? "white" : "black",
+                                        color:
+                                            isToday || eventColor ? "white" : "black",
                                     }}
                                 >
                                     <Typography fontWeight="bold">
@@ -287,15 +311,13 @@ export const CalenderView = () => {
                                     </Typography>
                                     <Typography>{date.getDate()}</Typography>
                                 </Box>
-
-
                             );
                         })}
                     </Box>
                 </Box>
             )}
 
-
+            {/* Day View */}
             {viewType === "day" && (
                 <Box p={2}>
                     <Typography variant="h6" gutterBottom>
@@ -306,27 +328,31 @@ export const CalenderView = () => {
                         sx={{
                             p: 3,
                             borderRadius: 2,
-                            backgroundColor: "#1976d2", // Blue background
-                            color: "white",             // White text
+                            backgroundColor: "#1976d2",
+                            color: "white",
                             boxShadow: 3,
                             textAlign: "center",
                             minHeight: "100px",
                             display: "flex",
                             flexDirection: "column",
-                            justifyContent: "center"
+                            justifyContent: "center",
                         }}
                     >
-                        <Typography variant="h4">
-                            {value.getDate()}
-                        </Typography>
+                        <Typography variant="h4">{value.getDate()}</Typography>
                         <Typography variant="subtitle1">
-                            {value.toLocaleDateString("en-US", { weekday: "long", month: "long", year: "numeric" })}
+                            {value.toLocaleDateString("en-US", {
+                                weekday: "long",
+                                month: "long",
+                                year: "numeric",
+                            })}
                         </Typography>
 
-                        {/* Optional: Show if there's an event */}
-                        {eventDays[value.toISOString().split("T")[0]] && (
+                        {eventDays[value.toLocaleDateString("en-CA")] && (
                             <Typography mt={2}>
-                                Event Color: <span style={{ fontWeight: 'bold' }}>{eventDays[value.toISOString().split("T")[0]]}</span>
+                                Event Color:{" "}
+                                <span style={{ fontWeight: "bold" }}>
+                                    {eventDays[value.toLocaleDateString("en-CA")]}
+                                </span>
                             </Typography>
                         )}
                     </Box>
@@ -340,7 +366,7 @@ export const CalenderView = () => {
                 onClose={handleClose}
                 anchorOrigin={{
                     vertical: "bottom",
-                    horizontal: "center"
+                    horizontal: "center",
                 }}
             >
                 <Box sx={{ p: 1 }}>
@@ -355,16 +381,15 @@ export const CalenderView = () => {
                                         setIsModalOpen(true);
                                         handleClose();
                                     }
-
                                 }}
                             >
                                 {option}
                             </Button>
                         ))}
-
                     </Stack>
                 </Box>
             </Popover>
+
             {selectedRequest && (
                 <ServiceRequestModal
                     open={isModalOpen}
@@ -372,8 +397,6 @@ export const CalenderView = () => {
                     data={selectedRequest}
                 />
             )}
-
         </Box>
     );
 };
-

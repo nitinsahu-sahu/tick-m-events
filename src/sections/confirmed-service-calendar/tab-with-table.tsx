@@ -18,12 +18,12 @@ export function TabWithTableView() {
         setTabValue(newValue);
     };
 
-    const { requests } = useSelector((state: RootState) => state.serviceRequest);
+      const { completedRequests, signedReqests } = useSelector((state: RootState) => state?.serviceRequest);
+
 
     const confirmedServiceListTableHeader = ["Service", "Location", "Date & Time", "Expected Payment", "Reminders"];
 
-    const confirmedServiceListTableData = requests
-        .filter((r: any) => r.contractStatus === "signed" || r.contractStatus === "ongoing")
+    const confirmedServiceListTableData = signedReqests
         .map((r: any) => {
             const id = r._id;
             const eventId = r.eventId?._id;

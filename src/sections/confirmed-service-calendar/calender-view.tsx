@@ -15,7 +15,7 @@ import "./index.css"
 const options = ["View Details", "Contact Organizer", "Modify Availability"];
 
 export const CalenderView = () => {
-    const { requests } = useSelector((state: RootState) => state?.serviceRequest);
+    const { signedReqests } = useSelector((state: RootState) => state?.serviceRequest);
     const dispatch = useDispatch<AppDispatch>();
     useEffect(() => {
         dispatch(getRequestsByProvider({ status: "accepted-by-organizer" }));
@@ -24,11 +24,11 @@ export const CalenderView = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const eventDays: { [key: string]: string } = {};
-    requests.forEach((r: any) => {
+    signedReqests.forEach((r: any) => {
         const eventDateKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
-        if (r.contractStatus === "completed") {
+        if (r.projectStatus === "completed") {
             eventDays[eventDateKey] = "gold";
-        } else if (r.status === "accepted-by-organizer" && r.contractStatus === "ongoing") {
+        } else if (r.projectStatus === "ongoing") {
             eventDays[eventDateKey] = "red";
         }
     });
@@ -72,7 +72,7 @@ export const CalenderView = () => {
     const handleTileClick = (date: Date, event: any) => {
         const key = date.toLocaleDateString("en-CA");
 
-        const matchedRequest = requests.find((r: any) => {
+        const matchedRequest = signedReqests?.find((r: any) => {
             const eventKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
             return eventKey === key;
         });

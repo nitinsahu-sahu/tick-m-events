@@ -14,7 +14,6 @@ export function ConfirmedTab() {
 
 
     useEffect(() => {
-
         dispatch(getRequestsByProvider());
     }, [dispatch]);
     return (

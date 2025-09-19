@@ -10,13 +10,13 @@ import { RequestTabSection } from "../request-tab-section";
 import { pendingRequestTableHeaders, onServiceTableHeader } from "../utills";
 
 export function ReservationsAndContractsView() {
-    const { requests } = useSelector((state: RootState) => state?.serviceRequest);
+    const { completedRequests, signedReqests } = useSelector((state: RootState) => state?.serviceRequest);
     const dispatch = useDispatch<AppDispatch>();
 
     const [viewType, setViewType] = useState<null | "active" | "completed">('active');
 
     useEffect(() => {
-        dispatch(getRequestsByProvider({ status: "accepted-by-organizer" }));
+        dispatch(getRequestsByProvider());
     }, [dispatch]);
 
     const handleCardButtonClick = (type: "active" | "completed") => {
@@ -25,13 +25,11 @@ export function ReservationsAndContractsView() {
 
     const filteredRequests = (() => {
         if (viewType === "active") {
-            return requests.filter((req: any) =>
-                req.contractStatus === "ongoing"
-            );
+            return signedReqests
         }
 
         if (viewType === "completed") {
-            return requests.filter((req: any) => req.contractStatus === "completed");
+            return completedRequests
         }
 
         return [];
@@ -44,19 +42,18 @@ export function ReservationsAndContractsView() {
                 metrics={[
                     {
                         title: "Active Contracts",
-                        value: requests.filter((r: { contractStatus: string }) => r.contractStatus === "ongoing").length.toString(),
+                        value: signedReqests?.length.toString(),
                         buttonType: "active"
                     },
                     {
                         title: "Completed Projects",
-                        value: requests.filter((r: { contractStatus: string }) => r.contractStatus === "completed").length.toString(),
+                        value: completedRequests?.length.toString(),
                         buttonType: "completed"
                     },
                     {
                         title: "Total Expected Payments",
-                        value: `${requests
-                            .filter((r: { contractStatus: string }) => r.contractStatus === "completed")
-                            .reduce((sum: number, r: { orgBudget: number }) => sum + (r.orgBudget || 0), 0)
+                        value: `${signedReqests
+                            ?.reduce((sum: number, r: { orgBudget: number }) => sum + (r.orgBudget || 0), 0)
                             .toLocaleString()} XAF`
 
                     }

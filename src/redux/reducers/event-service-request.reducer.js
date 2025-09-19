@@ -2,7 +2,9 @@ import { serviceRequestConstants } from "../actions/constants";
 
 const initialState = {
     message: '',
-    requests: [],
+    completedRequests: [],
+    signedReqests: [],
+    pendingRequests: [],
     proposal: null,
     total: 0,
     currentPage: 1,
@@ -67,7 +69,9 @@ const eventServiceRequestReducer = (state, action) => {
                 ...state,
                 loading: false,
                 message: action.payload.message,
-                requests: action.payload.requests,
+                completedRequests: action.payload.completedRequests,
+                signedReqests: action.payload.signedReqests,
+                pendingRequests: action.payload.pendingRequests,
             };
 
         case serviceRequestConstants.GET_REQUESTED_SERVICE_FAILURE:

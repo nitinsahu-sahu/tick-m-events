@@ -40,7 +40,7 @@ interface ApiResult {
 }
 
 // ServiceCard.tsx (new component)
-export function ServiceCard({ event, service, onRequest, eventId, disabled = false }: any) {
+export function ServiceCard({ event, service, providerId, eventId, disabled = false }: any) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const dispatch = useDispatch<AppDispatch>();
@@ -51,7 +51,8 @@ export function ServiceCard({ event, service, onRequest, eventId, disabled = fal
     orgRequirement: '',
     serviceTime: "",
     eventLocation: '',
-    orgAdditionalRequirement: ""
+    orgAdditionalRequirement: "",
+    providerId
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -98,6 +99,7 @@ export function ServiceCard({ event, service, onRequest, eventId, disabled = fal
       formDataObj.append("orgRequirement", formData.orgRequirement);
       formDataObj.append("orgAdditionalRequirement", formData.orgAdditionalRequirement);
       formDataObj.append("eventLocation", formData.eventLocation);
+      formDataObj.append("providerId", formData.providerId._id);
 
       const result = await dispatch(organizerRequstToProvider(formDataObj));
       if ((result as ApiResult)?.status === 201) {
@@ -108,7 +110,8 @@ export function ServiceCard({ event, service, onRequest, eventId, disabled = fal
           orgRequirement: '',
           serviceTime: "",
           eventLocation: '',
-          orgAdditionalRequirement: ""
+          orgAdditionalRequirement: "",
+          providerId:null
         })
         setTermsAccepted(false)
       } else {

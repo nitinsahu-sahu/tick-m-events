@@ -22,6 +22,7 @@ export function SearchAndSelectServiceProvidersView() {
   const { providersList } = useSelector((state: RootState) => state?.providers);
   const { organizerRequests } = useSelector((state: RootState) => state?.serviceRequest);
   const [select, setSelected] = useState<any>({})
+  
   const { __events } = useSelector((state: RootState) => state.organizer);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
@@ -30,7 +31,6 @@ export function SearchAndSelectServiceProvidersView() {
   const tabLabels = ["Global Search", "List of Providers", "Proposals", "Requested Sevice"];
   const [offerList, setOfferList] = useState({})
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
-console.log('selectedEvent',selectedEvent);
 
   const handleSelct = (row: any) => {
     setSelected(row)

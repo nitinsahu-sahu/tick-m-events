@@ -11,9 +11,9 @@ import { contractTableHeader } from "../utills";
 
 export function SignedTab() {
     const dispatch = useDispatch<AppDispatch>()
-    const { requests } = useSelector((state: RootState) => state?.serviceRequest);
+    const { signedReqests } = useSelector((state: RootState) => state?.serviceRequest);
     useEffect(() => {
-        dispatch(getRequestsByProvider({ orgStatus: "accepted", isSigned: true, projectStatus: "ongoing" }));
+        dispatch(getRequestsByProvider());
     }, [dispatch]);
 
     return (
@@ -27,7 +27,7 @@ export function SignedTab() {
             }}>
             <HeadingCommon title="Signed Project (By Organizer)" />
             <ContractTable
-                data={requests}
+                data={signedReqests}
                 headers={contractTableHeader}
                 type="1"
             />

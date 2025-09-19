@@ -70,9 +70,9 @@ export function PaymentMethodForm() {
                 fields: {}
             });
         }
-        if (error) {
-             toast.error(error);
-        }
+        // if (error) {
+        //      toast.error(error);
+        // }
     }, [success, error, dispatch]);
 
     useEffect(() => {

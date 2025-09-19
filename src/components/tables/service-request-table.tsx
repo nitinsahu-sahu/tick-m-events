@@ -37,19 +37,6 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
   const [openModal, setOpenModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
 
-  const handleCancelReqByOrg = useCallback(async (row: any) => {
-    try {
-      const result = await dispatch(serviceEventReqDelete({ serviceId: row._id }));
-      if ((result as ApiResult)?.status === 200) {
-        toast.success("Request Cancelled...");
-      } else {
-        toast.error(result?.message || "Failed to delete service");
-      }
-    } catch (error) {
-      toast.error("Server error");
-    }
-  }, [dispatch]);
-
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedRequest(null);
@@ -62,6 +49,7 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
     setSelectedContractForStatus(contract);
     setStatusModalOpen(true);
   };
+  console.log(data);
   
   return (
     <>
@@ -108,7 +96,7 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                     {row.providerId?.name || "-"}
                   </TableCell>
                   <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    {`${row.providerProposal?.amount} XAF` || row.orgBudget || "-"}
+                    {`${row.providerProposal?.amount||0} XAF`}
                   </TableCell>
                   <TableCell align="center">
                     {row.eventId?.date
@@ -158,7 +146,7 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                       sx={{
                         marginX: 0.5,
                         borderColor: "gray",
-                        backgroundColor: row.providerHasProposed ? '#0B2E4E' : '#ff9800',
+                        backgroundColor: '#0B2E4E',
                         color: 'white',
                         '&:hover': {
                           backgroundColor: row.providerHasProposed ? '#2e7d32' : '#b71c1c',
@@ -166,10 +154,10 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
 
                       }}
                     >
-                      {row.providerHasProposed ? 'View Details' : 'Pending'}
+                      View
                     </Button>
                     {
-                      row.projectStatus !== 'completed' && (
+                      row.isSigned && (
                         <Button
                           onClick={() => handleStatusChangeClick(row)}
                           variant="outlined"

@@ -26,17 +26,7 @@ export function TabButton({ providersList, tabValue, onChange, tabLabels }: any)
             label={
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 {label}
-                {index === 1 && (
-                  <Typography
-                    sx={{
-                      ml: 1,
-                      color: tabValue === index ? 'white' : 'black'
-                    }}
-                    fontSize={14}
-                  >
-                    ({providersList?.length || 0})
-                  </Typography>
-                )}
+               
               </Box>
             }
             sx={{

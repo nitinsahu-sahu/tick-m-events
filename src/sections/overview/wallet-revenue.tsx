@@ -8,8 +8,24 @@ type WalletBalanceProps = {
 };
 
 export function WalletBalance({ selectedEvent }: WalletBalanceProps) {
-    const orders = selectedEvent?.order ?? [];
+    // Calculate total confirmed sales
+    const totalConfirmedSales = selectedEvent?.order
+        ?.filter((order: any) => order.paymentStatus === "confirmed")
+        .reduce((sum: number, order: any) => sum + order.totalAmount, 0) || 0;
 
+    // Calculate base balance (90% of confirmed sales)
+    const baseBalance = totalConfirmedSales * 0.9;
+
+    // Calculate total approved withdrawals
+    const totalApprovedWithdrawals = selectedEvent?.withdrawals
+        ?.filter((withdrawal: any) => withdrawal.status === "approved")
+        .reduce((sum: number, withdrawal: any) => sum + withdrawal.amount, 0) || 0;
+
+    // Calculate final wallet balance
+    const walletBalance = baseBalance - totalApprovedWithdrawals;
+
+    // Prepare revenue chart data
+    const orders = selectedEvent?.order ?? [];
     const revenueByMonth: Record<string, number> = {};
 
     orders.forEach((order: any) => {
@@ -18,14 +34,14 @@ export function WalletBalance({ selectedEvent }: WalletBalanceProps) {
             const monthYear = date.toLocaleString("default", {
                 month: "short",
                 year: "numeric",
-            }); // e.g. "Aug 2025"
+            });
 
             revenueByMonth[monthYear] = (revenueByMonth[monthYear] || 0) + order.totalAmount;
         }
     });
 
-    const labels = Object.keys(revenueByMonth);       // ["Aug 2025", ...]
-    const seriesData = Object.values(revenueByMonth); // [900, ...]
+    const labels = Object.keys(revenueByMonth);
+    const seriesData = Object.values(revenueByMonth);
 
     const chartrevenuSeries = [
         {
@@ -78,16 +94,33 @@ export function WalletBalance({ selectedEvent }: WalletBalanceProps) {
                 }}
             >
                 <Typography variant="h6">Wallet Balance</Typography>
-                <Typography variant="h4" fontWeight="bold">100.00 XAF</Typography>
+                <Typography variant="h4" fontWeight="bold">
+                    {walletBalance.toFixed(2)} XAF
+                </Typography>
 
                 <Box display="flex" gap={2} mt={1}>
-                    <Button variant="contained" color="secondary">Withdraw</Button>
-                    <Button variant="contained" color="warning">Top Up</Button>
+                    <Button variant="contained" color="secondary">
+                        Withdraw
+                    </Button>
+                    <Button variant="contained" color="warning">
+                        Top Up
+                    </Button>
                 </Box>
 
-                <Typography variant="body2" mt={1}>Transaction History:</Typography>
-                <Typography variant="body2">• +50 XAF (Top-up)</Typography>
-                <Typography variant="body2">• -10 XAF (TXN + 4% Commission)</Typography>
+                <Typography variant="body2" mt={1}>
+                    Transaction History:
+                </Typography>
+                <Typography variant="body2">
+                    • +{totalConfirmedSales.toFixed(2)} XAF (Total Sales)
+                </Typography>
+                <Typography variant="body2">
+                    • -{(totalConfirmedSales * 0.1).toFixed(2)} XAF (10% Platform Fee)
+                </Typography>
+                {totalApprovedWithdrawals > 0 && (
+                    <Typography variant="body2">
+                        • -{totalApprovedWithdrawals.toFixed(2)} XAF (Withdrawals)
+                    </Typography>
+                )}
             </CardContent>
 
             {/* Sales Revenue Chart */}
@@ -101,14 +134,19 @@ export function WalletBalance({ selectedEvent }: WalletBalanceProps) {
                 }}
             >
                 <Typography variant="h6">Sales Revenue</Typography>
-                <Chart options={chartrevenuOptions} series={chartrevenuSeries} type="line" height={200} />
-                <Link to='/marketing-engagenment'>
+                <Chart
+                    options={chartrevenuOptions}
+                    series={chartrevenuSeries}
+                    type="line"
+                    height={200}
+                />
+                <Link to="/marketing-engagenment">
                     <Button
                         variant="contained"
                         sx={{
                             mt: 1,
-                            backgroundColor: '#0B2E4E',
-                            width: "100%"
+                            backgroundColor: "#0B2E4E",
+                            width: "100%",
                         }}
                     >
                         Boost Sales

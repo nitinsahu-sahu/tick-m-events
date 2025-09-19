@@ -1,11 +1,11 @@
 import {
     Avatar, Box, Button, Grid, Typography, IconButton,
     Menu, MenuItem, ListItemIcon, Dialog, DialogTitle,
-    DialogContent, DialogActions, Collapse
+    DialogContent, DialogActions, Collapse, CircularProgress
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import EditIcon from '@mui/icons-material/Edit';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { WhatsApp, Facebook, Twitter, LinkedIn, Instagram, Link as LinkIcon, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
@@ -33,6 +33,8 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
     const { user } = useSelector((state: RootState) => state?.auth);
     const dispatch = useDispatch<AppDispatch>();
     const [covererror, setCoverError] = useState(null)
+    const [coverloading, setCoverLoading] = useState(false)
+    const [picloading, setPicLoading] = useState(false)
     const [avatarerror, setAvatarError] = useState(null)
     const avatarInputRef = useRef<HTMLInputElement>(null);
     const coverInputRef = useRef<HTMLInputElement>(null);
@@ -49,7 +51,7 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
     };
 
     const copyProfileLink = () => {
-        const profileUrl = `${import.meta.env.VITE_FRONT_URL || 'https://tick-m-events.vercel.app' }/profile/${user?._id}`;
+        const profileUrl = `${import.meta.env.VITE_FRONT_URL || 'https://tick-m-events.vercel.app'}/profile/${user?._id}`;
         navigator.clipboard.writeText(profileUrl);
         setCopySuccess(true);
         handleShareClose();
@@ -57,7 +59,7 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
     };
 
     const shareOnSocialMedia = (platform: string) => {
-        const profileUrl = `${import.meta.env.VITE_FRONT_URL || 'https://tick-m-events.vercel.app' }/profile/${user?._id}`;
+        const profileUrl = `${import.meta.env.VITE_FRONT_URL || 'https://tick-m-events.vercel.app'}/profile/${user?._id}`;
         const message = `Check out my profile on EventHub: ${profileUrl}`;
 
         let url = '';
@@ -98,6 +100,9 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
             formData.append('cover', file);
 
             try {
+                setCoverLoading(true);
+                setCoverError(null);
+
                 const result = await dispatch(updateProCover(formData))
                 if ((result as ApiResult)?.status === 200) {
                     setCoverError(null);
@@ -108,6 +113,8 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                 }
             } catch (error) {
                 toast.error(error.message);
+            } finally {
+                setCoverLoading(false);
             }
         }
     };
@@ -119,6 +126,8 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
             formData.append('avatar', file);
 
             try {
+                setPicLoading(true);
+                setAvatarError(null);
                 const result = await dispatch(updateProAvatar(formData))
                 if ((result as ApiResult)?.status === 200) {
                     setAvatarError(null);
@@ -128,6 +137,8 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                 }
             } catch (error) {
                 toast.error(error.message);
+            } finally {
+                setPicLoading(false);
             }
         }
     };
@@ -140,6 +151,10 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
         coverInputRef.current?.click();
     };
 
+
+    useEffect(() => {
+        dispatch(profileGet(user?._id));
+    }, [dispatch, user?._id]);
     return (
         <Box boxShadow={3} borderRadius={3} bgcolor="#FFFFFF" >
             {/* Banner Image */}
@@ -166,15 +181,37 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                     width: "100%",
                     height: { xs: "150px", sm: "220px" },
                     backgroundImage: profile?.cover?.url
-                        ? `url(${profile.cover.url})`
+                        ? `url(${profile.cover?.url})`
                         : `url(https://res.cloudinary.com/dm624gcgg/image/upload/v1745399695/a33ffade6c44792172af87c950e914099ba87c45_dg1rab.png)`,
                     backgroundSize: "cover",
-                    backgroundPosition: "center center", // More specific position
+                    backgroundPosition: "center center",
                     backgroundRepeat: "no-repeat",
                     position: 'relative',
-                    overflow: 'hidden' // Ensures rounded corners work properly
+                    overflow: 'hidden',
+                    opacity: coverloading ? 0.7 : 1,
+                    transition: 'opacity 0.3s ease'
                 }}
             >
+                {/* Loading overlay for cover image */}
+                {coverloading && (
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                            zIndex: 1
+                        }}
+                    >
+                        <CircularProgress size={40} sx={{ color: 'white' }} />
+                    </Box>
+                )}
+
                 <IconButton
                     onClick={triggerCoverInput}
                     sx={{
@@ -185,18 +222,23 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                         color: 'white',
                         '&:hover': {
                             backgroundColor: 'rgba(0, 0, 0, 0.7)'
-                        }
+                        },
+                        zIndex: 2,
+                        opacity: coverloading ? 0.5 : 1
                     }}
+                    disabled={coverloading}
                 >
-                    <EditIcon fontSize="small" />
+                    {coverloading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : <EditIcon fontSize="small" />}
                 </IconButton>
+
                 <Typography sx={{
                     position: 'absolute',
                     top: 10,
                     right: 16,
-
-                }} color="red" fontSize={15} fontWeight={600}>{covererror}</Typography>
-
+                    zIndex: 2
+                }} color="red" fontSize={15} fontWeight={600}>
+                    {covererror}
+                </Typography>
             </Box>
 
             {/* Profile Info */}
@@ -238,7 +280,8 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                             }
                         }}
                     >
-                        <EditIcon fontSize="small" />
+                    {picloading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : <EditIcon fontSize="small" />}
+                        {/* <EditIcon fontSize="small" /> */}
                     </IconButton>
                 </Box>
 

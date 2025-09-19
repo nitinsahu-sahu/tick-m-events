@@ -9,7 +9,7 @@ import { providersListFetch } from 'src/redux/actions/searchSelect';
 import { fatchOrgEvents, fatchOrgPlaceABids } from 'src/redux/actions/organizer/pageEvents';
 import { EventBreadCrum } from 'src/sections/entry-validation/event-status';
 import { eventFetch } from 'src/redux/actions/event.action';
-import { getAccepedByProiver, getRequestsByOrganizer } from 'src/redux/actions/service-request';
+import { getAccepedByProiver, getRequestsByOrganizer, getRequestsByProvider } from 'src/redux/actions/service-request';
 import { ProviderOrganizerInfoModal } from 'src/components/modal/provider-orgnizer-info-modal';
 
 import { SearchAndAdvanceFilter } from '../SearchAndAdvanceFilter';
@@ -20,9 +20,11 @@ import RequestService from '../RequestService';
 
 export function SearchAndSelectServiceProvidersView() {
   const { providersList } = useSelector((state: RootState) => state?.providers);
-  const { organizerRequests } = useSelector((state: RootState) => state?.serviceRequest);
+     const {
+          totalRequests = [],
+      } = useSelector((state: RootState) => state?.serviceRequest || {});
   const [select, setSelected] = useState<any>({})
-  
+
   const { __events } = useSelector((state: RootState) => state.organizer);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
@@ -31,7 +33,9 @@ export function SearchAndSelectServiceProvidersView() {
   const tabLabels = ["Global Search", "List of Providers", "Proposals", "Requested Sevice"];
   const [offerList, setOfferList] = useState({})
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
-
+console.log('====================================');
+console.log('totalRequests',totalRequests);
+console.log('====================================');
   const handleSelct = (row: any) => {
     setSelected(row)
     setOfferList(row)
@@ -60,6 +64,10 @@ export function SearchAndSelectServiceProvidersView() {
       setTabValue(1);
     }
   };
+
+  useEffect(() => {
+    dispatch(getRequestsByProvider());
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(providersListFetch())
@@ -127,9 +135,9 @@ export function SearchAndSelectServiceProvidersView() {
           <ProposalsCard proposals={selectedEvent?.eventRequests} />
         )}
         {tabValue === 3 && (
-          <RequestService requests={organizerRequests} />
+          <RequestService requests={totalRequests} />
         )}
-       
+
         <ProviderOrganizerInfoModal
           isModalOpen={isModalOpen}
           handleCloseModal={handleCloseModal}

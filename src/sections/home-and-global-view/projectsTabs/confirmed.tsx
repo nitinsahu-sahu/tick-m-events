@@ -10,11 +10,12 @@ import { contractTableHeader } from "../utills";
 
 export function ConfirmedTab() {
     const dispatch = useDispatch<AppDispatch>()
-    const { requests } = useSelector((state: RootState) => state?.serviceRequest);
+    const { completedRequests } = useSelector((state: RootState) => state?.serviceRequest);
+
 
     useEffect(() => {
-        
-        dispatch(getRequestsByProvider({ orgStatus: "accepted", isSigned: true, projectStatus: "completed" }));
+
+        dispatch(getRequestsByProvider());
     }, [dispatch]);
     return (
         <Paper elevation={6}
@@ -28,7 +29,7 @@ export function ConfirmedTab() {
             <HeadingCommon title="Completed Project (By You)" />
 
             <ContractTable
-                data={requests}
+                data={completedRequests}
                 headers={contractTableHeader}
                 type="2"
             />

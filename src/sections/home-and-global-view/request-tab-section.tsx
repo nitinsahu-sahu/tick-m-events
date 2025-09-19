@@ -46,7 +46,7 @@ export function RequestTabSection({
         }));
     };
 
-    const filteredData = data.filter(item => {
+    const filteredData = data?.filter(item => {
         // Filter by event name
         if (filters.eventName && !item.eventId.eventName.toLowerCase().includes(filters.eventName.toLowerCase())) {
             return false;
@@ -102,7 +102,7 @@ export function RequestTabSection({
 
             {/* Filter Controls */}
             {
-                data.length > 0 && title === 'Available Projects (Organizer Requests)' && (
+                data?.length > 0 && title === 'Available Projects (Organizer Requests)' && (
                     <Box sx={{ mb: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                             <TextField
@@ -170,7 +170,7 @@ export function RequestTabSection({
                 onMarkCompleted={onMarkCompleted}
             />
             {
-                filteredData.length > 0 && (
+                filteredData?.length > 0 && (
                     <Box display="flex" justifyContent="flex-end" mt={2}>
                         <Typography variant="body2" fontStyle="italic" color="text.secondary">
                             NB: Negotiable Budget

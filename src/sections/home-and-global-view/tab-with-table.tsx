@@ -54,7 +54,7 @@ interface Project {
 
 export function TabWithTableView() {
     const [tabValue, setTabValue] = useState(0);
-    const { requests } = useSelector((state: RootState) => state?.serviceRequest);
+    const { pendingRequests } = useSelector((state: RootState) => state?.serviceRequest);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const tabLabels = ["Available Projects", "Awarded Projects", "Confirmed Services"];
     const [amount, setAmount] = useState('');
@@ -64,7 +64,7 @@ export function TabWithTableView() {
     const dispatch = useDispatch<AppDispatch>()
 
     useEffect(() => {
-        dispatch(getRequestsByProvider({ statusType: "request", isSigned: false, projectStatus: "pending" }));
+        dispatch(getRequestsByProvider());
     }, [tabValue, dispatch]);
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -123,7 +123,7 @@ export function TabWithTableView() {
                         title="Available Projects (Organizer Requests)"
                         description=""
                         headers={availableProjectsTableHeaders}
-                        data={requests}
+                        data={pendingRequests}
                         type="1"
                         onApply={async (row) => {
                             setSelectedProject(row);

@@ -84,7 +84,7 @@ export function ConfirmedServiceCalenderTable({
                             )}
 
                             {/* Status with conditional coloring */}
-                            <TableCell
+                            {/* <TableCell
                                 align="center"
                                 sx={{
                                     fontWeight: "bold",
@@ -94,10 +94,9 @@ export function ConfirmedServiceCalenderTable({
                                 {row.status}
                             </TableCell>
 
-                            {/* Actions with consistent button styling */}
                             <TableCell align="center">
                                 <ActionButtons actions={row.actions} />
-                            </TableCell>
+                            </TableCell> */}
                         </TableRow>
                     ))}
                 </TableBody>

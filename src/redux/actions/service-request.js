@@ -16,6 +16,7 @@ export const getRequestsByProvider = (data) => async (dispatch) => {
         completedRequests: response?.data?.completedRequests,
         signedReqests: response?.data?.signedReqests,
         pendingRequests: response?.data?.pendingRequests,
+        totalRequests: response?.data?.totalRequests
       },
     });
   } catch (error) {

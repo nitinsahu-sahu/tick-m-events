@@ -22,6 +22,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { updateServiceProjectStatus } from "src/redux/actions/organizer/pageEvents";
 import { AppDispatch } from "src/redux/store";
 import { useDispatch } from "react-redux";
+import { getRequestsByOrganizer } from "src/redux/actions/service-request";
 
 interface StatusConfirmationModalProps {
   open: boolean;
@@ -50,8 +51,6 @@ export const ProjectConfirmationModal = ({
   useEffect(() => {
     setSelectedStatus(currentStatus);
   }, [currentStatus]);
-
-
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -89,7 +88,6 @@ export const ProjectConfirmationModal = ({
       
       if (res?.status === 200) {
         onClose();
-
       }
     } catch (error) {
       console.error('Error updating status:', error);

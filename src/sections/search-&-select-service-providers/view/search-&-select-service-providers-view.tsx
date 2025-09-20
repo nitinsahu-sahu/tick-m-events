@@ -33,9 +33,7 @@ export function SearchAndSelectServiceProvidersView() {
   const tabLabels = ["Global Search", "List of Providers", "Proposals", "Requested Sevice"];
   const [offerList, setOfferList] = useState({})
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
-console.log('====================================');
-console.log('totalRequests',totalRequests);
-console.log('====================================');
+
   const handleSelct = (row: any) => {
     setSelected(row)
     setOfferList(row)
@@ -103,6 +101,7 @@ console.log('====================================');
     setSelectedEvent(event);
   };
 
+  
   return (
     <>
       <EventBreadCrum events={__events} onEventSelect={handleEventSelect} />

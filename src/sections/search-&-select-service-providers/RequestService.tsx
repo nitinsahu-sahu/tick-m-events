@@ -23,10 +23,6 @@ export default function RequestService({ requests }: Props) {
       </Typography>
       <ServiceRequestTable
         requests={requests}
-        onActionClick={(row) => {
-          console.log("Clicked row:", row);
-        }}
-        type='1'
       />
     </Box>
   );

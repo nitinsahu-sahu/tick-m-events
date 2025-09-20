@@ -329,7 +329,7 @@ export function ProviderOrganizerInfoModal({ isModalOpen, selectedEvent, handleC
                         </Box>
                         <Box>
                             <Typography variant="subtitle2">Completed Gigs</Typography>
-                            <Typography fontWeight={600}>120</Typography>
+                            <Typography fontWeight={600}>  {select?.gigsCounts?.completed|| 0}</Typography>
                         </Box>
                         <Box>
                             <Typography variant="subtitle2">Response Time</Typography>

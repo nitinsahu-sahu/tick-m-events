@@ -406,7 +406,7 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                             Completed Gigs
                         </Typography>
                         <Typography fontWeight="bold" fontSize="16px" mt={0.5}>
-                            120
+                            {profile?.gigsCounts?.completed|| 0}
                         </Typography>
                     </Grid>
                     {profile?.role === 'provider' && (

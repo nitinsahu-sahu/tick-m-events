@@ -1,4 +1,5 @@
-import { Box, Button, Paper, Tab, Tabs, Typography, Grid, TextField, CardContent, Card } from "@mui/material";
+// Parent Component
+import { Box, Button, Paper, Tab, Tabs, Typography, Grid, TextField, CardContent, Card, Modal, Divider, Chip } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MatrixOneCard } from "src/components/matrix-three-cards/matrix-one-cards";
@@ -50,12 +51,20 @@ interface Project {
         days: number;
         message: string;
     };
+    eventLocation?: string;
+    providerStatus?: string;
+    orgStatus?: string;
+    isSigned?: boolean;
+    projectStatus?: string;
+    orgAdditionalRequirement?: string;
+    serviceTime?: string;
 }
 
 export function TabWithTableView() {
     const [tabValue, setTabValue] = useState(0);
     const { pendingRequests } = useSelector((state: RootState) => state?.serviceRequest);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+    const [modalOpen, setModalOpen] = useState(false);
     const tabLabels = ["Available Projects", "Awarded Projects", "Confirmed Services"];
     const [amount, setAmount] = useState('');
     const [days, setDays] = useState('');
@@ -70,6 +79,72 @@ export function TabWithTableView() {
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
         setSelectedProject(null);
+        setModalOpen(false);
+    };
+
+    const handleApplyClick = async (row: Project) => {
+        setSelectedProject(row);
+
+        // Check if provider already proposed
+        if (row.providerHasProposed) {
+            const res = await dispatch(getProposalById(row._id) as any);
+
+            if (res?.data?.providerProposal) {
+                const {
+                    amount: proposalAmount,
+                    days: proposalDays,
+                    message,
+                } = res.data.providerProposal;
+                setAmount(String(proposalAmount));
+                setDays(String(proposalDays));
+                setDescription(message);
+            }
+        } else {
+            setAmount('');
+            setDays('');
+            setDescription('');
+        }
+
+        setModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setSelectedProject(null);
+    };
+
+    const handleSubmitProposal = async () => {
+        if (!amount || !days || !description || !selectedProject) return;
+
+        const proposalData = {
+            amount: Number(amount),
+            days: Number(days),
+            message: description,
+        };
+
+        let res;
+
+        if (selectedProject.providerHasProposed) {
+            // Call update proposal API
+            res = await dispatch(updateProviderProposal(selectedProject._id, proposalData) as any);
+        } else {
+            // Call create proposal API
+            res = await dispatch(sendProviderProposal(selectedProject._id, proposalData) as any);
+         
+        }
+        console.log(res);
+
+        if (res?.status === 200) {
+            setAmount('');
+            setDays('');
+            setDescription('');
+            setModalOpen(false);
+            setSelectedProject(null);
+            dispatch(getRequestsByProvider()); // Refresh
+        } else {
+                        setModalOpen(false);
+
+        }
     };
 
     return (
@@ -125,110 +200,207 @@ export function TabWithTableView() {
                         headers={availableProjectsTableHeaders}
                         data={pendingRequests}
                         type="1"
-                        onApply={async (row) => {
-                            setSelectedProject(row);
-
-                            // Check if provider already proposed
-                            if (row.providerHasProposed) {
-                                const res = await dispatch(getProposalById(row._id) as any);
-
-                                if (res?.data?.providerProposal) {
-                                    const {
-                                        amount: proposalAmount,
-                                        days: proposalDays,
-                                        message,
-                                    } = res.data.providerProposal;
-                                    setAmount(String(proposalAmount));
-                                    setDays(String(proposalDays));
-                                    setDescription(message);
-
-                                }
-                            } else {
-                                setAmount('');
-                                setDays('');
-                                setDescription('');
-                            }
-
-                            setTimeout(() => {
-                                proposalFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                            }, 100);
-                        }}
-
+                        onApply={handleApplyClick}
                         onViewDetails={() => {
                             setSelectedProject(null);
                         }}
-
                     />
-                    {/* Proposal Form */}
-                    {selectedProject && (
+
+                    {/* Proposal Form Modal */}
+                    <Modal
+                        open={modalOpen}
+                        onClose={handleCloseModal}
+                        aria-labelledby="proposal-modal-title"
+                        aria-describedby="proposal-modal-description"
+                    >
                         <Box
-                            ref={proposalFormRef}
                             sx={{
-                                backgroundColor: "#f1f1f1",
-                                borderRadius: "10px",
-                                marginTop: 4,
-                                overflow: "hidden",
-                                padding: 0,
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: { xs: '95%', sm: '90%', md: '85%', lg: '80%' },
+                                maxWidth: '1200px',
+                                maxHeight: '90vh',
+                                bgcolor: 'background.paper',
+                                borderRadius: 2,
+                                boxShadow: 24,
+                                p: 0,
+                                display: 'flex',
+                                flexDirection: { xs: 'column', md: 'row' },
+                                overflow: 'hidden'
                             }}
                         >
-
-                            {/* Form Header */}
+                            {/* Left Panel - Project Details */}
                             <Box
                                 sx={{
-                                    backgroundColor: "#1F8FCD",
-                                    padding: "10px 20px",
-                                    color: "#fff",
-                                    fontWeight: 600,
-                                    fontSize: "16px",
-                                    borderTopLeftRadius: "10px",
-                                    borderTopRightRadius: "10px",
+                                    flex: { md: 1 },
+                                    p: 3,
+                                    backgroundColor: '#f9f9f9',
+                                    overflowY: 'auto',
+                                    maxHeight: '90vh'
                                 }}
                             >
-                                Fill Out This Form
+                                <Typography variant="h5" fontWeight="bold" gutterBottom color="#1F8FCD">
+                                    Project Details
+                                </Typography>
+
+                                <Box sx={{ mb: 3 }}>
+                                    <Typography variant="h6" fontWeight="bold" color="#0B2E4C" gutterBottom>
+                                        {selectedProject?.eventId?.eventName}
+                                    </Typography>
+                                    <Chip
+                                        label={selectedProject?.providerHasProposed ? "Proposal Submitted" : "New Project"}
+                                        color={selectedProject?.providerHasProposed ? "success" : "primary"}
+                                        size="small"
+                                        sx={{ mb: 2 }}
+                                    />
+                                </Box>
+
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6}>
+                                        <DetailItem title="Event Date" value={selectedProject?.eventId?.date ? new Date(selectedProject.eventId.date).toLocaleDateString() : 'N/A'} />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <DetailItem title="Event Time" value={selectedProject?.eventId?.time || 'N/A'} />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <DetailItem title="Service Time" value={selectedProject?.serviceTime ? new Date(selectedProject.serviceTime).toLocaleString() : 'N/A'} />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <DetailItem title="Location" value={selectedProject?.eventId?.location || selectedProject?.eventLocation || 'N/A'} />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <DetailItem title="Service Type" value={selectedProject?.serviceRequestId?.serviceType || 'N/A'} />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <DetailItem title="Organizer Budget" value={selectedProject?.serviceRequestId?.budget || 'N/A'} />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <DetailItem title="Organizer" value={selectedProject?.organizerId?.name || 'N/A'} />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                                            Event Description
+                                        </Typography>
+                                        <Box
+                                            sx={{
+                                                p: 1.5,
+                                                backgroundColor: 'white',
+                                                borderRadius: 1,
+                                                border: '1px solid #e0e0e0',
+                                                minHeight: '60px'
+                                            }}
+                                        >
+                                            <Typography variant="body2">
+                                                {selectedProject?.eventId?.description ?
+                                                    selectedProject.eventId.description.replace(/<[^>]*>/g, '') :
+                                                    'No description available'}
+                                            </Typography>
+                                        </Box>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                                            Organizer Requirements
+                                        </Typography>
+                                        <Box
+                                            sx={{
+                                                p: 1.5,
+                                                backgroundColor: 'white',
+                                                borderRadius: 1,
+                                                border: '1px solid #e0e0e0',
+                                                minHeight: '60px'
+                                            }}
+                                        >
+                                            <Typography variant="body2">
+                                                {selectedProject?.orgRequirement || 'No specific requirements provided'}
+                                            </Typography>
+                                        </Box>
+                                    </Grid>
+                                    {selectedProject?.orgAdditionalRequirement && (
+                                        <Grid item xs={12}>
+                                            <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                                                Additional Requirements
+                                            </Typography>
+                                            <Box
+                                                sx={{
+                                                    p: 1.5,
+                                                    backgroundColor: 'white',
+                                                    borderRadius: 1,
+                                                    border: '1px solid #e0e0e0',
+                                                    minHeight: '60px'
+                                                }}
+                                            >
+                                                <Typography variant="body2">
+                                                    {selectedProject.orgAdditionalRequirement}
+                                                </Typography>
+                                            </Box>
+                                        </Grid>
+                                    )}
+                                    <Grid item xs={12} sm={6}>
+                                        <DetailItem title="Project Status" value={selectedProject?.projectStatus || 'N/A'} />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <DetailItem title="Provider Status" value={selectedProject?.providerStatus || 'N/A'} />
+                                    </Grid>
+                                </Grid>
                             </Box>
 
-                            {/* Form Body */}
-                            <Box sx={{ padding: "26px" }}>
-                                {/* Project Info Section */}
-                                <Box
-                                    sx={{ padding: "10px", }} >
-                                    <Typography variant="h6" fontWeight="bold" gutterBottom>
-                                        Project Details
-                                    </Typography>
+                            {/* Divider */}
+                            <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', md: 'block' } }} />
 
-                                    <Typography variant="body2"><strong>Event Name:</strong> {selectedProject?.eventId?.eventName}</Typography>
-                                    <Typography variant="body2"><strong>Date:</strong> {new Date(selectedProject?.eventId?.date).toDateString()}</Typography>
-                                    <Typography variant="body2"><strong>Location:</strong> {selectedProject?.eventId?.location}</Typography>
-                                    <Typography variant="body2"><strong>Organizer:</strong> {selectedProject?.organizerId?.name}</Typography>
-                                    <Typography variant="body2"><strong>Budget:</strong> {selectedProject?.serviceRequestId?.budget}</Typography>
-                                    <Typography variant="body2"><strong>Service Type:</strong> {selectedProject?.serviceRequestId?.serviceType}</Typography>
-                                    <Typography variant="body2"><strong>Organizer Requirement:</strong> {selectedProject?.orgRequirement}</Typography>
+                            {/* Right Panel - Proposal Form */}
+                            <Box
+                                sx={{
+                                    flex: { md: 1 },
+                                    p: 3,
+                                    overflowY: 'auto',
+                                    maxHeight: '90vh'
+                                }}
+                            >
+                                <Typography variant="h5" fontWeight="bold" gutterBottom color="#1F8FCD">
+                                    Submit Your Proposal
+                                </Typography>
 
-                                </Box>
-                                <Grid container spacing={1}>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography sx={{ fontWeight: "600", fontSize: "17px", mb: 0.5 }}>
-                                            Amount
+                                <Typography variant="body2" color="textSecondary" paragraph>
+                                    Fill out the form below to submit your proposal for this project.
+                                </Typography>
+
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6}>
+                                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                                            Amount (XAF)
                                         </Typography>
-                                        <TextField placeholder="Enter Amount" fullWidth variant="outlined" value={amount}
+                                        <TextField
+                                            placeholder="Enter Amount"
+                                            fullWidth
+                                            variant="outlined"
+                                            value={amount}
                                             onChange={(e) => setAmount(e.target.value)}
+                                            type="number"
                                         />
                                     </Grid>
 
-                                    <Grid item xs={12} md={6}>
-                                        <Typography sx={{ fontWeight: "600", fontSize: "17px", mb: 0.5 }}>
-                                            Days
-                                        </Typography>
-                                        <TextField placeholder="Enter Days" fullWidth variant="outlined" value={days}
-                                            onChange={(e) => setDays(e.target.value)} />
-                                    </Grid>
-
-                                    <Grid item xs={12} mt={1}>
-                                        <Typography sx={{ fontWeight: "600", fontSize: "17px", mb: 0.5 }}>
-                                            Describe Your Proposal
+                                    <Grid item xs={12} sm={6}>
+                                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                                            Days Required
                                         </Typography>
                                         <TextField
-                                            placeholder="Write A Message.."
+                                            placeholder="Enter Days"
+                                            fullWidth
+                                            variant="outlined"
+                                            value={days}
+                                            onChange={(e) => setDays(e.target.value)}
+                                            type="number"
+                                        />
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                                            Proposal Description
+                                        </Typography>
+                                        <TextField
+                                            placeholder="Describe your approach, timeline, and why you're the best fit for this project..."
                                             fullWidth
                                             multiline
                                             rows={4}
@@ -238,7 +410,18 @@ export function TabWithTableView() {
                                         />
                                     </Grid>
 
-                                    <Grid item xs={12} mt={2} textAlign="right">
+                                    <Grid item xs={12} mt={2} display="flex" justifyContent="flex-end" gap={2}>
+                                        <Button
+                                            variant="outlined"
+                                            onClick={handleCloseModal}
+                                            sx={{
+                                                borderRadius: "10px",
+                                                textTransform: "none",
+                                                paddingX: 3,
+                                            }}
+                                        >
+                                            Cancel
+                                        </Button>
                                         <Button
                                             variant="contained"
                                             sx={{
@@ -250,47 +433,17 @@ export function TabWithTableView() {
                                                     backgroundColor: "#09304a",
                                                 },
                                             }}
-                                            onClick={async () => {
-                                                if (!amount || !days || !description || !selectedProject) return;
-
-                                                const proposalData = {
-                                                    amount: Number(amount),
-                                                    days: Number(days),
-                                                    message: description,
-                                                };
-
-                                                let res;
-
-                                                if (selectedProject.providerHasProposed) {
-                                                    // Call update proposal API
-                                                    res = await dispatch(updateProviderProposal(selectedProject._id, proposalData) as any);
-                                                } else {
-                                                    // Call create proposal API
-                                                    res = await dispatch(sendProviderProposal(selectedProject._id, proposalData) as any);
-                                                }
-
-                                                if (res?.type?.includes("SUCCESS")) {
-                                                    setAmount('');
-                                                    setDays('');
-                                                    setDescription('');
-                                                    setSelectedProject(null);
-                                                    dispatch(getRequestsByProvider()); // Refresh
-                                                } else {
-                                                    alert(res?.message || "Something went wrong");
-                                                }
-                                            }}
+                                            onClick={handleSubmitProposal}
+                                            disabled={!amount || !days || !description}
                                         >
-                                            {selectedProject?.providerHasProposed ? "Update" : "Submit"}
+                                            {selectedProject?.providerHasProposed ? "Update Proposal" : "Submit Proposal"}
                                         </Button>
-
                                     </Grid>
                                 </Grid>
                             </Box>
                         </Box>
-                    )}
-
+                    </Modal>
                 </>
-
             )}
 
             {tabValue === 1 && (
@@ -301,6 +454,19 @@ export function TabWithTableView() {
                 <ConfirmedTab />
             )}
         </>
+    );
+}
 
-    )
+// Helper component for detail items
+function DetailItem({ title, value }: { title: string; value: string }) {
+    return (
+        <Box>
+            <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                {title}
+            </Typography>
+            <Typography variant="body2" sx={{ p: 1, backgroundColor: 'white', borderRadius: 1, border: '1px solid #e0e0e0' }}>
+                {value}
+            </Typography>
+        </Box>
+    );
 }

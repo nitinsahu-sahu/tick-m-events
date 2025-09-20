@@ -41,9 +41,10 @@ export function ProposalsCard({ proposals }: any) {
 
   const handleAwardedProject = useCallback(async (id: any, status: any) => {
     // Handle accept logic here
-    const res = await dispatch(updateAwardedBid(id, status))as unknown as StatusUpdateResponse;;
+    const res = await dispatch(updateAwardedBid(id, status))as unknown as StatusUpdateResponse;
+  
     if (res?.status === 200) {
-      handleDialogClose();
+      setDialogOpen(false);
     }
   }, [dispatch])
 

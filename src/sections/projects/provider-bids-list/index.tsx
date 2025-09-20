@@ -36,9 +36,7 @@ export function ProviderBidsList() {
   const [selectedBid, setSelectedBid] = useState<any>(null);
   const [openViewDialog, setOpenViewDialog] = useState(false);
   const [selectedOrg, setSelectedOrg] = useState<any>({});
-console.log('====================================');
-console.log(_mybids);
-console.log('====================================');
+
   const handleViewOpenDialog = (bid: any) => {
     setSelectedOrg(bid);
     setOpenViewDialog(true);
@@ -157,10 +155,6 @@ console.log('====================================');
       ...prev,
       [bidId]: newStatus
     }));
-
-    // Here you would typically save the status change to your backend
-    console.log(`Updating bid ${bidId} status to:`, newStatus);
-    // dispatch(updateBidStatus(bidId, newStatus));
   };
 
   const toggleRowExpand = (bidId: string) => {
@@ -168,13 +162,13 @@ console.log('====================================');
   };
 
   const handleProviderAcceptance = useCallback(async (bid: any) => {
-    const data={
-      status:"isProviderAccepted"
+    const data = {
+      status: "isProviderAccepted"
     }
-  
+
     try {
       await dispatch(confirmAcceptanceProvider(data, bid?.projectId?._id, bid?._id));
-   
+
     } catch (error) {
       console.error("Verification error:", error);
     }
@@ -339,236 +333,316 @@ console.log('====================================');
             </TableRow>
           </TableHead>
           <TableBody>
-            {_mybids?.map((bid: any, index: number) => (
-              <React.Fragment key={index}>
-                <TableRow
-                  sx={{
-                    boxShadow: bid?.status === 'withdrawn' ? 'inset 0 0 8px rgba(244, 67, 54, 0.6)' : 'none',
-                    borderTop: '1px solid',
-                    borderColor: 'grey.700',
-                    '&:hover': { backgroundColor: 'grey.600' },
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => toggleRowExpand(bid._id)}
-                >
-                  <TableCell sx={{ py: 2 }}>
-                    <Typography
-                      component={Link}
-                      to={`/project/${bid.projectId?._id}`}
+            {
+              _mybids?.length > 0 ? (
+                _mybids?.map((bid: any, index: number) => (
+                  <React.Fragment key={index}>
+                    <TableRow
                       sx={{
-                        color: 'black',
-                        textDecoration: 'none',
-                        cursor: 'pointer',
-                        '&:hover': {
-                          textDecoration: 'underline',
-                        }
+                        boxShadow: bid?.status === 'withdrawn' ? 'inset 0 0 8px rgba(244, 67, 54, 0.6)' : 'none',
+                        borderTop: '1px solid',
+                        borderColor: 'grey.700',
+                        '&:hover': { backgroundColor: 'grey.600' },
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => toggleRowExpand(bid._id)}
+                    >
+                      <TableCell sx={{ py: 2 }}>
+                        <Typography
+                          component={Link}
+                          to={`/project/${bid.projectId?._id}`}
+                          sx={{
+                            color: 'black',
+                            textDecoration: 'none',
+                            cursor: 'pointer',
+                            '&:hover': {
+                              textDecoration: 'underline',
+                            }
+                          }}
+                        >
+                          {bid.projectId?.eventId?.eventName}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ py: 2 }}>{formatEventDate(bid?.createdAt)}</TableCell>
+                      <TableCell sx={{ py: 2 }}>#{bid?.bidInfo?.yourBidRank} of {bid?.bidInfo?.totalBidsOnProject} bids</TableCell>
+                      <TableCell sx={{ py: 2 }}>
+                        <Chip
+                          label={`${bid?.winningBid} XAF`}
+                          size="small"
+                          sx={{
+                            backgroundColor: 'primary.main',
+                            color: 'white',
+                            fontWeight: 'bold'
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ py: 2 }}>{bid?.bidAmount} XAF</TableCell>
+                      <TableCell sx={{ py: 2 }}>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <IconButton size="small" sx={{ color: 'green' }}
+                            disabled={bid?.status === 'withdrawn'} onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditOpen(bid);
+                            }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            sx={{ color: 'red' }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenDialog(bid);
+                            }}
+                            disabled={bid?.status === 'withdrawn'}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                      <TableCell sx={{ py: 2 }}>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<EyeIcon />}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewOpenDialog(bid?.projectId?.createdBy);
+                          }}
+                          disabled={bid?.status === 'withdrawn'}
+                          sx={{
+                            backgroundColor: bid.chat ? 'success.main' : 'grey.700',
+                            color: bid.chat ? 'white' : 'grey.400',
+                          }}
+                        >
+                          View
+                        </Button>
+                      </TableCell>
+                      <TableCell sx={{ py: 2 }}>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<ChatIcon />}
+                          disabled={bid?.status === 'withdrawn'}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate("/messaging-&-client-relationship");
+                            sessionStorage.setItem('currentChatProvider', JSON.stringify(bid.projectId?.createdBy?._id));
+                          }}
+                          sx={{
+                            backgroundColor: bid.chat ? 'success.main' : 'grey.700',
+                            color: bid.chat ? 'white' : 'grey.400',
+                          }}
+                        >
+                          Chat
+                        </Button>
+                      </TableCell>
+                      <TableCell sx={{ py: 2 }}>
+                        <IconButton size="small" sx={{ color: 'black' }}>
+                          {expandedRow === bid._id ? <ArrowUpIcon sx={{ color: "black" }} /> : <ArrowDownIcon />}
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+
+                    {/* Expanded Row Content */}
+                    <TableRow>
+                      <TableCell style={{ padding: 0 }} colSpan={9}>
+                        <Collapse in={expandedRow === bid._id} timeout="auto" unmountOnExit>
+                          <Box sx={{ p: 3, backgroundColor: 'grey.100' }}>
+                            <Typography variant="h6" gutterBottom>
+                              Bid Details: {bid.projectId?.eventId?.eventName}
+                            </Typography>
+
+                            <Grid container spacing={3}>
+                              <Grid item xs={12} md={6}>
+                                <Typography variant="subtitle2" gutterBottom>Project Information</Typography>
+                                <Typography><strong>Event:</strong> {bid.projectId?.eventId?.eventName}</Typography>
+                                <Typography><strong>Location:</strong> {bid.projectId?.eventLocation}</Typography>
+                                <Typography><strong>Budget Range:</strong> {bid.projectId?.orgBudget}</Typography>
+                                <Typography><strong>Service Time:</strong> {new Date(bid.projectId?.serviceTime).toLocaleString()}</Typography>
+                                <Typography mt={2} sx={{ display: 'flex', alignItems: 'center' }}>
+                                  <strong>Status:</strong>
+                                  <FormControl size="small" sx={{ ml: 1, minWidth: 120 }}>
+                                    <InputLabel>Project Status</InputLabel>
+                                    <Select
+                                      sx={{ width: 200, height: 30, textTransform: "capitalize" }}
+                                      value={bid.projectId?.status}
+                                      label="Status"
+                                      onChange={(e) => handleStatusChange(selectedBid._id, e.target.value)}
+                                      onClick={(e) => e.stopPropagation()}
+                                      disabled={!(bid.isProviderAccepted && bid.isOrgnizerAccepted)}
+                                    >
+                                      <MenuItem value={bid.projectId?.status} disabled>
+                                        {bid.projectId?.status} (Current)
+                                      </MenuItem>
+                                      <MenuItem value="process">Mark as Process</MenuItem>
+                                      <MenuItem value="ongoing">Mark as Ongoing</MenuItem>
+                                    </Select>
+                                  </FormControl>
+
+
+                                  <Tooltip
+                                    title={
+                                      !(bid.isProviderAccepted && bid.isOrgnizerAccepted)
+                                        ? "Status can only be changed after both provider and organizer have accepted the project."
+                                        : "You can now change the project status, and the organizer is complete this project"
+                                    }
+                                    placement="right"
+                                    arrow
+                                  >
+                                    <IconButton size="small" sx={{ ml: 1, color: 'text.secondary' }}>
+                                      <InfoIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Typography>
+                              </Grid>
+
+                              <Grid item xs={12} md={6}>
+                                <Typography variant="subtitle2" gutterBottom>Your Bid Information</Typography>
+                                <Typography><strong>Bid Amount:</strong> {bid.bidAmount} XAF</Typography>
+                                <Typography><strong>Delivery Time:</strong> {bid.deliveryTime} {bid.deliveryUnit}</Typography>
+                                <Typography><strong>Time to bid:</strong> {formatEventDate(bid?.createdAt)}</Typography>
+                                <Typography sx={{ color: bid.isOrgnizerAccepted ? 'green' : 'red' }}><strong style={{ color: "black" }}>Orgnizer Acceptance:</strong> {bid.isOrgnizerAccepted ? "Accepted" : "Pending"}</Typography>
+                                {
+                                  bid.isOrgnizerAccepted && (<Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <strong>Your Acceptance:</strong>
+                                    {bid.isProviderAccepted ? (
+                                      "Accepted"
+                                    ) : (
+                                      <Button
+                                        sx={{ height: 22 }}
+                                        variant="contained"
+                                        color="primary"
+                                        size="small"
+                                        onClick={() => handleProviderAcceptance(bid)}
+                                      >
+                                        Accept
+                                      </Button>
+                                    )}
+                                  </Typography>)
+                                }
+
+                              </Grid>
+
+                              {bid.milestones && bid.milestones.length > 0 && (
+                                <Grid item xs={12}>
+                                  <Typography variant="subtitle2" gutterBottom>Milestones</Typography>
+                                  <Table size="small">
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell>Milestone Name</TableCell>
+                                        <TableCell align="right">Amount</TableCell>
+                                        <TableCell>Currency</TableCell>
+                                        <TableCell>Status</TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                      {bid.milestones?.map((milestone: any, idx: number) => (
+                                        <TableRow key={idx}>
+                                          <TableCell>{milestone.milestorneName}</TableCell>
+                                          <TableCell align="right">{milestone.amount}</TableCell>
+                                          <TableCell>{milestone.currency}</TableCell>
+                                          <TableCell sx={{ fontWeight: 700, color: milestone.isReleased ? 'green' : 'red' }}>
+                                            {milestone.isReleased ? 'Released' : 'Pending'}
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </Grid>
+                              )}
+
+                              <Grid item xs={12}>
+                                <Typography variant="subtitle2" gutterBottom>Proposal</Typography>
+                                <Paper sx={{ p: 2, backgroundColor: 'white' }}>
+                                  <TextWithShowMore text={bid.proposal} />
+                                </Paper>
+                              </Grid>
+                            </Grid>
+                          </Box>
+                        </Collapse>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} align="center">
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        p: 4,
                       }}
                     >
-                      {bid.projectId?.eventId?.eventName}
-                    </Typography>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>{formatEventDate(bid?.createdAt)}</TableCell>
-                  <TableCell sx={{ py: 2 }}>#{bid?.bidInfo?.yourBidRank} of {bid?.bidInfo?.totalBidsOnProject} bids</TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Chip
-                      label={`${bid?.winningBid} XAF`}
-                      size="small"
-                      sx={{
-                        backgroundColor: 'primary.main',
-                        color: 'white',
-                        fontWeight: 'bold'
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>{bid?.bidAmount} XAF</TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <IconButton size="small" sx={{ color: 'green' }}
-                        disabled={bid?.status === 'withdrawn'} onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditOpen(bid);
+                      <Box
+                        sx={{
+                          width: 120,
+                          height: 120,
+                          borderRadius: '50%',
+                          backgroundColor: 'grey.100',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mb: 3,
                         }}
                       >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        sx={{ color: 'red' }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenDialog(bid);
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="60"
+                          height="60"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+                          <polyline points="13 2 13 9 20 9" />
+                        </svg>
+                      </Box>
+
+                      <Typography variant="h6" color="textSecondary" gutterBottom>
+                        No Bids Yet
+                      </Typography>
+
+                      <Typography variant="body2" color="textSecondary" sx={{ mb: 3, textAlign: 'center', maxWidth: 400 }}>
+                        You haven&apos;t placed any bids on projects yet. Start bidding to get hired for exciting events and projects.
+                      </Typography>
+
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        startIcon={
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                          </svg>
+                        }
+                        onClick={() => navigate('/project/view')}
+                        sx={{
+                          borderRadius: 2,
+                          px: 4,
+                          py: 1,
+                          fontWeight: 'bold',
                         }}
-                        disabled={bid?.status === 'withdrawn'}
                       >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
+                        Find Projects to Bid On
+                      </Button>
+{/* 
+                      <Typography variant="body2" sx={{ mt: 3, color: 'text.secondary' }}>
+                        or <Link to="" style={{ color: '#1976d2', textDecoration: 'none' }}>learn how to place effective bids</Link>
+                      </Typography> */}
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      startIcon={<EyeIcon />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewOpenDialog(bid?.projectId?.createdBy);
-                      }}
-                      disabled={bid?.status === 'withdrawn'}
-                      sx={{
-                        backgroundColor: bid.chat ? 'success.main' : 'grey.700',
-                        color: bid.chat ? 'white' : 'grey.400',
-                      }}
-                    >
-                      View
-                    </Button>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      startIcon={<ChatIcon />}
-                      disabled={bid?.status === 'withdrawn'}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate("/messaging-&-client-relationship");
-                        sessionStorage.setItem('currentChatProvider', JSON.stringify(bid.projectId?.createdBy?._id));
-                      }}
-                      sx={{
-                        backgroundColor: bid.chat ? 'success.main' : 'grey.700',
-                        color: bid.chat ? 'white' : 'grey.400',
-                      }}
-                    >
-                      Chat
-                    </Button>
-                  </TableCell>
-                  <TableCell sx={{ py: 2 }}>
-                    <IconButton size="small" sx={{ color: 'black' }}>
-                      {expandedRow === bid._id ? <ArrowUpIcon sx={{ color: "black" }} /> : <ArrowDownIcon />}
-                    </IconButton>
-                  </TableCell>
                 </TableRow>
+              )
+            }
 
-                {/* Expanded Row Content */}
-                <TableRow>
-                  <TableCell style={{ padding: 0 }} colSpan={9}>
-                    <Collapse in={expandedRow === bid._id} timeout="auto" unmountOnExit>
-                      <Box sx={{ p: 3, backgroundColor: 'grey.100' }}>
-                        <Typography variant="h6" gutterBottom>
-                          Bid Details: {bid.projectId?.eventId?.eventName}
-                        </Typography>
-
-                        <Grid container spacing={3}>
-                          <Grid item xs={12} md={6}>
-                            <Typography variant="subtitle2" gutterBottom>Project Information</Typography>
-                            <Typography><strong>Event:</strong> {bid.projectId?.eventId?.eventName}</Typography>
-                            <Typography><strong>Location:</strong> {bid.projectId?.eventLocation}</Typography>
-                            <Typography><strong>Budget Range:</strong> {bid.projectId?.orgBudget}</Typography>
-                            <Typography><strong>Service Time:</strong> {new Date(bid.projectId?.serviceTime).toLocaleString()}</Typography>
-                            <Typography mt={2} sx={{ display: 'flex', alignItems: 'center' }}>
-                              <strong>Status:</strong>
-                              <FormControl size="small" sx={{ ml: 1, minWidth: 120 }}>
-                                <InputLabel>Project Status</InputLabel>
-                                <Select
-                                  sx={{ width: 200, height: 30, textTransform: "capitalize" }}
-                                  value={bid.projectId?.status}
-                                  label="Status"
-                                  onChange={(e) => handleStatusChange(selectedBid._id, e.target.value)}
-                                  onClick={(e) => e.stopPropagation()}
-                                  disabled={!(bid.isProviderAccepted && bid.isOrgnizerAccepted)}
-                                >
-                                  <MenuItem value={bid.projectId?.status} disabled>
-                                    {bid.projectId?.status} (Current)
-                                  </MenuItem>
-                                  <MenuItem value="process">Mark as Process</MenuItem>
-                                  <MenuItem value="ongoing">Mark as Ongoing</MenuItem>
-                                </Select>
-                              </FormControl>
-
-
-                              <Tooltip
-                                title={
-                                  !(bid.isProviderAccepted && bid.isOrgnizerAccepted)
-                                    ? "Status can only be changed after both provider and organizer have accepted the project."
-                                    : "You can now change the project status, and the organizer is complete this project"
-                                }
-                                placement="right"
-                                arrow
-                              >
-                                <IconButton size="small" sx={{ ml: 1, color: 'text.secondary' }}>
-                                  <InfoIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Typography>
-                          </Grid>
-
-                          <Grid item xs={12} md={6}>
-                            <Typography variant="subtitle2" gutterBottom>Your Bid Information</Typography>
-                            <Typography><strong>Bid Amount:</strong> {bid.bidAmount} XAF</Typography>
-                            <Typography><strong>Delivery Time:</strong> {bid.deliveryTime} {bid.deliveryUnit}</Typography>
-                            <Typography><strong>Time to bid:</strong> {formatEventDate(bid?.createdAt)}</Typography>
-                            <Typography sx={{ color: bid.isOrgnizerAccepted ? 'green' : 'red' }}><strong style={{ color: "black" }}>Orgnizer Acceptance:</strong> {bid.isOrgnizerAccepted ? "Accepted" : "Pending"}</Typography>
-                            {
-                              bid.isOrgnizerAccepted && (<Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <strong>Your Acceptance:</strong>
-                                {bid.isProviderAccepted ? (
-                                  "Accepted"
-                                ) : (
-                                  <Button
-                                    sx={{ height: 22 }}
-                                    variant="contained"
-                                    color="primary"
-                                    size="small"
-                                    onClick={() => handleProviderAcceptance(bid)}
-                                  >
-                                    Accept
-                                  </Button>
-                                )}
-                              </Typography>)
-                            }
-
-                          </Grid>
-
-                          {bid.milestones && bid.milestones.length > 0 && (
-                            <Grid item xs={12}>
-                              <Typography variant="subtitle2" gutterBottom>Milestones</Typography>
-                              <Table size="small">
-                                <TableHead>
-                                  <TableRow>
-                                    <TableCell>Milestone Name</TableCell>
-                                    <TableCell align="right">Amount</TableCell>
-                                    <TableCell>Currency</TableCell>
-                                    <TableCell>Status</TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {bid.milestones?.map((milestone: any, idx: number) => (
-                                    <TableRow key={idx}>
-                                      <TableCell>{milestone.milestorneName}</TableCell>
-                                      <TableCell align="right">{milestone.amount}</TableCell>
-                                      <TableCell>{milestone.currency}</TableCell>
-                                      <TableCell sx={{ fontWeight: 700, color: milestone.isReleased ? 'green' : 'red' }}>
-                                        {milestone.isReleased ? 'Released' : 'Pending'}
-                                      </TableCell>
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            </Grid>
-                          )}
-
-                          <Grid item xs={12}>
-                            <Typography variant="subtitle2" gutterBottom>Proposal</Typography>
-                            <Paper sx={{ p: 2, backgroundColor: 'white' }}>
-                              <TextWithShowMore text={bid.proposal} />
-                            </Paper>
-                          </Grid>
-                        </Grid>
-                      </Box>
-                    </Collapse>
-                  </TableCell>
-                </TableRow>
-              </React.Fragment>
-            ))}
           </TableBody>
         </Table>
       </TableContainer>

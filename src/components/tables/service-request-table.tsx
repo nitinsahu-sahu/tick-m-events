@@ -2,12 +2,8 @@ import {
   Button, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, Typography,
 } from "@mui/material";
-import { useCallback, useState } from "react";
-import { toast } from 'react-toastify';
-import { useDispatch } from "react-redux";
+import {  useState } from "react";
 
-import { serviceEventReqDelete } from "src/redux/actions/service-request";
-import { AppDispatch } from "src/redux/store";
 import { formatDateTimeCustom } from "src/hooks/formate-time";
 import { ProjectConfirmationModal } from "src/sections/search-&-select-service-providers/project-status-modal";
 
@@ -17,22 +13,12 @@ import { ServiceRequestModal } from "../modal/service-request-modal";
 
 interface RequestTableProps {
   requests: any[];
-  onActionClick?: (row: any) => void;
-  handleSignedContract?: (row: any) => void;
-  type: string
-}
-interface ApiResult {
-  status: number;
-  type: string;
-  message: any;
+  
 }
 
-export function ServiceRequestTable({ handleSignedContract, requests, onActionClick, type }: RequestTableProps) {
+export function ServiceRequestTable({ requests }: RequestTableProps) {
   const data = requests;
-  const dispatch = useDispatch<AppDispatch>();
   const [selectedContractForStatus, setSelectedContractForStatus] = useState<any>(null);
-
-  const [modalOpen, setModalOpen] = useState(false);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
@@ -49,8 +35,7 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
     setSelectedContractForStatus(contract);
     setStatusModalOpen(true);
   };
-  console.log(data);
-  
+
   return (
     <>
       <TableContainer component={Paper} sx={{ mt: 2 }}>
@@ -96,7 +81,7 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                     {row.providerId?.name || "-"}
                   </TableCell>
                   <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    {`${row.providerProposal?.amount||0} XAF`}
+                    {`${row.providerProposal?.amount || 0} XAF`}
                   </TableCell>
                   <TableCell align="center">
                     {row.eventId?.date
@@ -139,7 +124,6 @@ export function ServiceRequestTable({ handleSignedContract, requests, onActionCl
                       variant="contained"
                       size="small"
                       onClick={() => {
-                        onActionClick?.(row);
                         handleViewDetails(row);
                       }}
 

@@ -306,7 +306,6 @@ export function StepperStepTwo() {
 
             navigate(`?eventId=${eventId}&ticketConfigId=${ticketConfigId}`, { replace: true });
 
-            toast.success("Tickets saved successfully!");
         } catch (error) {
             console.error(error);
             toast.error("Server Error");

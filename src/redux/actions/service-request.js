@@ -42,6 +42,8 @@ export const organizerRequstToProvider = (formDataObj) => async (dispatch) => {
         message: response?.data?.message
       },
     });
+    dispatch(getRequestsByProvider());
+
     return {
       type: serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_SUCCESS,
       message: response?.data?.message,
@@ -60,41 +62,7 @@ export const organizerRequstToProvider = (formDataObj) => async (dispatch) => {
   }
 };
 
-// Provider sends proposal
-export const sendProviderProposal = (eventRequestId, proposalData) => async (dispatch) => {
-  dispatch({ type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_REQUEST });
 
-  try {
-    const response = await axios.post(`/event-requests/${eventRequestId}/propose`, proposalData);
-    dispatch({
-      type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_SUCCESS,
-      payload: {
-        message: response?.data?.message,
-        updatedRequest: response?.data?.eventRequest
-      },
-    });
-
-    return {
-      type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_SUCCESS,
-      message: response?.data?.message,
-      status: response?.status,
-    };
-  } catch (error) {
-    dispatch({
-      type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_FAILURE,
-      payload: {
-        message: error?.response?.data?.message || "Server error",
-        error: error.status
-      },
-    });
-
-    return {
-      type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_FAILURE,
-      message: error?.response?.data?.message,
-      status: error?.status
-    };
-  }
-};
 
 // get proposal
 export const getProposalById = (eventRequestId) => async (dispatch) => {
@@ -129,6 +97,43 @@ export const getProposalById = (eventRequestId) => async (dispatch) => {
   }
 };
 
+// Provider sends proposal
+export const sendProviderProposal = (eventRequestId, proposalData) => async (dispatch) => {
+  dispatch({ type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_REQUEST });
+
+  try {
+    const response = await axios.post(`/event-requests/${eventRequestId}/propose`, proposalData);
+   
+    dispatch({
+      type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_SUCCESS,
+      payload: {
+        message: response?.data?.message,
+        updatedRequest: response?.data?.eventRequest
+      },
+    });
+
+    return {
+      type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_SUCCESS,
+      message: response?.data?.message,
+      status: response?.status,
+    };
+  } catch (error) {
+    dispatch({
+      type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_FAILURE,
+      payload: {
+        message: error?.response?.data?.message || "Server error",
+        error: error.status
+      },
+    });
+
+    return {
+      type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_FAILURE,
+      message: error?.response?.data?.message,
+      status: error?.status
+    };
+  }
+};
+
 // update
 export const updateProviderProposal = (eventRequestId, proposalData) => async (dispatch) => {
   dispatch({ type: serviceRequestConstants.UPDATE_PROVIDER_PROPOSAL_REQUEST });
@@ -144,6 +149,7 @@ export const updateProviderProposal = (eventRequestId, proposalData) => async (d
     return {
       type: serviceRequestConstants.UPDATE_PROVIDER_PROPOSAL_SUCCESS,
       data: response.data,
+      status: response.status,
     };
   } catch (error) {
     dispatch({
@@ -158,6 +164,8 @@ export const updateProviderProposal = (eventRequestId, proposalData) => async (d
       type: serviceRequestConstants.UPDATE_PROVIDER_PROPOSAL_FAILURE,
       message: error?.response?.data?.message || "Server error",
       error: error?.status,
+      status: error.status,
+
     };
   }
 };

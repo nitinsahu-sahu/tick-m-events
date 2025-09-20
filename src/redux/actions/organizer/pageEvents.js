@@ -38,9 +38,14 @@ export const updateAwardedBid = (id, status) => async (dispatch) => {
             payload: {
                 message: response?.data?.message,
             },
-
         });
         dispatch(fatchOrgEvents())
+
+        return {
+            type: organizerEventConstants.ASSIGN_PROJECT_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
     } catch (error) {
         dispatch({
             type: organizerEventConstants.ASSIGN_PROJECT_FAILURE,
@@ -49,6 +54,11 @@ export const updateAwardedBid = (id, status) => async (dispatch) => {
                 error: error.status
             },
         });
+        return {
+            type: organizerEventConstants.ASSIGN_PROJECT_FAILURE,
+            status: error.status,
+            message: error?.data?.message
+        };
     }
 };
 
@@ -57,7 +67,7 @@ export const updateServiceProjectStatus = (id, newStatus) => async (dispatch) =>
     try {
         const response = await axios.put(`/event-requests/${id}/projectUpdate`, { newStatus })
         console.log(response);
-        
+
         dispatch({
             type: organizerEventConstants.SERVICE_STATUS_SUCCESS,
             payload: {

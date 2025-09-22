@@ -9,7 +9,7 @@ export function LoyaltyProgramTable({ headers, data }: any) {
             <Table>
                 {/* Table Header */}
                 <TableHead>
-                    <TableRow sx={{ bgcolor: "#E1E1E1" }}>
+                    <TableRow sx={{ bgcolor: "#E1E1E1",textAlign:"center" }}>
                         {headers.map((header: string) => (
                             <TableCell
                                 key={header}
@@ -36,6 +36,7 @@ export function LoyaltyProgramTable({ headers, data }: any) {
                                     sx={{
                                         fontSize: { xs: "0.8rem", sm: "1rem" },
                                         fontWeight: "normal",
+                                        textAlign:'center',
                                         ...(key === 'status' && {
                                             color: 'black',
                                             fontWeight: 'bold',

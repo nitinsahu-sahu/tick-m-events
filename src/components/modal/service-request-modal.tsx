@@ -1,11 +1,6 @@
-import React, { useState } from 'react';
 import { Modal, Box, Typography, Button, Avatar, Divider, Chip } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { toast } from 'react-toastify';
-import { useSelector, useDispatch } from "react-redux";
-import { AppDispatch, RootState } from 'src/redux/store';
 import { HeadingCommon } from "../multiple-responsive-heading/heading";
-import { updateOrganizerDecision } from '../../redux/actions/service-request';
 
 
 const ModalContainer = styled(Box)(({ theme }) => ({
@@ -177,7 +172,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
               <DetailLabel variant="body2">Organizer Status:</DetailLabel>
               <DetailValue variant="body2">
                 <Chip
-                  sx={{textTransform:'capitalize'}}
+                  sx={{ textTransform: 'capitalize' }}
 
                   label={data.orgStatus}
                   color={
@@ -210,19 +205,19 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                     {data.providerProposal?.days} days
                   </DetailValue>
                 </DetailItem>
-                
+
                 <DetailItem>
                   <DetailLabel variant="body2">Status:</DetailLabel>
                   <DetailValue variant="body2">
-                  <Chip
-                  sx={{textTransform:'capitalize'}}
-                    label={data.providerStatus}
-                    color={
-                      data.providerStatus === 'accepted' ? 'success' :
-                        data.providerStatus === 'rejected' ? 'error' : data.providerStatus === 'request' ? 'info' : 'info'
-                    }
-                  />
-                </DetailValue>
+                    <Chip
+                      sx={{ textTransform: 'capitalize' }}
+                      label={data.providerStatus}
+                      color={
+                        data.providerStatus === 'accepted' ? 'success' :
+                          data.providerStatus === 'rejected' ? 'error' : data.providerStatus === 'request' ? 'info' : 'info'
+                      }
+                    />
+                  </DetailValue>
                 </DetailItem>
               </>
             )}

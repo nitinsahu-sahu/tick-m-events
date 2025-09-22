@@ -74,6 +74,11 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
     const [bidCheckError, setBidCheckError] = useState("");
     const [hasExistingBidThisProject, setHasExistingBidThisProject] = useState<any>(null);
 
+     useEffect(() => {
+            const textContent = bidData.proposal.replace(/<[^>]*>/g, '');
+            setCharCount(textContent.length);
+        }, [bidData.proposal]);
+
     // Use useCallback to memoize the function and prevent infinite re-renders
     const checkExistingBid = useCallback(async () => {
         try {
@@ -432,25 +437,40 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
                         </Grid>
 
                         {/* Proposal */}
-                        <Typography variant="subtitle2" mb={1}>
-                            Describe your proposal (minimum 100 characters)
-                        </Typography>
-                        <ReactQuill
-                            theme="snow"
-                            value={bidData.proposal}
-                            onChange={handleDescriptionChange}
-                            className="custom-quill"
-                            placeholder="Full Description of Requirements (minimum 80 characters)"
-                            modules={{
-                                toolbar: [
-                                    [{ 'header': [1, 2, false] }],
-                                    ['bold', 'italic', 'underline', 'strike'],
-                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                    ['link', 'clean']
-                                ]
-                            }}
-                        />
-                       
+                        <Box my={2}>
+
+                            <Typography variant="subtitle2" mb={1}>
+                                Describe your proposal (minimum 100 characters)
+                            </Typography>
+                            <ReactQuill
+                                theme="snow"
+                                value={bidData.proposal}
+                                onChange={handleDescriptionChange}
+                                className="custom-quill"
+                                placeholder="Full Description of Requirements (minimum 80 characters)"
+                                modules={{
+                                    toolbar: [
+                                        [{ 'header': [1, 2, false] }],
+                                        ['bold', 'italic', 'underline', 'strike'],
+                                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                        ['link', 'clean']
+                                    ]
+                                }}
+                            />
+                            <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between' }}>
+                                <Typography
+                                    variant="caption"
+                                    color={charCount < 80 ? "error" : "textSecondary"}
+                                >
+                                    {charCount} characters (Minimum 80 required)
+                                </Typography>
+                                {errors.orgRequirement && (
+                                    <Typography variant="caption" color="error">
+                                        {errors.orgRequirement}
+                                    </Typography>
+                                )}
+                            </Box>
+                        </Box>
 
                         {/* Milestone Payment */}
                         <Divider sx={{ my: 2 }} />

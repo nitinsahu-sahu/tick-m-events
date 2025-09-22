@@ -69,6 +69,7 @@ export const EventEditPage = lazy(() => import('src/pages/evets-edit'));
 export const ContactPage = lazy(() => import('src/pages/contact'));
 export const SingleProfilePage = lazy(() => import('src/pages/single-profile'));
 export const WithDrawlPage = lazy(() => import('src/pages/withdrawl'));
+export const AwardedListPage = lazy(() => import('src/pages/signedProjectList'));
 
 // ----------------------------------------------------------------------
 
@@ -111,7 +112,7 @@ export function Router() {
       ),
       children: [
         // Participant Route
-        
+
         {
           path: '/referrals',
           element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><Referrel /></RoleProtectedRoute>
@@ -205,6 +206,11 @@ export function Router() {
           path: '/place-a-bid/bids/:projectId',
           element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><BidsOnPlaceABidsPage /></RoleProtectedRoute>
         },
+        {
+          path: '/place-a-bid/bids/awarded',
+          element: <RoleProtectedRoute allowedRoles={['organizer']} currentRole={currentRole}><AwardedListPage /></RoleProtectedRoute>
+        },
+
         // -----------------------**************-------------------------
         {
           path: '/project/view',
@@ -260,7 +266,7 @@ export function Router() {
           path: '/ticketing-&-transactions-supervision',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><TicketingAndTransactionsSupervisionPage /></RoleProtectedRoute>
         },
-{
+        {
           path: '/withdrawal',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><WithDrawlPage /></RoleProtectedRoute>
         },

@@ -2,7 +2,7 @@ import {
   Button, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, Typography,
 } from "@mui/material";
-import {  useState } from "react";
+import { useState } from "react";
 
 import { formatDateTimeCustom } from "src/hooks/formate-time";
 import { ProjectConfirmationModal } from "src/sections/search-&-select-service-providers/project-status-modal";
@@ -13,7 +13,7 @@ import { ServiceRequestModal } from "../modal/service-request-modal";
 
 interface RequestTableProps {
   requests: any[];
-  
+
 }
 
 export function ServiceRequestTable({ requests }: RequestTableProps) {
@@ -146,6 +146,7 @@ export function ServiceRequestTable({ requests }: RequestTableProps) {
                           onClick={() => handleStatusChangeClick(row)}
                           variant="outlined"
                           size="small"
+                          disabled={row?.projectStatus === 'completed'}
                           sx={{
                             marginX: 0.5,
                             color: "white",

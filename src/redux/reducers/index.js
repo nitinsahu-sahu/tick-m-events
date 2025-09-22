@@ -22,6 +22,7 @@ import homeAndGlobalReducer from './homeAndGlobal.reducer'
 import globalOverviewGeneralStatisticsReducer from './global-overview-general-statistice.reducer'
 import { notificationReducer } from './notification.reducer';
 import placeABidReducer from './provider/Home-Global-View/freelancer.reducer'
+import { rewardReducer } from './rewardReducer'
 
 const rootReducer = combineReducers({
     provider: placeABidReducer,
@@ -47,6 +48,7 @@ const rootReducer = combineReducers({
     transactions: transactionPaymentReducer,
     serviceRequest: eventServiceReqReducer,
     user: userReducer,
+    reward: rewardReducer,
 })
 
 export default rootReducer

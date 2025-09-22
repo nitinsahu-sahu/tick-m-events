@@ -262,7 +262,6 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
         console.log('Releasing funds for milestone:', milestoneId);
         // Your release logic here
     };
-console.log(project,'project');
 
     return (
         <>
@@ -554,7 +553,7 @@ console.log(project,'project');
                         variant="contained"
                         color="success"
                         onClick={() => handleActionClick('isOrgnizerAccepted')}
-                        disabled={selectedBid?.status !== 'accepted' || isEditing}
+                        disabled={selectedBid?.isSigned || isEditing}
                     >
                         Award Request
                     </Button>

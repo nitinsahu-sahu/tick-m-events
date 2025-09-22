@@ -754,14 +754,14 @@ const [selectedAvatar, setSelectedAvatar] = useState('');
               />
 
               {/* Call and Video Call Icons */}
-              <Box display="flex" gap={1}>
+              {/* <Box display="flex" gap={1}>
                 <IconButton color="primary" aria-label="call">
                   <CallIcon />
                 </IconButton>
                 <IconButton color="primary" aria-label="video call">
                   <VideoCallIcon />
                 </IconButton>
-              </Box>
+              </Box> */}
             </Box>
             {/* Messages */}
             <Box

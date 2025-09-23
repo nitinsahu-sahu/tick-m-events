@@ -70,7 +70,7 @@ export const formatDateTimeCustom = (dateTimeString:any, formatType = 'standard'
     const date = new Date(dateTimeString);
     
     const year = date.getFullYear();
-    const month = date.toLocaleString('en-US', { month: 'long' });
+    const month = date.toLocaleString('en-US', { month: 'short' });
     const day = date.getDate();
     const hours = date.getHours();
     const minutes = date.getMinutes();
@@ -95,7 +95,6 @@ export const formatDateTimeCustom = (dateTimeString:any, formatType = 'standard'
         return `${month} ${day}, ${year} at ${hours12}:${minutesPadded} ${ampm}`;
     }
   } catch (error) {
-    console.error('Error formatting date:', error);
     return 'Invalid date';
   }
 };

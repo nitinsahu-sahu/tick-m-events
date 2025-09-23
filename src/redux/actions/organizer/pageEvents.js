@@ -28,6 +28,40 @@ export const fatchOrgEvents = () => async (dispatch) => {
     }
 };
 
+export const placeABidProjectStatusUpdate = (id, newStatus, providerId) => async (dispatch) => {
+    dispatch({ type: organizerEventConstants.PLACEABID_UPDATE_STATUS_REQUEST });
+    try {
+        const response = await axios.put(`/o/place-a-bid/${id}/${providerId}/projectUpdate`, { newStatus })
+        console.log(response);
+
+        dispatch({
+            type: organizerEventConstants.PLACEABID_UPDATE_STATUS_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+            },
+        });
+        dispatch(fatchOrgEvents())
+        return {
+            type: organizerEventConstants.PLACEABID_UPDATE_STATUS_SUCCESS,
+            status: response.status,
+            message: response?.data?.message
+        };
+    } catch (error) {
+        dispatch({
+            type: organizerEventConstants.PLACEABID_UPDATE_STATUS_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error.status
+            },
+        });
+        return {
+            type: organizerEventConstants.PLACEABID_UPDATE_STATUS_FAILURE,
+            status: error.status,
+            message: error?.data?.message
+        };
+    }
+};
+
 export const updateAwardedBid = (id, status) => async (dispatch) => {
     dispatch({ type: organizerEventConstants.ASSIGN_PROJECT_REQUEST });
 

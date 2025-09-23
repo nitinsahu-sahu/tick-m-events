@@ -1,22 +1,25 @@
 import {
-    Typography, Box, Paper, Card, CardContent, Grid,
-    Chip, Button, Avatar, Stack, Fade, Collapse,
-    Modal, IconButton, Divider, Table, TableBody,
-    TableCell, TableContainer, TableHead, TableRow,
-    Tooltip, CircularProgress
+    Typography, Box, Card, CardContent, Grid,
+    Chip, Avatar, Fade, Collapse,Tooltip, CircularProgress,
+    Modal, IconButton, Table, TableBody,
+    TableCell, TableContainer, TableHead, TableRow
+    
 } from "@mui/material";
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { DashboardContent } from "src/layouts/dashboard";
-import { RootState } from "src/redux/store";
-import { EventBreadCrum } from "src/sections/entry-validation/event-status";
+import { useDispatch, useSelector } from "react-redux";
 import {
-    ExpandMore, ExpandLess, Chat, Visibility,
-    Assignment, People, MonetizationOn, CheckCircle,
-    Schedule, ArrowForward
+    ExpandMore, ExpandLess, Chat, Assignment, People, MonetizationOn, CheckCircle, ArrowForward
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+
 import { Iconify } from "src/components/iconify";
+import { fatchOrgEvents } from "src/redux/actions/organizer/pageEvents";
+import { DashboardContent } from "src/layouts/dashboard";
+import { AppDispatch, RootState } from "src/redux/store";
+import { EventBreadCrum } from "src/sections/entry-validation/event-status";
+import { formatDateTimeCustom } from "src/hooks/formate-time";
+
+import { SignedStatusModal } from "./signed-modal";
 
 // Types
 interface Provider {
@@ -306,19 +309,21 @@ function ProjectRow({
     onChatClick: (provider: Provider) => void;
 }) {
     const [expanded, setExpanded] = useState(false);
-
+    const [selectedContractForStatus, setSelectedContractForStatus] = useState<any>(null);
+    const [statusModalOpen, setStatusModalOpen] = useState(false);
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'accepted': return 'success';
-            case 'pending': return 'warning';
+            case 'pending': return 'success';
+            case 'ongoing': return 'warning';
+            case 'completed': return 'info';
             case 'rejected': return 'error';
             default: return 'default';
         }
     };
 
     const handleStatusChangeClick = (contract: any) => {
-        // setSelectedContractForStatus(contract);
-        // setStatusModalOpen(true);
+        setSelectedContractForStatus(contract);
+        setStatusModalOpen(true);
     };
 
     return (
@@ -340,13 +345,13 @@ function ProjectRow({
                             src={project.winningBid?.providerId?.avatar?.url}
                             alt={project.winningBid?.providerId?.name}
                         >
-                            {project.winningBid.providerId.name.charAt(0)}
+                            {project?.winningBid?.providerId?.name.charAt(0)}
                         </Avatar>
                         <Box>
                             <Typography variant="subtitle2" fontWeight="bold">
                                 {project.winningBid?.providerId?.name}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography variant="caption" color="text.secondary" fontSize={9}>
                                 {project.projectDetails?.categoryId?.name}
                             </Typography>
                         </Box>
@@ -357,7 +362,7 @@ function ProjectRow({
                     <Typography variant="body2">
                         {project.winningBid.bidAmount.toLocaleString()} XAF
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" color="text.secondary" fontSize={9}>
                         Accepted: {project.winningBid.winningBid.toLocaleString()} XAF
                     </Typography>
                 </TableCell>
@@ -365,6 +370,7 @@ function ProjectRow({
                 <TableCell>
                     <Chip
                         label={project.projectStatus}
+                        sx={{ textTransform: "capitalize" }}
                         size="small"
                         color={getStatusColor(project.projectStatus)}
                         variant="outlined"
@@ -379,11 +385,11 @@ function ProjectRow({
 
                 <TableCell>
                     <Typography variant="body2">
-                        {new Date(project.projectDetails?.serviceTime).toLocaleDateString()}
+                        {formatDateTimeCustom(project.projectDetails?.serviceTime)}
                     </Typography>
                 </TableCell>
 
-                <TableCell>
+                <TableCell align="center">
                     <Box display="flex" gap={1}>
                         <Tooltip title="Chat with Provider">
                             <IconButton
@@ -400,12 +406,11 @@ function ProjectRow({
                         <Tooltip title="We can change project status here.">
                             <IconButton
                                 size="small"
-                                // onClick={(e) => {
-                                //     e.stopPropagation();
-                                //     onChatClick(project.winningBid.providerId);
-                                // }}
-                                onClick={() => handleStatusChangeClick(project)}
-
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleStatusChangeClick(project)
+                                }}
+                                disabled={project?.projectDetails?.status === 'completed'}
                                 color="primary"
                             >
                                 <Iconify width={24} icon="f7:status" />
@@ -456,6 +461,13 @@ function ProjectRow({
                     </Collapse>
                 </TableCell>
             </TableRow>
+
+            <SignedStatusModal
+                open={statusModalOpen}
+                onClose={() => setStatusModalOpen(false)}
+                currentStatus={selectedContractForStatus?.projectDetails?.status || ''}
+                contract={selectedContractForStatus}
+            />
         </>
     );
 }
@@ -468,7 +480,10 @@ export function SignedProjectList() {
     const [selectedProject, setSelectedProject] = useState<SignedProject | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
     const navigate = useNavigate();
-
+    const dispatch = useDispatch<AppDispatch>()
+    useEffect(() => {
+        dispatch(fatchOrgEvents())
+    }, [dispatch,__events])
     const handleEventSelect = (event: any | null) => {
         setSelectedEvent(event);
         setIsLoading(true);
@@ -484,12 +499,6 @@ export function SignedProjectList() {
         navigate("/messaging-relationship");
         sessionStorage.setItem('currentChatProvider', JSON.stringify(provider));
     };
-
-    // const handleChatClick = (provider: Provider) => {
-    //     // Implement chat functionality
-    //     console.log('Start chat with:', provider);
-    //     // Navigate to chat or open chat modal
-    // };
 
     const handleCloseModal = () => {
         setModalOpen(false);
@@ -566,7 +575,7 @@ export function SignedProjectList() {
                                                         <TableCell><strong>Status</strong></TableCell>
                                                         <TableCell><strong>Delivery Time</strong></TableCell>
                                                         <TableCell><strong>Service Date</strong></TableCell>
-                                                        <TableCell><strong>Actions</strong></TableCell>
+                                                        <TableCell align="center"><strong>Actions</strong></TableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>

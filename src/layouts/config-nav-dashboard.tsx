@@ -210,12 +210,12 @@ export const navData: NavItem[] = [
     icon: icon('ic_calender'),
     roles: ['provider'],
   },
-  {
-    title: 'Transaction & Payment Management',
-    path: '/transaction-&-payment-management',
-    icon: icon('ic_payment_management'),
-    roles: ['provider'],
-  },
+  // {
+  //   title: 'Transaction & Payment Management',
+  //   path: '/transaction-&-payment-management',
+  //   icon: icon('ic_payment_management'),
+  //   roles: ['provider'],
+  // },
   {
     title: 'Messaging & Client Relationship',
     path: '/messaging-&-client-relationship',

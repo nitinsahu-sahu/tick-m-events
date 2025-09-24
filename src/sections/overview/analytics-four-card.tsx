@@ -23,6 +23,7 @@ export function AnalyticsFourCards({
     selectedEvent,
 }: any) {
     const theme = useTheme();
+console.log(selectedEvent);
 
     const totalTickets = parseInt(selectedEvent?.ticketQuantity ?? "0", 10);
     const soldTickets = selectedEvent?.soldTicket ?? 0;
@@ -38,7 +39,7 @@ export function AnalyticsFourCards({
 
     // --- Confirmed orders in range ---
     const confirmedOrders = (selectedEvent?.order || []).filter((order: Order) => {
-        const date = dayjs(order.createdAt);
+        const date = dayjs(order?.createdAt);
         return (
             order.paymentStatus === "confirmed" &&
             (date.isAfter(eventStartDate.subtract(1, "day")) &&

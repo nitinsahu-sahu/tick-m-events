@@ -1,7 +1,7 @@
 
 import { Card, Grid, Typography, Box, MenuItem, Select, Stack, Tab, Tabs } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import dayjs from 'dayjs';
 import { Chart } from "src/components/chart";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
@@ -14,12 +14,9 @@ interface TicketSalesData {
 
 export function BestSelling(
     {
-        selectedTicket,
-        setSelectedTicket,
-        donutBestSellingChartOptions,
-        donutBestSellingChartSeries,
         chartOptions, selectedEvent
     }: any) {
+    const [selectedTicket, setSelectedTicket] = useState<any>({});
 
     const totalTickets = Number(selectedEvent?.ticketQuantity) || 0;
     const soldTickets = Number(selectedEvent?.soldTicket) || 0;
@@ -32,15 +29,19 @@ export function BestSelling(
         ? 0
         : Math.round(((lastValue - prevValue) / prevValue) * 100);
 
-    const ticketTypes = selectedEvent?.tickets?.[0]?.tickets || [];
-    useEffect(() => {
-        const firstTicket = selectedEvent?.tickets?.[0]?.tickets?.[0];
-        const allTicketTypes = selectedEvent?.tickets?.[0]?.tickets?.map((t: any) => t.ticketType) || [];
+    const ticketTypes = selectedEvent?.ticketType || [];
+    console.log('selectedTicket', selectedTicket);
+    console.log('ticketTypes', ticketTypes);
 
-        if (firstTicket && (!selectedTicket || !allTicketTypes.includes(selectedTicket))) {
-            setSelectedTicket(firstTicket.ticketType);
+    useEffect(() => {
+        const firstTicket = selectedEvent?.ticketType?.[0];
+        const currentTicketId = selectedTicket?._id;
+        const allTicketIds = selectedEvent?.ticketType?.map((t: any) => t._id) || [];
+
+        if (firstTicket && (!currentTicketId || !allTicketIds.includes(currentTicketId))) {
+            setSelectedTicket(firstTicket);
         }
-    }, [selectedEvent, selectedTicket, setSelectedTicket]);
+    }, [selectedEvent?.ticketType, selectedTicket?._id]);
 
     const { labels, series } = getTicketSalesData(selectedEvent, selectedTicket);
 
@@ -50,19 +51,20 @@ export function BestSelling(
     const fallbackSeries = [0.00001, 0.99999];
     const localDonutOptions: ApexOptions = {
         chart: { type: "donut" },
-        labels: hasData ? labels : fallbackLabels,
+        labels: hasData && selectedTicket ? labels : fallbackLabels,
         legend: { show: false },
-        colors: hasData ? undefined : ["#9E9E9E", "#F7F7F7"],
+        colors: hasData && selectedTicket ? undefined : ["#9E9E9E", "#F7F7F7"],
         plotOptions: {
             pie: {
                 dataLabels: {
-                    minAngleToShowLabel: 0 // show even tiny slices
+                    minAngleToShowLabel: 0
                 }
             }
         },
         dataLabels: {
             enabled: true,
             formatter: (val, opts) => {
+                if (!opts.w.config.series[opts.seriesIndex]) return '0';
                 const value = opts.w.config.series[opts.seriesIndex];
                 return `${value}`;
             },
@@ -92,18 +94,25 @@ export function BestSelling(
                         <Stack direction="row" alignItems="center" spacing={1}>
                             <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>Ticket Type:</Typography>
                             <Select
-                                value={selectedTicket}
-                                onChange={(e) => setSelectedTicket(e.target.value)}
+                                value={selectedTicket?._id || ""}
+                                onChange={(e) => {
+                                    const selectedId = e.target.value;
+                                    const ticket = ticketTypes.find((t: any) => t._id === selectedId);
+                                    setSelectedTicket(ticket); // This sets the entire ticket object
+                                }}
                                 size="small"
-                                sx={{ minWidth: 100 }}
+                                sx={{ minWidth: 120 }}
+                                displayEmpty
                             >
-                                {ticketTypes.map((ticket: any) => (
-                                    <MenuItem key={ticket.id} value={ticket.ticketType}>
-                                        {ticket.ticketType}
+                                <MenuItem value="">
+                                    <em>Select a ticket</em>
+                                </MenuItem>
+                                {ticketTypes?.map((ticket: any) => (
+                                    <MenuItem key={ticket._id} value={ticket._id}>
+                                        {ticket.name} - {ticket.price}
                                     </MenuItem>
                                 ))}
                             </Select>
-
                         </Stack>
                     </Stack>
 
@@ -112,10 +121,10 @@ export function BestSelling(
                         <Chart
                             options={{
                                 ...localDonutOptions,
-                                labels,
-                                colors: series[0] > 0 ? undefined : ["#E0E0E0"]
+                                labels: hasData && selectedTicket ? labels : fallbackLabels,
+                                colors: hasData && selectedTicket ? undefined : ["#E0E0E0", "#F0F0F0"]
                             }}
-                            series={series}
+                            series={hasData && selectedTicket ? series : fallbackSeries}
                             type="donut"
                             height={150}
                             width={150}
@@ -131,43 +140,16 @@ export function BestSelling(
                                 color="primary"
                             />
                             <Stack direction="row" spacing={2}>
-                                {(() => {
-                                    const selectedTicketData = ticketTypes.find((t: any) => t.ticketType === selectedTicket);
-                                    const ticketId = selectedTicketData?.id;
-                                    const totalForTicket = Number(selectedTicketData?.totalTickets || 0);
-
-                                    const soldForTicket = selectedEvent?.order?.reduce((sum: number, order: any) => {
-                                        if (order.paymentStatus !== "confirmed") return sum;
-
-                                        const ticketQty = Array.isArray(order.tickets)
-                                            ? order.tickets.reduce(
-                                                (innerSum: number, t: any) =>
-                                                    t.ticketId === ticketId ? innerSum + (t.quantity || 0) : innerSum,
-                                                0
-                                            )
-                                            : 0;
-
-                                        return sum + ticketQty;
-                                    }, 0) || 0;
-
-
-                                    const leftForTicket = totalForTicket - soldForTicket;
-
-                                    return (
-                                        <>
-                                            <Stack>
-                                                <Box width={20} height={5} bgcolor="#12263F" borderRadius={2} />
-                                                <Typography variant="h6" fontWeight="bold">{leftForTicket}</Typography>
-                                                <Typography variant="caption" color="gray">Ticket Left</Typography>
-                                            </Stack>
-                                            <Stack>
-                                                <Box width={20} height={5} bgcolor="#1E88E5" borderRadius={2} />
-                                                <Typography variant="h6" fontWeight="bold">{soldForTicket}</Typography>
-                                                <Typography variant="caption" color="gray">Ticket Sold</Typography>
-                                            </Stack>
-                                        </>
-                                    );
-                                })()}
+                                <Stack>
+                                    <Box width={20} height={5} bgcolor="#12263F" borderRadius={2} />
+                                    <Typography variant="h6" fontWeight="bold">{Number(selectedTicket?.quantity) - selectedTicket.sold}</Typography>
+                                    <Typography variant="caption" color="gray">Ticket Left</Typography>
+                                </Stack>
+                                <Stack>
+                                    <Box width={20} height={5} bgcolor="#1E88E5" borderRadius={2} />
+                                    <Typography variant="h6" fontWeight="bold">{selectedTicket?.sold}</Typography>
+                                    <Typography variant="caption" color="gray">Ticket Sold</Typography>
+                                </Stack>
                             </Stack>
 
                         </Stack>
@@ -289,37 +271,23 @@ function getLast7DaysTicketData(selectedEvent: any): number[] {
 
 
 
-function getTicketSalesData(event: any, selectedTicket: string): { labels: string[]; series: number[], total: number } {
-    const ticketList = event?.tickets?.[0]?.tickets || [];
-    const selected = ticketList.find((t: any) => t.ticketType === selectedTicket);
-
-    if (!selected) {
+function getTicketSalesData(event: any, selectedTicket: any): { labels: string[]; series: number[], total: number } {
+    if (!selectedTicket) {
         return {
-            labels: ["Sold", "Pending"],
+            labels: ["Ticket Sold", "Ticket Left"],
             series: [0, 0],
             total: 0
         };
     }
 
-    const totalCount = Number(selected.totalTickets || 0);
-    let soldCount = 0;
+    const soldCount = selectedTicket?.sold;
 
-    event?.order?.forEach((order: any) => {
-        if (order.paymentStatus !== "confirmed") return;
-
-        order.tickets?.forEach((ticket: any) => {
-            if (ticket.ticketId === selected.id) {
-                soldCount += ticket.quantity || 0;
-            }
-        });
-    });
-
-    const pendingCount = Math.max(totalCount - soldCount, 0);
+    const pendingCount = Number(selectedTicket?.quantity) - selectedTicket.sold;
 
     return {
-        labels: ["Sold", "Pending"],
+        labels: ["Ticket Sold", "Ticket Left"],
         series: [soldCount, pendingCount],
-        total: totalCount
+        total: Number(selectedTicket?.quantity) - selectedTicket.sold
     };
 }
 

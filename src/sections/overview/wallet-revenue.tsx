@@ -140,7 +140,7 @@ export function WalletBalance({ selectedEvent }: WalletBalanceProps) {
                     type="line"
                     height={200}
                 />
-                <Link to="/marketing-engagenment">
+                <Link to="/marketing-engagement">
                     <Button
                         variant="contained"
                         sx={{

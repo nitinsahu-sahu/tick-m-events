@@ -406,7 +406,7 @@ export function MainChartComponents({ selectedEvent }: MainChartComponentsProps)
     { title: "Geographical Distribution", options: geographicalDistributionOptions, series: geographicalDistributionSeries, type: "bar" as const },
     { title: "Device Usage", options: deviceUsageOptions, series: deviceUsageSeries, type: "pie" as const },
     { title: "Age Groups", options: ageGroupsOptions, series: ageGroupsSeries, type: "bar" as const },
-    { title: "Email & Notification Click Rates", options: clickRatesOptions, series: clickRatesSeries, type: "pie" as const },
+    // { title: "Email & Notification Click Rates", options: clickRatesOptions, series: clickRatesSeries, type: "pie" as const },
   ];
 
   return (

@@ -6,7 +6,7 @@ import { fetchUserPoints } from "src/redux/actions/rewardActions";
 
 export const AccountPoints = () => {
   const dispatch = useDispatch();
-  
+
   // Get points from Redux store
   const points = useSelector((state: RootState) => state.reward.points || 0);
 
@@ -22,6 +22,17 @@ export const AccountPoints = () => {
   useEffect(() => {
     dispatch(fetchUserPoints() as any);
   }, [dispatch]);
+
+  const earningActivities = [
+    { label: "Purchase of a Standard Ticket", points: 10 },
+    { label: "Purchase of a VIP Ticket", points: 10 },
+    { label: "Purchase of a Premium Ticket", points: 10 },
+    { label: "Sharing an event on social media", points: 10 },
+    { label: "Inviting a friend to buy a ticket", points: 10 },
+    { label: "Validation of attendance at an event (ticket scan or manual verification)", points: 30 },
+    { label: "Sponsorship (registered godchild + 1st purchase)", points: 100 },
+    { label: "Leave a verified review of an event", points: 20 }
+  ];
 
   return (
     <Card sx={{ borderRadius: 3, boxShadow: 3, p: 3, mt: 4, mb: 4 }}>
@@ -54,16 +65,10 @@ export const AccountPoints = () => {
             Ways to Earn More Points
           </Typography>
           <Box mt={2}>
-            {[
-              "Purchase of a Standard Ticket",
-              "Purchase of a VIP Ticket",
-              "Purchase of a Premium Ticket",
-              "Sharing an event on social media",
-              "Inviting a friend to buy a ticket"
-            ].map((item, index) => (
+            {earningActivities.map((activity, index) => (
               <Box key={index} display="flex" justifyContent="space-between" py={1}>
-                <Typography fontWeight={500}>{item}</Typography>
-                <Typography color="#0B2E4C" fontWeight={600}>+10 pts</Typography>
+                <Typography fontWeight={500}>{activity.label}</Typography>
+                <Typography color="#0B2E4C" fontWeight={600}>+{activity.points} pts</Typography>
               </Box>
             ))}
           </Box>

@@ -1,4 +1,4 @@
-import {  rewardConstants } from "./constants";
+import { rewardConstants } from "./constants";
 import axios from "../helper/axios";
 
 export const fetchUserPoints = () => async (dispatch) => {
@@ -40,17 +40,24 @@ export const fetchAvailableRewards = () => async (dispatch) => {
 
   try {
     const response = await axios.get("/loyalty/available");
+    console.log("fetchAvailableRewards response.data:", response.data);
 
     dispatch({
       type: rewardConstants.FETCH_REWARDS_SUCCESS,
-      payload: response.data.rewards,
+      payload: {
+        rewards: response.data.rewards,   // already merged with txn
+        totalPoints: response.data.totalPoints,
+      },
     });
 
     return {
       type: rewardConstants.FETCH_REWARDS_SUCCESS,
       status: response.status,
       message: response.data.message,
-      payload: response.data.rewards,
+      payload: {
+        rewards: response.data.rewards,
+        totalPoints: response.data.totalPoints,
+      },
     };
   } catch (error) {
     dispatch({
@@ -101,6 +108,42 @@ export const fetchRewardHistory = () => async (dispatch) => {
       status: error?.response?.status || 500,
       message:
         error?.response?.data?.message || "Failed to fetch reward history",
+    };
+  }
+};
+
+export const redeemReward = (rewardId, code) => async (dispatch) => {
+  dispatch({ type: rewardConstants.REDEEM_REWARD_REQUEST });
+
+  try {
+    const response = await axios.post("/loyalty/redeemCode", {
+      rewardId,
+      code,
+    });
+
+    dispatch({
+      type: rewardConstants.REDEEM_REWARD_SUCCESS,
+      payload: response.data,
+    });
+
+    return {
+      type: rewardConstants.REDEEM_REWARD_SUCCESS,
+      status: response.status,
+      ...response.data, // success, code, message
+    };
+  } catch (error) {
+    dispatch({
+      type: rewardConstants.REDEEM_REWARD_FAILURE,
+      payload: {
+        message: error?.response?.data?.message || "Failed to redeem reward",
+        error: error?.response?.status || 500,
+      },
+    });
+
+    return {
+      type: rewardConstants.REDEEM_REWARD_FAILURE,
+      status: error?.response?.status || 500,
+      message: error?.response?.data?.message || "Failed to redeem reward",
     };
   }
 };

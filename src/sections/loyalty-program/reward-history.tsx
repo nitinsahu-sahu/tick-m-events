@@ -1,38 +1,80 @@
-import { Container, Grid, Card, CardContent, Typography, Button, Divider, Box, LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { useEffect } from "react";
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  Paper,
+  CircularProgress,
+} from "@mui/material";
 import { LoyaltyProgramTable } from "src/components/tables/loyalty-program-table";
-
+import { useDispatch, useSelector } from "react-redux";
+import { fetchRewardHistory } from "src/redux/actions/rewardActions";
+import { RootState } from "src/redux/store";
 
 export const RewardsHistory = () => {
-    // Withdrawal Table History 
-    const rewardRecordsTableHeaders = ["Reward", "Redemption Date ", "Status ", " Action"];
+  const dispatch = useDispatch();
 
-    const rewardRecordsTableData = [
-        { Reward: "10% Discount on a Ticket", date: "01/02/2025", status: "Used", action: "View Details" },
-        { Reward: "Free Standard Ticket", date: "1000 pts", status: "Pending Use", action: "View Details" },
-    ];
+  const { history, loading, error } = useSelector((state: RootState) => state.reward);
 
-    return (
-        <Grid container spacing={3} mt={2}>
-            <Grid item xs={12}>
-                <Card sx={{ borderRadius: 3, boxShadow: 3, p: 2 }}>
-                    <CardContent>
-                        <Typography variant="h6" fontWeight={600} fontSize={{ xs: "18px", sm: "22px", md: "26px" }} gutterBottom>
-                            Reward History
-                        </Typography>
-                        <Box mt={2} boxShadow={3} borderRadius={3} >
-                            {/* Card Wrapper */}
-                            <Paper sx={{ p: { xs: 2, sm: 2.5, md: 3 }, borderRadius: 2, maxWidth: "1000px", mx: "auto" }}>
-                                {/* Table with filtered data */}
-                                <LoyaltyProgramTable
-                                    headers={rewardRecordsTableHeaders}
-                                    data={rewardRecordsTableData}
-                                    type="1"
-                                />
-                            </Paper>
-                        </Box>
-                    </CardContent>
-                </Card>
-            </Grid>
-        </Grid>
-    )
-}
+  const rewardRecordsTableHeaders = ["Reward", "Redemption Date", "Status", "Action"];
+
+  useEffect(() => {
+    dispatch(fetchRewardHistory() as any);
+  }, [dispatch]);
+
+  // Prepare table data (safe fallback for empty list)
+  const tableData = history?.map((item: any) => ({
+    Reward: item.name,
+    "Redemption Date": new Date(item.date).toLocaleDateString(),
+    Status: item.status || "Used",
+    action: "View Details",
+  })) || [];
+
+  return (
+    <Grid container spacing={3} mt={2}>
+      <Grid item xs={12}>
+        <Card sx={{ borderRadius: 3, boxShadow: 3, p: 2 }}>
+          <CardContent>
+            <Typography
+              variant="h6"
+              fontWeight={600}
+              fontSize={{ xs: "18px", sm: "22px", md: "26px" }}
+              gutterBottom
+            >
+              Reward History
+            </Typography>
+
+            <Box mt={2} boxShadow={3} borderRadius={3}>
+              <Paper
+                sx={{
+                  p: { xs: 2, sm: 2.5, md: 3 },
+                  borderRadius: 2,
+                  maxWidth: "1000px",
+                  mx: "auto",
+                }}
+              >
+                {loading ? (
+                  <Box display="flex" justifyContent="center" p={4}>
+                    <CircularProgress />
+                  </Box>
+                ) : error ? (
+                  <Typography color="error" align="center">
+                    {error.message || "Failed to load reward history"}
+                  </Typography>
+                ) : (
+                  <LoyaltyProgramTable
+                    headers={rewardRecordsTableHeaders}
+                    data={tableData}
+                    type="2"
+                  />
+                )}
+              </Paper>
+            </Box>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+  );
+};

@@ -1,6 +1,7 @@
 import { Typography, TableContainer, Table, TableRow, TableBody, Paper, TableHead, TableCell, Button, Box } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 
+
 export function LoyaltyProgramTable({ headers, data }: any) {
     const theme = useTheme();
 
@@ -9,7 +10,7 @@ export function LoyaltyProgramTable({ headers, data }: any) {
             <Table>
                 {/* Table Header */}
                 <TableHead>
-                    <TableRow sx={{ bgcolor: "#E1E1E1",textAlign:"center" }}>
+                    <TableRow sx={{ bgcolor: "#E1E1E1" }}>
                         {headers.map((header: string) => (
                             <TableCell
                                 key={header}
@@ -18,6 +19,7 @@ export function LoyaltyProgramTable({ headers, data }: any) {
                                     fontSize: { xs: "0.8rem", sm: "1rem" },
                                     color: theme.palette.common.white,
                                     backgroundColor: "#1F8FCD",
+                                    textAlign: 'center',
                                 }}
                             >
                                 {header}
@@ -28,7 +30,15 @@ export function LoyaltyProgramTable({ headers, data }: any) {
 
                 {/* Table Body */}
                 <TableBody>
-                    {data.map((row: any, index: number) => (
+                    {data.length === 0 ? (
+                        <TableRow>
+                            <TableCell colSpan={headers.length} align="center" sx={{ py: 3 }}>
+                                <Typography color="text.secondary" fontSize="0.9rem">
+                                    No record found.
+                                </Typography>
+                            </TableCell>
+                        </TableRow>
+                    ) : (data.map((row: any, index: number) => (
                         <TableRow key={index} sx={{ backgroundColor: "#f5f5f5", borderBottom: "2px solid #E1E1E1" }}>
                             {Object.keys(row).map((key, idx) => (
                                 <TableCell
@@ -36,7 +46,7 @@ export function LoyaltyProgramTable({ headers, data }: any) {
                                     sx={{
                                         fontSize: { xs: "0.8rem", sm: "1rem" },
                                         fontWeight: "normal",
-                                        textAlign:'center',
+                                        textAlign: 'center',
                                         ...(key === 'status' && {
                                             color: 'black',
                                             fontWeight: 'bold',
@@ -85,7 +95,8 @@ export function LoyaltyProgramTable({ headers, data }: any) {
                                 </TableCell>
                             ))}
                         </TableRow>
-                    ))}
+                    ))
+                        )}
                 </TableBody>
             </Table>
         </TableContainer>

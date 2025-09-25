@@ -173,11 +173,18 @@ export function StepperStepTwo() {
     };
 
     // Update field values
-    const handleChange = (id: any, field: any, value: any) => {
+  const handleChange = (id: any, field: any, value: any) => {
         setTicketRows(
-            ticketRows.map(row =>
-                row.id === id ? { ...row, [field]: value } : row
-            )
+            ticketRows.map(row => {
+                if (row.id === id) {
+                    if (field === "isLimitedSeat" && value === false) {
+                        // Unlimited seat selected, set totalTickets = 10000
+                        return { ...row, [field]: value, totalTickets: "10000" };
+                    }
+                    return { ...row, [field]: value };
+                }
+                return row;
+            })
         );
     };
 
@@ -471,7 +478,7 @@ export function StepperStepTwo() {
                             <TextField
                                 fullWidth
                                 label="Total Tickets"
-                                placeholder="100"
+                             placeholder={row.isLimitedSeat ? "100" : "Unlimited"}
                                 value={row.totalTickets}
                                 onChange={(e) => handleChange(row.id, 'totalTickets', e.target.value)}
                                 disabled={!row.isLimitedSeat}

@@ -1,4 +1,4 @@
-import {Box,Card,Typography,Table,TableBody,TableCell,TableContainer,TableHead,TableRow,Paper,Grid,} from "@mui/material";
+import { Box, Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Grid, } from "@mui/material";
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
@@ -18,36 +18,30 @@ type TicketInfo = {
 export function TicketDetailsAndCategories({
     selectedEvent,
 }: TicketDetailsAndCategoriesProps) {
-    const ticketTypes = selectedEvent?.tickets?.[0]?.tickets || [];
-    
+    const ticketTypes = selectedEvent?.ticketType || [];
+
     // Prepare ticket data with sales and revenue
     const ticketData: TicketInfo[] = ticketTypes.map((ticket: any, index: number): TicketInfo => {
-        const ticketId = ticket.id;
-        let sold = 0;
-        selectedEvent.order?.forEach((order: any) => {
-            order.tickets?.forEach((t: any) => {
-                if (t.ticketId === ticketId) {
-                    sold += parseInt(t.quantity, 10);
-                }
-            });
-        });
-
-        const price = ticket.price === "Free" ? "Free" : parseInt(ticket.price, 10);
-        const stock = parseInt(ticket.totalTickets, 10);
+        const sold = ticket?.sold || 0;
+        const total = ticket?.quantity || 0;
+        const price = ticket.price === "Free" ? "Free" : parseInt(ticket?.price, 10);
+        const stock = Number(ticket.quantity - ticket.sold);
         const revenue = price === "Free" ? "Free" : price * sold;
-        const percentage = stock > 0 ? Math.round((sold / stock) * 100) : 0;
+        const percentage = (sold / total) * 100 || 0;
+
+
 
         return {
-            type: ticket.ticketType,
+            type: ticket.name,
             price,
             stock,
             sold,
             percentage,
             revenue,
-            color: getColorByTicketType(ticket.ticketType,index), 
+            color: getColorByTicketType(ticket.name, index),
         };
     });
-
+    console.log('ticketData', ticketData);
     // Chart configuration
     const chartOptions: ApexOptions = {
         chart: { type: "radialBar" },
@@ -79,7 +73,7 @@ export function TicketDetailsAndCategories({
             labels: { colors: "#333" },
             itemMargin: { horizontal: 25, vertical: 5 },
             onItemClick: {
-                toggleDataSeries: false 
+                toggleDataSeries: false
             },
             onItemHover: {
                 highlightDataSeries: false
@@ -88,7 +82,6 @@ export function TicketDetailsAndCategories({
     };
 
     const chartSeries = ticketData.map((t: TicketInfo) => t.percentage);
-    console.log("chartSeries", chartSeries);
 
     return (
         <Box boxShadow={3} borderRadius={3} mt={3}>

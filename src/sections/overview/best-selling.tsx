@@ -1,16 +1,10 @@
 
-import { Card, Grid, Typography, Box, MenuItem, Select, Stack, Tab, Tabs } from "@mui/material";
-import { useTheme } from '@mui/material/styles';
+import { Card, Grid, Typography, Box, MenuItem, Select, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import dayjs from 'dayjs';
 import { Chart } from "src/components/chart";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { ApexOptions } from 'apexcharts';
-
-interface TicketSalesData {
-    labels: string[];
-    series: number[];
-}
 
 export function BestSelling(
     {
@@ -30,8 +24,6 @@ export function BestSelling(
         : Math.round(((lastValue - prevValue) / prevValue) * 100);
 
     const ticketTypes = selectedEvent?.ticketType || [];
-    console.log('selectedTicket', selectedTicket);
-    console.log('ticketTypes', ticketTypes);
 
     useEffect(() => {
         const firstTicket = selectedEvent?.ticketType?.[0];
@@ -48,7 +40,7 @@ export function BestSelling(
     const hasData = series.some(value => value > 0);
 
     const fallbackLabels = [selectedTicket || "No Sales"];
-    const fallbackSeries = [0.00001, 0.99999];
+    const fallbackSeries = [0, 0];
     const localDonutOptions: ApexOptions = {
         chart: { type: "donut" },
         labels: hasData && selectedTicket ? labels : fallbackLabels,
@@ -142,12 +134,12 @@ export function BestSelling(
                             <Stack direction="row" spacing={2}>
                                 <Stack>
                                     <Box width={20} height={5} bgcolor="#12263F" borderRadius={2} />
-                                    <Typography variant="h6" fontWeight="bold">{Number(selectedTicket?.quantity) - selectedTicket.sold}</Typography>
+                                    <Typography variant="h6" fontWeight="bold">{Number(selectedTicket?.quantity) - selectedTicket.sold || 0}</Typography>
                                     <Typography variant="caption" color="gray">Ticket Left</Typography>
                                 </Stack>
                                 <Stack>
                                     <Box width={20} height={5} bgcolor="#1E88E5" borderRadius={2} />
-                                    <Typography variant="h6" fontWeight="bold">{selectedTicket?.sold}</Typography>
+                                    <Typography variant="h6" fontWeight="bold">{selectedTicket?.sold || 0}</Typography>
                                     <Typography variant="caption" color="gray">Ticket Sold</Typography>
                                 </Stack>
                             </Stack>

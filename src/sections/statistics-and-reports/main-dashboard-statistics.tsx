@@ -108,7 +108,10 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
 
     // Replace your chart data or counts with these variables
     const totalTicketsSoldStr = totalTicketsSold.toString();
-    const revenueGeneratedStr = `${revenueGenerated}XAF`;
+    const revenueGeneratedStr = selectedEvent?.payStatus === "free"
+        ? "Free Tickets"
+        : `${revenueGenerated.toLocaleString("en-CM")} XAF`;
+
 
     // 1. Create an array with days of the week labels
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -192,13 +195,13 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday
         endOfWeek.setHours(23, 59, 59, 999);
-          
+
         // console.log(startOfWeek);
         // console.log(endOfWeek);
         selectedEvent.order.forEach((order: any) => {
-              // console.log("xd",new Date(order.createdAt).toISOString().split('T')[0]);
+            // console.log("xd",new Date(order.createdAt).toISOString().split('T')[0]);
             if (!order.createdAt) return;
-        
+
             const orderDate = new Date(order.createdAt);
             console.log("orderData", orderDate)
             // ✅ Only include orders between Sun and Sat of this week
@@ -282,6 +285,17 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
 
     const TicketsPendingChartSeries = [{ data: totalPendingTicketsPerDay }];
 
+    const validatedTicketsCount = Array.isArray(selectedEvent?.order)
+        ? selectedEvent.order
+            .filter((order: any) => order.verifyEntry === true) // only validated entries
+            .reduce((sum: number, order: any) =>
+                sum + order.tickets.reduce((ticketSum: number, ticket: any) =>
+                    ticketSum + (ticket.quantity || 0), 0)
+                , 0)
+        : 0;
+    const validatedPercentage = totalTicketsAvailable > 0
+        ? Math.round((validatedTicketsCount / totalTicketsAvailable) * 100)
+        : 0;
 
     return (
         <Box mt={3}>
@@ -314,22 +328,31 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                 <Box>
                                     <Typography variant="h4" fontWeight="bold">
-                                        45,242
+                                        {validatedTicketsCount.toLocaleString()} {/* dynamically show count */}
                                     </Typography>
                                     <Typography color="primary" sx={{ fontSize: "13px", fontWeight: 500 }}>
-                                        Attendee <br /> Engagement
-                                    </Typography>
-                                    <Typography sx={{ fontSize: "12px", color: "#2395D4", fontWeight: "bold" }}>
-                                        2.4% <span style={{ color: "#2395D4", fontWeight: 300 }}>than last week</span>
+                                        Tickets <br /> Validated at Entrance
                                     </Typography>
                                 </Box>
                                 <Box position="relative" display="flex" alignItems="center">
-                                    <CircularProgress variant="determinate" value={75} size={55} thickness={5} sx={{ color: "#2395D4" }} />
+                                    <CircularProgress
+                                        variant="determinate"
+                                        value={validatedPercentage} // replace with dynamic % if available
+                                        size={55}
+                                        thickness={5}
+                                        sx={{ color: "#2395D4" }}
+                                    />
                                     <Typography
                                         variant="caption"
-                                        sx={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", fontWeight: "bold" }}
+                                        sx={{
+                                            position: "absolute",
+                                            left: "50%",
+                                            top: "50%",
+                                            transform: "translate(-50%, -50%)",
+                                            fontWeight: "bold",
+                                        }}
                                     >
-                                        75%
+                                        {validatedPercentage}%
                                     </Typography>
                                 </Box>
                             </Box>

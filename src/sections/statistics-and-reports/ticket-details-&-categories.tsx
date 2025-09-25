@@ -118,13 +118,16 @@ export function TicketDetailsAndCategories({
                                 <TableRow key={index}>
                                     <TableCell align="center">{ticket.type}</TableCell>
                                     <TableCell align="center">
-                                        {ticket.price === "Free" ? "Free" : `${ticket.price} XAF`}
+                                        {ticket.price === 0 ? "Free" : `${ticket.price} XAF`}
                                     </TableCell>
-                                    <TableCell align="center">{ticket.stock}</TableCell>
+                                    <TableCell align="center">
+                                         {Number(ticket.stock + ticket.sold) >= 10000 ? "Unlimited" : ticket.stock}
+ 
+                                    </TableCell>
                                     <TableCell align="center">{ticket.sold}</TableCell>
                                     <TableCell align="center">{ticket.percentage}%</TableCell>
                                     <TableCell align="center">
-                                        {ticket.revenue === "Free"
+                                        {ticket.revenue === 0
                                             ? "Free"
                                             : `${ticket.revenue} XAF`}
                                     </TableCell>

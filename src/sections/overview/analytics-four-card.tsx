@@ -174,7 +174,7 @@ console.log(selectedEvent);
             <Grid item xs={12} sm={6} md={3} sx={{ display: "flex" }}>
                 <AnalyticsCard
                     title="Revenue Generated"
-                    value={`XAF ${revenue.toLocaleString("en-CM")}`}
+                    value={selectedEvent?.payStatus === "free" ? "Free Tickets" : `XAF ${revenue.toLocaleString("en-CM")}`}
                     iconSrc={
                         up
                             ? "./assets/icons/dashboard/ic_arrow_down.svg"

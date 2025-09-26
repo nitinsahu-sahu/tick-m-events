@@ -1,33 +1,37 @@
 import { Typography, Box, Link, Grid } from "@mui/material";
 import Footer from "src/components/Footer";
 import { Header } from "src/components/Header";
+import AgentsSection from "./meet-agents";
+import UpcomingEvents from "../global-home/upcoming-events";
+import GetMission from "./get-mission";
+import StatsSection from "./counter";
 
 
 const features = [
-  {
-    img: "/assets/images/about/fi_5035167.png",
-    alt: "Instant Booking",
-    title: "Instant Events Booking Easily",
-    desc: "Choose from a diverse range of vehicles, from economy cars to luxury SUVs, to suit any need or occasion.",
-  },
-  {
-    img: "/assets/images/about/fi_9099392.png",
-    alt: "Transparent Pricing",
-    title: "Transparent Pricing",
-    desc: "Enjoy clear and upfront pricing with no surprises, ensuring you know exactly what you&apos;re paying for.",
-  },
-  {
-    img: "/assets/images/about/fi_15305191.png",
-    alt: "Convenient Booking",
-    title: "Convenient Booking",
-    desc: "Benefit from a variety of rental options, including short-term, long-term, and weekend specials.",
-  },
-  {
-    img: "/assets/images/about/fi_9723160.png",
-    alt: "Customer Support",
-    title: "24/7 Customer Support",
-    desc: "Get assistance whenever you need it with our dedicated support team available around the clock.",
-  },
+    {
+        img: "/assets/images/about/fi_5035167.png",
+        alt: "Instant Booking",
+        title: "Instant Events Booking Easily",
+        desc: "Choose from a diverse range of vehicles, from economy cars to luxury SUVs, to suit any need or occasion.",
+    },
+    {
+        img: "/assets/images/about/fi_9099392.png",
+        alt: "Transparent Pricing",
+        title: "Transparent Pricing",
+        desc: "Enjoy clear and upfront pricing with no surprises, ensuring you know exactly what you&apos;re paying for.",
+    },
+    {
+        img: "/assets/images/about/fi_15305191.png",
+        alt: "Convenient Booking",
+        title: "Convenient Booking",
+        desc: "Benefit from a variety of rental options, including short-term, long-term, and weekend specials.",
+    },
+    {
+        img: "/assets/images/about/fi_9723160.png",
+        alt: "Customer Support",
+        title: "24/7 Customer Support",
+        desc: "Get assistance whenever you need it with our dedicated support team available around the clock.",
+    },
 ];
 
 export function AboutUs() {
@@ -379,11 +383,11 @@ export function AboutUs() {
                 {/* Features Section */}
                 <Box
                     sx={{
-                    px: { xs: 2, md: 4 },
-                    py: { xs: 4, md: 8 },
-                    maxWidth: "1050px",
-                    mx: "auto",
-                }}
+                        px: { xs: 2, md: 4 },
+                        py: { xs: 4, md: 8 },
+                        maxWidth: "1050px",
+                        mx: "auto",
+                    }}
                 >
                     <Grid container spacing={4}>
                         {features.map((feature, index) => (
@@ -395,7 +399,7 @@ export function AboutUs() {
                                         alt={feature.alt}
                                         sx={{ width: 40, height: 40, mb: 2 }}
                                     />
-                                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1,fontSize: { xs: "0.95rem", md: "1.1rem" }  }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: "0.95rem", md: "1.1rem" } }}>
                                         {feature.title}
                                     </Typography>
                                     <Typography variant="body2" sx={{ color: "#666" }}>
@@ -409,6 +413,12 @@ export function AboutUs() {
 
             </Box>
 
+            <AgentsSection />
+
+            <GetMission />
+
+            <StatsSection />
+            <UpcomingEvents des="Stay ahead with the latest car releases and upcoming events" title="Upcoming Cars & Events" />
             <Footer />
         </>
     );

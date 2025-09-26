@@ -2,14 +2,14 @@ import { Box, Typography, Grid, Card, CardContent, CardMedia, Button } from "@mu
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 const eventTypes = [
-  { title: "Beach Party", events: 180, image: "/images/beach.jpg" },
-  { title: "Music Concerts", events: 24, image: "/images/concert.jpg" },
-  { title: "Theater", events: 16, image: "/images/theater.jpg" },
-  { title: "Sports", events: 150, image: "/images/sports.jpg" },
-  { title: "Festivals", events: 25, image: "/images/festival.jpg" },
-  { title: "Private Family Events", events: 56, image: "/images/family.jpg" },
-  { title: "DJ Nights", events: 25, image: "/images/dj.jpg" },
-  { title: "Art Exhibitions", events: 125, image: "/images/art.jpg" },
+  { title: "Beach Party", events: 180, image: "/assets/home-global-img/Card/img.png" },
+  { title: "Music Concerts", events: 24, image: "/assets/home-global-img/Card/img-1.png" },
+  { title: "Theater", events: 16, image: "/assets/home-global-img/Card/img-2.png" },
+  { title: "Sports", events: 150, image: "/assets/home-global-img/Card/img-3.png" },
+  { title: "Festivals", events: 25, image: "/assets/home-global-img/Card/img-4.png" },
+  { title: "Private Family Events", events: 56, image: "/assets/home-global-img/Card/img-5.png"},
+  { title: "DJ Nights", events: 25, image: "/assets/home-global-img/Card/img-6.png" },
+  { title: "Art Exhibitions", events: 125, image: "/assets/home-global-img/Card/img-7.png" },
 ];
 
 export default function BrowseByType() {

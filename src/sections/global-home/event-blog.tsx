@@ -14,17 +14,17 @@ const blogs = [
   {
     title: "Best Midsize 3-row SUVs 2024",
     date: "18 August 2024",
-    image: "/images/suv.jpg",
+    image: "/assets/home-global-img/EventBlogs/Frame 1000004528.png",
   },
   {
     title: "5 Best Luxury event coupes 2024",
     date: "18 August 2024",
-    image: "/images/coupe.jpg",
+    image: "/assets/home-global-img/EventBlogs/Frame 1000004531.png",
   },
   {
     title: "Best Small hatchbacks 2024 and 2025",
     date: "18 August 2024",
-    image: "/images/hatchback.jpg",
+    image: "/assets/home-global-img/EventBlogs/Frame 1000004530.png",
   },
 ];
 
@@ -73,7 +73,7 @@ export default function EventsBlog() {
             <Box sx={{ position: "relative" }}>
               <CardMedia
                 component="img"
-                src="/images/featured.jpg"
+                src="/assets/home-global-img/EventBlogs/Frame.png"
                 alt="Featured Blog"
                 sx={{ height: 300, borderRadius: "12px 12px 0 0" }}
               />

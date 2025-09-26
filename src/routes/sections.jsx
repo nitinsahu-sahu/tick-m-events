@@ -11,6 +11,7 @@ import { isUserLoggedIn } from 'src/redux/actions';
 import Protected from 'src/redux/helper/HOC';
 import { RoleProtectedRoute } from 'src/redux/helper/RoleWise';
 import { MultipleDashboard } from 'src/hooks/common-dashbord';
+import { GlobalHome } from 'src/sections/global-home';
 
 // ----------------------------Organizer Routes------------------------------------------
 export const PlaceABidAddPage = lazy(() => import('src/pages/projects/placeABidAdd'));
@@ -70,6 +71,8 @@ export const ContactPage = lazy(() => import('src/pages/contact'));
 export const SingleProfilePage = lazy(() => import('src/pages/single-profile'));
 export const WithDrawlPage = lazy(() => import('src/pages/withdrawl'));
 export const AwardedListPage = lazy(() => import('src/pages/signedProjectList'));
+export const AboutUsPage = lazy(() => import('src/pages/about-us'));
+export const GobalHomePage = lazy(() => import('src/pages/global-home'));
 
 // ----------------------------------------------------------------------
 
@@ -285,6 +288,18 @@ export function Router() {
 
         { path: 'password-recovery', element: <PasswordRecoveryPage /> },
       ],
+    },
+     {
+      path: 'home',
+      element: (
+          <GlobalHome />
+      ),
+    },
+     {
+      path: 'about-us',
+      element: (
+          <AboutUsPage />
+      ),
     },
     {
       path: 'sign-in',

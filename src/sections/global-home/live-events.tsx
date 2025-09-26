@@ -44,7 +44,7 @@ export default function LiveEventPromo() {
               position: 'relative',
               width: '100%',
               aspectRatio: '1 / 1',
-              backgroundImage: 'url(https://via.placeholder.com/500x500.png?text=Thumbnail)',
+              backgroundImage: 'url(assets/home-global-img/dicover.png)',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}

@@ -76,12 +76,12 @@ export function Header() {
           </Box>
 
           {/* Center (hidden on xs/sm) */}
-          <Typography
+          {/* <Typography
             variant="body2"
             sx={{ display: { xs: "none", md: "block" } }}
           >
             More than 800+ special collection in this summer — Access Now
-          </Typography>
+          </Typography> */}
 
           {/* Right */}
           <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
@@ -97,6 +97,7 @@ export function Header() {
             >
               <PersonIcon fontSize="small" /> Sign in
             </Button>
+            
 
             {/* Language */}
             <Box display="flex" alignItems="center" gap={0.5}>
@@ -119,7 +120,7 @@ export function Header() {
             </Box>
 
             {/* Currency */}
-            <Select
+            {/* <Select
               defaultValue="USD"
               size="small"
               sx={{
@@ -133,10 +134,10 @@ export function Header() {
             >
               <MenuItem value="USD">USD</MenuItem>
               <MenuItem value="EUR">EUR</MenuItem>
-            </Select>
+            </Select> */}
 
             {/* Seller button (hidden xs) */}
-            <Button
+            {/* <Button
               variant="outlined"
               sx={{
                 display: { xs: "none", sm: "block" },
@@ -154,7 +155,7 @@ export function Header() {
               }}
             >
               Become Seller
-            </Button>
+            </Button> */}
           </Box>
         </Toolbar>
       </AppBar>
@@ -211,10 +212,13 @@ export function Header() {
               About Us
             </Typography>
             <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
-              Sell Your Event
+              Events
             </Typography>
             <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
-              Advertise Your Event
+              Blog
+            </Typography>
+            <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
+              B2B Marketplace
             </Typography>
             <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
               Contact

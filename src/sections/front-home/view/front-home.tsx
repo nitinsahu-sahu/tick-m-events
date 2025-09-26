@@ -24,6 +24,7 @@ import { RateAndReview } from "../rate-and-review";
 import { CompanyMarquee } from "../company-marquee";
 import { FriendWhoBooked } from "../friend-who-booked";
 import { LiveChat } from "../live-chat";
+import { NavHomeTwo } from "../nav-two";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
     display: "flex",
@@ -218,7 +219,7 @@ export function FrontHome() {
 
     return (
         <>
-            {/* <NavHomeTwo /> */}
+            <NavHomeTwo />
             <NavHomeOne />
             <Box sx={{ p: 3 }} key={_id}>
                 {/* Breadcrumb */}

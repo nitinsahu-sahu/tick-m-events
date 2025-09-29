@@ -15,6 +15,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import { assignProjectToProvider } from "src/redux/actions/organizer/pageEvents";
 import { AppDispatch, RootState } from "src/redux/store";
 import { formatEventDate } from "src/hooks/formate-time";
+import { ConfirmAcceptanceDialog } from "./Confirm-acceptance-dialog";
 
 interface Milestone {
     _id: number;
@@ -288,7 +289,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
             );
             // Redirect to Fapshi payment page
             if (fapshiRes.data && fapshiRes.data.link) {
-                const reslese = window.open(fapshiRes.data.link,'__blank', 'width=500,height=600');
+                const reslese = window.open(fapshiRes.data.link, '__blank', 'width=500,height=600');
             }
 
         } catch (error) {
@@ -317,7 +318,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
                         milestoneId,
                         projectId
                     });
-console.log(verificationResponse);
+                    console.log(verificationResponse);
 
                     if (verificationResponse.data.success) {
                         setStatus('success');
@@ -676,55 +677,16 @@ console.log(verificationResponse);
             </Dialog>
 
             {/* Accept Confirmation Dialog */}
-            <Dialog open={actionType === 'isOrgnizerAccepted'} onClose={handleCancelAction} maxWidth="sm" fullWidth>
-                <DialogTitle>Confirm Acceptance</DialogTitle>
-                <DialogContent>
-                    <Alert severity="info" sx={{ mb: 2 }}>
-                        Are you sure you want to accept this bid?
-                    </Alert>
-                    <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" color="error">
-                            {
-                                errors.message
-                            }
-                        </Typography>
-                    </Box>
-                    <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" color="text.secondary">
-                            Original Bid Amount: {selectedBid?.bidAmount} XAF
-                        </Typography>
-                    </Box>
-                    <TextField
-                        fullWidth
-                        type="number"
-                        label="Accepted Amount (XAF)"
-                        value={bidData.bidAmount}
-                        disabled
-                        onChange={(e) => {
-                            const value = parseFloat(e.target.value);
-                            setAcceptedAmount(value ? 0 : value);
-                            if (errors.acceptedAmount) setErrors({ ...errors, acceptedAmount: '' });
-                        }}
-                        error={!!errors.acceptedAmount}
-                        helperText={errors.acceptedAmount || "Enter the final accepted amount"}
-                        required
-                        inputProps={{
-                            min: 1,
-                            max: selectedBid?.bidAmount || 0
-                        }}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCancelAction}>Cancel</Button>
-                    <Button
-                        onClick={handleConfirmAction}
-                        color="success"
-                        variant="contained"
-                    >
-                        Confirm Acceptance
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <ConfirmAcceptanceDialog
+                actionType={actionType}
+                handleCancelAction={handleCancelAction}
+                selectedBid={selectedBid}
+                errors={errors}
+                bidData={bidData}
+                setAcceptedAmount={setAcceptedAmount}
+                setErrors={setErrors}
+                handleConfirmAction={handleConfirmAction}
+            />
         </>
     );
 }

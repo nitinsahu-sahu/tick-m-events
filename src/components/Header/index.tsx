@@ -45,7 +45,7 @@ export function Header() {
   return (
     <header>
       {/* 🔹 Top Bar */}
-      <AppBar position="static" sx={{ bgcolor: "#0d2a4d", py: 0.5 }}>
+      {/* <AppBar position="static" sx={{ bgcolor: "#0d2a4d", py: 0.5 }}>
         <Toolbar
           sx={{
             display: "flex",
@@ -54,7 +54,6 @@ export function Header() {
             minHeight: "40px !important",
           }}
         >
-          {/* Left */}
           <Box
             display="flex"
             gap={{ xs: 1, sm: 2, md: 3 }}
@@ -75,15 +74,7 @@ export function Header() {
             </Box>
           </Box>
 
-          {/* Center (hidden on xs/sm) */}
-          {/* <Typography
-            variant="body2"
-            sx={{ display: { xs: "none", md: "block" } }}
-          >
-            More than 800+ special collection in this summer — Access Now
-          </Typography> */}
 
-          {/* Right */}
           <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
             <Button
               sx={{
@@ -97,9 +88,8 @@ export function Header() {
             >
               <PersonIcon fontSize="small" /> Sign in
             </Button>
-            
 
-            {/* Language */}
+
             <Box display="flex" alignItems="center" gap={0.5}>
               <LanguageIcon sx={{ fontSize: 16, color: "white" }} />
               <Select
@@ -119,46 +109,10 @@ export function Header() {
               </Select>
             </Box>
 
-            {/* Currency */}
-            {/* <Select
-              defaultValue="USD"
-              size="small"
-              sx={{
-                fontSize: "12px",
-                height: 28,
-                color: "white",
-                "& .MuiSelect-icon": { color: "white" },
-                "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-              }}
-              variant="outlined"
-            >
-              <MenuItem value="USD">USD</MenuItem>
-              <MenuItem value="EUR">EUR</MenuItem>
-            </Select> */}
-
-            {/* Seller button (hidden xs) */}
-            {/* <Button
-              variant="outlined"
-              sx={{
-                display: { xs: "none", sm: "block" },
-                backgroundColor: "white",
-                color: "black",
-                border: "1px solid black",
-                borderRadius: "8px",
-                textTransform: "none",
-                fontSize: "12px",
-                px: 1.5,
-                "&:hover": {
-                  backgroundColor: "#f0f0f0",
-                  borderColor: "black",
-                },
-              }}
-            >
-              Become Seller
-            </Button> */}
+          
           </Box>
         </Toolbar>
-      </AppBar>
+      </AppBar> */}
 
       {/* 🔹 Main Navbar */}
       <AppBar
@@ -208,9 +162,7 @@ export function Header() {
             >
               Home <ExpandMoreIcon sx={{ fontSize: 16 }} />
             </Typography>
-            <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
-              About Us
-            </Typography>
+
             <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
               Events
             </Typography>
@@ -221,31 +173,63 @@ export function Header() {
               B2B Marketplace
             </Typography>
             <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
+              About
+            </Typography>
+            <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
               Contact
             </Typography>
           </Box>
 
           {/* Right Controls */}
           <Box display="flex" alignItems="center" gap={1}>
-            <IconButton>
-              <SearchIcon sx={{ color: "#3cb1f1" }} />
-            </IconButton>
-
-            {/* CTA hidden on xs */}
             <Button
-              variant="contained"
               sx={{
-                display: { xs: "none", sm: "block" },
-                bgcolor: "#0d2a4d",
-                borderRadius: "8px",
+                color: "#0d2a4d",
+                fontSize: { xs: "10px", sm: "12px" },
                 textTransform: "none",
-                fontSize: "13px",
-                px: 2,
-                "&:hover": { bgcolor: "#0b223e" },
+                display: "flex",
+                alignItems: "center",
+                minWidth: "auto",
+                border: "1px solid #0d2a4d"
               }}
             >
-              Create Your Event
+              <PersonIcon fontSize="small" /> Sign in
             </Button>
+
+            <Button
+              sx={{
+                color: "#0d2a4d",
+                fontSize: { xs: "10px", sm: "12px" },
+                textTransform: "none",
+                display: "flex",
+                alignItems: "center",
+                minWidth: "auto",
+                border: "1px solid #0d2a4d"
+              }}
+            >
+              <PersonIcon fontSize="small" /> Create an Event
+            </Button>
+
+            {/* Language */}
+            <Box display="flex" alignItems="center" gap={0.5}>
+              <LanguageIcon sx={{ fontSize: 16, color: "#0d2a4d" }} />
+              <Select
+                defaultValue="EN"
+                size="small"
+                sx={{
+                  fontSize: "12px",
+                  height: 28,
+                  color: "#0d2a4d",
+                  "& .MuiSelect-icon": { color: "#0d2a4d" },
+                  "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                }}
+                variant="outlined"
+              >
+                <MenuItem value="EN">EN</MenuItem>
+                <MenuItem value="FR">FR</MenuItem>
+              </Select>
+            </Box>
+
 
             {/* Hamburger menu (mobile only) */}
             <IconButton

@@ -4,16 +4,18 @@ import {
     DialogContent, DialogActions, Stack, Divider, IconButton, Select
 } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info'; // or your preferred info icon
-
+import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useCallback, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CheckCircle, Cancel, Edit, Save } from "@mui/icons-material";
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 
 import { assignProjectToProvider } from "src/redux/actions/organizer/pageEvents";
-import { AppDispatch } from "src/redux/store";
+import { AppDispatch, RootState } from "src/redux/store";
 import { formatEventDate } from "src/hooks/formate-time";
+import { ConfirmAcceptanceDialog } from "./Confirm-acceptance-dialog";
 
 interface Milestone {
     _id: number;
@@ -44,6 +46,11 @@ interface BidErrors {
 
 export function BidActionDialog({ open, selectedBid, onClose, onAction, project }: any) {
     const [actionType, setActionType] = useState(null); // 'reject' or 'accept'
+    const { user } = useSelector((state: RootState) => state?.auth);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+    const [message, setMessage] = useState('');
     const [rejectionReason, setRejectionReason] = useState("");
     const [acceptedAmount, setAcceptedAmount] = useState(0);
     const [errors, setErrors] = useState({ acceptedAmount: "", rejectionReason: "", message: "" });
@@ -257,11 +264,86 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
         // dispatch(updateBidStatus(bidId, newStatus));
     };
 
-    const handleReleaseMilestone = (milestoneId: any) => {
-        // API call to release funds for this milestone
-        console.log('Releasing funds for milestone:', milestoneId);
+    const handleReleaseMilestone = async (milestone: any, bid: any) => {
+        const fapshiPayload = {
+            amount: Number(milestone?.amount),
+            email: user?.email,
+            redirectUrl: `http://localhost:3039/place-a-bid/bids/68d7da67a34a3899fbbbdc25?bidId=${bid._id}&milestoneId=${milestone._id}&projectId=${project?._id}`,
+            userId: user._id.toString(),
+            externalId: `milestone_${milestone._id}_${Date.now()}`, // Unique ID for tracking
+            message: `Milestone release for project ${project?.title}`,
+        };
+
+        try {
+            const fapshiRes = await axios.post(
+                "https://sandbox.fapshi.com/initiate-pay",
+                fapshiPayload,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        apikey: 'FAK_TEST_177a608c18c0db8c50be',
+                        apiuser: 'f046347f-8d27-40cd-af94-90bc44f3d2c7',
+                    },
+                    timeout: 10000, // 10 second timeout
+                }
+            );
+            // Redirect to Fapshi payment page
+            if (fapshiRes.data && fapshiRes.data.link) {
+                const reslese = window.open(fapshiRes.data.link, '__blank', 'width=500,height=600');
+            }
+
+        } catch (error) {
+            console.log('Fapsi erro', error);
+
+        }
+
         // Your release logic here
     };
+
+    useEffect(() => {
+        const handlePaymentCallback = async () => {
+            const queryParams = new URLSearchParams(location.search);
+            const transId = queryParams.get('transId');
+            const fapshistatus = queryParams.get('status');
+            const bidId = queryParams.get('bidId');
+            const milestoneId = queryParams.get('milestoneId');
+            const projectId = queryParams.get('projectId');
+
+            if (fapshistatus === 'successful' && transId) {
+                try {
+                    // Verify payment with your backend
+                    const verificationResponse = await axios.post('/api/verify-payment', {
+                        transId,
+                        bidId,
+                        milestoneId,
+                        projectId
+                    });
+                    console.log(verificationResponse);
+
+                    if (verificationResponse.data.success) {
+                        setStatus('success');
+                        setMessage('Payment completed successfully! Milestone has been released.');
+
+                        // Update local state or refetch data
+                        setTimeout(() => {
+                            navigate(`/projects/${projectId}/bids`);
+                        }, 3000);
+                    } else {
+                        setStatus('error');
+                        setMessage('Payment verification failed.');
+                    }
+                } catch (error) {
+                    setStatus('error');
+                    setMessage('Error verifying payment. Please contact support.');
+                }
+            } else {
+                setStatus('error');
+                setMessage('Payment was not successful. Please try again.');
+            }
+        };
+
+        handlePaymentCallback();
+    }, [location.search, navigate]);
 
     return (
         <>
@@ -500,7 +582,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
                                                         textTransform: 'none',
                                                         boxShadow: milestone.isReleased ? 'none' : '0 2px 4px rgba(0,0,0,0.2)',
                                                     }}
-                                                    onClick={() => handleReleaseMilestone(milestone._id)}
+                                                    onClick={() => handleReleaseMilestone(milestone, selectedBid)}
                                                 >
                                                     {milestone.isReleased ? 'Released' : 'Release Funds'}
                                                 </Button>
@@ -595,55 +677,16 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
             </Dialog>
 
             {/* Accept Confirmation Dialog */}
-            <Dialog open={actionType === 'isOrgnizerAccepted'} onClose={handleCancelAction} maxWidth="sm" fullWidth>
-                <DialogTitle>Confirm Acceptance</DialogTitle>
-                <DialogContent>
-                    <Alert severity="info" sx={{ mb: 2 }}>
-                        Are you sure you want to accept this bid?
-                    </Alert>
-                    <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" color="error">
-                            {
-                                errors.message
-                            }
-                        </Typography>
-                    </Box>
-                    <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" color="text.secondary">
-                            Original Bid Amount: {selectedBid?.bidAmount} XAF
-                        </Typography>
-                    </Box>
-                    <TextField
-                        fullWidth
-                        type="number"
-                        label="Accepted Amount (XAF)"
-                        value={bidData.bidAmount}
-                        disabled
-                        onChange={(e) => {
-                            const value = parseFloat(e.target.value);
-                            setAcceptedAmount(value ? 0 : value);
-                            if (errors.acceptedAmount) setErrors({ ...errors, acceptedAmount: '' });
-                        }}
-                        error={!!errors.acceptedAmount}
-                        helperText={errors.acceptedAmount || "Enter the final accepted amount"}
-                        required
-                        inputProps={{
-                            min: 1,
-                            max: selectedBid?.bidAmount || 0
-                        }}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCancelAction}>Cancel</Button>
-                    <Button
-                        onClick={handleConfirmAction}
-                        color="success"
-                        variant="contained"
-                    >
-                        Confirm Acceptance
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <ConfirmAcceptanceDialog
+                actionType={actionType}
+                handleCancelAction={handleCancelAction}
+                selectedBid={selectedBid}
+                errors={errors}
+                bidData={bidData}
+                setAcceptedAmount={setAcceptedAmount}
+                setErrors={setErrors}
+                handleConfirmAction={handleConfirmAction}
+            />
         </>
     );
 }

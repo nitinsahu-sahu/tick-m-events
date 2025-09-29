@@ -70,8 +70,8 @@ export default function HeroSection() {
                             fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
                         }}
                     >
-                        A single platform to manage your events, sell your tickets,<br/> find quality service 
-providers and live unforgettable experiences.
+                        A single platform to manage your events, sell your tickets,<br /> find quality service
+                        providers and live unforgettable experiences.
                     </Typography>
 
                     <Grid container justifyContent="center" spacing={4} mt={3}>
@@ -106,7 +106,7 @@ providers and live unforgettable experiences.
                     color: '#000',
                 }}
             >
-               
+
                 <Box
                     display="flex"
                     justifyContent="space-between"

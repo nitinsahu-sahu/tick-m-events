@@ -12,75 +12,15 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { AppDispatch, RootState } from '../../redux/store';
-import { recommTrandingPopularEventFetch } from "../../redux/actions/home-recommendation.action";
-
-
-const events = [
-  {
-    id: 1,
-    title: "The Live Vibe",
-    location: "New South Wales, Australia",
-    time: "12:00 PM - 6:00 AM",
-    person: "Single Person",
-    venue: "Burj Khalifa - Dubai",
-    date: "20 Jan 2025",
-    price: "$498.25",
-    image:
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1400&q=80",
-    rating: "4.95",
-    reviews: 672,
-  },
-  {
-    id: 2,
-    title: "The Live Vibe",
-    location: "New South Wales, Australia",
-    time: "12:00 PM - 6:00 AM",
-    person: "Single Person",
-    venue: "Burj Khalifa - Dubai",
-    date: "20 Jan 2025",
-    price: "$498.25",
-    image:
-      "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=1400&q=80",
-    rating: "4.95",
-    reviews: 672,
-  },
-  {
-    id: 3,
-    title: "The Live Vibe",
-    location: "New South Wales, Australia",
-    time: "12:00 PM - 6:00 AM",
-    person: "Single Person",
-    venue: "Burj Khalifa - Dubai",
-    date: "20 Jan 2025",
-    price: "$498.25",
-    image:
-      "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=1400&q=80",
-    rating: "4.95",
-    reviews: 672,
-  },
-  {
-    id: 4,
-    title: "The Live Vibe",
-    location: "New South Wales, Australia",
-    time: "12:00 PM - 6:00 AM",
-    person: "Single Person",
-    venue: "Burj Khalifa - Dubai",
-    date: "20 Jan 2025",
-    price: "$498.25",
-    image:
-      "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=1400&q=80",
-    rating: "4.95",
-    reviews: 672,
-  },
-];
+import { publicHomeEventsFetch } from "../../redux/actions/home-recommendation.action";
 
 export default function UpcomingEvents({ title, des }: any) {
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
-  const { recommendedEvents, loading } = useSelector((state: any) => state.homeRecom);
-  console.log("upcomievents", recommendedEvents);
+  const { upcomingHomeEvents, loading } = useSelector((state: any) => state.homeRecom);
+  console.log("upcomingHomeEvents",upcomingHomeEvents);
   useEffect(() => {
-    dispatch(recommTrandingPopularEventFetch());
+    dispatch(publicHomeEventsFetch());
   }, [dispatch]);
 
   return (
@@ -143,11 +83,11 @@ export default function UpcomingEvents({ title, des }: any) {
 
       {loading ? (
         <Typography>Loading events...</Typography>
-      ) : !recommendedEvents?.length ? (
+      ) : !upcomingHomeEvents?.length ? (
         <Typography>No upcoming events found</Typography>
       ) : (
         <Grid container spacing={{ xs: 3, md: 4 }}>
-          {recommendedEvents.map((ev: any) => (
+          {upcomingHomeEvents.map((ev: any) => (
             <Grid key={ev.id} item xs={12} sm={6} md={4}>
               <Card
                 sx={{

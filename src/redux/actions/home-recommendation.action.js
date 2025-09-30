@@ -45,3 +45,29 @@ export const fetchLatestSales = () => async (dispatch) => {
         });
     }
 };
+
+export const publicHomeEventsFetch = () => async (dispatch) => {
+    dispatch({ type: homeAndRecomConstants.PUBLIC_GET_REQUEST });
+ 
+    try {
+        const response = await axios.get("/home-recommendations/get-home-events");
+        console.log("API Response:", response);
+        dispatch({
+            type: homeAndRecomConstants.PUBLIC_GET_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                upcomingHomeEvents: response?.data?.upcomingEvents,
+                popularHomeEvents: response?.data?.popularEvents,
+                latestHomeEvents: response?.data?.latestEvents,
+            },
+        });
+    } catch (error) {
+        dispatch({
+            type: homeAndRecomConstants.PUBLIC_GET_FAILURE,
+            payload: {
+                message: error?.response?.data?.message || "Server error",
+                error: error?.response?.status || 500,
+            },
+        });
+    }
+};

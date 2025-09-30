@@ -88,7 +88,7 @@ export function HeroSection() {
                                 color: "#555",
                             }}
                         >
-                            Welcome to Ticket-M, your trusted partner in car rentals. Since our founding, we have been committed to providing our customers with a seamless and reliable car rental experience. Whether you&#39;re planning a business trip, a family vacation, or just need a vehicle for everyday use, we offer a wide range of vehicles to meet your needs.
+                            Welcome to TICK-M EVENTS, the all-in-one platform that is revolutionizing the way events are organized, discovered, and experienced in Africa and worldwide. We know every event is unique – whether it’s a concert, wedding, conference, festival, or trade show. That’s why we created a simple, secure, and accessible ecosystem that connects Organizers, Participants, and Service Providers on one platform.
                         </Typography>
                     </Grid>
                 </Grid>

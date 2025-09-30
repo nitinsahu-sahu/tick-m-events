@@ -1,18 +1,19 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Box, Typography, Grid, Card, CardContent, CardMedia, Button } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-
-const eventTypes = [
-  { title: "Beach Party", events: 180, image: "/assets/home-global-img/Card/img.png" },
-  { title: "Music Concerts", events: 24, image: "/assets/home-global-img/Card/img-1.png" },
-  { title: "Theater", events: 16, image: "/assets/home-global-img/Card/img-2.png" },
-  { title: "Sports", events: 150, image: "/assets/home-global-img/Card/img-3.png" },
-  { title: "Festivals", events: 25, image: "/assets/home-global-img/Card/img-4.png" },
-  { title: "Private Family Events", events: 56, image: "/assets/home-global-img/Card/img-5.png"},
-  { title: "DJ Nights", events: 25, image: "/assets/home-global-img/Card/img-6.png" },
-  { title: "Art Exhibitions", events: 125, image: "/assets/home-global-img/Card/img-7.png" },
-];
+import { AppDispatch, RootState } from "src/redux/store";
+import { Link } from "react-router-dom";
+import { fetchAllCategories } from "../../redux/actions/event.action";
 
 export default function BrowseByType() {
+  const dispatch = useDispatch<AppDispatch>();
+  const { categories, loading } = useSelector((state: RootState) => state.event);
+
+  useEffect(() => {
+    dispatch(fetchAllCategories() as any);
+  }, [dispatch]);
+
   return (
     <Box sx={{ p: 4 }}>
       {/* Header */}
@@ -22,7 +23,7 @@ export default function BrowseByType() {
             Browse by Type
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Find the perfect ride for any occasion
+            Find the perfect event for any occasion
           </Typography>
         </Box>
         <Button
@@ -40,9 +41,12 @@ export default function BrowseByType() {
         </Button>
       </Box>
 
+      {/* Loader */}
+      {loading && <Typography>Loading categories...</Typography>}
+
       {/* Event Cards */}
       <Grid container spacing={3}>
-        {eventTypes.map((event, index) => (
+        {categories?.map((cat: any, index: number) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
             <Card
               sx={{
@@ -57,16 +61,19 @@ export default function BrowseByType() {
               <CardMedia
                 component="img"
                 height="150"
-                image={event.image}
-                alt={event.title}
+                image={cat.cover?.url || "/assets/home-global-img/Card/default.png"}
+                alt={cat.name}
               />
               <CardContent sx={{ p: 2 }}>
-                <Typography fontWeight={600}>{event.title}</Typography>
+                <Typography fontWeight={600}>{cat.name}</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {event.events} Events
+                  {`${cat.events?.length ?? 0} Events`}
                 </Typography>
               </CardContent>
               <Box
+                component={Link}
+                to={`/category/${cat?._id}`}
+                target="_blank"
                 sx={{
                   position: "absolute",
                   bottom: 10,

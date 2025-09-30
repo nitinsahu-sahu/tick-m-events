@@ -1,19 +1,7 @@
-// UpcomingEvents.tsx
-import React from "react";
+import React, { useEffect } from "react";
+import { Box, Typography, Grid, Card, CardContent, CardMedia, Button, IconButton, Chip, useTheme, } from "@mui/material";
 import {
-  Box,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Button,
-  IconButton,
-  Chip,
-  useTheme,
-} from "@mui/material";
-import {
-  ArrowBackIos,
+  ArrowBackIos, LaptopMac,
   ArrowForwardIos,
   LocationOn,
   AccessTime,
@@ -21,6 +9,11 @@ import {
   Event,
   Star,
 } from "@mui/icons-material";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { AppDispatch, RootState } from '../../redux/store';
+import { recommTrandingPopularEventFetch } from "../../redux/actions/home-recommendation.action";
+
 
 const events = [
   {
@@ -65,7 +58,7 @@ const events = [
     rating: "4.95",
     reviews: 672,
   },
-   {
+  {
     id: 4,
     title: "The Live Vibe",
     location: "New South Wales, Australia",
@@ -81,8 +74,14 @@ const events = [
   },
 ];
 
-export default function UpcomingEvents({title,des}:any) {
+export default function UpcomingEvents({ title, des }: any) {
   const theme = useTheme();
+  const dispatch = useDispatch<AppDispatch>();
+  const { recommendedEvents, loading } = useSelector((state: any) => state.homeRecom);
+  console.log("upcomievents", recommendedEvents);
+  useEffect(() => {
+    dispatch(recommTrandingPopularEventFetch());
+  }, [dispatch]);
 
   return (
     <Box
@@ -141,126 +140,158 @@ export default function UpcomingEvents({title,des}:any) {
       </Box>
 
       {/* Grid of cards */}
-      <Grid container spacing={{ xs: 3, md: 4 }}>
-        {events.map((ev) => (
-          <Grid key={ev.id} item xs={12} sm={6} md={4}>
-            <Card
-              sx={{
-                borderRadius: 3,
-                boxShadow: 3,
-                display: "flex",
-                flexDirection: "column",
-                height: "100%",
-                position: "relative",
-                overflow: "visible",
-              }}
-            >
-              {/* image area (use CardMedia or a Box with backgroundImage) */}
-              <Box
+
+      {loading ? (
+        <Typography>Loading events...</Typography>
+      ) : !recommendedEvents?.length ? (
+        <Typography>No upcoming events found</Typography>
+      ) : (
+        <Grid container spacing={{ xs: 3, md: 4 }}>
+          {recommendedEvents.map((ev: any) => (
+            <Grid key={ev.id} item xs={12} sm={6} md={4}>
+              <Card
                 sx={{
+                  borderRadius: 3,
+                  boxShadow: 3,
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
                   position: "relative",
-                  height: { xs: 180, sm: 200, md: 220 },
-                  overflow: "hidden",
+                  overflow: "visible",
                 }}
               >
-                <CardMedia
-                  component="img"
-                  image={ev.image}
-                  alt={ev.title}
-                  sx={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-
-                {/* rating badge */}
-                <Chip
-                  icon={<Star sx={{ fontSize: 16 }} />}
-                  label={`${ev.rating} (${ev.reviews} reviews)`}
-                  size="small"
-                  sx={{
-                    position: "absolute",
-                    right: 12,
-                    top: 12,
-                    bgcolor: "background.paper",
-                    boxShadow: 2,
-                    borderRadius: 2,
-                    fontWeight: 600,
-                  }}
-                />
-              </Box>
-
-              {/* content */}
-              <CardContent sx={{ display: "flex", flexDirection: "column", flexGrow: 1, p: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {ev.title}
-                </Typography>
-
-                <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary", mt: 0.5 }}>
-                  <LocationOn fontSize="small" sx={{ mr: 0.5 }} />
-                  <Typography variant="body2" color="text.secondary">
-                    {ev.location}
-                  </Typography>
-                </Box>
-
-                {/* details grid */}
-                <Grid container spacing={1} sx={{ mt: 2, color: "text.secondary", fontSize: 13 }}>
-                  <Grid item xs={6}>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <AccessTime fontSize="small" sx={{ mr: 1 }} />
-                      <Typography variant="body2">{ev.time}</Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Person fontSize="small" sx={{ mr: 1 }} />
-                      <Typography variant="body2">{ev.person}</Typography>
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={6}>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <LocationOn fontSize="small" sx={{ mr: 1 }} />
-                      <Typography variant="body2">{ev.venue}</Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Event fontSize="small" sx={{ mr: 1 }} />
-                      <Typography variant="body2">{ev.date}</Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-
-                {/* footer with price and button */}
+                {/* Image */}
                 <Box
                   sx={{
-                    pt: 2,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    borderTop: `1px solid ${theme.palette.divider}`,
-                    mt: 3,
+                    position: "relative",
+                    height: { xs: 180, sm: 200, md: 220 },
+                    overflow: "hidden",
                   }}
                 >
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                    From {ev.price}
-                  </Typography>
-                  <Button
-                    variant="contained"
+                  <CardMedia
+                    component="img"
+                    image={ev.coverImage?.url}
+                    alt={ev.eventName}
+                    sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                  <Chip
+                    icon={<Star sx={{ fontSize: 16 }} />}
+                    label={`${ev.averageRating} (${ev.reviewCount} reviews)`}
                     size="small"
                     sx={{
-                      px: 3,
-                      py: 0.8,
-                      textTransform: "none",
-                      boxShadow: 0,
+                      position: "absolute",
+                      right: 12,
+                      top: 12,
+                      bgcolor: "background.paper",
+                      boxShadow: 2,
+                      borderRadius: 2,
+                      fontWeight: 600,
+                    }}
+                  />
+                </Box>
+
+                {/* Content */}
+                <CardContent sx={{ display: "flex", flexDirection: "column", flexGrow: 1, p: 3 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    {ev.eventName}
+                  </Typography>
+
+                  <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary", mt: 0.5 }}>
+                    <LocationOn fontSize="small" sx={{ mr: 0.5 }} />
+                    <Typography variant="body2" color="text.secondary">
+                      {ev.location}
+                    </Typography>
+                  </Box>
+
+                  {/* Details */}
+                  <Grid container spacing={1} sx={{ mt: 2, color: "text.secondary", fontSize: 13 }}>
+                    <Grid item xs={6}>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <AccessTime fontSize="small" sx={{ mr: 1 }} />
+                        <Typography variant="body2">{ev.time}</Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Event fontSize="small" sx={{ mr: 1 }} />
+                        <Typography variant="body2">{ev.date}</Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        {ev.format === "online" ? (
+                          <LaptopMac fontSize="small" sx={{ mr: 1, color: "blue" }} />
+                        ) : (
+                          <LaptopMac fontSize="small" sx={{ mr: 1, color: "blue" }} />
+                        )}
+                        <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
+                          {ev.eventType}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={6}>
+                      {/* <Box sx={{ display: "flex", alignItems: "center" }}>
+                              <LocationOn fontSize="small" sx={{ mr: 1 }} />
+                              <Typography variant="body2">{ev.venue}</Typography>
+                            </Box> */}
+                    </Grid>
+
+                  </Grid>
+
+                  {/* Footer */}
+                  <Box
+                    sx={{
+                      pt: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      borderTop: `1px solid ${theme.palette.divider}`,
+                      mt: 3,
                     }}
                   >
-                    Book Now
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                      From :{" "}
+                      {ev.payStatus === "free"
+                        ? "Free Event"
+                        : ev.tickets?.[0]?.tickets?.length
+                          ? (() => {
+                            // infer ticket type
+                            type Ticket = { price: string };
+                            const minPrice = ev.tickets[0].tickets.reduce(
+                              (min: number, t: Ticket) => {
+                                const numericPrice = parseFloat(t.price);
+                                return Number.isNaN(numericPrice) ? min : Math.min(min, numericPrice);
+                              },
+                              Infinity
+                            );
+                            // extract currency (if any, e.g. "600 XAF")
+                            const firstPrice = ev.tickets[0].tickets[0].price;
+                            const currency = firstPrice.replace(/[0-9.\s]/g, "") || "";
+                            return `${minPrice} ${currency}`.trim();
+                          })()
+                          : "0"}
+                    </Typography>
+                    <Button
+                      component={Link}
+                      to={`/our-event/${ev._id}`}
+                      variant="contained"
+                      size="small"
+                      sx={{
+                        px: 3,
+                        py: 0.8,
+                        textTransform: "none",
+                        boxShadow: 0,
+                      }}
+                    >
+                      Book Now
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Box>
   );
 }

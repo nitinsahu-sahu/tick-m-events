@@ -10,14 +10,15 @@ interface SocialIconProps {
 
 const agents = [
     {
-        name: "Cody Fisher",
-        role: "CFO (Chief Financial Officer)",
+       
+        name: "Yannick Cabrel TEGUEBOUG",
+        role: "COO (Co-founder)",
         img: "/assets/images/about/teams/team-1.png",
         socials: ["instagram", "facebook", "x", "youtube"],
     },
     {
-        name: "Darrell Steward",
-        role: "CEO (Chief Executive Officer)",
+        name: "Samuel DIMOU",
+        role: "CEO (Co-founder))",
         img: "/assets/images/about/teams/team-1.png",
         socials: ["instagram", "facebook", "x", "youtube"],
     },
@@ -40,26 +41,27 @@ const features = [
         img: "/assets/images/about/fi_5035167.png",
         alt: "Instant Booking",
         title: "Instant Events Booking Easily",
-        desc: "Choose from a diverse range of vehicles, from economy cars to luxury SUVs, to suit any need or occasion.",
+        desc: " Online Ticketing: Buy, sell, and manage tickets with ease.",
     },
     {
         img: "/assets/images/about/fi_9099392.png",
         alt: "Transparent Pricing",
         title: "Transparent Pricing",
-        desc: "Enjoy clear and upfront pricing with no surprises, ensuring you know exactly what you&apos;re paying for.",
+        desc: "Organizer Tools: Ticket management, promotions, notifications, payments, and real-time analytics.",
     },
     {
         img: "/assets/images/about/fi_15305191.png",
         alt: "Convenient Booking",
         title: "Convenient Booking",
-        desc: "Benefit from a variety of rental options, including short-term, long-term, and weekend specials.",
+        desc: "B2B Marketplace: Easily find trusted and verified service providers for your events.",
     },
     {
         img: "/assets/images/about/fi_9723160.png",
         alt: "Customer Support",
         title: "24/7 Customer Support",
-        desc: "Get assistance whenever you need it with our dedicated support team available around the clock.",
+        desc: "Custom Photo/Video Filters: Capture memories with the unique style of each event.",
     },
+ 
 ];
 
 function SocialIcon({ type }: SocialIconProps) {

@@ -83,17 +83,15 @@ export function MissionSection() {
                                 lineHeight: 1.7,
                             }}
                         >
-                            Our mission is to make car rental easy, accessible, and affordable
-                            for everyone. We believe that renting a car should be a hassle-free
-                            experience, and we’re dedicated to ensuring that every customer finds
-                            the perfect vehicle for their journey.
+                            To make TICK-M EVENTS the official partner for events in Africa, and soon across the world, by becoming the go-to app for experiencing, organizing, and professionalizing events. With TICK-M EVENTS, every event becomes simpler, more connected, and truly unforgettable.
                         </Typography>
 
                         {/* Bullet points */}
                         {[
-                            "Explore a wide range of flexible rental options to suit your needs",
-                            "Comprehensive insurance coverage for complete peace of mind",
-                            "24/7 customer support for assistance anytime, anywhere",
+                            "Simplifies event organization with modern ticketing and management tools.",
+                            "Makes events more accessible with secure e-tickets (QR Code).",
+                            "Connects organizers with service providers through a dedicated marketplace (venues, caterers, decorators, artists, etc.).",
+                            "Creates unforgettable experiences with personalized photo/video filters for each event.",
                         ].map((item, i) => (
                             <Box key={i} sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
                                 <CheckCircleIcon sx={{ color: "#2395d4", mr: 1 }} />
@@ -235,7 +233,7 @@ export function MissionSection() {
                                         objectFit: "cover",
                                     }}
                                 />
-                               
+
                             </Box>
 
                             {/* Second Image (diagonal + overlapping) */}
@@ -248,7 +246,7 @@ export function MissionSection() {
                                     borderRadius: 2,
                                     overflow: "hidden",
                                     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                                   
+
                                     zIndex: 9999,
                                 }}
                             >
@@ -305,7 +303,7 @@ export function MissionSection() {
                                 color: "#737373",
                                 mb: 3,
                                 lineHeight: 1.7,
-                                fontSize:'1rem'
+                                fontSize: '1rem'
                             }}
                         >
                             We are committed to offering transparent pricing with no hidden

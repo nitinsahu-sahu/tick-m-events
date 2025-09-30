@@ -135,8 +135,9 @@ export function Header() {
         >
           {/* Logo */}
           <Box display="flex" alignItems="center" gap={1}>
+            
             <img
-              src="/public/assets/logo/full-logo.png"
+              src="/assets/logo/full-logo.png"
               alt="Logo"
               style={{ height: 50 }}
             />

@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { Header } from "src/components/Header";
+import Header from "src/components/Header";
 import Footer from "src/components/Footer";
 
 import UpcomingEvents from "./upcoming-events";

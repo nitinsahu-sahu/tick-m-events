@@ -4,6 +4,8 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import XIcon from "@mui/icons-material/X"; // Twitter/X
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import TwitterIcon from "@mui/icons-material/Twitter";
 
 export default function Footer() {
   return (
@@ -12,7 +14,7 @@ export default function Footer() {
         {/* Newsletter Section */}
         <Grid item xs={12} md={6}>
           <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-            Subscribe To See Secret Deals Prices <br /> Drop The Moment You Sign Up!
+            Receive the best events and news every week
           </Typography>
           <Box sx={{ display: "flex", gap: 1 }}>
             <TextField
@@ -44,16 +46,22 @@ export default function Footer() {
         {/* Payment Methods */}
         <Grid item xs={12} md={6} sx={{ textAlign: { xs: "left", md: "right" } }}>
           <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-            Our Payment Methods
+            Our Networks
           </Typography>
-          <Box sx={{ display: "flex", gap: 2, justifyContent: { xs: "flex-start", md: "flex-end" } }}>
-            <img src="/visa.png" alt="Visa" height={30} />
-            <img src="/mastercard.png" alt="MasterCard" height={30} />
-            <img src="/amex.png" alt="Amex" height={30} />
-            <img src="/paypal.png" alt="PayPal" height={30} />
-            <img src="/applepay.png" alt="Apple Pay" height={30} />
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              justifyContent: { xs: "flex-start", md: "flex-end" },
+            }}
+          >
+            <FacebookIcon sx={{ color: "#fff", fontSize: 28 }} />
+            <InstagramIcon sx={{ color: "#fff", fontSize: 28 }} />
+            <WhatsAppIcon sx={{ color: "#fff", fontSize: 28 }} />
+            <TwitterIcon sx={{ color: "#fff", fontSize: 28 }} />
           </Box>
         </Grid>
+
       </Grid>
 
       {/* Footer Links */}
@@ -64,17 +72,32 @@ export default function Footer() {
           </Typography>
           <Typography variant="body2">2356 Oakwood Drive, Suite 18, San Francisco, California 94111, US</Typography>
           <Typography variant="body2" sx={{ mt: 1 }}>Hours: 8:00 - 17:00, Mon - Sat</Typography>
-          <Typography variant="body2" sx={{ mt: 1 }}>support@carento.com</Typography>
+          <Typography variant="body2" sx={{ mt: 1 }}>support@tickm-events.com</Typography>
           <Typography sx={{ mt: 1 }}>
             Need help? Call us <br />
-            <Typography component="span" sx={{ color: "primary.main", fontWeight: 600 }}>
-              +1 222-555-33-99
-            </Typography>
+            <>
+              <Typography
+                component="a"
+                href="tel:+237655178302"
+                sx={{ color: "primary.main", fontWeight: 600, mr: 1 }}
+              >
+                +237 655 178 302
+              </Typography>
+              /
+              <Typography
+                component="a"
+                href="tel:+237673994445"
+                sx={{ color: "primary.main", fontWeight: 600, ml: 1 }}
+              >
+                673 994 445
+              </Typography>
+            </>
+
           </Typography>
         </Grid>
 
         {[
-          { title: "Company", links: ["About Us", "Our Awards", "Agencies", "Copyright Notices", "Terms of Use", "Privacy Notice", "Lost & Found"] },
+          { title: "Company", links: ["About Us", "Blog", "FAQ", "Terms of Use", "Privacy Policy", "Contact"] },
           { title: "Customer", links: ["My Booking", "My Account", "Ticket Calculator", "Refunds Terms", "Privacy Policy"] },
           { title: "Our Partners", links: ["Affiliates", "Travel Agents", "AARP Members", "Points Programs", "Military & Veterans", "Work with us", "Advertise with us"] },
           { title: "Support", links: ["Forum support", "Help Center", "Live chat", "How it works", "Security", "Refund Policy"] },

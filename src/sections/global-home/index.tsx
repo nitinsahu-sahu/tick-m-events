@@ -1,4 +1,9 @@
 import { Box, Typography } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "src/redux/store";
+import { useEffect, useState } from "react";
+
+import { publicHomeEventsFetch } from "src/redux/actions/home-recommendation.action";
 import Header from "src/components/Header";
 import Footer from "src/components/Footer";
 
@@ -9,17 +14,49 @@ import BrowseByType from "./browse-by-type";
 import HowItWorks from "./how-it-work";
 import EventsBlog from "./event-blog";
 import TrustedExpertise from "./trusted-experties";
+import Testimonial from "./testimonial";
+
 
 export function GlobalHome() {
+    const dispatch = useDispatch<AppDispatch>();
+    const { upcomingHomeEvents, loading } = useSelector((state: any) => state.homeRecom);
+    const [filteredEvents, setFilteredEvents] = useState([]);
+
+    useEffect(() => {
+        dispatch(publicHomeEventsFetch());
+    }, [dispatch]);
+
+    // Initialize filtered events with all events when data loads
+    useEffect(() => {
+        if (upcomingHomeEvents && upcomingHomeEvents.length > 0) {
+            setFilteredEvents(upcomingHomeEvents);
+        }
+    }, [upcomingHomeEvents]);
+
+    const handleEventsFiltered = (events:any) => {
+        setFilteredEvents(events);
+    };
+
     return (
         <Box>
             <Header />
-            <HeroSection />
-            <UpcomingEvents title="Upcoming Events" des="The world's leading car brands" />
+
+            <HeroSection
+                events={upcomingHomeEvents}
+                onEventsFiltered={handleEventsFiltered}
+            />
+            <UpcomingEvents
+                title="Upcoming Events"
+                des="The world's leading car brands"
+                filterdEvent={filteredEvents}
+                loading={loading}
+            />
             <LiveEventPromo />
             <BrowseByType />
             <HowItWorks />
-            <UpcomingEvents title="Events Listings" des="Find the perfect events for any occasion" />
+            <Testimonial />
+            <UpcomingEvents
+                title="Events Listings" des="Find the perfect events for any occasion" />
             <TrustedExpertise />
             <EventsBlog />
             <Footer />

@@ -8,41 +8,75 @@ import {
     Button,
     IconButton,
     Stack,
-    Avatar,
-    Grid,
-    Chip,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import { useNavigate } from "react-router-dom";
 
 const faqs = [
     {
-        question: "How do I book a car rental with Carento?",
-        answer:
-            "Provide a step-by-step guide on how users can browse and book travel services on your platform. Include information on searching for destinations, selecting dates, choosing accommodation, and completing the booking process. Mention any special features or tools that can help users find the best deals.",
+        question: "What is TICK-M EVENTS?",
+        answer: `TICK-M EVENTS is an all-in-one platform that simplifies the organization, management, and participation in events. It offers online ticketing, a marketplace to find reliable service providers (venues, caterers, artists, etc.), and innovative tools such as customized photo/video filters and much more.`,
     },
     {
-        question:
-            "How do I book a car rental with Carento, and what options are available during the booking process?",
-        answer: "",
+        question: "How do I buy a ticket on TICK-M EVENTS?",
+        answer: `• Search for the event you’re interested in using the search bar.
+• Check the details (location, date, available ticket types).
+• Select the ticket type and quantity.
+• Enter your personal information.
+• Choose a payment method (Mobile Money, bank card, transfer, or cash depending on the organizer).
+• Instantly receive your electronic ticket with a QR Code and manual code.`,
     },
     {
-        question:
-            "What specific documents and identification are required to rent a car from Carento?",
-        answer: "",
+        question: "How do I validate my ticket on the event day?",
+        answer: `On the event day, simply present your QR Code or manual code (displayed on your phone or printed). The organizing team scans the code to confirm your entry.`,
     },
     {
-        question:
-            "Is insurance automatically included in the rental price, and what additional coverage options are available?",
-        answer: "",
+        question: "I want to organize an event. How do I proceed?",
+        answer: `• Create an organizer account on TICK-M EVENTS.
+• Set up your event (title, description, date, location, images).
+• Define your ticket types (free or paid).
+• Customize your settings (visibility, notifications, photo/video filters).
+• Publish the event and start selling your tickets immediately.`,
     },
     {
-        question:
-            "Can I modify or cancel my booking after it’s been confirmed, and what are the terms and conditions?",
-        answer: "",
+        question: "What are the benefits for organizers?",
+        answer: `• Simple management of tickets and participants.
+• Integrated marketing tools (promotions, notifications, social media sharing).
+• Access to detailed statistics (sales, attendance rate, engagement).
+• Secure and transparent payments.
+• Ability to recruit service providers via the marketplace.`,
+    },
+    {
+        question: "How does the TICK-M EVENTS marketplace work?",
+        answer: `• Organizers post their needs (e.g., venue rental, catering, DJ).
+• Interested service providers submit their offers.
+• Both parties can discuss through the integrated messaging system.
+• Once an agreement is reached, the contract is validated on the platform.
+• TICK-M EVENTS charges a 10% commission to secure the transaction.`,
+    },
+    {
+        question: "What are the benefits for service providers?",
+        answer: `• Increased visibility among organizers and participants.
+• Online messaging and contract management.
+• Tracking of services through an integrated calendar.
+• Secure payments and automatic invoice generation.`,
+    },
+    {
+        question: "Are payments secure?",
+        answer: `Yes, All payments are processed through secure solutions (Mobile Money, bank cards, transfers). In addition, TICK-M EVENTS applies a transparent commission system to protect both organizers and service providers.`,
+    },
+    {
+        question: "How do customized photo/video filters work?",
+        answer: `Each organizer can configure an official filter (frame, logo, colors) for their event. Participants can use it to take photos/videos before or during the event and either save them or share them directly on social media (WhatsApp, TikTok, Facebook, etc.).`,
+    },
+    {
+        question: "How much does it cost to use TICK-M EVENTS?",
+        answer: `• For participants: Access to the platform is free, you only pay for your tickets.
+• For organizers: A commission is applied on each ticket sold.
+• For service providers: Registration is free, but TICK-M EVENTS charges a small commission on contracts made via the marketplace.
+
+👉 With TICK-M EVENTS, you get everything in one place: ticketing, event organization, service providers, photo/video tools, secure management, and much more.`,
     },
 ];
 
@@ -85,6 +119,7 @@ export default function FAQSection() {
     const handleChange = (panelIndex: number) => {
         setExpanded((prev) => (prev === panelIndex ? false : panelIndex));
     };
+    const navigate = useNavigate();
 
     return (
         <Box sx={{ bgcolor: "#fff" }}>
@@ -226,6 +261,7 @@ export default function FAQSection() {
                                         pb: 3,
                                         color: "#000",
                                         fontSize: "14px",
+                                        whiteSpace: "pre-line",
                                     }}
                                 >
                                     {faq.answer}
@@ -249,16 +285,17 @@ export default function FAQSection() {
                             bgcolor: "#204470",
                         },
                     }}
+                    onClick={() => navigate("/contact-us")}
                 >
                     Contact Us →
                 </Button>
             </Box>
 
             {/* ========== HR LINE ========== */}
-            <Box sx={{ borderTop: "1px solid #e0e0e0", mx: "auto", width: "90%", my: 6 }} />
+            {/* <Box sx={{ borderTop: "1px solid #e0e0e0", mx: "auto", width: "90%", my: 6 }} /> */}
 
             {/* ========== BLOG / EVENT SECTION ========== */}
-            <Box sx={{ px: 2, maxWidth: "1050px", mx: "auto", mb: 8 }}>
+            {/* <Box sx={{ px: 2, maxWidth: "1050px", mx: "auto", mb: 8 }}>
                 <Typography
                     variant="h5"
                     sx={{
@@ -392,7 +429,7 @@ export default function FAQSection() {
                         </Grid>
                     ))}
                 </Grid>
-            </Box>
+            </Box> */}
         </Box>
     );
 }

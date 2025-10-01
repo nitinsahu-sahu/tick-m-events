@@ -16,6 +16,8 @@ import { assignProjectToProvider } from "src/redux/actions/organizer/pageEvents"
 import { AppDispatch, RootState } from "src/redux/store";
 import { formatEventDate } from "src/hooks/formate-time";
 import { ConfirmAcceptanceDialog } from "./Confirm-acceptance-dialog";
+import RejectConfirmationDialog from "./reject-confirmation-dialog";
+// import axios from "../../../../redux/helper/axios";
 
 interface Milestone {
     _id: number;
@@ -49,7 +51,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
     const { user } = useSelector((state: RootState) => state?.auth);
     const location = useLocation();
     const navigate = useNavigate();
-    const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+    const [statuss, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
     const [message, setMessage] = useState('');
     const [rejectionReason, setRejectionReason] = useState("");
     const [acceptedAmount, setAcceptedAmount] = useState(0);
@@ -169,11 +171,168 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleActionClick = (type: any) => {
-        setActionType(type);
+    // const handleActionClick = (type: any) => {
+    //     setActionType(type);
+    //     if (type === 'isOrgnizerAccepted') {
+    //         setAcceptedAmount(selectedBid?.bidAmount || 0);
+    //     }
+    // };
+    const handleActionClick = async (type: any) => {
         if (type === 'isOrgnizerAccepted') {
-            setAcceptedAmount(selectedBid?.bidAmount || 0);
+            // Calculate 10% admin fee
+            const bidAmount = selectedBid?.bidAmount || 0;
+            const adminFee = bidAmount * 0.1;
+
+            // Process admin fee payment first
+            const paymentSuccess = await processAdminFeePayment(adminFee);
+
+            if (paymentSuccess) {
+                setActionType(type);
+                setAcceptedAmount(bidAmount);
+            } else {
+                setErrors({
+                    acceptedAmount: "",
+                    rejectionReason: "",
+                    message: "Failed to process admin fee payment. Please try again."
+                });
+                // Remove the unnecessary return statement
+            }
+        } else {
+            setActionType(type);
         }
+    };
+
+    const processAdminFeePayment = async (adminFee: number): Promise<boolean> => {
+        try {
+            const fapshiPayload = {
+                amount: Math.round(adminFee), // Round to whole number
+                email: user?.email,
+                redirectUrl: `${window.location.origin}${location.pathname}?projectId=${project?._id}&bidId=${selectedBid?._id}&adminFee=true`,
+                userId: user._id.toString(),
+                externalId: `admin_fee_${selectedBid?._id}_${Date.now()}`,
+                message: `Admin fee for project award: ${project?.title}`,
+            };
+
+            const fapshiRes = await axios.post(
+                "https://sandbox.fapshi.com/initiate-pay",
+                fapshiPayload,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        apikey: 'FAK_TEST_177a608c18c0db8c50be',
+                        apiuser: 'f046347f-8d27-40cd-af94-90bc44f3d2c7',
+                    },
+                    timeout: 10000,
+                }
+            );
+
+            if (fapshiRes.data && fapshiRes.data.link) {
+                // Open payment window and wait for callback
+                return await waitForPaymentConfirmation(fapshiRes.data.link);
+            }
+            return false;
+        } catch (error) {
+            console.error('Admin fee payment error:', error);
+            return false;
+        }
+    };
+
+    const waitForPaymentConfirmation = (paymentLink: string): Promise<boolean> =>
+        new Promise((resolve) => {
+            const paymentWindow = window.open(paymentLink, '_blank', 'width=500,height=600');
+
+            if (!paymentWindow) {
+                alert('Please allow popups for this site to make payments');
+                resolve(false);
+                return;
+            }
+
+            let paymentCompleted = false;
+
+            const checkPayment = setInterval(() => {
+                try {
+                    // Check if payment window is closed by user
+                    if (paymentWindow.closed) {
+                        clearInterval(checkPayment);
+                        if (!paymentCompleted) {
+                            // Window was closed manually without completing payment
+                            resolve(false);
+                        }
+                        return;
+                    }
+
+                    // Check the main window's URL for payment success parameters
+                    const mainWindowParams = new URLSearchParams(window.location.search);
+                    const adminFeeStatus = mainWindowParams.get('adminFeeStatus');
+                    const transId = mainWindowParams.get('transId');
+                    const status = mainWindowParams.get('status');
+
+                    if ((adminFeeStatus === 'success') || (status === 'successful' && transId)) {
+                        paymentCompleted = true;
+                        clearInterval(checkPayment);
+
+                        // Force close the payment popup
+                        paymentWindow.close();
+
+                        // Clean up the main window URL
+                        cleanUrlParameters();
+
+                        resolve(true);
+                        return;
+                    }
+
+                    // Alternative: Check if we're in the popup and payment is successful
+                    try {
+                        const popupUrl = paymentWindow.location.href;
+                        if (popupUrl.includes('success') || popupUrl.includes('status=successful')) {
+                            paymentCompleted = true;
+                            clearInterval(checkPayment);
+
+                            // Close the popup
+                            paymentWindow.close();
+
+                            resolve(true);
+                        }
+                    } catch (error) {
+                        // Cross-origin error - can't access payment window URL
+                        // This is normal, continue checking
+                    }
+
+                } catch (error) {
+                    console.log('Error checking payment status:', error);
+                }
+            }, 1000);
+
+            // Also listen for message events from the popup
+            const handleMessage = (event: MessageEvent) => {
+                if (event.data?.type === 'PAYMENT_COMPLETED') {
+                    paymentCompleted = true;
+                    clearInterval(checkPayment);
+                    paymentWindow.close();
+                    window.removeEventListener('message', handleMessage);
+                    resolve(true);
+                }
+            };
+
+            window.addEventListener('message', handleMessage);
+
+            // Timeout after 5 minutes
+            setTimeout(() => {
+                if (!paymentCompleted) {
+                    clearInterval(checkPayment);
+                    window.removeEventListener('message', handleMessage);
+                    if (!paymentWindow.closed) {
+                        paymentWindow.close();
+                    }
+                    resolve(false);
+                }
+            }, 300000);
+        });
+
+    // Helper function to clean URL parameters
+    const cleanUrlParameters = () => {
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, '', cleanUrl);
     };
 
     // Handle input changes
@@ -308,42 +467,45 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
             const bidId = queryParams.get('bidId');
             const milestoneId = queryParams.get('milestoneId');
             const projectId = queryParams.get('projectId');
+            const adminFee = queryParams.get('adminFee');
 
-            if (fapshistatus === 'successful' && transId) {
+            // Handle admin fee payment callback
+            if (adminFee && fapshistatus === 'successful' && transId) {
                 try {
-                    // Verify payment with your backend
-                    const verificationResponse = await axios.post('/api/verify-payment', {
+                    // Verify admin fee payment with your backend
+                    const verificationResponse = await axios.post('/api/v1/admin/verify-admin-fee-payment', {
                         transId,
                         bidId,
-                        milestoneId,
-                        projectId
+                        projectId,
+                        amount: selectedBid.bidAmount * 0.1
                     });
-                    console.log(verificationResponse);
 
                     if (verificationResponse.data.success) {
-                        setStatus('success');
-                        setMessage('Payment completed successfully! Milestone has been released.');
+                        // Update URL to remove admin fee parameters
+                        const newUrl = window.location.pathname + window.location.search.replace(/[?&]adminFee=true&adminFeeStatus=success/, '');
+                        window.history.replaceState({}, '', newUrl);
 
-                        // Update local state or refetch data
-                        setTimeout(() => {
-                            navigate(`/projects/${projectId}/bids`);
-                        }, 3000);
+                        setStatus('success');
+                        setMessage('Admin fee paid successfully! You can now proceed with awarding the project.');
                     } else {
                         setStatus('error');
-                        setMessage('Payment verification failed.');
+                        setMessage('Admin fee payment verification failed.');
                     }
                 } catch (error) {
                     setStatus('error');
-                    setMessage('Error verifying payment. Please contact support.');
+                    setMessage('Error verifying admin fee payment.');
                 }
-            } else {
-                setStatus('error');
-                setMessage('Payment was not successful. Please try again.');
+                return;
+            }
+
+            // Existing milestone payment handling...
+            if (fapshistatus === 'successful' && transId && !adminFee) {
+                // Your existing milestone payment logic...
             }
         };
 
         handlePaymentCallback();
-    }, [location.search, navigate]);
+    }, [location.search, navigate, selectedBid]);
 
     return (
         <>
@@ -638,43 +800,29 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
                         disabled={selectedBid?.isSigned || isEditing}
                     >
                         Award Request
+                        {selectedBid?.bidAmount && (
+                            <Tooltip
+                                title={`10% admin fee: ${(selectedBid.bidAmount * 0.1).toFixed(2)} XAF will be deducted`}
+                                placement="top"
+                            >
+                                <InfoIcon fontSize="small" sx={{ ml: 1 }} />
+                            </Tooltip>
+                        )}
                     </Button>
                 </DialogActions>
             </Dialog>
 
             {/* Reject Confirmation Dialog */}
-            <Dialog open={actionType === 'rejected'} onClose={handleCancelAction} maxWidth="sm" fullWidth>
-                <DialogTitle>Confirm Rejection</DialogTitle>
-                <DialogContent>
-                    <Alert severity="warning" sx={{ mb: 2 }}>
-                        Are you sure you want to reject this bid?
-                    </Alert>
-                    <TextField
-                        fullWidth
-                        multiline
-                        rows={4}
-                        label="Reason for rejection"
-                        value={rejectionReason}
-                        onChange={(e) => {
-                            setRejectionReason(e.target.value);
-                            if (errors.rejectionReason) setErrors({ ...errors, rejectionReason: '' });
-                        }}
-                        error={!!errors.rejectionReason}
-                        helperText={errors.rejectionReason || "Please provide a detailed reason for rejection"}
-                        required
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCancelAction}>Cancel</Button>
-                    <Button
-                        onClick={handleConfirmAction}
-                        color="error"
-                        variant="contained"
-                    >
-                        Confirm Rejection
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <RejectConfirmationDialog
+                actionType={actionType}
+                handleCancelAction={handleCancelAction}
+                rejectionReason={rejectionReason}
+                setRejectionReason={setRejectionReason}
+                errors={errors}
+                setErrors={setErrors}
+                handleConfirmAction={handleConfirmAction}
+            />
+
 
             {/* Accept Confirmation Dialog */}
             <ConfirmAcceptanceDialog

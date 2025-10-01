@@ -1,27 +1,18 @@
-import React, { useEffect } from "react";
 import { Box, Typography, Grid, Card, CardContent, CardMedia, Button, IconButton, Chip, useTheme, } from "@mui/material";
 import {
   ArrowBackIos, LaptopMac,
   ArrowForwardIos,
   LocationOn,
   AccessTime,
-  Person,
   Event,
   Star,
 } from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { AppDispatch, RootState } from '../../redux/store';
-import { publicHomeEventsFetch } from "../../redux/actions/home-recommendation.action";
 
-export default function UpcomingEvents({ title, des }: any) {
+
+export default function UpcomingEvents({ title, des,filterdEvent,loading }: any) {
   const theme = useTheme();
-  const dispatch = useDispatch<AppDispatch>();
-  const { upcomingHomeEvents, loading } = useSelector((state: any) => state.homeRecom);
-  console.log("upcomingHomeEvents",upcomingHomeEvents);
-  useEffect(() => {
-    dispatch(publicHomeEventsFetch());
-  }, [dispatch]);
+  
 
   return (
     <Box
@@ -83,11 +74,11 @@ export default function UpcomingEvents({ title, des }: any) {
 
       {loading ? (
         <Typography>Loading events...</Typography>
-      ) : !upcomingHomeEvents?.length ? (
+      ) : !filterdEvent?.length ? (
         <Typography>No upcoming events found</Typography>
       ) : (
         <Grid container spacing={{ xs: 3, md: 4 }}>
-          {upcomingHomeEvents.map((ev: any) => (
+          {filterdEvent.map((ev: any) => (
             <Grid key={ev.id} item xs={12} sm={6} md={4}>
               <Card
                 sx={{

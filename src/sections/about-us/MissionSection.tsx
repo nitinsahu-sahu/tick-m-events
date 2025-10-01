@@ -4,6 +4,7 @@ import StarIcon from "@mui/icons-material/Star";
 import PeopleIcon from "@mui/icons-material/People";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import { useNavigate } from "react-router-dom";
 
 const features = [
     {
@@ -29,11 +30,13 @@ const features = [
 ];
 
 export function MissionSection() {
+     const navigate = useNavigate();
+    
     return (
         <>
             <Box
                 sx={{
-                    py: { xs: 6, md: 10 },
+                    py: { xs: 1, md: 1 },
                     px: { xs: 2, md: 4 },
                     maxWidth: "1050px",
                     mx: "auto",
@@ -83,7 +86,8 @@ export function MissionSection() {
                                 lineHeight: 1.7,
                             }}
                         >
-                            To make TICK-M EVENTS the official partner for events in Africa, and soon across the world, by becoming the go-to app for experiencing, organizing, and professionalizing events. With TICK-M EVENTS, every event becomes simpler, more connected, and truly unforgettable.
+                            To make TICK-M EVENTS the official partner for events in Africa, and soon across the world, by becoming the go-to app for experiencing, organizing, and professionalizing events.
+                             With TICK-M EVENTS, every event becomes simpler, more connected, and truly unforgettable.
                         </Typography>
 
                         {/* Bullet points */}
@@ -114,6 +118,7 @@ export function MissionSection() {
                                 py: 1.2,
                                 "&:hover": { backgroundColor: "#102c44" },
                             }}
+                             onClick={() => navigate("/sign-in")}
                         >
                             Get Started Now →
                         </Button>
@@ -132,7 +137,7 @@ export function MissionSection() {
                                     <Box
                                         sx={{
                                             width: "100%",
-                                            aspectRatio: "1 / 1", // ✅ makes the image square
+                                            aspectRatio: "1 / 1", 
                                             overflow: "hidden",
                                             borderRadius: "12px",
                                             boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
@@ -155,7 +160,7 @@ export function MissionSection() {
                     </Grid>
                 </Grid>
             </Box>
-            <Box
+            {/* <Box
                 sx={{
                     bgcolor: "#2395d4",
                     py: { xs: 6, md: 6 },
@@ -191,7 +196,7 @@ export function MissionSection() {
                         </Box>
                     ))}
                 </Box>
-            </Box>
+            </Box> */}
             <Box
                 sx={{
                     py: { xs: 6, md: 10 },
@@ -216,7 +221,7 @@ export function MissionSection() {
                             <Box
                                 sx={{
                                     position: "relative",
-                                    width: "70%",
+                                    width: "90%",
                                     borderRadius: 2,
                                     overflow: "hidden",
                                     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
@@ -225,7 +230,7 @@ export function MissionSection() {
                             >
                                 <Box
                                     component="img"
-                                    src="/assets/images/about/img.png"
+                                    src="/assets/images/about/img-2.png"
                                     alt="Video"
                                     sx={{
                                         width: "100%",
@@ -233,11 +238,11 @@ export function MissionSection() {
                                         objectFit: "cover",
                                     }}
                                 />
-
+                               
                             </Box>
 
                             {/* Second Image (diagonal + overlapping) */}
-                            <Box
+                            {/* <Box
                                 sx={{
                                     position: "absolute",
                                     bottom: { xs: "-30px", md: "-40px" },
@@ -246,7 +251,7 @@ export function MissionSection() {
                                     borderRadius: 2,
                                     overflow: "hidden",
                                     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-
+                                   
                                     zIndex: 9999,
                                 }}
                             >
@@ -260,7 +265,7 @@ export function MissionSection() {
                                         objectFit: "cover",
                                     }}
                                 />
-                            </Box>
+                            </Box> */}
                         </Box>
                     </Grid>
 
@@ -293,8 +298,8 @@ export function MissionSection() {
                                 color: "#000000",
                             }}
                         >
-                            Ticket-M offers Clear pricing <br />
-                            and 24/7 great support.
+                            Tick-M Events offers full transparency <br />
+                            and 24/7 dedicated support.
                         </Typography>
 
                         <Typography
@@ -303,19 +308,16 @@ export function MissionSection() {
                                 color: "#737373",
                                 mb: 3,
                                 lineHeight: 1.7,
-                                fontSize: '1rem'
+                                fontSize:'1rem'
                             }}
                         >
-                            We are committed to offering transparent pricing with no hidden
-                            fees, comprehensive insurance options for peace of mind, and
-                            24/7 customer support to assist you whenever you need it. At
-                            Carento, your satisfaction is our top priority.
+                           We are committed to providing clear pricing with no hidden fees, maximum security for all your payments, and continuous assistance so that every organizer, participant, and service provider enjoys a smooth and reliable experience. At Tick-M Events, your trust and satisfaction are our top priority
                         </Typography>
 
                         {[
-                            "Explore a wide range of flexible rental options to suit your needs",
-                            "Comprehensive insurance coverage for complete peace of mind",
-                            "24/7 customer support for assistance anytime, anywhere",
+                            "Easy and transparent ticketing, no hidden costs ",
+                            "Verified and trusted service providers for your events ",
+                            " 24/7 customer support, anytime, anywhere ",
                         ].map((item, index) => (
                             <Box
                                 key={index}
@@ -327,7 +329,7 @@ export function MissionSection() {
                                 </Typography>
                             </Box>
                         ))}
-
+                         <Typography>Join us today and experience events differently. </Typography>
                         <Button
                             variant="contained"
                             sx={{
@@ -340,6 +342,7 @@ export function MissionSection() {
                                 py: 1.2,
                                 "&:hover": { backgroundColor: "#102c44" },
                             }}
+                             onClick={() => navigate("/sign-in")}
                         >
                             Get Started Now →
                         </Button>

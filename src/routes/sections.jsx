@@ -73,7 +73,7 @@ export const WithDrawlPage = lazy(() => import('src/pages/withdrawl'));
 export const AwardedListPage = lazy(() => import('src/pages/signedProjectList'));
 export const AboutUsPage = lazy(() => import('src/pages/about-us'));
 export const GobalHomePage = lazy(() => import('src/pages/global-home'));
-
+export const EventListPage = lazy(() => import('src/pages/event-list'));
 // ----------------------------------------------------------------------
 
 const renderFallback = (
@@ -289,16 +289,22 @@ export function Router() {
         { path: 'password-recovery', element: <PasswordRecoveryPage /> },
       ],
     },
-     {
-      path: 'home',
+    {
+      path: 'event-list',
       element: (
-          <GlobalHome />
+        <EventListPage />
       ),
     },
-     {
+    {
+      path: 'home',
+      element: (
+        <GlobalHome />
+      ),
+    },
+    {
       path: 'about-us',
       element: (
-          <AboutUsPage />
+        <AboutUsPage />
       ),
     },
     {

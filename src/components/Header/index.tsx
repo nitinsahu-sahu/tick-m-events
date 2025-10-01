@@ -20,6 +20,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LanguageIcon from "@mui/icons-material/Language";
 import { useState } from "react";
+// OR if using React Router:
+import { Link } from "react-router-dom";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -31,89 +33,28 @@ export default function Header() {
   const drawer = (
     <Box sx={{ width: 250, p: 2 }}>
       <List>
-        {["Home", "About Us", "Sell Your Event", "Advertise Your Event", "Contact"].map(
-          (text, index) => (
-            <ListItem button key={index}>
-              <ListItemText primary={text} />
-            </ListItem>
-          )
-        )}
+        {[
+          { text: "About Us", path: "/about-us" },
+          { text: "Sell Your Event", path: "/sell-event" },
+          { text: "Advertise Your Event", path: "/advertise-event" },
+          { text: "Contact", path: "/contact-us" },
+        ].map((item, index) => (
+          <ListItem 
+            button 
+            key={index}
+            component={Link}
+            to={item.path}
+            onClick={handleDrawerToggle}
+          >
+            <ListItemText primary={item.text} />
+          </ListItem>
+        ))}
       </List>
     </Box>
   );
 
   return (
     <header>
-      {/* 🔹 Top Bar */}
-      {/* <AppBar position="static" sx={{ bgcolor: "#0d2a4d", py: 0.5 }}>
-        <Toolbar
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontSize: "14px",
-            minHeight: "40px !important",
-          }}
-        >
-          <Box
-            display="flex"
-            gap={{ xs: 1, sm: 2, md: 3 }}
-            alignItems="center"
-            sx={{ fontSize: { xs: "11px", sm: "13px" } }}
-          >
-            <Box display="flex" alignItems="center" gap={0.5}>
-              <PhoneIcon sx={{ fontSize: 14 }} />
-              <Typography variant="body2">+1 222-555-33-99</Typography>
-            </Box>
-            <Box
-              display={{ xs: "none", sm: "flex" }}
-              alignItems="center"
-              gap={0.5}
-            >
-              <EmailIcon sx={{ fontSize: 14 }} />
-              <Typography variant="body2">sale@carento.com</Typography>
-            </Box>
-          </Box>
-
-
-          <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
-            <Button
-              sx={{
-                color: "white",
-                fontSize: { xs: "10px", sm: "12px" },
-                textTransform: "none",
-                display: "flex",
-                alignItems: "center",
-                minWidth: "auto",
-              }}
-            >
-              <PersonIcon fontSize="small" /> Sign in
-            </Button>
-
-
-            <Box display="flex" alignItems="center" gap={0.5}>
-              <LanguageIcon sx={{ fontSize: 16, color: "white" }} />
-              <Select
-                defaultValue="EN"
-                size="small"
-                sx={{
-                  fontSize: "12px",
-                  height: 28,
-                  color: "white",
-                  "& .MuiSelect-icon": { color: "white" },
-                  "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                }}
-                variant="outlined"
-              >
-                <MenuItem value="EN">EN</MenuItem>
-                <MenuItem value="FR">FR</MenuItem>
-              </Select>
-            </Box>
-
-          
-          </Box>
-        </Toolbar>
-      </AppBar> */}
-
       {/* 🔹 Main Navbar */}
       <AppBar
         position="static"
@@ -135,12 +76,13 @@ export default function Header() {
         >
           {/* Logo */}
           <Box display="flex" alignItems="center" gap={1}>
-            
-            <img
-              src="/assets/logo/full-logo.png"
-              alt="Logo"
-              style={{ height: 50 }}
-            />
+            <Link to="/home">
+              <img
+                src="/assets/logo/full-logo.png"
+                alt="Logo"
+                style={{ height: 50, cursor: "pointer" }}
+              />
+            </Link>
           </Box>
 
           {/* Menu (desktop only) */}
@@ -152,64 +94,135 @@ export default function Header() {
               fontWeight: 500,
             }}
           >
-            <Typography
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 0.5,
-                cursor: "pointer",
-                fontWeight: 600,
-              }}
-            >
-              Home <ExpandMoreIcon sx={{ fontSize: 16 }} />
-            </Typography>
+            {/* <Link to="/home" style={{ textDecoration: "none", color: "inherit" }}>
+              <Typography
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  '&:hover': {
+                    color: "#0d2a4d",
+                  }
+                }}
+              >
+                Home <ExpandMoreIcon sx={{ fontSize: 16 }} />
+              </Typography>
+            </Link> */}
 
-            <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
-              Events
-            </Typography>
-            <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
-              Blog
-            </Typography>
-            <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
-              B2B Marketplace
-            </Typography>
-            <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
-              About
-            </Typography>
-            <Typography sx={{ cursor: "pointer", fontWeight: 600 }}>
-              Contact
-            </Typography>
+            <Link to="/our-event" style={{ textDecoration: "none", color: "inherit" }}>
+              <Typography 
+                sx={{ 
+                  cursor: "pointer", 
+                  fontWeight: 600,
+                  '&:hover': {
+                    color: "#0d2a4d",
+                  }
+                }}
+              >
+                Events
+              </Typography>
+            </Link>
+            
+            <Link to="/blog" style={{ textDecoration: "none", color: "inherit" }}>
+              <Typography 
+                sx={{ 
+                  cursor: "pointer", 
+                  fontWeight: 600,
+                  '&:hover': {
+                    color: "#0d2a4d",
+                  }
+                }}
+              >
+                Blog
+              </Typography>
+            </Link>
+            
+            <Link to="/b2b-marketplace" style={{ textDecoration: "none", color: "inherit" }}>
+              <Typography 
+                sx={{ 
+                  cursor: "pointer", 
+                  fontWeight: 600,
+                  '&:hover': {
+                    color: "#0d2a4d",
+                  }
+                }}
+              >
+                B2B Marketplace
+              </Typography>
+            </Link>
+            
+            <Link to="/about-us" style={{ textDecoration: "none", color: "inherit" }}>
+              <Typography 
+                sx={{ 
+                  cursor: "pointer", 
+                  fontWeight: 600,
+                  '&:hover': {
+                    color: "#0d2a4d",
+                  }
+                }}
+              >
+                About
+              </Typography>
+            </Link>
+            
+            <Link to="/contact-us" style={{ textDecoration: "none", color: "inherit" }}>
+              <Typography 
+                sx={{ 
+                  cursor: "pointer", 
+                  fontWeight: 600,
+                  '&:hover': {
+                    color: "#0d2a4d",
+                  }
+                }}
+              >
+                Contact
+              </Typography>
+            </Link>
           </Box>
 
           {/* Right Controls */}
           <Box display="flex" alignItems="center" gap={1}>
-            <Button
-              sx={{
-                color: "#0d2a4d",
-                fontSize: { xs: "10px", sm: "12px" },
-                textTransform: "none",
-                display: "flex",
-                alignItems: "center",
-                minWidth: "auto",
-                border: "1px solid #0d2a4d"
-              }}
-            >
-              <PersonIcon fontSize="small" /> Sign in
-            </Button>
+            <Link to="/sign-in" style={{ textDecoration: "none" }}>
+              <Button
+                sx={{
+                  color: "#0d2a4d",
+                  fontSize: { xs: "10px", sm: "12px" },
+                  textTransform: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  minWidth: "auto",
+                  border: "1px solid #0d2a4d",
+                  '&:hover': {
+                    backgroundColor: "#0d2a4d",
+                    color: "white",
+                  }
+                }}
+              >
+                <PersonIcon fontSize="small" /> Sign in
+              </Button>
+            </Link>
 
-            <Button
-              sx={{
-                color: "#0d2a4d",
-                fontSize: { xs: "10px", sm: "12px" },
-                textTransform: "none",
-                display: "flex",
-                alignItems: "center",
-                minWidth: "auto",
-                border: "1px solid #0d2a4d"
-              }}
-            >
-              <PersonIcon fontSize="small" /> Create an Event
-            </Button>
+            <Link to="#" style={{ textDecoration: "none" }}>
+              <Button
+                sx={{
+                  color: "#0d2a4d",
+                  fontSize: { xs: "10px", sm: "12px" },
+                  textTransform: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  minWidth: "auto",
+                  border: "1px solid #0d2a4d",
+                  '&:hover': {
+                    backgroundColor: "#0d2a4d",
+                    color: "white",
+                  }
+                }}
+              >
+                <PersonIcon fontSize="small" /> Create Your Event
+              </Button>
+            </Link>
 
             {/* Language */}
             <Box display="flex" alignItems="center" gap={0.5}>
@@ -231,12 +244,14 @@ export default function Header() {
               </Select>
             </Box>
 
-
             {/* Hamburger menu (mobile only) */}
             <IconButton
               edge="end"
               color="inherit"
-              sx={{ display: { xs: "flex", md: "none" } }}
+              sx={{ 
+                display: { xs: "flex", md: "none" },
+                color: "#0d2a4d"
+              }}
               onClick={handleDrawerToggle}
             >
               <MenuIcon />

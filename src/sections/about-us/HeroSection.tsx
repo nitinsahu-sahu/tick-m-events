@@ -88,7 +88,8 @@ export function HeroSection() {
                                 color: "#555",
                             }}
                         >
-                            Welcome to TICK-M EVENTS, the all-in-one platform that is revolutionizing the way events are organized, discovered, and experienced in Africa and worldwide. We know every event is unique – whether it’s a concert, wedding, conference, festival, or trade show. That’s why we created a simple, secure, and accessible ecosystem that connects Organizers, Participants, and Service Providers on one platform.
+                           Welcome to TICK-M EVENTS, the all-in-one platform that is revolutionizing the way events are organized, discovered, and experienced in Africa and worldwide.
+                            We know every event is unique – whether it’s a concert, wedding, conference, festival, or trade show. That’s why we created a simple, secure, and accessible ecosystem that connects Organizers, Participants, and Service Providers on one platform.
                         </Typography>
                     </Grid>
                 </Grid>

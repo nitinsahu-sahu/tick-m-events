@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Box,
     Typography,
@@ -9,14 +9,11 @@ import {
     Button,
     Grid,
     Paper,
+    IconButton,
 } from '@mui/material';
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
-
-const eventTypes = ['Concert', 'Sports', 'Theater'];
-const locations = ['New York', 'London', 'Tokyo'];
-const pricingOptions = ['Low to High', 'High to Low'];
 
 const brands = [
     { name: "trivago", img: "/assets/home-global-img/trivago.png" },
@@ -28,57 +25,306 @@ const brands = [
     { name: "priceline", img: "/assets/home-global-img/priceline.png" },
 ];
 
-export default function HeroSection() {
-    const [tab, setTab] = React.useState(0);
+// Carousel items with your specified points
+const carouselItems = [
+    {
+        type: 'video',
+        src: '/assets/videos/concert-showcase.mp4', // Replace with your actual video path
+        title: 'Concerts in Full Light',
+        description: 'A concert in full light in the colours of TICK-M EVENTS',
+        poster: '/assets/home-banner/01.jpg' // Fallback image
+    },
+    {
+        type: 'image',
+        src: '/assets/home-banner/02.jpg',
+        title: 'Beautiful Wedding Events',
+        description: 'A smiling bride in a beautifully decorated room',
+        poster: '/assets/home-banner/01.jpg' // Fallback image
+
+    },
+    {
+        type: 'image',
+        src: '/assets/images/e-ticket-users.jpg',
+        title: 'Digital E-Tickets',
+        description: 'Participants smiling with their phones displaying their e-ticket'
+    },
+    {
+        type: 'video',
+        src: '/assets/videos/qr-scanning.mp4',
+        title: 'Seamless Entry',
+        description: 'A scanned ticket at the entrance with QR Code animation',
+        poster: '/assets/images/qr-poster.jpg'
+    },
+    {
+        type: 'image',
+        src: '/assets/images/photo-filter-event.jpg',
+        title: 'Personalized Experience',
+        description: 'Participants who take pictures of themselves with a personalized filter of the event'
+    },
+    {
+        type: 'image',
+        src: '/assets/images/professional-conference.jpg',
+        title: 'Professional Conferences',
+        description: 'Host and attend high-quality professional conferences'
+    }
+];
+
+// Static options for filters
+const eventTypes = ['All', 'Public', 'Private'];
+const pricingOptions = ['All', 'Free', 'Paid'];
+
+interface HeroSectionProps {
+    events: any[];
+    onEventsFiltered?: (events: any[]) => void;
+}
+
+export default function HeroSection({ events, onEventsFiltered }: HeroSectionProps) {
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [isPlaying, setIsPlaying] = useState<boolean>(true);
+    const videoRef = useRef(null);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Auto-scroll functionality
+    useEffect(() => {
+        if (isPlaying) {
+            intervalRef.current = setInterval(() => {
+                setCurrentSlide((prev) => (prev + 1) % carouselItems.length);
+            }, 5000); // 5 seconds
+        } else if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+
+        // Cleanup function
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+            }
+        };
+    }, [isPlaying]);
+
+    const currentItem = carouselItems[currentSlide];
+
+    const [tab, setTab] = useState(0);
+    const [filters, setFilters] = useState({
+        eventType: '',
+        location: '',
+        date: '',
+        pricing: ''
+    });
+
+    const [filteredEvents, setFilteredEvents] = useState<any[]>([]);
+    const [locations, setLocations] = useState<string[]>(['All']);
+
+    useEffect(() => {
+        if (onEventsFiltered) {
+            onEventsFiltered(filteredEvents);
+        }
+    }, [filteredEvents, onEventsFiltered]);
+
+    // Extract unique locations from events
+    useEffect(() => {
+        if (events && events.length > 0) {
+            const uniqueLocations = [...new Set(events.map((event: any) => {
+                // Extract city from location string or use full location
+                const locationParts = event.location.split(',');
+                return locationParts[0]?.trim() || event.location;
+            }))];
+            setLocations(['All', ...uniqueLocations]);
+        }
+    }, [events]);
+
+    // Apply filters whenever filters or tab change
+    useEffect(() => {
+        if (!events) return;
+
+        let result = [...events];
+
+        // Tab filter (Online vs Live events)
+        if (tab === 1) { // Online Events
+            result = result.filter(event => event.format === 'Online');
+        } else if (tab === 2) { // Live Events
+            result = result.filter(event => event.format === 'In-person');
+        }
+        // tab === 0 shows All Events
+
+        // Event Type filter
+        if (filters.eventType && filters.eventType !== 'All') {
+            result = result.filter(event => event.eventType === filters.eventType);
+        }
+
+        // Location filter
+        if (filters.location && filters.location !== 'All') {
+            result = result.filter(event => {
+                const eventLocation = event.location.split(',')[0]?.trim();
+                return eventLocation === filters.location;
+            });
+        }
+
+        // Date filter
+        if (filters.date) {
+            result = result.filter(event => event.date === filters.date);
+        }
+
+        // Pricing filter
+        if (filters.pricing && filters.pricing !== 'All') {
+            if (filters.pricing === 'Free') {
+                result = result.filter(event => event.payStatus === 'free');
+            } else if (filters.pricing === 'Paid') {
+                result = result.filter(event => event.payStatus === 'paid');
+            }
+        }
+
+        setFilteredEvents(result);
+    }, [events, tab, filters]);
+
+    const handleFilterChange = (filterType: any, value: any) => {
+        setFilters(prev => ({
+            ...prev,
+            [filterType]: value
+        }));
+    };
+
+    const handleSearch = () => {
+        // Search is already handled by the useEffect, but you can add additional logic here
+        console.log('Search triggered with filters:', filters);
+    };
+
+    const clearFilters = () => {
+        setFilters({
+            eventType: '',
+            location: '',
+            date: '',
+            pricing: ''
+        });
+        setTab(0);
+    };
 
     return (
         <Box>
-            {/* HERO SECTION */}
+            {/* HERO SECTION WITH VIDEO/CAROUSEL BACKGROUND */}
             <Box
                 sx={{
-                    backgroundImage: 'url(/assets/home-global-img/banner.jpg)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    color: '#fff',
-                    py: 12,
-                    px: 2,
-                    textAlign: 'center',
                     position: 'relative',
+                    height: '100vh',
+                    minHeight: '600px',
                     overflow: 'hidden',
-                    '&::before': {
-                        content: '""',
+                    color: '#fff',
+                }}
+            >
+                {/* Background Video/Image */}
+                <Box
+                    sx={{
                         position: 'absolute',
                         top: 0,
                         left: 0,
                         width: '100%',
                         height: '100%',
-                        background: 'linear-gradient(120deg, #0d1f69, #071c5a)',
-                        opacity: 0.85,
                         zIndex: 0,
-                    },
-                }}
-            >
-                <Box position="relative" zIndex={1}>
-                    <Typography variant="h6" fontWeight="medium" gutterBottom>
-                        Organize. Book. Save time. TICK-M EVENTS is revolutionizing events in Africa
-                    </Typography>
+                    }}
+                >
+                    {currentItem.type === 'video' ? (
+                        <Box
+                            component="video"
+                            ref={videoRef}
+                            src={currentItem.src}
+                            poster={currentItem.poster}
+                            autoPlay
+                            muted
+                            loop
+                            sx={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                            }}
+                        />
+                    ) : (
+                        <Box
+                            component="img"
+                            src={currentItem.src}
+                            alt={currentItem.title}
+                            sx={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                            }}
+                        />
+                    )}
+                    {/* Overlay */}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            background: 'linear-gradient(120deg, #0d1f69, #071c5a)',
+                            opacity: 0.7,
+                        }}
+                    />
+                </Box>
+
+                {/* Content */}
+                <Box
+                    position="relative"
+                    zIndex={2}
+                    sx={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        textAlign: 'center',
+                        px: 2,
+                    }}
+                >
                     <Typography
                         variant="h3"
                         fontWeight="bold"
                         sx={{
                             fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+                            mb: 2,
                         }}
                     >
-                        A single platform to manage your events, sell your tickets,<br /> find quality service
+                        Organize. Book. Save time. TICK-M EVENTS is revolutionizing events in Africa
+                    </Typography>
+                    <Typography
+                        variant="h6"
+                        fontWeight="mediam"
+
+                    >
+                        A single platform to manage your events, sell your tickets, find quality service
                         providers and live unforgettable experiences.
                     </Typography>
 
-                    <Grid container justifyContent="center" spacing={4} mt={3}>
+                    {/* Current Slide Title */}
+                    <Typography
+                        variant="h4"
+                        fontWeight="bold"
+                        sx={{
+                            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
+                            mb: 1,
+                            color: '#00AEEF',
+                        }}
+                    >
+                        {currentItem.title}
+                    </Typography>
+
+                    <Typography
+                        variant="h6"
+                        fontWeight="medium"
+                        sx={{
+                            mb: 4,
+                            maxWidth: '800px',
+                        }}
+                    >
+                        {currentItem.description}
+                    </Typography>
+
+                    <Grid container justifyContent="center" spacing={4}>
                         {[
-                            "High quality at a low cost.",
-                            "Premium services.",
-                            "24/7 Customer support.",
+                            "Create my even",
+                            "I'm looking for an event",
+                            "I find a service provider",
                         ].map((text, index) => (
                             <Grid item key={index}>
                                 <Box display="flex" alignItems="center" gap={1}>
@@ -88,6 +334,8 @@ export default function HeroSection() {
                             </Grid>
                         ))}
                     </Grid>
+
+
                 </Box>
             </Box>
 
@@ -106,7 +354,6 @@ export default function HeroSection() {
                     color: '#000',
                 }}
             >
-
                 <Box
                     display="flex"
                     justifyContent="space-between"
@@ -129,7 +376,7 @@ export default function HeroSection() {
                                 py: 1,
                                 mr: 1,
                                 backgroundColor: tab === 0 ? '#00AEEF' : 'transparent',
-                                color: tab === 0 ? '#fff' : '#000', // black text for inactive tabs
+                                color: tab === 0 ? '#fff' : '#000',
                             }}
                         />
                         <Tab
@@ -162,7 +409,7 @@ export default function HeroSection() {
                     <Box display="flex" alignItems="center" gap={1}>
                         <PersonIcon fontSize="small" sx={{ color: '#000' }} />
                         <Typography variant="body2" color="text.primary">
-                            Need more information?
+                            {filteredEvents.length} events found
                         </Typography>
                     </Box>
                 </Box>
@@ -183,12 +430,14 @@ export default function HeroSection() {
                         select
                         fullWidth
                         label="Event Type"
-                        defaultValue=""
+                        value={filters.eventType}
+                        onChange={(e) => handleFilterChange('eventType', e.target.value)}
                         variant="standard"
                         InputProps={{ disableUnderline: true, style: { color: '#000' } }}
                         InputLabelProps={{ style: { color: '#000' } }}
                         sx={{ minWidth: 150 }}
                     >
+                        <MenuItem value="">All Types</MenuItem>
                         {eventTypes.map((type) => (
                             <MenuItem key={type} value={type}>
                                 {type}
@@ -201,12 +450,14 @@ export default function HeroSection() {
                         select
                         fullWidth
                         label="Event Location"
-                        defaultValue=""
+                        value={filters.location}
+                        onChange={(e) => handleFilterChange('location', e.target.value)}
                         variant="standard"
                         InputProps={{ disableUnderline: true, style: { color: '#000' } }}
                         InputLabelProps={{ style: { color: '#000' } }}
                         sx={{ minWidth: 150 }}
                     >
+                        <MenuItem value="">All Locations</MenuItem>
                         {locations.map((loc) => (
                             <MenuItem key={loc} value={loc}>
                                 {loc}
@@ -219,6 +470,8 @@ export default function HeroSection() {
                         fullWidth
                         type="date"
                         label="Event Date"
+                        value={filters.date}
+                        onChange={(e) => handleFilterChange('date', e.target.value)}
                         variant="standard"
                         InputLabelProps={{ shrink: true, style: { color: '#000' } }}
                         InputProps={{ disableUnderline: true, style: { color: '#000' } }}
@@ -230,12 +483,14 @@ export default function HeroSection() {
                         select
                         fullWidth
                         label="Pricing"
-                        defaultValue=""
+                        value={filters.pricing}
+                        onChange={(e) => handleFilterChange('pricing', e.target.value)}
                         variant="standard"
                         InputProps={{ disableUnderline: true, style: { color: '#000' } }}
                         InputLabelProps={{ style: { color: '#000' } }}
                         sx={{ minWidth: 150 }}
                     >
+                        <MenuItem value="">All Pricing</MenuItem>
                         {pricingOptions.map((option) => (
                             <MenuItem key={option} value={option}>
                                 {option}
@@ -243,26 +498,40 @@ export default function HeroSection() {
                         ))}
                     </TextField>
 
-                    {/* Search Button */}
-                    <Button
-                        variant="contained"
-                        startIcon={<SearchIcon />}
-                        sx={{
-                            minWidth: 160,
-                            bgcolor: '#002d72',
-                            color: '#fff',
-                            fontWeight: 'bold',
-                            textTransform: 'none',
-                            px: 3,
-                            py: 1.5,
-                            borderRadius: 2,
-                            '&:hover': {
-                                bgcolor: '#001f4f',
-                            },
-                        }}
-                    >
-                        Find a Event
-                    </Button>
+                    {/* Action Buttons */}
+                    <Box display="flex" gap={1}>
+                        <Button
+                            variant="outlined"
+                            onClick={clearFilters}
+                            sx={{
+                                textTransform: 'none',
+                                borderRadius: 2,
+                                px: 2,
+                            }}
+                        >
+                            Clear
+                        </Button>
+                        <Button
+                            variant="contained"
+                            startIcon={<SearchIcon />}
+                            onClick={handleSearch}
+                            sx={{
+                                minWidth: 160,
+                                bgcolor: '#002d72',
+                                color: '#fff',
+                                fontWeight: 'bold',
+                                textTransform: 'none',
+                                px: 3,
+                                py: 1.5,
+                                borderRadius: 2,
+                                '&:hover': {
+                                    bgcolor: '#001f4f',
+                                },
+                            }}
+                        >
+                            Find Events
+                        </Button>
+                    </Box>
                 </Box>
             </Paper>
 

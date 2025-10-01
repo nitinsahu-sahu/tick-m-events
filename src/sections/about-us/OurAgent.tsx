@@ -1,4 +1,4 @@
-import { Typography, Box,Grid, CardContent, Avatar, IconButton, Card } from "@mui/material";
+import { Typography, Box, Grid, CardContent, Avatar, IconButton, Card, Divider } from "@mui/material";
 import Facebook from '@mui/icons-material/Facebook';
 import Instagram from '@mui/icons-material/Instagram';
 import YouTube from '@mui/icons-material/YouTube';
@@ -10,58 +10,47 @@ interface SocialIconProps {
 
 const agents = [
     {
-       
+        name: "Samuel DIMOU",
+        role: "CEO (Co-founder))",
+        img: "/assets/images/about/teams/team-2.jpg",
+        socials: ["instagram", "facebook", "x", "youtube"],
+    },
+    {
+
         name: "Yannick Cabrel TEGUEBOUG",
         role: "COO (Co-founder)",
         img: "/assets/images/about/teams/team-1.png",
         socials: ["instagram", "facebook", "x", "youtube"],
     },
-    {
-        name: "Samuel DIMOU",
-        role: "CEO (Co-founder))",
-        img: "/assets/images/about/teams/team-1.png",
-        socials: ["instagram", "facebook", "x", "youtube"],
-    },
-    {
-        name: "Ronald Richards",
-        role: "COO (Chief Operating Officer)",
-        img: "/assets/images/about/teams/team-1.png",
-        socials: ["instagram", "facebook", "x", "youtube"],
-    },
-    {
-        name: "Jerome Bell",
-        role: "CMO (Chief Marketing Officer)",
-        img: "/assets/images/about/teams/team-1.png",
-        socials: ["instagram", "facebook", "youtube"],
-    },
+
 ];
 
 const features = [
     {
         img: "/assets/images/about/fi_5035167.png",
-        alt: "Instant Booking",
-        title: "Instant Events Booking Easily",
-        desc: " Online Ticketing: Buy, sell, and manage tickets with ease.",
+        alt: "Online Ticketing",
+        title: "Online Ticketing:",
+        desc: "  Buy, sell, and manage tickets with ease.",
     },
     {
         img: "/assets/images/about/fi_9099392.png",
-        alt: "Transparent Pricing",
-        title: "Transparent Pricing",
-        desc: "Organizer Tools: Ticket management, promotions, notifications, payments, and real-time analytics.",
+        alt: "Organizer Tools",
+        title: "Organizer Tools:",
+        desc: "Ticket management, promotions, notifications, payments, and real-time analytics.",
     },
     {
         img: "/assets/images/about/fi_15305191.png",
-        alt: "Convenient Booking",
-        title: "Convenient Booking",
-        desc: "B2B Marketplace: Easily find trusted and verified service providers for your events.",
+        alt: "B2B Marketplace",
+        title: "B2B Marketplace:",
+        desc: "Easily find trusted and verified service providers for your events.",
     },
     {
         img: "/assets/images/about/fi_9723160.png",
-        alt: "Customer Support",
-        title: "24/7 Customer Support",
-        desc: "Custom Photo/Video Filters: Capture memories with the unique style of each event.",
+        alt: "Custom Photo/Video Filters",
+        title: "Custom Photo/Video Filters: ",
+        desc: "Capture memories with the unique style of each event.",
     },
- 
+
 ];
 
 function SocialIcon({ type }: SocialIconProps) {
@@ -81,9 +70,9 @@ function SocialIcon({ type }: SocialIconProps) {
 export function OurAgent() {
     return (
         <>
-          <Box
+            <Box
                 sx={{
-                    py: { xs: 6, md: 10 },
+                    py: { xs: 1, md: 1 },
                     px: { xs: 2, md: 4 },
                     maxWidth: "1050px",
                     mx: "auto",
@@ -117,7 +106,7 @@ export function OurAgent() {
                             />
 
                             {/* Overlay Box on the right */}
-                            <Box
+                            {/* <Box
                                 sx={{
                                     position: "absolute",
                                     bottom: 16,
@@ -152,7 +141,7 @@ export function OurAgent() {
                                 >
                                     Industry <br /> Experts
                                 </Typography>
-                            </Box>
+                            </Box> */}
                         </Box>
 
                     </Grid>
@@ -184,10 +173,35 @@ export function OurAgent() {
                         </Box>
                     </Grid>
 
-                    {/* Right: Top box + Bottom image */}
                     <Grid item xs={12} md={4}>
+                        <Box
+                            sx={{
+                                height: "100%",
+                                borderRadius: "12px",
+                                overflow: "hidden",
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                "&:hover": {
+                                    boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                                },
+                                transition: "box-shadow 0.3s ease",
+                            }}
+                        >
+                            <Box
+                                component="img"
+                                src="/assets/images/about/about.png"
+                                alt="Portrait"
+                                sx={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                }}
+                            />
+                        </Box>
+                    </Grid>
+                    {/* Right: Top box + Bottom image */}
+                    {/* <Grid item xs={12} md={4}>
                         <Grid container direction="column" spacing={4}>
-                            {/* Top Blue Box */}
+                         
                             <Grid item>
                                 <Box
                                     sx={{
@@ -226,7 +240,7 @@ export function OurAgent() {
                             </Grid>
 
 
-                            {/* Bottom image */}
+                   
                             <Grid item>
                                 <Box
                                     sx={{
@@ -253,7 +267,7 @@ export function OurAgent() {
                                 </Box>
                             </Grid>
                         </Grid>
-                    </Grid>
+                    </Grid> */}
                 </Grid>
                 {/* Features Section */}
                 <Box
@@ -286,103 +300,95 @@ export function OurAgent() {
                     </Grid>
                 </Box>
 
+                <Box sx={{ maxWidth: 1200, mx: "auto", px: 2, py: 6 }}>
+                    {/* Top Divider */}
+                    <Divider sx={{ mb: 4 }} />
 
-            </Box>
-           <Box sx={{
-                py: { xs: 6, md: 10 },
-                px: { xs: 2, md: 4 },
-                maxWidth: "1050px",
-                mx: "auto",
-            }}>
-                {/* Horizontal Line */}
-                <Box
-                    sx={{
-                        height: "2px",
-                        backgroundColor: "grey.300",
-                        width: "100%",
-                        mb: 2,
-                    }}
+                    {/* Title Section */}
+                    <Box sx={{ mb: 6 }}>
+                        <Typography
+                            variant="subtitle1"
+                            sx={{ color: "text.secondary", mb: 1, textAlign: "left" }}
+                        >
+                            Awesome Teams
+                        </Typography>
+                        <Typography
+                            variant="h4"
+                            sx={{
+                                fontWeight: 700,
+                                fontSize: { xs: "1.8rem", md: "2.4rem" },
+                                textAlign: "left",
+                            }}
+                        >
+                            Meet Our Agents
+                        </Typography>
+                    </Box>
 
-                />
+                    {/* Agent Cards */}
+                    <Grid container spacing={4} justifyContent="center">
+                        {agents.map((agent, index) => (
+                            <Grid item xs={12} sm={6} md={6} lg={6} key={index}>
+                                <Card
+                                    sx={{
+                                        borderRadius: 3,
+                                        overflow: "hidden",
+                                        boxShadow: 2,
+                                        transition: "box-shadow 0.3s ease",
+                                        "&:hover": {
+                                            boxShadow: 4,
+                                        },
+                                    }}
+                                >
+                                    <Avatar
+                                        src={agent.img}
+                                        alt={agent.name}
+                                        variant="square"
+                                        sx={{
+                                            width: "100%",
+                                            height: 350, // Increased height
+                                            objectFit: "cover",
+                                        }}
+                                    />
+                                    <CardContent>
+                                        <Typography
+                                            variant="h6"
+                                            sx={{ fontWeight: 700, color: "text.primary" }}
+                                        >
+                                            {agent.name}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
+                                            {agent.role}
+                                        </Typography>
+                                        <Box sx={{ display: "flex", gap: 1 }}>
+                                            {agent.socials.map((social, i) => (
+                                                <Box
+                                                    key={i}
+                                                    sx={{
+                                                        backgroundColor: "#F2F4F6",
+                                                        borderRadius: "50%",
+                                                        width: 36,
+                                                        height: 36,
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                    }}
+                                                >
+                                                    <IconButton size="small" sx={{ color: "black", p: 0 }}>
+                                                        <SocialIcon type={social} />
+                                                    </IconButton>
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
 
-                {/* Title Section - Left Aligned */}
-                <Typography variant="subtitle1" sx={{ color: "gray.600", mb: 1, textAlign: "left" }}>
-                    Awesome Teams
-                </Typography>
-                <Typography
-                    variant="h4"
-                    sx={{
-                        fontWeight: 700,
-                        mb: 6,
-                        fontSize: { xs: "1.8rem", md: "2.4rem" },
-                        textAlign: "left",
-                    }}
-                >
-                    Meet Our Agents
-                </Typography>
 
-                <Grid container spacing={4} justifyContent="center">
-                    {agents.map((agent, index) => (
-                        <Grid item xs={12} sm={6} md={3} key={index}>
-                            <Card
-                                sx={{
-                                    borderRadius: "16px",
-                                    overflow: "hidden",
-                                    boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
-                                    "&:hover": {
-                                        boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-                                    },
-                                }}
-                            >
-                                <Avatar
-                                    src={agent.img}
-                                    alt={agent.name}
-                                    variant="square"
-                                    sx={{ width: "100%", height: 280, objectFit: "cover" }}
-                                />
-                                <CardContent sx={{ textAlign: "left" }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 700, color: "black" }}>
-                                        {agent.name}
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: "#737373", mb: 2 }}>
-                                        {agent.role}
-                                    </Typography>
-                                    <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 1 }}>
-                                        {agent.socials.map((social, i) => (
-                                            <Box
-                                                key={i}
-                                                sx={{
-                                                    backgroundColor: "#F2F4F6",
-                                                    borderRadius: "50%",
-                                                    width: 36,
-                                                    height: 36,
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center",
-                                                }}
-                                            >
-                                                <IconButton size="small" sx={{ color: "black", p: 0 }}>
-                                                    <SocialIcon type={social} />
-                                                </IconButton>
-                                            </Box>
-                                        ))}
-                                    </Box>
-
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-                <Box
-                    sx={{
-                        width: "100%",
-                        height: "2px",
-                        backgroundColor: "grey.300",
-                        mt: 8,
-                        mb: 4,
-                    }}
-                />
-
+                    {/* Bottom Divider */}
+                    <Divider sx={{ mt: 8, mb: 4 }} />
+                </Box>
             </Box>
         </>
 

@@ -92,7 +92,8 @@ export function FrontHome() {
             <Header />
             <Box sx={{ p: 3 }} key={_id}>
                 {/* Breadcrumb */}
-                <Breadcrumb eventName={eventName} />
+                <Breadcrumb eventName={eventName} date={date} time={time} />
+
 
                 {/* Main Event Banner */}
                 <BannerGallery portraitImage={portraitImage} coverImage={coverImage} eventName={eventName} description={description} date={date} time={time} />

@@ -5,7 +5,7 @@ import { HeadingCommon } from "src/components/multiple-responsive-heading/headin
 import { formatEventDate, formatTimeTo12Hour } from "src/hooks/formate-time";
 
 
-export function BannerGallery({ coverImage, eventName, description, date, time,portraitImage }: any) {
+export function BannerGallery({ coverImage, eventName, description, date, time, portraitImage }: any) {
 
     return (
         <Grid container spacing={3}>
@@ -25,12 +25,7 @@ export function BannerGallery({ coverImage, eventName, description, date, time,p
                         borderRadius: "15px",
                         p: 3,
                     }}
-                >
-                    <HeadingCommon title={eventName} variant="h4" color="white" baseSize="54px" mb={0} />
-                    {ReactHtmlParser(description)}
-                    <HeadingCommon color="white" title={`${formatEventDate(date)} | ${formatTimeTo12Hour(time)}`} weight={400} baseSize="16px" />
-
-                </Card>
+                />
             </Grid>
 
             {/* Side Gallery */}
@@ -38,7 +33,7 @@ export function BannerGallery({ coverImage, eventName, description, date, time,p
                 <Card
                     sx={{
                         height: "330px",
-                         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${portraitImage?.url || "../assets/images/cover/banner-2.png"})`,
+                        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${portraitImage?.url || "../assets/images/cover/banner-2.png"})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                         borderRadius: "10px",

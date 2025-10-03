@@ -24,7 +24,7 @@ const EventManagementTable: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [eventToCancel, setEventToCancel] = useState(null);
-    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const handleApprove = async (event: any, status: any) => {
     setIsLoading(true);
@@ -63,7 +63,7 @@ const EventManagementTable: React.FC = () => {
         return 'default';
     }
   };
- const handleOpenCancelModal = (event:any) => {
+  const handleOpenCancelModal = (event: any) => {
     setSelectedEvent(event);
     setIsCancelModalOpen(true);
   };
@@ -71,7 +71,7 @@ const EventManagementTable: React.FC = () => {
   const handleCloseCancelModal = () => {
     setIsCancelModalOpen(false);
   };
-const handleCancelSuccess = () => {
+  const handleCancelSuccess = () => {
     // refresh data or show success message
   };
   return (
@@ -278,7 +278,7 @@ const handleCancelSuccess = () => {
         selectedEvent={selectedEvent}
         getStatusColor={getStatusColor}
       />
-       <CancellationModal
+      <CancellationModal
         open={isCancelModalOpen}
         onClose={handleCloseCancelModal}
         selectedEvent={selectedEvent}

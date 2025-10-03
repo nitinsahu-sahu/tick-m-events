@@ -104,13 +104,13 @@ export function FrontHome() {
                         <HeadingCommon title='Event Description' variant="h5" color="white" baseSize="40px" mb={0} weight={600} />
                         {ReactHtmlParser(description)}
 
-                        <Typography mt={2}>
+                        {/* <Typography mt={2}>
                             Registration is required before November 10, 2025. Don’t miss out on this incredible event!
-                        </Typography>
+                        </Typography> */}
                     </Box>
                     {/* Action Buttons */}
                     <Box display="flex" justifyContent="end" gap={2} mt={2}>
-                        <Button
+                        {/* <Button
                             variant="outlined"
                             sx={{
                                 color: "white",
@@ -124,7 +124,7 @@ export function FrontHome() {
                             startIcon={<ShareIcon />} // Add icon to the left of text
                         >
                             Share
-                        </Button>
+                        </Button> */}
                         <Button
                             variant="outlined"
                             onClick={handleAddToWishlist}

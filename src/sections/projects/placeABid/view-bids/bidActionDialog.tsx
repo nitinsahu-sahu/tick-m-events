@@ -239,8 +239,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
 
     const waitForPaymentConfirmation = (paymentLink: string): Promise<boolean> =>
         new Promise((resolve) => {
-            const paymentWindow = window.open(paymentLink, '_blank', 'width=500,height=600');
-
+            const paymentWindow = window.open(paymentLink, '_self');
             if (!paymentWindow) {
                 alert('Please allow popups for this site to make payments');
                 resolve(false);
@@ -448,7 +447,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
             );
             // Redirect to Fapshi payment page
             if (fapshiRes.data && fapshiRes.data.link) {
-                const reslese = window.open(fapshiRes.data.link, '__blank', 'width=500,height=600');
+                const reslese = window.open(fapshiRes.data.link, '_self');
             }
 
         } catch (error) {

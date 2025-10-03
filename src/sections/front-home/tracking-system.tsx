@@ -323,7 +323,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                         </Grid>
                         {/* Purchase Buttons */}
                         <Grid container spacing={2} mt={1}>
-                            <Grid item xs={12} sm={4}>
+                            <Grid item xs={12} sm={12}>
                                 <Button
                                     fullWidth
                                     variant="contained"
@@ -331,7 +331,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                                     disabled={calculateSubtotal() <= 0}
                                     onClick={handleBuyClick}
                                 >
-                                    Buy Online
+                                    Buy
                                 </Button>
                             </Grid>
                             <PurchaseModal
@@ -342,7 +342,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                                 selectedTickets={getSelectedTickets()}
                                 totalAmount={calculateTotal()}
                             />
-                            <Grid item xs={12} sm={4}>
+                            {/* <Grid item xs={12} sm={4}>
                                 <Button
                                     fullWidth
                                     variant="contained"
@@ -351,8 +351,8 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                                 >
                                     Buy At a Physical Store
                                 </Button>
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
+                            </Grid> */}
+                            {/* <Grid item xs={12} sm={4}>
                                 <Button
                                     fullWidth
                                     variant="contained"
@@ -361,7 +361,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                                 >
                                     Buy Via WhatsApp
                                 </Button>
-                            </Grid>
+                            </Grid> */}
                         </Grid>
                         <Box sx={{ mt: 2, textAlign: 'center' }}>
                             <HeadingCommon title={`Event Time: ${formatEventDate(date)}, ${formatTimeTo12Hour(time)}`} weight={400} baseSize="12px" />
@@ -370,19 +370,92 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                 </Grid>
 
                 {/* Location Map Section */}
-                <Grid item xs={12} sm={6} md={6} alignContent={{ md: "center" }}>
-                    <Card variant="outlined" sx={{ p: 3, backgroundColor: "#fafafa" }}>
-                        <Typography fontWeight="bold" fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>Location</Typography>
-                        <Typography fontSize={{ xs: "12px", sm: "14px", md: "16px" }}>
-                            <strong>Full Address:</strong> {location}
-                        </Typography>
-                        <iframe
-                            title="Location map"
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2872.379073403025!2d4.804463075231841!3d43.951522671089506!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12b5eb86894c0b4f%3A0x2937b10bc1f0a963!2sCentre%20de%20congr%C3%A8s%20du%20Palais%20des%20Papes!5e0!3m2!1sen!2sin!4v1743656943350!5m2!1sen!2sin"
-                            width="100%"
-                            height="250"
-                            loading="lazy"
-                        />
+                <Grid item xs={12} sm={6} md={6}  alignContent={{ md: "center" }}>
+                    <Card
+                        variant="outlined"
+                        sx={{
+                            p: 3,
+                            backgroundColor: "white",
+                            border: "1px solid #e0e0e0",
+                            borderRadius: 3,
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                                boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+                                borderColor: "#1976d2"
+                            }
+                        }}
+                    >
+                        {/* Header Section */}
+                        <Box sx={{ mb: 2.5 }}>
+                            <Typography
+                                fontWeight="bold"
+                                fontSize={{ xs: "20px", sm: "22px", md: "24px" }}
+                                sx={{
+                                    color: "#1a237e",
+                                    mb: 1,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1
+                                }}
+                            >
+                                📍 Location
+                            </Typography>
+                            <Typography
+                                fontSize={{ xs: "14px", sm: "15px", md: "16px" }}
+                                sx={{
+                                    color: "text.secondary",
+                                    lineHeight: 1.6
+                                }}
+                            >
+                                <Box component="span" sx={{ fontWeight: "600", color: "text.primary" }}>
+                                    Full Address:
+                                </Box> {location}
+                            </Typography>
+                        </Box>
+
+                        {/* Map Container with Better Styling */}
+                        <Box
+                            sx={{
+                                borderRadius: 2,
+                                overflow: "hidden",
+                                border: "2px solid #e0e0e0",
+                                boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
+                                transition: "all 0.3s ease",
+                                "&:hover": {
+                                    borderColor: "#1976d2",
+                                    boxShadow: "0 4px 20px rgba(25, 118, 210, 0.15)"
+                                }
+                            }}
+                        >
+                            <iframe
+                                title="Location map"
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2872.379073403025!2d4.804463075231841!3d43.95152271!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12b5eb86894c0b4f%3A0x2937b10bc1f0a963!2sCentre%20de%20congr%C3%A8s%20du%20Palais%20des%20Papes!5e0!3m2!1sen!2sin!4v1743656943350!5m2!1sen!2sin"
+                                width="100%"
+                                height="280"
+                                loading="lazy"
+                                style={{
+                                    border: "none",
+                                    display: "block"
+                                }}
+                            />
+                        </Box>
+
+                        {/* Optional: Additional Location Info */}
+                        <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 1 }}>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "text.secondary",
+                                    fontSize: "14px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.5
+                                }}
+                            >
+                                🔍 Click and drag to explore the area
+                            </Typography>
+                        </Box>
                     </Card>
                 </Grid>
             </Grid>

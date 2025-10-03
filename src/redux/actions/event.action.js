@@ -391,8 +391,11 @@ export const eventSubmitRating = (participantRating) => async (dispatch) => {
         dispatch(successAction);
         dispatch(eventByIdFetch(participantRating.eventId));
 
-        // Return the success action consistently
-        return successAction;
+        return {
+            type: eventConstants.EVENT_SUBMIT_RATING_SUCCESS,
+            message: response?.data?.message,
+            status: response?.status,
+        };
 
     } catch (error) {
         const failureAction = {

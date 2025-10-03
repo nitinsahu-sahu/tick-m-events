@@ -22,12 +22,12 @@ export function StepperStepFour() {
         status: "publish"
     });
 
-  const rawBaseUrl = import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app';
-// remove trailing slash if present
-const baseUrl = rawBaseUrl.replace(/\/$/, "");
+    const rawBaseUrl = import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app';
+    // remove trailing slash if present
+    const baseUrl = rawBaseUrl.replace(/\/$/, "");
 
-// always generate with single slash
-const link = `${baseUrl}/our-event/${eventId}`;
+    // always generate with single slash
+    const link = `${baseUrl}/our-event/${eventId}`;
 
 
     // const link = publicationData.visibilityType === "private" ?
@@ -51,7 +51,7 @@ const link = `${baseUrl}/our-event/${eventId}`;
         //     ? `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${eventId}`
         //     : `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event`;
 
-          const newUrl = `${baseUrl}/our-event/${eventId}`;
+        const newUrl = `${baseUrl}/our-event/${eventId}`;
         setPublicationData(prevData => ({
             ...prevData,
             visibilityType: value, // 'public' or 'private'

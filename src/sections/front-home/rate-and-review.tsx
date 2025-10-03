@@ -10,7 +10,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { eventAddReview } from "src/redux/actions/reviewOnEvent.action";
 import { AppDispatch } from "src/redux/store";
 import { useParams } from "react-router-dom";
-import { eventSubmitRating } from "src/redux/actions/event.action";
+import { eventByIdFetch, eventSubmitRating } from "src/redux/actions/event.action";
 
 interface ApiResult {
     status: number;
@@ -77,14 +77,14 @@ const ReviewCard = ({ name, rating, comment, createdAt }: any) => {
 
                 {/* Reply Section */}
                 <Box mt={2} textAlign="right">
-                    <Button
+                    {/* <Button
                         variant="outlined"
                         startIcon={<ChatBubbleOutlineIcon />}
                         sx={{ textTransform: "none" }}
                         onClick={() => setIsReplying(!isReplying)}
                     >
                         {isReplying ? 'Cancel Reply' : 'Reply to Review'}
-                    </Button>
+                    </Button> */}
 
                     <Collapse in={isReplying}>
                         <Box mt={2} display="flex" alignItems="flex-end">
@@ -138,6 +138,7 @@ export function RateAndReview({ reviews, reviewCount, rating }: any) {
         const result = await dispatch(eventAddReview(reviewFormData));
         if ((result as ApiResult)?.status === 201) {
             toast.success(result?.message);
+            await dispatch(eventByIdFetch(eventId));
             setFormData({
                 name: '',
                 email: '',
@@ -168,6 +169,11 @@ export function RateAndReview({ reviews, reviewCount, rating }: any) {
             eventId
         }
         const result = await dispatch(eventSubmitRating(participantRating))
+        console.log(result);
+        
+        if ((result as ApiResult)?.status === 200) {
+            await dispatch(eventByIdFetch(eventId));
+        }
     };
 
     // Function to render interactive stars
@@ -230,7 +236,8 @@ export function RateAndReview({ reviews, reviewCount, rating }: any) {
                                 </Box>
                             </Box>
                             <Typography fontSize="0.9rem" mt={1} color="black">
-                                {userRating > 0 ? 'Thanks for your rating!' : 'based on 14,997 reviews'}
+                                {`Based on ${reviewCount} reviews`}
+                                {/* {userRating > 0 ? 'Thanks for your rating!' : `based on ${reviewCount} reviews`} */}
                             </Typography>
                         </Box>
                     </Grid>

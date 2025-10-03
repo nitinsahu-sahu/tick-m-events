@@ -50,6 +50,12 @@ const features = [
         title: "Custom Photo/Video Filters: ",
         desc: "Capture memories with the unique style of each event.",
     },
+    {
+        img: "/assets/images/about/security.png",
+        alt: "Security & Trust",
+        title: "Security & Trust: ",
+        desc: "Verified providers (KYC) & secure payments (Mobile Money, Credit Card, etc.).",
+    },
 
 ];
 
@@ -74,11 +80,10 @@ export function OurAgent() {
                 sx={{
                     py: { xs: 1, md: 1 },
                     px: { xs: 2, md: 4 },
-                    maxWidth: "1050px",
                     mx: "auto",
                 }}
             >
-                <Grid container spacing={4}>
+                <Grid container spacing={4} sx={{ maxWidth: "1050px", mx: 'auto' }}>
                     {/* Left: Image with overlay text */}
                     <Grid item xs={12} md={4}>
                         <Box
@@ -272,21 +277,22 @@ export function OurAgent() {
                 {/* Features Section */}
                 <Box
                     sx={{
-                        px: { xs: 2, md: 4 },
+                        px: { xs: 1, md: 2 },
                         py: { xs: 4, md: 8 },
-                        maxWidth: "1050px",
                         mx: "auto",
+                        maxWidth: "1050px"
                     }}
                 >
-                    <Grid container spacing={4}>
+                    <Grid container spacing={2}>
                         {features.map((feature, index) => (
-                            <Grid item xs={12} sm={6} md={3} key={index}>
+                            <Grid item xs={12} sm={6} md={2.4} key={index}>
                                 <Box>
                                     <Box
                                         component="img"
                                         src={feature.img}
                                         alt={feature.alt}
                                         sx={{ width: 40, height: 40, mb: 2 }}
+
                                     />
                                     <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: "0.95rem", md: "1.1rem" } }}>
                                         {feature.title}
@@ -325,9 +331,9 @@ export function OurAgent() {
                     </Box>
 
                     {/* Agent Cards */}
-                    <Grid container spacing={4} justifyContent="center">
+                    <Grid container spacing={2} justifyContent="center">
                         {agents.map((agent, index) => (
-                            <Grid item xs={12} sm={6} md={6} lg={6} key={index}>
+                            <Grid item xs={12} sm={6} md={3} lg={6} key={index}>
                                 <Card
                                     sx={{
                                         borderRadius: 3,
@@ -337,29 +343,63 @@ export function OurAgent() {
                                         "&:hover": {
                                             boxShadow: 4,
                                         },
+                                        height: "100%", // Ensure card takes full height
+                                        display: "flex",
+                                        flexDirection: "column",
                                     }}
                                 >
-                                    <Avatar
-                                        src={agent.img}
-                                        alt={agent.name}
-                                        variant="square"
-                                        sx={{
-                                            width: "100%",
-                                            height: 350, // Increased height
-                                            objectFit: "cover",
-                                        }}
-                                    />
-                                    <CardContent>
+                                    <Box sx={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        backgroundColor: "#f8f9fa", // Optional: subtle background
+                                        p: 2 // Optional: add some padding around the avatar
+                                    }}>
+                                        <Avatar
+                                            src={agent.img}
+                                            alt={agent.name}
+                                            sx={{
+                                                width: "100%",
+                                                maxWidth: 200, // Control maximum width
+                                                height: 250, // Fixed height for consistency
+                                                objectFit: "cover",
+                                                objectPosition: "center",
+                                                borderRadius: 2, // Slight rounding for better look
+                                            }}
+                                        />
+                                    </Box>
+                                    <CardContent sx={{
+                                        flexGrow: 1, // Allow content to grow and push socials to bottom
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        p: 2
+                                    }}>
                                         <Typography
                                             variant="h6"
-                                            sx={{ fontWeight: 700, color: "text.primary" }}
+                                            sx={{
+                                                fontWeight: 700,
+                                                color: "text.primary",
+                                                textAlign: "center",
+                                                mb: 1
+                                            }}
                                         >
                                             {agent.name}
                                         </Typography>
-                                        <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
+                                        <Typography
+                                            variant="body2"
+                                            sx={{
+                                                color: "text.secondary",
+                                                textAlign: "center",
+                                                mb: 2
+                                            }}
+                                        >
                                             {agent.role}
                                         </Typography>
-                                        <Box sx={{ display: "flex", gap: 1 }}>
+                                        <Box sx={{
+                                            display: "flex",
+                                            gap: 1,
+                                            justifyContent: "center",
+                                            mt: "auto" // Push social icons to bottom
+                                        }}>
                                             {agent.socials.map((social, i) => (
                                                 <Box
                                                     key={i}
@@ -373,7 +413,16 @@ export function OurAgent() {
                                                         justifyContent: "center",
                                                     }}
                                                 >
-                                                    <IconButton size="small" sx={{ color: "black", p: 0 }}>
+                                                    <IconButton
+                                                        size="small"
+                                                        sx={{
+                                                            color: "black",
+                                                            p: 0,
+                                                            "&:hover": {
+                                                                backgroundColor: "rgba(0,0,0,0.1)"
+                                                            }
+                                                        }}
+                                                    >
                                                         <SocialIcon type={social} />
                                                     </IconButton>
                                                 </Box>

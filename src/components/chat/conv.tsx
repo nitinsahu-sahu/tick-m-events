@@ -105,7 +105,7 @@ export function ChatPanel() {
     };
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
     if (socket) {
       socket.emit('addUser', user?._id);
 
@@ -124,6 +124,12 @@ export function ChatPanel() {
         type: string;
         updatedAt?: string;
       }) => {
+        // Don't add the message if it's from the current user
+        // The optimistic update already handles this case
+        if (data.senderId === user?._id) {
+          return;
+        }
+
         if (data.conversationId === messages.conversationId) {
           // If message is for current conversation, add to messages
           setMessages(prev => ({

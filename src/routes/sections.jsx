@@ -74,6 +74,7 @@ export const AwardedListPage = lazy(() => import('src/pages/signedProjectList'))
 export const AboutUsPage = lazy(() => import('src/pages/about-us'));
 export const GobalHomePage = lazy(() => import('src/pages/global-home'));
 export const EventListPage = lazy(() => import('src/pages/event-list'));
+export const PromotionLogosPage = lazy(() => import('src/pages/customization/promotion-logo/index'));
 // ----------------------------------------------------------------------
 
 const renderFallback = (
@@ -273,6 +274,12 @@ export function Router() {
           path: '/withdrawal',
           element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><WithDrawlPage /></RoleProtectedRoute>
         },
+        {
+          path: '/customization/promotions-logos',
+          element: <RoleProtectedRoute allowedRoles={['admin']} currentRole={currentRole}><PromotionLogosPage /></RoleProtectedRoute>
+        },
+    
+
         // -----------------------**************-------------------------
 
         {

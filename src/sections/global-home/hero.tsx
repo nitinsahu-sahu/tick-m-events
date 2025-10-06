@@ -14,6 +14,9 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
+import { useSelector } from 'react-redux';
+import { RootState } from 'src/redux/store';
+import { PromotionLogoBar } from 'src/components/brands-logo';
 
 const brands = [
     { name: "trivago", img: "/assets/home-global-img/trivago.png" },
@@ -83,6 +86,7 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
     const [isPlaying, setIsPlaying] = useState<boolean>(true);
     const videoRef = useRef(null);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const { promotionLogos, loading } = useSelector((state: RootState) => state.customization);
 
     // Auto-scroll functionality
     useEffect(() => {
@@ -537,32 +541,12 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
 
 
             {/* BRANDS SECTION */}
-            <Box textAlign="center" mt={8}>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                    Premium Brands
-                </Typography>
-                <Typography color="textSecondary" gutterBottom>
-                    Unveil the Finest Selection of High-End Vehicles
-                </Typography>
-                <Grid container justifyContent="center" spacing={2} mt={2}>
-                    {brands.map((brand) => (
-                        <Grid item key={brand.name}>
-                            <Paper sx={{ p: 2, borderRadius: 2 }}>
-                                <Box
-                                    component="img"
-                                    src={brand.img}
-                                    alt={brand.name}
-                                    sx={{
-                                        width: 100,
-                                        height: "auto",
-                                        objectFit: "contain",
-                                    }}
-                                />
-                            </Paper>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
+            <PromotionLogoBar
+                brands={promotionLogos}
+                mainHead="Premium Brands"
+                subHead="Unveil the Finest Selection of High-End Vehicles"
+            />
+
         </Box>
     );
 }

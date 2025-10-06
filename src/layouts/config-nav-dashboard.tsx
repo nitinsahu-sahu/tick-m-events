@@ -266,4 +266,28 @@ export const navData: NavItem[] = [
     icon: icon('ic-analytics'),
     roles: ['provider'],
   },
+  {
+    title: 'Customization',
+    path: '#',
+    icon: icon('ic_projects'),
+    roles: ['admin'],
+    children: [ // Submenu items
+      {
+        title: 'Promotion Logos',
+        path: '/customization/promotions-logos',
+        icon: icon('ic_project_add'),
+      },
+      // {
+      //   title: 'View Place A Bids',
+      //   path: '/place-a-bid/view',
+      //   icon: icon('ic_project_view'),
+      // },
+      // {
+      //   title: 'Awarded Projects',
+      //   path: '/place-a-bid/bids/awarded',
+      //   icon: icon('ic_awarded'),
+      // }
+      
+    ],
+  },
 ];

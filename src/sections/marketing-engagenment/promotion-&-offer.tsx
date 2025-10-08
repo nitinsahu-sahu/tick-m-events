@@ -24,21 +24,37 @@ export function PromotionsAndOffers({ selEvent }: any) {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   const [selectedDiscounts, setSelectedDiscounts] = useState('');
+  const [earlyBuyerDiscountType, setEarlyBuyerDiscountType] = useState('');
+  const [earlyBuyerDiscountValue, setEarlyBuyerDiscountValue] = useState('');
+
   const handleDiscountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedDiscounts(event.target.value);
+    // Reset early buyer specific fields when changing discount type
+    if (event.target.value !== 'earlyBuyerDiscount') {
+      setEarlyBuyerDiscountType('');
+      setEarlyBuyerDiscountValue('');
+    }
   };
+
+  const handleEarlyBuyerDiscountTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEarlyBuyerDiscountType(event.target.value);
+    setEarlyBuyerDiscountValue(''); // Reset value when type changes
+  };
+
   useEffect(() => {
     if (selEvent?._id) {
       setSelectedEvent(selEvent);
       setShowCreateForm(false);
     }
   }, [selEvent]);
+
   const [promotionFormData, setPromotionFormData] = useState({
     discountValue: '',
     ticketSelection: '',
     validityPeriodStart: '',
     validityPeriodEnd: '',
   });
+
   const [promoCode, setPromoCode] = useState('')
   const [showCreateForm, setShowCreateForm] = useState(false);
 
@@ -62,6 +78,22 @@ export function PromotionsAndOffers({ selEvent }: any) {
         return;
       }
 
+      // Validate early buyer discount
+      if (selectedDiscounts === 'earlyBuyerDiscount') {
+        if (!earlyBuyerDiscountType) {
+          toast.error('Please select early buyer discount type.');
+          return;
+        }
+        if (!earlyBuyerDiscountValue) {
+          toast.error('Please enter early buyer discount value.');
+          return;
+        }
+        if (earlyBuyerDiscountType === 'percentage' && Number(earlyBuyerDiscountValue) > 100) {
+          toast.error('Percentage cannot exceed 100%');
+          return;
+        }
+      }
+
       const validityStart = new Date(promotionFormData.validityPeriodStart);
       const validityEnd = new Date(promotionFormData.validityPeriodEnd);
       const eventCreatedAt = new Date(selectedEvent.createdAt);
@@ -76,7 +108,16 @@ export function PromotionsAndOffers({ selEvent }: any) {
 
       const formEventData = new FormData();
       formEventData.append('eventId', selectedEvent._id);
-      formEventData.append('discountValue', promotionFormData.discountValue);
+      
+      // Handle different discount types
+      if (selectedDiscounts === 'earlyBuyerDiscount') {
+        formEventData.append('discountValue', earlyBuyerDiscountValue);
+        formEventData.append('earlyBuyerDiscountType', earlyBuyerDiscountType);
+        formEventData.append('daysBeforeEvent', promotionFormData.discountValue); // This is the days before event
+      } else {
+        formEventData.append('discountValue', promotionFormData.discountValue);
+      }
+      
       formEventData.append('ticketSelection', promotionFormData.ticketSelection);
       formEventData.append('validityPeriodEnd', promotionFormData.validityPeriodEnd);
       formEventData.append('validityPeriodStart', promotionFormData.validityPeriodStart);
@@ -95,6 +136,8 @@ export function PromotionsAndOffers({ selEvent }: any) {
           });
           setPromoCode('');
           setSelectedDiscounts('');
+          setEarlyBuyerDiscountType('');
+          setEarlyBuyerDiscountValue('');
           setShowCreateForm(false);
         } else {
           toast.error(result?.message);
@@ -103,7 +146,7 @@ export function PromotionsAndOffers({ selEvent }: any) {
         toast.error('Promotion creation failed');
       }
     },
-    [promotionFormData, selectedDiscounts, promoCode, selectedEvent, dispatch]
+    [promotionFormData, selectedDiscounts, earlyBuyerDiscountType, earlyBuyerDiscountValue, promoCode, selectedEvent, dispatch]
   );
 
   const handleEventChange = (event: SelectChangeEvent<string>) => {
@@ -126,11 +169,14 @@ export function PromotionsAndOffers({ selEvent }: any) {
 
   const isFormValid = Boolean(
     selectedDiscounts &&
-    promotionFormData.discountValue &&
     promotionFormData.ticketSelection &&
     promotionFormData.validityPeriodStart &&
     promotionFormData.validityPeriodEnd &&
     promoCode
+  ) && (
+    selectedDiscounts === 'earlyBuyerDiscount' 
+      ? Boolean(earlyBuyerDiscountType && earlyBuyerDiscountValue && promotionFormData.discountValue)
+      : Boolean(promotionFormData.discountValue)
   );
 
   return (
@@ -159,7 +205,6 @@ export function PromotionsAndOffers({ selEvent }: any) {
         Create a new Promotion
       </Button>
 
-
       {showCreateForm && (
         <Paper sx={{ p: 3, borderRadius: '10px', background: '#f5f5f5', mt: 3 }}>
           <Typography variant="subtitle1" fontWeight="bold" mb={2}>
@@ -174,12 +219,10 @@ export function PromotionsAndOffers({ selEvent }: any) {
               value={selectedDiscounts}
               onChange={handleDiscountChange}
               row
-
             >
               {[
                 { label: 'Percentage Discount', value: 'percentageDiscount' },
-                { label: 'Fixed Value Discount', value: 'fixedValueDiscount' },
-                { label: 'Group Offer', value: 'groupOffer' },
+                { label: 'Fixed Amount Discount', value: 'fixedValueDiscount' },
                 { label: 'Early Buyer Discount', value: 'earlyBuyerDiscount' },
               ].map((option) => (
                 <FormControlLabel
@@ -191,58 +234,122 @@ export function PromotionsAndOffers({ selEvent }: any) {
               ))}
             </RadioGroup>
 
-            <Typography variant="body2" fontWeight="bold" mb={1}>
-              {(() => {
-                switch (selectedDiscounts) {
-                  case 'percentageDiscount':
-                    return 'Discount Percentage (%)';
-                  case 'fixedValueDiscount':
-                    return 'Discount Amount (XAF)';
-                  case 'groupOffer':
-                    return 'Group Size Required';
-                  case 'earlyBuyerDiscount':
-                    return 'Days Before Event for Discount';
-                  default:
-                    return 'Discount Value';
-                }
-              })()}
-            </Typography>
+            {/* Days Before Event Field (Only for Early Buyer Discount) */}
+            {selectedDiscounts === 'earlyBuyerDiscount' && (
+              <>
+                <Typography variant="body2" fontWeight="bold" mb={1}>
+                  Days Before Event for Discount
+                </Typography>
+                <TextField
+                  fullWidth
+                  required
+                  name="discountValue"
+                  type="number"
+                  placeholder="Enter days before event (e.g., 7)"
+                  value={promotionFormData.discountValue}
+                  onChange={handlePromotionChange}
+                  sx={{ mb: 2 }}
+                />
+                
+                {/* Early Buyer Discount Type Selection */}
+                <Typography variant="body2" fontWeight="bold" mb={1}>
+                  Early Buyer Discount Type
+                </Typography>
+                <RadioGroup
+                  name="earlyBuyerDiscountType"
+                  value={earlyBuyerDiscountType}
+                  onChange={handleEarlyBuyerDiscountTypeChange}
+                  row
+                >
+                  <FormControlLabel
+                    value="percentage"
+                    control={<Radio required />}
+                    label="Percentage Discount"
+                  />
+                  <FormControlLabel
+                    value="fixed"
+                    control={<Radio required />}
+                    label="Fixed Amount Discount"
+                  />
+                </RadioGroup>
 
-            <TextField
-              fullWidth
-              required
-              name="discountValue"
-              type="number"
-              placeholder={
-                selectedDiscounts === 'percentageDiscount'
-                  ? 'Enter % (e.g., 10)'
-                  : selectedDiscounts === 'fixedValueDiscount'
-                    ? 'Enter amount (e.g., 2000)'
-                    : selectedDiscounts === 'groupOffer'
-                      ? 'Enter group size (e.g., 5)'
-                      : selectedDiscounts === 'earlyBuyerDiscount'
-                        ? 'Enter days before event (e.g., 7)'
-                        : 'Enter discount value'
-              }
-              InputProps={{
-                endAdornment:
-                  selectedDiscounts === 'percentageDiscount'
-                    ? <span style={{ marginLeft: 8 }}>%</span>
-                    : selectedDiscounts === 'fixedValueDiscount'
-                      ? <span style={{ marginLeft: 8 }}>XAF</span>
-                      : null,
-              }}
-              value={promotionFormData.discountValue}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (selectedDiscounts === 'percentageDiscount' && Number(val) > 100) {
-                  toast.error('Percentage cannot exceed 100%');
-                  return;
-                }
-                setPromotionFormData((prevData) => ({ ...prevData, discountValue: val }));
-              }}
-              sx={{ mb: 2 }}
-            />
+                {/* Early Buyer Discount Value */}
+                {earlyBuyerDiscountType && (
+                  <>
+                    <Typography variant="body2" fontWeight="bold" mb={1}>
+                      {earlyBuyerDiscountType === 'percentage' 
+                        ? 'Discount Percentage (%)' 
+                        : 'Discount Amount (XAF)'}
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      required
+                      type="number"
+                      placeholder={
+                        earlyBuyerDiscountType === 'percentage'
+                          ? 'Enter % (e.g., 10)'
+                          : 'Enter amount (e.g., 2000)'
+                      }
+                      InputProps={{
+                        endAdornment:
+                          earlyBuyerDiscountType === 'percentage'
+                            ? <span style={{ marginLeft: 8 }}>%</span>
+                            : <span style={{ marginLeft: 8 }}>XAF</span>,
+                      }}
+                      value={earlyBuyerDiscountValue}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (earlyBuyerDiscountType === 'percentage' && Number(val) > 100) {
+                          toast.error('Percentage cannot exceed 100%');
+                          return;
+                        }
+                        setEarlyBuyerDiscountValue(val);
+                      }}
+                      sx={{ mb: 2 }}
+                    />
+                  </>
+                )}
+              </>
+            )}
+
+            {/* Regular Discount Value (For Percentage and Fixed Amount) */}
+            {selectedDiscounts !== 'earlyBuyerDiscount' && selectedDiscounts && (
+              <>
+                <Typography variant="body2" fontWeight="bold" mb={1}>
+                  {selectedDiscounts === 'percentageDiscount'
+                    ? 'Discount Percentage (%)'
+                    : 'Discount Amount (XAF)'}
+                </Typography>
+                <TextField
+                  fullWidth
+                  required
+                  name="discountValue"
+                  type="number"
+                  placeholder={
+                    selectedDiscounts === 'percentageDiscount'
+                      ? 'Enter % (e.g., 10)'
+                      : 'Enter amount (e.g., 2000)'
+                  }
+                  InputProps={{
+                    endAdornment:
+                      selectedDiscounts === 'percentageDiscount'
+                        ? <span style={{ marginLeft: 8 }}>%</span>
+                        : <span style={{ marginLeft: 8 }}>XAF</span>,
+                  }}
+                  value={promotionFormData.discountValue}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (selectedDiscounts === 'percentageDiscount' && Number(val) > 100) {
+                      toast.error('Percentage cannot exceed 100%');
+                      return;
+                    }
+                    setPromotionFormData((prevData) => ({ ...prevData, discountValue: val }));
+                  }}
+                  sx={{ mb: 2 }}
+                />
+              </>
+            )}
+
             {/* Ticket Selection */}
             <Typography variant="body2" fontWeight="bold" mb={1}>
               Ticket Selection
@@ -266,6 +373,7 @@ export function PromotionsAndOffers({ selEvent }: any) {
                 </MenuItem>
               ))}
             </Select>
+
             {/* Validity Period */}
             <Typography variant="body2" fontWeight="bold" mb={1}>
               Validity Period
@@ -322,6 +430,7 @@ export function PromotionsAndOffers({ selEvent }: any) {
               }}
               value={promoCode}
               onChange={handlePromoCodeChange}
+              required
             />
 
             {/* Submit Button */}
@@ -331,7 +440,7 @@ export function PromotionsAndOffers({ selEvent }: any) {
               type="submit"
               color="inherit"
               variant="contained"
-              disabled={!isFormValid} // 👈 Disable if form is incomplete
+              disabled={!isFormValid}
               sx={{
                 mt: 2,
                 backgroundColor: isFormValid ? '#0B2E4C' : 'gray',

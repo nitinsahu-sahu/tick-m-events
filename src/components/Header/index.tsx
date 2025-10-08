@@ -94,7 +94,7 @@ export default function Header() {
               fontWeight: 500,
             }}
           >
-            {/* <Link to="/home" style={{ textDecoration: "none", color: "inherit" }}>
+            <Link to="/home" style={{ textDecoration: "none", color: "inherit" }}>
               <Typography
                 sx={{
                   display: "flex",
@@ -109,9 +109,9 @@ export default function Header() {
               >
                 Home <ExpandMoreIcon sx={{ fontSize: 16 }} />
               </Typography>
-            </Link> */}
+            </Link>
 
-            <Link to="/our-event" style={{ textDecoration: "none", color: "inherit" }}>
+            <Link to="/event-list" style={{ textDecoration: "none", color: "inherit" }}>
               <Typography 
                 sx={{ 
                   cursor: "pointer", 

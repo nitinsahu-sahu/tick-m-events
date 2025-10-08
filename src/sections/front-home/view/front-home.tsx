@@ -17,21 +17,25 @@ import { AppDispatch, RootState } from "src/redux/store";
 import { eventByIdFetch, eventAddToWishlist } from "src/redux/actions/event.action";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import Header from "src/components/Header";
+import { getPromotionLogo } from "src/redux/actions/customization/promotion-logo";
+import { PromotionLogoBar } from "src/components/brands-logo";
 
 import { BannerGallery } from "../banner-gallery";
 import { TrackingSystem } from "../tracking-system";
 import { ContactAndSharing } from "../contact-and-sharing";
 import { CountDownCounter } from "../count-down-counter";
 import { RateAndReview } from "../rate-and-review";
-import { CompanyMarquee } from "../company-marquee";
 import { FriendWhoBooked } from "../friend-who-booked";
 import { LiveChat } from "../live-chat";
+
 
 
 export function FrontHome() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const { authenticate } = useSelector((state: RootState) => state?.auth)
+    const { promotionLogos, loading } = useSelector((state: RootState) => state.customization);
+
     const { eventId } = useParams();
     const { _id, eventName, date, time, portraitImage, category, eventType, coverImage, location, formate, description,
         organizer, customization, tickets, visibility, averageRating, reviewCount, review
@@ -47,7 +51,9 @@ export function FrontHome() {
 
         fetchEvent(); // Call the async function inside useEffect
     }, [dispatch, eventId]); // Add dependencies
-
+    useEffect(() => {
+        dispatch(getPromotionLogo())
+    }, [dispatch]);
 
 
     const handleAddToWishlist = async () => {
@@ -164,8 +170,11 @@ export function FrontHome() {
                 <RateAndReview reviews={review} reviewCount={reviewCount} rating={averageRating} />
 
                 {/* Rate and Review */}
-                <CompanyMarquee />
-
+                <PromotionLogoBar
+                    brands={promotionLogos}
+                    mainHead="Premium Brands"
+                    subHead="Unveil the Finest Selection of High-End Vehicles"
+                />
                 {/* Rate and Review */}
                 {/* <FriendWhoBooked /> */}
 

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { publicHomeEventsFetch } from "src/redux/actions/home-recommendation.action";
 import Header from "src/components/Header";
 import Footer from "src/components/Footer";
+import { getPromotionLogo } from "src/redux/actions/customization/promotion-logo";
 
 import UpcomingEvents from "./upcoming-events";
 import HeroSection from "./hero";
@@ -23,6 +24,7 @@ export function GlobalHome() {
     const [filteredEvents, setFilteredEvents] = useState([]);
 
     useEffect(() => {
+        dispatch(getPromotionLogo())
         dispatch(publicHomeEventsFetch());
     }, [dispatch]);
 
@@ -33,7 +35,7 @@ export function GlobalHome() {
         }
     }, [upcomingHomeEvents]);
 
-    const handleEventsFiltered = (events:any) => {
+    const handleEventsFiltered = (events: any) => {
         setFilteredEvents(events);
     };
 

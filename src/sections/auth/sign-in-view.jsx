@@ -33,8 +33,8 @@ export function SignInView() {
   const [formData, setFormData] = useState(
     {
     
-      email: 'provider.watson13@gmail.com',
-      password: 'wAtson@123'
+      email: 'organizer.rabada12@gmail.com',
+      password: 'Nitin@123'
 
     });
   const [showPassword, setShowPassword] = useState(false);

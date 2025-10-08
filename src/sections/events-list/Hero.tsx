@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -8,21 +8,76 @@ import {
     MenuItem,
     Button,
     Grid,
-    Paper, InputAdornment,
+    Paper,
+    InputAdornment,
+    FormControl,
+    InputLabel,
+    Select,
 } from '@mui/material';
 import PersonIcon from "@mui/icons-material/Person";
 import SearchIcon from '@mui/icons-material/Search';
 import CategoryIcon from "@mui/icons-material/Category";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
+import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
 
-const eventTypes = ['Concert', 'Sports', 'Theater'];
-const locations = ['New York', 'London', 'Tokyo'];
-const pricingOptions = ['Low to High', 'High to Low'];
+interface Event {
+    _id: string;
+    eventName?: string;
+    location?: string;
+    status?: string;
+    date?: string;
+    eventType?: string;
+    tickets?: any[];
+    category: string;
+    averageRating?: number;
+}
 
-export default function HeroSection() {
-    const [tab, setTab] = React.useState(0);
+interface HeroSectionProps {
+    approvedEvents: Event[];
+    loading: boolean;
+    onFilterChange?: (filters: {
+        eventType: string;
+        eventLocation: string;
+        eventDate: string;
+        eventPricing: string;
+    }) => void;
+}
+
+export default function HeroSection({ approvedEvents, loading, onFilterChange }: HeroSectionProps) {
+    const [tab, setTab] = useState(0);
+    const [eventType, setEventType] = useState('');
+    const [eventLocation, setEventLocation] = useState('');
+    const [eventDate, setEventDate] = useState('');
+    const [eventPricing, setEventPricing] = useState('');
+
+    // Get unique event locations
+    const eventLocations = useMemo(() => {
+        const locations = approvedEvents
+            .map((event) => event.location?.trim() || "")
+            .filter((loc) => loc !== "");
+        return Array.from(new Set(locations));
+    }, [approvedEvents]);
+
+    // Apply filters callback
+    const applyFilters = useCallback(() => {
+        const filters = { eventType, eventLocation, eventDate, eventPricing };
+        if (onFilterChange) onFilterChange(filters);
+    }, [eventType, eventLocation, eventDate, eventPricing, onFilterChange]);
+
+    // Clear filters
+    const clearFilters = useCallback(() => {
+        setEventType('');
+        setEventLocation('');
+        setEventDate('');
+        setEventPricing('');
+        if (onFilterChange) onFilterChange({ eventType: '', eventLocation: '', eventDate: '', eventPricing: '' });
+    }, [onFilterChange]);
+
+    // Auto-apply filters when values change
+    useEffect(() => {
+        applyFilters();
+    }, [applyFilters]);
 
     return (
         <Box mt={4}>
@@ -62,32 +117,23 @@ export default function HeroSection() {
                             bgcolor: "#2296D4",
                             color: "#fff",
                             fontWeight: "medium",
-                            textTransform: "none", // keeps the original casing
+                            textTransform: "none",
                             px: 3,
                             py: 1.5,
                             fontSize: "1rem",
                             borderRadius: 2,
-                            '&:hover': {
-                                bgcolor: "#1a7cb3", // optional: slightly darker on hover
-                            },
+                            '&:hover': { bgcolor: "#1a7cb3" },
                         }}
                     >
                         Find The Best Event Near You
                     </Button>
 
-                    <Typography
-                        variant="h3"
-                        fontWeight="bold"
-                        sx={{
-                            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
-                        }}
-                    >
+                    <Typography variant="h3" fontWeight="bold" sx={{ fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' } }}>
                         Uncover Your Dream Events
                     </Typography>
                     <Typography variant="h6" fontWeight="medium" gutterBottom>
                         Search and find your best event with easy way
                     </Typography>
-
                 </Box>
             </Box>
 
@@ -107,15 +153,8 @@ export default function HeroSection() {
                     border: "1px solid #e0e0e0",
                 }}
             >
-                {/* Top Bar with Tabs and Info */}
-                <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mb={2}
-                    flexWrap="wrap"
-                >
-                    {/* Tabs */}
+                {/* Tabs + Info */}
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} flexWrap="wrap">
                     <Tabs
                         value={tab}
                         onChange={(e, val) => setTab(val)}
@@ -141,7 +180,6 @@ export default function HeroSection() {
                         ))}
                     </Tabs>
 
-                    {/* Info Text */}
                     <Box display="flex" alignItems="center" gap={1} mt={{ xs: 2, md: 0 }}>
                         <PersonIcon fontSize="small" sx={{ color: "#000" }} />
                         <Typography variant="body2" color="text.primary">
@@ -151,129 +189,94 @@ export default function HeroSection() {
                 </Box>
 
                 {/* Filters Grid */}
-                <Grid container spacing={2}>
+                <Grid container spacing={2} alignItems="center">
                     {/* Event Type */}
-                    <Grid item xs={12} sm={6} md={2.5}>
-                        <TextField
-                            select
-                            fullWidth
-                            label="Event Type"
-                            defaultValue=""
-                            variant="outlined"
-                            size="small"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <CategoryIcon fontSize="small" sx={{ color: "#737373" }} />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        >
-                            {eventTypes.map((type) => (
-                                <MenuItem key={type} value={type}>
-                                    {type}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                    <Grid item xs={12} sm={6} md={2.4}>
+                        <FormControl fullWidth size="small">
+                            <InputLabel shrink sx={{ fontWeight: "bold", color: "#555" }}>Event Type</InputLabel>
+                            <Select
+                                displayEmpty
+                                value={eventType}
+                                onChange={(e) => setEventType(e.target.value)}
+                                renderValue={(selected) => selected || <Box display="flex" alignItems="center" gap={1}><CategoryIcon fontSize="small" sx={{ color: "#777" }} /><Typography variant="body2" color="#777">Select Event Type</Typography></Box>}
+                            >
+                                <MenuItem value="Public">Public</MenuItem>
+                                <MenuItem value="Private">Private</MenuItem>
+                                <MenuItem value="Online">Online</MenuItem>
+                                <MenuItem value="Live">Live</MenuItem>
+                            </Select>
+                        </FormControl>
                     </Grid>
 
                     {/* Event Location */}
-                    <Grid item xs={12} sm={6} md={2.5}>
-                        <TextField
-                            select
-                            fullWidth
-                            label="Event Location"
-                            defaultValue=""
-                            variant="outlined"
-                            size="small"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <LocationOnIcon fontSize="small" sx={{ color: '#737373' }} />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        >
-                            {locations.map((loc) => (
-                                <MenuItem key={loc} value={loc}>
-                                    {loc}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                    <Grid item xs={12} sm={6} md={2.4}>
+                        <FormControl fullWidth size="small">
+                            <InputLabel shrink sx={{ fontWeight: "bold", color: "#555" }}>Event Location</InputLabel>
+                            <Select
+                                displayEmpty
+                                value={eventLocation}
+                                onChange={(e) => setEventLocation(e.target.value)}
+                                renderValue={(selected) => selected || <Box display="flex" alignItems="center" gap={1}><LocationOnOutlinedIcon fontSize="small" sx={{ color: "#777" }} /><Typography variant="body2" color="#777">Select Location</Typography></Box>}
+                            >
+                                {eventLocations.map((loc) => <MenuItem key={loc} value={loc}>{loc}</MenuItem>)}
+                            </Select>
+                        </FormControl>
                     </Grid>
 
                     {/* Event Date */}
-                    <Grid item xs={12} sm={6} md={2.5}>
-                        <TextField
-                            select
-                            fullWidth
-                            label="Event Date"
-                            defaultValue=""
-                            variant="outlined"
-                            size="small"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <CalendarTodayIcon fontSize="small" sx={{ color: '#737373' }} />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        >
-                            {["Today", "This Weekend", "This Month"].map((d) => (
-                                <MenuItem key={d} value={d}>
-                                    {d}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                    <Grid item xs={12} sm={6} md={2.4}>
+                        <FormControl fullWidth size="small">
+                            <TextField
+                                type="date"
+                                label="Event Date"
+                                value={eventDate}
+                                onChange={(e) => setEventDate(e.target.value)}
+                                InputLabelProps={{ shrink: true, sx: { fontWeight: "bold", color: "#555" } }}
+                                InputProps={{ startAdornment: <InputAdornment position="start"><CalendarTodayIcon fontSize="small" sx={{ color: "#777" }} /></InputAdornment> }}
+                                sx={{ '& .MuiInputBase-input': { padding: '8.5px 14px' } }}
+                            />
+                        </FormControl>
                     </Grid>
 
-                    {/* Pricing */}
-                    <Grid item xs={12} sm={6} md={2.5}>
-                        <TextField
-                            select
-                            fullWidth
-                            label="Pricing"
-                            defaultValue=""
-                            variant="outlined"
-                            size="small"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <CreditCardIcon fontSize="small" sx={{ color: '#737373' }} />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        >
-                            {pricingOptions.map((option) => (
-                                <MenuItem key={option} value={option}>
-                                    {option}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                    {/* Event Pricing */}
+                    <Grid item xs={12} sm={6} md={2.4}>
+                        <FormControl fullWidth size="small">
+                            <InputLabel shrink sx={{ fontWeight: "bold", color: "#555" }}>Event Pricing</InputLabel>
+                            <Select
+                                displayEmpty
+                                value={eventPricing}
+                                onChange={(e) => setEventPricing(e.target.value)}
+                                renderValue={(selected) => selected || <Box display="flex" alignItems="center" gap={1}><MonetizationOnOutlinedIcon fontSize="small" sx={{ color: "#777" }} /><Typography variant="body2" color="#777">Select Pricing</Typography></Box>}
+                            >
+                                <MenuItem value="Free">Free</MenuItem>
+                                <MenuItem value="Paid">Paid</MenuItem>
+                            </Select>
+                        </FormControl>
                     </Grid>
 
-                    {/* Find Event Button */}
-                    <Grid item xs={12} md={2}>
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            startIcon={<SearchIcon />}
-                            sx={{
-                                bgcolor: "#002d72",
-                                color: "#fff",
-                                fontWeight: "bold",
-                                textTransform: "none",
-                                px: 2,
-                                py: 1.2,
-                                borderRadius: 2,
-                                height: "40px",
-                                "&:hover": {
-                                    bgcolor: "#001f4f",
-                                },
-                            }}
-                        >
-                            Find a Event
-                        </Button>
+                    {/* Action Buttons */}
+                    <Grid item xs={12} sm={12} md={2.4}>
+                        <Box display="flex" gap={1}>
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                startIcon={<SearchIcon />}
+                                sx={{
+                                    bgcolor: "#002d72",
+                                    color: "#fff",
+                                    fontWeight: "bold",
+                                    textTransform: "none",
+                                    px: 2,
+                                    py: 1.2,
+                                    borderRadius: 2,
+                                    height: "40px",
+                                    "&:hover": { bgcolor: "#001f4f" },
+                                }}
+                                onClick={applyFilters}
+                            >
+                                Find Event
+                            </Button>
+                        </Box>
                     </Grid>
                 </Grid>
             </Paper>

@@ -1,13 +1,18 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import {
   Container, Grid, Typography, Card, CardContent, CardMedia, Button, Box, Slider, Checkbox, FormControlLabel, Rating, Pagination,
-  useTheme,useMediaQuery,Paper,Divider,IconButton,Collapse, Tabs, Tab, FormControl,InputLabel,Select,
-  MenuItem, Stack, TextField
+  useTheme,
+  useMediaQuery,
+  Paper,
+  Divider, IconButton,
+  Collapse, Tabs, Tab, FormControl,
+  InputLabel,
+  Select,
+  MenuItem, Stack, TextField, InputAdornment
 } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PersonIcon from "@mui/icons-material/Person";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import EventIcon from "@mui/icons-material/Event";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -19,10 +24,13 @@ import PhoneIphoneOutlinedIcon from "@mui/icons-material/PhoneIphoneOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import FaxOutlinedIcon from "@mui/icons-material/PrintOutlined";
+import SearchIcon from "@mui/icons-material/Search";
+import CategoryIcon from "@mui/icons-material/Category";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from 'src/redux/store';
-import { eventFetch } from 'src/redux/actions/event.action';
+import { eventFetch, fetchAllCategories } from 'src/redux/actions/event.action';
 import { useNavigate } from "react-router-dom";
+import axios from 'src/redux/helper/axios';
 
 type EventTicketDetail = {
   ticketType?: string;
@@ -53,73 +61,123 @@ type Event = {
   time?: string;
   eventType?: string;
   tickets?: EventTicketGroup[];
+  category: string;
+  status?: string;
 };
 
-const EventBooking: React.FC = () => {
+interface EventBookingProps {
+  filteredEvents: Event[];
+  onFilterChange?: (filters: {
+    eventType: string;
+    eventLocation: string;
+    eventDate: string;
+    eventPricing: string;
+    tabValue: string;
+  }) => void;
+}
+
+const EventBooking: React.FC<EventBookingProps> = ({
+  filteredEvents: propFilteredEvents,
+  onFilterChange
+}) => {
+  // Theme & utilities
   const theme = useTheme();
   const eventsRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  // UI state toggles
   const [showMap, setShowMap] = useState(true);
   const [eventTypeOpen, setEventTypeOpen] = useState(true);
   const [eventLocationOpen, setEventLocationOpen] = useState(true);
   const [reviewOpen, setReviewOpen] = useState(true);
+
+  // Filters state (for sidebar filters only)
   const [tabValue, setTabValue] = useState(0);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
+  const [price, setPrice] = useState<number>(5000);
+  const [showPrice, setShowPrice] = useState<boolean>(false);
+
+  // "BOOK THIS EVENT" SECTION STATE VARIABLES
   const [eventType, setEventType] = useState("");
   const [eventLocation, setEventLocation] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [eventPricing, setEventPricing] = useState("");
-  const navigate = useNavigate();
 
+  // Book Event Filters state
+  const [bookEventFilters, setBookEventFilters] = useState({
+    eventType: "",
+    eventLocation: "",
+    eventDate: "",
+    eventPricing: "",
+    tabValue: "All Events"
+  });
+
+  // Data state
   const { fullData } = useSelector((state: RootState) => state.event);
-  const dispatch = useDispatch<AppDispatch>();
+  const { categories, loading: categoriesLoading } = useSelector((state: RootState) => state.event);
   const [loading, setLoading] = useState(true);
   const [showEvents, setShowEvents] = useState(false);
 
+  // Extract only approved events
   const approvedEvents = useMemo(
     () => fullData?.filter((event: any) => event.status === "approved") || [],
     [fullData]
   );
 
-  useEffect(() => {
-    setCurrentPage(1);
+  // Unique event locations for sidebar filters
+  const eventLocations: string[] = useMemo(() => {
+    if (!approvedEvents.length) return [];
+    const locations = approvedEvents
+      .map((event: Event) => event.location?.trim() || "")
+      .filter((loc: string) => loc !== "");
+    return Array.from(new Set(locations)) as string[];
   }, [approvedEvents]);
 
+  // Events to display - use prop events as base, apply sidebar filters on top
+  const [finalFilteredEvents, setFinalFilteredEvents] = useState<Event[]>([]);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 10;
+  const totalPages = Math.ceil(finalFilteredEvents.length / eventsPerPage);
+  const startIndex = (currentPage - 1) * eventsPerPage;
+  const currentEvents = finalFilteredEvents.slice(startIndex, startIndex + eventsPerPage);
+
+  // Fetch categories & events
   useEffect(() => {
+    dispatch(fetchAllCategories() as any);
     dispatch(eventFetch());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (approvedEvents.length === 0) {
-      setLoading(false);
-      return;
+  // Comprehensive filtering function
+  const applyAllFilters = useCallback(() => {
+    let filtered = propFilteredEvents;
+
+    // ✅ Category filter
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter((event: Event) =>
+        selectedCategories.includes(event.category || "")
+      );
     }
 
-    const timer = setTimeout(() => {
-      setLoading(false);
-      setShowEvents(true);
-    }, 1000);
+    // ✅ Location filter (from sidebar checkboxes)
+    if (selectedLocations.length > 0) {
+      filtered = filtered.filter((event: Event) =>
+        selectedLocations.some((loc) =>
+          event.location?.toLowerCase().includes(loc.toLowerCase())
+        )
+      );
+    }
 
-    // Cleanup function for timer
-    // eslint-disable-next-line consistent-return
-    return () => clearTimeout(timer);
-  }, [approvedEvents]);
-
-
-  // State for filtered events
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
-  const [price, setPrice] = useState<number>(5000); // max by default
-  const [showPrice, setShowPrice] = useState<boolean>(false);
-
-  useEffect(() => {
-    setFilteredEvents(approvedEvents); 
-    setCurrentPage(1);
-  }, [approvedEvents])
-  const applyPriceFilter = () => {
-    console.log("Selected Price:", price);
-
-    const filtered = approvedEvents.filter((event: Event) => {
+    // ✅ Price filter
+    filtered = filtered.filter((event: Event) => {
       const mainTicketGroup = event.tickets?.[0];
-      if (!mainTicketGroup) return true; // keep event if no tickets
+      if (!mainTicketGroup) return true;
 
       if (mainTicketGroup.payStatus === "free") return price >= 0;
 
@@ -137,32 +195,205 @@ const EventBooking: React.FC = () => {
       return true;
     });
 
-    setFilteredEvents(filtered);
-    setCurrentPage(1); // reset pagination
-  };
+    // ✅ Rating filter
+    if (selectedRatings.length > 0) {
+      filtered = filtered.filter((event: Event) => {
+        const rating = event.averageRating || 0;
+        return selectedRatings.some((selected) => {
+          const lowerBound = selected;
+          const upperBound = selected + 1;
+          return selected === 5
+            ? rating === 5
+            : rating >= lowerBound && rating < upperBound;
+        });
+      });
+    }
 
-  const clearPriceFilter = () => {
-    setPrice(500); // Reset slider
-    setFilteredEvents(approvedEvents);
+    // ✅ "Book This Event" Filters
+    if (bookEventFilters.eventType) {
+      filtered = filtered.filter((event: Event) =>
+        event.eventType?.toLowerCase() === bookEventFilters.eventType.toLowerCase()
+      );
+    }
+
+    if (bookEventFilters.eventLocation) {
+      filtered = filtered.filter((event: Event) =>
+        event.location?.toLowerCase().includes(bookEventFilters.eventLocation.toLowerCase())
+      );
+    }
+
+    if (bookEventFilters.eventDate) {
+      filtered = filtered.filter((event: Event) =>
+        event.date === bookEventFilters.eventDate
+      );
+    }
+
+    if (bookEventFilters.eventPricing) {
+      if (bookEventFilters.eventPricing === "Free") {
+        filtered = filtered.filter((event: Event) =>
+          event.tickets?.[0]?.payStatus === "free"
+        );
+      } else if (bookEventFilters.eventPricing === "Paid") {
+        filtered = filtered.filter((event: Event) =>
+          event.tickets?.[0]?.payStatus === "paid"
+        );
+      }
+    }
+
+    // ✅ Tab filter
+    if (bookEventFilters.tabValue === "Online Events") {
+      filtered = filtered.filter((event: Event) =>
+        event.eventType?.toLowerCase().includes("online") ||
+        event.location?.toLowerCase().includes("online")
+      );
+    } else if (bookEventFilters.tabValue === "Live Events") {
+      filtered = filtered.filter((event: Event) =>
+        !event.eventType?.toLowerCase().includes("online") &&
+        !event.location?.toLowerCase().includes("online")
+      );
+    }
+
+    setFinalFilteredEvents(filtered);
     setCurrentPage(1);
+  }, [propFilteredEvents, selectedCategories, selectedLocations, price, selectedRatings, bookEventFilters]);
+
+  // Apply "Book This Event" filters
+  const applyBookEventFilters = useCallback(() => {
+    const newFilters = {
+      eventType,
+      eventLocation,
+      eventDate,
+      eventPricing,
+      tabValue: ["All Events", "Online Events", "Live Events"][tabValue]
+    };
+
+    console.log("Applying Book Event Filters:", newFilters);
+
+    // Update the book event filters state
+    setBookEventFilters(newFilters);
+
+    if (onFilterChange) {
+      onFilterChange(newFilters);
+    }
+  }, [eventType, eventLocation, eventDate, eventPricing, tabValue, onFilterChange]);
+
+  // Clear "Book This Event" filters
+  const clearBookEventFilters = useCallback(() => {
+    setEventType("");
+    setEventLocation("");
+    setEventDate("");
+    setEventPricing("");
+    setTabValue(0);
+
+    const clearedFilters = {
+      eventType: "",
+      eventLocation: "",
+      eventDate: "",
+      eventPricing: "",
+      tabValue: "All Events"
+    };
+
+    // Clear the book event filters state
+    setBookEventFilters(clearedFilters);
+
+    if (onFilterChange) {
+      onFilterChange(clearedFilters);
+    }
+  }, [onFilterChange]);
+
+  // Apply all filters when dependencies change
+  useEffect(() => {
+    applyAllFilters();
+  }, [applyAllFilters]);
+
+  // Update final events when prop events change
+  useEffect(() => {
+    setFinalFilteredEvents(propFilteredEvents);
+    setCurrentPage(1);
+  }, [propFilteredEvents]);
+
+  // Delay loading for UI smoothness
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+      setShowEvents(true);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [approvedEvents]);
+
+  // Debug useEffect to see filtering in action
+  useEffect(() => {
+    console.log("Current Book Event Filters:", bookEventFilters);
+    console.log("Final Filtered Events Count:", finalFilteredEvents.length);
+  }, [bookEventFilters, finalFilteredEvents]);
+
+  // Clear sidebar filters
+  const clearSidebarFilters = () => {
+    setSelectedCategories([]);
+    setSelectedLocations([]);
+    setSelectedRatings([]);
+    setPrice(5000);
   };
 
-  // Pagination logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const eventsPerPage = 7;
+  // Clear price filter
+  const clearPriceFilter = () => {
+    setPrice(5000);
+  };
 
-  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
-  const startIndex = (currentPage - 1) * eventsPerPage;
-  const currentEvents = filteredEvents.slice(startIndex, startIndex + eventsPerPage);
-
+  // Pagination page change handler
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
-
     eventsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // Toggle category accordion
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategory((prev) => (prev === categoryId ? null : categoryId));
+  };
+
+  // Add this state with your other state declarations
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{ success: boolean; message: string } | null>(null);
+
+  // Add these functions with your other functions
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    try {
+      const response = await axios.post('/contact', formData);
+      setSubmitStatus({
+        success: true,
+        message: response.data.message || 'Message sent successfully!'
+      });
+      setFormData({ name: '', email: '', message: '' }); // Reset form
+    } catch (error: any) {
+      console.log(error);
+      setSubmitStatus({
+        success: false,
+        message: error.response?.data?.message || 'Failed to send message. Please try again.'
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
-    <Container maxWidth={false} sx={{ maxWidth: 1100, py: 4 }}>
+    <Container maxWidth={false} sx={{ maxWidth: 1180, py: 4 }}>
       <Box sx={{ mb: 4, textAlign: "left" }}>
         <Typography variant="h2" component="h1" color="#000">
           Our events list
@@ -220,7 +451,7 @@ const EventBooking: React.FC = () => {
 
               <Box display="flex" justifyContent="space-between">
                 <Typography variant="body2">${0}</Typography>
-                <Typography variant="body2">${price}</Typography> {/* dynamic */}
+                <Typography variant="body2">${price}</Typography>
               </Box>
 
               <Box mt={2} display="flex" justifyContent="space-between">
@@ -231,7 +462,7 @@ const EventBooking: React.FC = () => {
                   variant="contained"
                   size="small"
                   sx={{ bgcolor: "#0A2647", color: "#fff" }}
-                  onClick={applyPriceFilter}
+                  onClick={applyAllFilters}
                 >
                   Apply
                 </Button>
@@ -249,18 +480,68 @@ const EventBooking: React.FC = () => {
                 {eventTypeOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               </IconButton>
             </Box>
+
             <Collapse in={eventTypeOpen}>
-              {[
-                "Cultural and Artistic Events",
-                "Professional Events",
-                "Social and Festive Events",
-                "Sports Events",
-                "Academic Educational Event",
-                "Charitable Events",
-                "Corporate Events",
-              ].map((type) => (
-                <FormControlLabel key={type} control={<Checkbox size="small" />} label={type} />
-              ))}
+              <Box sx={{ maxHeight: 300, overflowY: 'auto', mt: 1, pr: 1 }}>
+                {loading ? (
+                  <Typography variant="body2">Loading categories...</Typography>
+                ) : categories.length > 0 ? (
+                  categories.map((category: any) =>
+                    category.subcategories.length > 0 ? (
+                      <Box key={category._id} sx={{ mb: 1 }}>
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                          onClick={() => toggleCategory(category._id)}
+                          sx={{
+                            cursor: 'pointer',
+                            bgcolor: expandedCategory === category._id ? 'action.hover' : 'transparent',
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: 1,
+                          }}
+                        >
+                          <Typography variant="subtitle2" fontWeight="bold">
+                            {category.name}
+                          </Typography>
+                          <IconButton size="small">
+                            {expandedCategory === category._id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                          </IconButton>
+                        </Box>
+
+                        <Collapse in={expandedCategory === category._id}>
+                          <Box sx={{ pl: 2, pt: 1 }}>
+                            {category.subcategories.map((subcategory: any) => (
+                              <FormControlLabel
+                                key={subcategory._id}
+                                control={
+                                  <Checkbox
+                                    size="small"
+                                    checked={selectedCategories.includes(subcategory._id)}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setSelectedCategories([...selectedCategories, subcategory._id]);
+                                      } else {
+                                        setSelectedCategories(
+                                          selectedCategories.filter((c) => c !== subcategory._id)
+                                        );
+                                      }
+                                    }}
+                                  />
+                                }
+                                label={subcategory.name}
+                              />
+                            ))}
+                          </Box>
+                        </Collapse>
+                      </Box>
+                    ) : null
+                  )
+                ) : (
+                  <Typography variant="body2">No categories available.</Typography>
+                )}
+              </Box>
             </Collapse>
           </Paper>
 
@@ -274,18 +555,33 @@ const EventBooking: React.FC = () => {
                 {eventLocationOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               </IconButton>
             </Box>
+
             <Collapse in={eventLocationOpen}>
-              {[
-                "Iconic Buildings",
-                "Hotels with Event Spaces",
-                "Entertainment Arenas",
-                "Cultural and Historical Venues",
-                "Beach and Island",
-                "Unique Venues",
-                "Castles and Palaces",
-              ].map((loc) => (
-                <FormControlLabel key={loc} control={<Checkbox size="small" />} label={loc} />
-              ))}
+              {eventLocations.length > 0 ? (
+                eventLocations.map((loc) => (
+                  <FormControlLabel
+                    key={loc}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={selectedLocations.includes(loc)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedLocations((prev) => [...prev, loc]);
+                          } else {
+                            setSelectedLocations((prev) => prev.filter((l) => l !== loc));
+                          }
+                        }}
+                      />
+                    }
+                    label={loc}
+                  />
+                ))
+              ) : (
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  No locations available.
+                </Typography>
+              )}
             </Collapse>
           </Paper>
 
@@ -303,13 +599,26 @@ const EventBooking: React.FC = () => {
               {[5, 4, 3, 2, 1].map((val) => (
                 <FormControlLabel
                   key={val}
-                  control={<Checkbox size="small" />}
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={selectedRatings.includes(val)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedRatings((prev) => [...prev, val]);
+                        } else {
+                          setSelectedRatings((prev) => prev.filter((r) => r !== val));
+                        }
+                      }}
+                    />
+                  }
                   label={<Rating value={val} readOnly size="small" />}
                 />
               ))}
             </Collapse>
           </Paper>
 
+          {/* Book This Event Section */}
           <Paper elevation={1} sx={{
             borderRadius: 3,
             overflow: "hidden",
@@ -329,7 +638,7 @@ const EventBooking: React.FC = () => {
                 value={tabValue}
                 onChange={(e, val) => setTabValue(val)}
                 variant="fullWidth"
-                TabIndicatorProps={{ style: { display: "none" } }} // hide default indicator
+                TabIndicatorProps={{ style: { display: "none" } }}
                 sx={{
                   "& .MuiTab-root": {
                     textTransform: "none",
@@ -358,7 +667,6 @@ const EventBooking: React.FC = () => {
               </Tabs>
             </Box>
 
-
             {/* Form Fields */}
             <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 2 }}>
               {/* Event Type */}
@@ -373,7 +681,7 @@ const EventBooking: React.FC = () => {
                   renderValue={(selected) =>
                     selected || (
                       <Box display="flex" alignItems="center" gap={1}>
-                        <LocationOnOutlinedIcon fontSize="small" sx={{ color: "#777" }} />
+                        <CategoryIcon fontSize="small" sx={{ color: "#777" }} />
                         <Typography variant="body2" color="#777">
                           Select Event Type
                         </Typography>
@@ -381,9 +689,10 @@ const EventBooking: React.FC = () => {
                     )
                   }
                 >
-                  <MenuItem value="Concert">Concert</MenuItem>
-                  <MenuItem value="Festival">Festival</MenuItem>
-                  <MenuItem value="Conference">Conference</MenuItem>
+                  <MenuItem value="Public">Public</MenuItem>
+                  <MenuItem value="Private">Private</MenuItem>
+                  <MenuItem value="Online">Online</MenuItem>
+                  <MenuItem value="Live">Live</MenuItem>
                 </Select>
               </FormControl>
 
@@ -401,42 +710,44 @@ const EventBooking: React.FC = () => {
                       <Box display="flex" alignItems="center" gap={1}>
                         <LocationOnOutlinedIcon fontSize="small" sx={{ color: "#777" }} />
                         <Typography variant="body2" color="#777">
-                          Select Event Location
+                          Select Location
                         </Typography>
                       </Box>
                     )
                   }
                 >
-                  <MenuItem value="London">London</MenuItem>
-                  <MenuItem value="Dubai">Dubai</MenuItem>
-                  <MenuItem value="Paris">Paris</MenuItem>
+                  {eventLocations.map((loc) => (
+                    <MenuItem key={loc} value={loc}>
+                      {loc}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
 
               {/* Event Date */}
               <FormControl fullWidth size="small">
-                <InputLabel shrink sx={{ fontWeight: "bold", color: "#555" }}>
-                  Event Date
-                </InputLabel>
-                <Select
-                  displayEmpty
+                <TextField
+                  type="date"
+                  label="Event Date"
                   value={eventDate}
                   onChange={(e) => setEventDate(e.target.value)}
-                  renderValue={(selected) =>
-                    selected || (
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <CalendarTodayOutlinedIcon fontSize="small" sx={{ color: "#777" }} />
-                        <Typography variant="body2" color="#777">
-                          Select Event Date
-                        </Typography>
-                      </Box>
-                    )
-                  }
-                >
-                  <MenuItem value="Today">Today</MenuItem>
-                  <MenuItem value="Tomorrow">Tomorrow</MenuItem>
-                  <MenuItem value="This Week">This Week</MenuItem>
-                </Select>
+                  InputLabelProps={{
+                    shrink: true,
+                    sx: { fontWeight: "bold", color: "#555" }
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <CalendarTodayOutlinedIcon fontSize="small" sx={{ color: "#777", mr: 1 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      padding: '8.5px 14px',
+                    }
+                  }}
+                />
               </FormControl>
 
               {/* Event Pricing */}
@@ -461,30 +772,45 @@ const EventBooking: React.FC = () => {
                 >
                   <MenuItem value="Free">Free</MenuItem>
                   <MenuItem value="Paid">Paid</MenuItem>
-                  <MenuItem value="Premium">Premium</MenuItem>
                 </Select>
               </FormControl>
 
-              {/* Find Button */}
-              <Button
-                variant="contained"
-                fullWidth
-                sx={{
-                  mt: 1,
-                  bgcolor: "#0A2647",
-                  textTransform: "none",
-                  fontWeight: "bold",
-                  py: 1,
-                  borderRadius: 1,
-                  "&:hover": { bgcolor: "#073366" },
-                }}
-                startIcon={<i className="fa fa-search" />}
-              >
-                Find a Event
-              </Button>
+              {/* Action Buttons */}
+              <Box display="flex" gap={1} mt={1}>
+                <Button
+                  variant="outlined"
+
+                  sx={{
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    py: 1,
+                    borderRadius: 1,
+                  }}
+                  onClick={clearBookEventFilters}
+                >
+                  Clear
+                </Button>
+                <Button
+                  variant="contained"
+
+                  sx={{
+                    bgcolor: "#0A2647",
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    py: 1,
+                    borderRadius: 1,
+                    "&:hover": { bgcolor: "#073366" },
+                  }}
+                  startIcon={<SearchIcon />}
+                  onClick={applyBookEventFilters}
+                >
+                  Find Event
+                </Button>
+              </Box>
             </Box>
           </Paper>
 
+          {/* Contact Form */}
           <Paper
             elevation={0}
             sx={{
@@ -502,60 +828,91 @@ const EventBooking: React.FC = () => {
             </Typography>
 
             {/* Form Fields */}
-            <Stack spacing={2}>
-              <TextField
-                fullWidth
-                placeholder="Your name"
-                variant="outlined"
-                InputProps={{
-                  sx: { borderRadius: 1, fontSize: "0.9rem" },
-                  startAdornment: (
-                    <Box component="span" sx={{ mr: 1, color: "#888" }}>
-                      <i className="ri-user-line" />
-                    </Box>
-                  ),
-                }}
-              />
-              <TextField
-                fullWidth
-                placeholder="Your email"
-                variant="outlined"
-                InputProps={{
-                  sx: { borderRadius: 1, fontSize: "0.9rem" },
-                  startAdornment: (
-                    <Box component="span" sx={{ mr: 1, color: "#888" }}>
-                      <i className="ri-mail-line" />
-                    </Box>
-                  ),
-                }}
-              />
-              <TextField
-                fullWidth
-                placeholder="Message"
-                variant="outlined"
-                multiline
-                rows={4}
-                InputProps={{
-                  sx: { borderRadius: 1, fontSize: "0.9rem" },
-                }}
-              />
+            <Box component="form" noValidate onSubmit={handleSubmit}>
+              <Stack spacing={2}>
+                <TextField
+                  fullWidth
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Your name"
+                  variant="outlined"
+                  InputProps={{
+                    sx: { borderRadius: 1, fontSize: "0.9rem" },
+                    startAdornment: (
+                      <Box component="span" sx={{ mr: 1, color: "#888" }}>
+                        <i className="ri-user-line" />
+                      </Box>
+                    ),
+                  }}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Your email"
+                  variant="outlined"
+                  type="email"
+                  InputProps={{
+                    sx: { borderRadius: 1, fontSize: "0.9rem" },
+                    startAdornment: (
+                      <Box component="span" sx={{ mr: 1, color: "#888" }}>
+                        <i className="ri-mail-line" />
+                      </Box>
+                    ),
+                  }}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  placeholder="Message"
+                  variant="outlined"
+                  multiline
+                  rows={4}
+                  InputProps={{
+                    sx: { borderRadius: 1, fontSize: "0.9rem" },
+                  }}
+                  required
+                />
 
-              {/* Submit Button */}
-              <Button
-                variant="contained"
-                fullWidth
-                endIcon={<ArrowForwardIcon />}
-                sx={{
-                  backgroundColor: "#0A2647",
-                  borderRadius: 1,
-                  textTransform: "none",
-                  fontWeight: "bold",
-                  "&:hover": { backgroundColor: "#073362" },
-                }}
-              >
-                Send message
-              </Button>
-            </Stack>
+                {/* Submit Status Message */}
+                {submitStatus && (
+                  <Box sx={{
+                    color: submitStatus.success ? 'success.main' : 'error.main',
+                    fontSize: '0.875rem',
+                    textAlign: 'center'
+                  }}>
+                    {submitStatus.message}
+                  </Box>
+                )}
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  disabled={submitting}
+                  endIcon={<ArrowForwardIcon />}
+                  sx={{
+                    backgroundColor: "#0A2647",
+                    borderRadius: 1,
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    "&:hover": { backgroundColor: "#073362" },
+                    "&:disabled": {
+                      backgroundColor: '#cccccc',
+                    },
+                  }}
+                >
+                  {submitting ? 'Submitting...' : 'Send message'}
+                </Button>
+              </Stack>
+            </Box>
 
             {/* Contact Info */}
             <Box mt={3}>
@@ -563,28 +920,28 @@ const EventBooking: React.FC = () => {
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <PhoneIphoneOutlinedIcon fontSize="small" />
                   <Typography variant="body2">
-                    <strong>Mobile:</strong> 1-222-333-4444
+                    <strong>Mobile:</strong> 673 994 445
                   </Typography>
                 </Stack>
 
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <EmailOutlinedIcon fontSize="small" />
                   <Typography variant="body2">
-                    <strong>Email:</strong> sale@eucarrental.com
+                    <strong>Email:</strong> support@tickm-events.com
                   </Typography>
                 </Stack>
 
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <WhatsAppIcon fontSize="small" />
                   <Typography variant="body2">
-                    <strong>WhatsApp:</strong> 1-222-333-4444
+                    <strong>WhatsApp:</strong> +237 655 178 302
                   </Typography>
                 </Stack>
 
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <FaxOutlinedIcon fontSize="small" />
                   <Typography variant="body2">
-                    <strong>Fax:</strong> 1-222-333-4444
+                    <strong>Fax:</strong> +237 655 178 302
                   </Typography>
                 </Stack>
               </Stack>
@@ -597,7 +954,7 @@ const EventBooking: React.FC = () => {
           <Grid container spacing={3} ref={eventsRef}>
             {loading ? (
               <Typography>Loading events...</Typography>
-            ) : showEvents && approvedEvents.length > 0 ? (
+            ) : showEvents && finalFilteredEvents.length > 0 ? (
               currentEvents.map((event: Event, index: number) => {
                 const isHighlighted = index === 0;
                 const image = event.coverImage?.url || event.portraitImage?.url;
@@ -616,7 +973,6 @@ const EventBooking: React.FC = () => {
                   if (mainTicketGroup.payStatus === "free") {
                     priceLabel = "Free";
                   } else if (mainTicketGroup.payStatus === "paid" && Array.isArray(mainTicketGroup.tickets)) {
-                    // Extract numeric prices safely
                     const prices = mainTicketGroup.tickets
                       .map((t: any) => {
                         const numericPrice = parseFloat(String(t.price).replace(/[^\d.]/g, ""));
@@ -626,7 +982,7 @@ const EventBooking: React.FC = () => {
 
                     if (prices.length > 0) {
                       const minPrice = Math.min(...prices);
-                      priceLabel = `${minPrice} XAF`; // or `${minPrice} ${currency}`
+                      priceLabel = `${minPrice} XAF`;
                     }
                   }
                 }
@@ -731,11 +1087,7 @@ const EventBooking: React.FC = () => {
 
                         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 2 }}>
                           <Typography variant="h6" fontWeight="bold" sx={{ color: isHighlighted ? "#fff" : "#000" }}>
-                            From: {" "}{priceLabel}
-
-                            {/* <Typography component="span" fontWeight="bold" sx={{ color: isHighlighted ? "#E0E0E0" : "text.secondary",fontSize:'1.3rem' }}>
-                              {priceLabel}
-                            </Typography> */}
+                            From: {priceLabel}
                           </Typography>
                           <Button
                             variant="contained"
@@ -764,7 +1116,6 @@ const EventBooking: React.FC = () => {
             ) : (
               <Typography>No events available.</Typography>
             )}
-
           </Grid>
 
           {/* Pagination */}

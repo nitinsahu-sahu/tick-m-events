@@ -22,6 +22,7 @@ interface Event {
 export function ProcessOne({ onTicketsSelected, onNext }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const { basicDetails, eventWithDetails } = useSelector((state: RootState) => state?.event);
+
     const [events, setEvents] = useState<Event[]>(basicDetails || []);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -31,28 +32,29 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
     const [promoError, setPromoError] = useState('');
     const [searchParams] = useSearchParams();
     const eventIdFromUrl = searchParams.get('eventId');
+
     const rawPaymentMethods = eventWithDetails?.tickets?.[0]?.paymentMethods;
-    // Memoized event data
+
     const eventId = useMemo(() => eventWithDetails?._id || '', [eventWithDetails]);
     const tickets = useMemo(() => eventWithDetails?.tickets || [], [eventWithDetails]);
     const totalTicketsSelected = useMemo(
         () => Object.values(ticketQuantities).reduce((sum, qty) => sum + qty, 0),
         [ticketQuantities]
     );
+
     // Initialize ticket quantities
     useEffect(() => {
         if (tickets.length > 0) {
             const initialQuantities: Record<string, number> = {};
             tickets.forEach((ticket: any) => {
                 ticket.tickets.forEach((item: any) => {
-                    initialQuantities[item._id] = ticketQuantities[item._id] || 0; // Preserve existing quantities
+                    initialQuantities[item._id] = ticketQuantities[item._id] || 0;
                 });
             });
             setTicketQuantities(initialQuantities);
         }
-    }, [tickets, ticketQuantities]); // Only run when tickets structure changes
+    }, [tickets, ticketQuantities]);
 
-    // Memoized fetch functions
     const fetchEvents = useCallback(async () => {
         try {
             await dispatch(eventFetch());
@@ -70,10 +72,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         }
     }, [dispatch]);
 
-
-
     // Initial data loading
-
     useEffect(() => {
         if (isInitialLoad && basicDetails.length === 0) {
             fetchEvents();
@@ -96,54 +95,62 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         }
     }, [selectedEvent?._id, fetchEventById]);
 
-    // Add this useEffect to select the event from URL
+    // Select event from URL
     useEffect(() => {
         if (eventIdFromUrl && events.length > 0) {
             const foundEvent = events.find(e => e._id === eventIdFromUrl);
-
-            if (foundEvent) {
-                setSelectedEvent(foundEvent);
-            }
+            if (foundEvent) setSelectedEvent(foundEvent);
         }
     }, [eventIdFromUrl, events]);
-    // Event change handler
+
     const handleEventChange = useCallback((event: SelectChangeEvent<string>) => {
         const event_id = event.target.value;
         const foundEvent = events.find(e => e._id === event_id);
         setSelectedEvent(foundEvent ?? null);
     }, [events]);
 
-    // Memoized calculations
     const calculateSubtotal = useCallback(() => {
         let subtotal = 0;
         tickets.forEach((ticket: any) => {
             ticket.tickets.forEach((item: any) => {
                 const quantity = ticketQuantities[item._id] || 0;
-
-                const price = item.price === "Free" ? 0 : parseFloat(item.price.replace(/[^0-9.]/g, ''))
-
+                const price = item.price === "Free" ? 0 : parseFloat(item.price.replace(/[^0-9.]/g, ''));
                 subtotal += quantity * price;
             });
         });
         return subtotal;
     }, [tickets, ticketQuantities]);
 
-    const calculateDiscount = useCallback(() => {
+    // ✅ Single calculateDiscount function
+    const calculateDiscount = useCallback((): number => {
         if (!appliedPromo) return 0;
+
         const subtotal = calculateSubtotal();
 
+        // Backend-calculated discount
+        if ('calculation' in appliedPromo && appliedPromo.calculation != null) {
+            return Number(appliedPromo.calculation) || 0;
+        }
+
+        // Type narrowing
         switch (appliedPromo.type) {
             case 'percentage':
-                return subtotal * (appliedPromo.value / 100);
+            case 'percentageDiscount':
+                return ('value' in appliedPromo ? subtotal * appliedPromo.value / 100 : 0);
+
             case 'simple':
-                return Math.min(appliedPromo.value, subtotal);
+            case 'fixedValueDiscount':
+                return ('value' in appliedPromo ? Math.min(appliedPromo.value, subtotal) : 0);
+
             case 'group': {
+                if (!('groupBuy' in appliedPromo) || !('groupGet' in appliedPromo)) return 0;
+
                 let totalFreeItems = 0;
                 tickets.forEach((ticket: any) => {
                     ticket.tickets.forEach((item: any) => {
                         const quantity = ticketQuantities[item._id] || 0;
                         if (quantity > 0) {
-                            const price = parseFloat(item.price.replace(/[^0-9.]/g, ''));
+                            const price = parseFloat(item.price.replace(/[^0-9.]/g, '')) || 0;
                             const freeItems = Math.floor(quantity / appliedPromo.groupBuy) * appliedPromo.groupGet;
                             totalFreeItems += freeItems * price;
                         }
@@ -151,17 +158,23 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                 });
                 return totalFreeItems;
             }
+
+            case 'earlyBuyer': {
+                if (!('earlyBuyerDiscountType' in appliedPromo) || !('value' in appliedPromo)) return 0;
+                if (appliedPromo.earlyBuyerDiscountType === 'percentage') return subtotal * appliedPromo.value / 100;
+                if (appliedPromo.earlyBuyerDiscountType === 'fixed') return Math.min(appliedPromo.value, subtotal);
+                return 0;
+            }
+
             default:
                 return 0;
         }
     }, [appliedPromo, tickets, ticketQuantities, calculateSubtotal]);
 
-    const calculateTotal = useCallback(() => {
-        const subtotal = calculateSubtotal();
-        const discount = calculateDiscount();
-        return Math.max(0, subtotal - discount);
-    }, [calculateSubtotal, calculateDiscount]);
-
+    const calculateTotal = useCallback(() =>
+        Math.max(0, calculateSubtotal() - calculateDiscount()),
+        [calculateSubtotal, calculateDiscount]
+    );
     const getSelectedTickets = useCallback(() => {
         const selected: Array<{
             ticketType: string;
@@ -187,7 +200,6 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         return selected;
     }, [tickets, ticketQuantities]);
 
-
     const applyPromoCode = useCallback(async () => {
         setPromoError('');
 
@@ -201,23 +213,10 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
             const result = await dispatch(promotionValidate(promoInput.toUpperCase(), eventId, selectedTickets));
 
             if (result.success) {
-                const promo = result.promo;
-                const validatedPromo: PromoCode = {
-                    code: promo.code,
-                    type: promo.type,
-                    value: Number(promo.value),
-                    groupBuy: promo.groupBuy ?? 0,
-                    groupGet: promo.groupGet ?? 0,
-                    minPurchase: promo.minPurchase ?? 0,
-                    ticketSelection: promo.ticketSelection ?? '',
-                    eventId: promo.eventId,
-                    validityPeriodStart: promo.validityPeriodStart,
-                    validityPeriodEnd: promo.validityPeriodEnd,
-                };
-                
 
-                setAppliedPromo(validatedPromo);
-              
+                console.log('✅ Promo details:', result.promo);
+
+                setAppliedPromo(result.promo);
             } else {
                 setPromoError(result.message || 'Invalid promo code');
             }
@@ -227,92 +226,55 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         }
     }, [promoInput, eventId, getSelectedTickets, dispatch]);
 
-
     const removePromoCode = useCallback(() => {
         setAppliedPromo(null);
         setPromoInput('');
         setPromoError('');
     }, []);
-    
-    // Ticket quantity handlers
+
     const handleDecrement = useCallback((ticketId: string) => {
-        setTicketQuantities(prev => (prev[ticketId] <= 0 ? prev : {
-            ...prev,
-            [ticketId]: prev[ticketId] - 1
-        }));
+        setTicketQuantities(prev => (prev[ticketId] <= 0 ? prev : { ...prev, [ticketId]: prev[ticketId] - 1 }));
     }, []);
 
     const handleIncrement = useCallback((ticketId: string, maxTickets?: string) => {
-        setTicketQuantities(prev => (maxTickets !== undefined && prev[ticketId] >= parseInt(maxTickets, 10) ? prev : {
-            ...prev,
-            [ticketId]: prev[ticketId] + 1
-        }));
+        setTicketQuantities(prev => (maxTickets !== undefined && prev[ticketId] >= parseInt(maxTickets, 10) ? prev : { ...prev, [ticketId]: prev[ticketId] + 1 }));
     }, []);
 
-    // Effect for sending selection updates
     useEffect(() => {
         let parsedPaymentMethods: string[] = [];
- 
+
         try {
-            if (Array.isArray(rawPaymentMethods)) {
-                parsedPaymentMethods = rawPaymentMethods;
-            } else if (typeof rawPaymentMethods === "string") {
-                // Try to parse only if it looks like JSON
-                if (rawPaymentMethods.trim().startsWith("[") || rawPaymentMethods.trim().startsWith("{")) {
-                    parsedPaymentMethods = JSON.parse(rawPaymentMethods);
-                } else {
-                    parsedPaymentMethods = [rawPaymentMethods]; // wrap plain string in array
-                }
-            } else {
-                parsedPaymentMethods = [];
+            if (Array.isArray(rawPaymentMethods)) parsedPaymentMethods = rawPaymentMethods;
+            else if (typeof rawPaymentMethods === "string") {
+                parsedPaymentMethods = rawPaymentMethods.trim().startsWith("[") ? JSON.parse(rawPaymentMethods) : [rawPaymentMethods];
             }
         } catch (error) {
             console.warn("Failed to parse paymentMethods:", error);
-            parsedPaymentMethods = [];
         }
- 
+
         const selection = {
             tickets: getSelectedTickets(),
             totalAmount: calculateTotal(),
             eventId,
             ticketCount: totalTicketsSelected,
-            paymentMethods: parsedPaymentMethods, // ✅ Always array
+            paymentMethods: parsedPaymentMethods,
         };
- 
-        onTicketsSelected(selection);
-    }, [
-        ticketQuantities,
-        eventId,
-        getSelectedTickets,
-        calculateTotal,
-        onTicketsSelected,
-        totalTicketsSelected,
-        rawPaymentMethods,
-    ]);
 
+        onTicketsSelected(selection);
+    }, [ticketQuantities, eventId, getSelectedTickets, calculateTotal, onTicketsSelected, totalTicketsSelected, rawPaymentMethods]);
 
     return (
         <Box sx={{ p: 3, boxShadow: 3, borderRadius: 3, position: "relative", mt: 3 }}>
             <HeadProcess title="Participant Details" step="1" />
             <Grid container spacing={3} mt={2} alignItems="center">
+                {/* Event Selection */}
                 <Grid item xs={12} sm={7} md={7}>
                     <Paper sx={{ p: 3, boxShadow: 3, borderRadius: 2, backdropFilter: "blur(14px)" }}>
-
                         <HeadingCommon weight={600} variant="h6" title="Select Event" baseSize="20px" />
-
                         <Select
                             value={selectedEvent?._id || ''}
                             onChange={handleEventChange}
-                            sx={{
-                                mt: 2,
-                                textTransform: "capitalize",
-                                width: "100%",
-                                '& .MuiOutlinedInput-root': {
-                                    '& fieldset': { borderColor: 'black' },
-                                    '&:hover fieldset': { borderColor: 'black' },
-                                    '&.Mui-focused fieldset': { borderColor: 'black' }
-                                }
-                            }}
+                            sx={{ mt: 2, textTransform: "capitalize", width: "100%", '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: 'black' }, '&:hover fieldset': { borderColor: 'black' }, '&.Mui-focused fieldset': { borderColor: 'black' } } }}
                             displayEmpty
                             inputProps={{ 'aria-label': 'Select Event' }}
                         >
@@ -320,37 +282,23 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                                 <MenuItem disabled value="">
                                     <em>No events available</em>
                                 </MenuItem>
-                            ) : (
-                                events.map((event) => (
-                                    <MenuItem key={event._id} value={event._id} sx={{ textTransform: "capitalize" }}>
-                                        {event.eventName}
-                                    </MenuItem>
-                                ))
-                            )}
+                            ) : events.map((event) => (
+                                <MenuItem key={event._id} value={event._id} sx={{ textTransform: "capitalize" }}>
+                                    {event.eventName}
+                                </MenuItem>
+                            ))}
                         </Select>
-
-                        {/* <Box display="flex" justifyContent="space-between" mt={2}>
-                            <Button variant="contained" sx={{ bgcolor: "#B0B0B0", borderRadius: 1, fontWeight: 400 }}>
-                                &lt; Back
-                            </Button>
-                            <Button variant="contained" sx={{ bgcolor: "#1F8FCD", borderRadius: 1, fontWeight: 400 }}>
-                                Next &gt;
-                            </Button>
-                        </Box> */}
                     </Paper>
                 </Grid>
 
-                {/* Summary Section */}
+                {/* Summary */}
                 <Grid item xs={12} sm={5} md={5}>
                     <Paper sx={{ height: "100%", p: 3, boxShadow: 4, borderRadius: 2, backdropFilter: "blur(14px)" }}>
                         <HeadingCommon weight={600} variant="h6" title="Summary" baseSize="20px" />
                         <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mt: 1 }}>
                             <HeadingCommon title={`Tickets: ${totalTicketsSelected}`} baseSize="16px" />
                             <HeadingCommon title={`Discount: -${calculateDiscount().toLocaleString() || 0} XAF`} baseSize="16px" />
-                            <HeadingCommon
-                                title={`Payment Method: ${eventWithDetails?.tickets?.[0]?.paymentMethods || 'Cash on Delivery'}`}
-                                baseSize="16px"
-                            />
+                            <HeadingCommon title={`Payment Method: ${eventWithDetails?.tickets?.[0]?.paymentMethods || 'Cash on Delivery'}`} baseSize="16px" />
                         </Box>
                         <Button variant="outlined" sx={{ borderRadius: 1, minWidth: "230px", flexGrow: 1, fontWeight: 500, color: "#0B2E4C", borderColor: "#0B2E4C", mt: 2 }}>
                             Net Amount To Be Paid :  {calculateTotal().toLocaleString()} XAF
@@ -358,64 +306,27 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                     </Paper>
                 </Grid>
             </Grid>
-            <HeadingCommon variant="h6" title="Select Tickets" baseSize="26px" />
 
-            <ParticipantTable
-                headers={processOneTableHeaders}
-                data={eventWithDetails?.tickets}
-                ticketQuantities={ticketQuantities}
-                handleDecrement={handleDecrement}
-                handleIncrement={handleIncrement}
-            />
-            <Box
-                display="flex"          // Enable Flexbox
-                justifyContent="center" // Horizontal centering
-                alignItems="center"     // Vertical centering
-                width="100%"           // Ensure full width
-            >
-                <HeadingCommon
-                    variant="h6"
-                    title={`Total: ${calculateSubtotal().toLocaleString()} XAF`}
-                    baseSize="26px"
-                />
+            <HeadingCommon variant="h6" title="Select Tickets" baseSize="26px" />
+            <ParticipantTable headers={processOneTableHeaders} data={eventWithDetails?.tickets} ticketQuantities={ticketQuantities} handleDecrement={handleDecrement} handleIncrement={handleIncrement} />
+
+            <Box display="flex" justifyContent="center" alignItems="center" width="100%">
+                <HeadingCommon variant="h6" title={`Total: ${calculateSubtotal().toLocaleString()} XAF`} baseSize="26px" />
             </Box>
 
             {/* Promo Code */}
-            <Grid container spacing={2} sx={{ marginTop: "1px" }}>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
                 <Grid item xs={12} sm={8} md={8}>
-                    <TextField
-                        fullWidth
-                        required
-                        variant="outlined"
-                        size="small"
-                        placeholder="Enter Promo Code"
-                        value={promoInput}
-                        onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
-                        disabled={!!appliedPromo}
-                    />
+                    <TextField fullWidth required variant="outlined" size="small" placeholder="Enter Promo Code" value={promoInput} onChange={(e) => setPromoInput(e.target.value.toUpperCase())} disabled={!!appliedPromo} />
                 </Grid>
                 <Grid item xs={12} sm={4} md={4}>
-                    <Button
-                        variant="contained"
-                        fullWidth
-                        sx={{
-                            paddingY: "9px",
-                            fontSize: { xs: "10px", sm: "11px", md: "12px" },
-                            backgroundColor: "#0B2E4C",
-                            color: "#fff"
-                        }}
-                        onClick={appliedPromo ? removePromoCode : applyPromoCode}
-                    >
-                        <>
-                            {appliedPromo ? 'Remove' : 'Apply'} Promo Code
-                        </>
-
-
+                    <Button variant="contained" fullWidth sx={{ paddingY: "9px", fontSize: { xs: "10px", sm: "11px", md: "12px" }, backgroundColor: "#0B2E4C", color: "#fff" }} onClick={appliedPromo ? removePromoCode : applyPromoCode}>
+                        {appliedPromo ? 'Remove' : 'Apply'} Promo Code
                     </Button>
                 </Grid>
             </Grid>
 
-            {/* Promo Code Display */}
+            {/* Promo Display */}
             {appliedPromo && (
                 <Box>
                     <Typography fontSize={{ xs: "0.9rem", md: "1rem" }} sx={{ color: "green" }}>
@@ -423,42 +334,21 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                         {appliedPromo.type === 'percentage' && `${appliedPromo.value}% off`}
                         {appliedPromo.type === 'simple' && `${appliedPromo.value.toLocaleString()} XAF off`}
                         {appliedPromo.type === 'group' && `Buy ${appliedPromo.groupBuy} Get ${appliedPromo.groupGet} free`}
+                        {appliedPromo.type === 'earlyBuyer' && `${appliedPromo.value}${appliedPromo.earlyBuyerDiscountType === 'percentage' ? '%' : ' XAF'} off (Early Buyer)`}
                         )
                     </Typography>
-
-                    <Button
-                        size="small"
-                        onClick={removePromoCode}
-                        sx={{ color: 'red', fontSize: '0.7rem' }}
-                    >
-                        Remove Promo
-                    </Button>
+                    <Button size="small" onClick={removePromoCode} sx={{ color: 'red', fontSize: '0.7rem' }}>Remove Promo</Button>
                 </Box>
             )}
 
-            {promoError && (
-                <HeadingCommon
-                    color="error"
-                    title={promoError}
-                    baseSize="14px"
-                />
-            )}
+            {promoError && <HeadingCommon color="error" title={promoError} baseSize="14px" />}
 
-            <Box
-                display="flex"          // Enable Flexbox
-                justifyContent="center" // Horizontal centering
-                alignItems="center"     // Vertical centering
-                width="100%"           // Ensure full width
-            >
-                <HeadingCommon
-                    variant="h6"
-                    title={`Net Amount: ${calculateTotal().toLocaleString()} XAF`}
-                    baseSize="26px"
-                />
+            <Box display="flex" justifyContent="center" alignItems="center" width="100%">
+                <HeadingCommon variant="h6" title={`Net Amount: ${calculateTotal().toLocaleString()} XAF`} baseSize="26px" />
             </Box>
+
             <Box mt={3} display="flex" justifyContent="center">
-                <Button onClick={onNext} fullWidth variant="contained" sx={{ bgcolor: "#0B3558", mt: 2 }}
-                    disabled={!selectedEvent || totalTicketsSelected < 1} >
+                <Button onClick={onNext} fullWidth variant="contained" sx={{ bgcolor: "#0B3558", mt: 2 }} disabled={!selectedEvent || totalTicketsSelected < 1}>
                     Proceed to Participant Details
                 </Button>
             </Box>

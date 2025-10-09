@@ -1,54 +1,106 @@
-import { Box, Grid, Typography, TextField, Button, IconButton, Tooltip } from "@mui/material";
+import {
+  Box, Grid, Typography, TextField, Button, IconButton, Tooltip, Alert,
+  Snackbar, AlertColor
+} from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import YouTubeIcon from "@mui/icons-material/YouTube";
-import XIcon from "@mui/icons-material/X"; // Twitter/X
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import TwitterIcon from "@mui/icons-material/Twitter";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+import { useState } from "react";
+
 import { RootState } from 'src/redux/store';
 import { Iconify } from "../iconify";
+import { SubscriptionModal } from "../modal/SubscriptionModal";
+import axios from '../../redux/helper/axios'
 
 export default function Footer() {
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const currentRole = useSelector((state: RootState) => state.auth?.user?.role || 'participant');
+  const { t } = useTranslation();
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalStatus, setModalStatus] = useState(''); // 'success' or 'error'
+  const [modalMessage, setModalMessage] = useState('');
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: AlertColor;
+  }>({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
 
-  const handleMyBookingClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (isAuthenticated) {
-      // If user is logged in, redirect to ticket management page
-      navigate('/ticket-management');
-    } else {
-      // If user is not logged in, redirect to sign-in page
-      navigate('/sign-in');
+  const validateEmail = (emaila: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(emaila);
+  };
+
+  const handleSubscribe = async () => {
+    // Validate email
+    if (!email.trim()) {
+      showSnackbar('Please enter your email address', 'error');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      showSnackbar('Please enter a valid email address', 'error');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await axios.post('/subs/subscribe', { email });
+
+      if (response.data.success) {
+        setModalStatus('success');
+        setModalMessage(response.data.message);
+        setModalOpen(true);
+        setEmail(''); // Clear input
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message ||
+        error.response?.data?.errors?.[0]?.msg ||
+        'Subscription failed. Please try again.';
+
+      setModalStatus('error');
+      setModalMessage(errorMessage);
+      setModalOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleMyAccountClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (isAuthenticated) {
-      // Redirect based on user role
-      if (currentRole === 'organizer') {
-        navigate('/organizer-dashboard');
-      } else if (currentRole === 'admin') {
-        navigate('/admin-dashboard');
-      } else {
-        navigate('/user-profile'); // For participants
-      }
-    } else {
-      // If user is not logged in, redirect to sign-in page
-      navigate('/sign-in');
+  const showSnackbar = (message: string, severity: AlertColor = 'success') => {
+    setSnackbar({
+      open: true,
+      message,
+      severity
+    });
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSubscribe();
     }
   };
 
   return (
     <Box sx={{ bgcolor: "#0d0d0d", color: "#fff", mt: 6, pt: 6, pb: 3, px: { xs: 3, md: 8 } }}>
-      <Grid container spacing={6}>
+      <Grid container spacing={4} justifyContent="space-around" alignItems="center">
         {/* Newsletter Section */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={5}>
           <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
             Receive the best events and news every week
           </Typography>
@@ -57,6 +109,12 @@ export default function Footer() {
               variant="outlined"
               placeholder="Enter your email"
               fullWidth
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={loading}
+              error={!!email && !validateEmail(email)}
+              helperText={email && !validateEmail(email) ? "Please enter a valid email" : ""}
               InputProps={{
                 startAdornment: <EmailIcon sx={{ mr: 1, color: "gray" }} />,
                 sx: {
@@ -67,20 +125,48 @@ export default function Footer() {
             />
             <Button
               variant="contained"
+              onClick={handleSubscribe}
+              disabled={loading || !email || !validateEmail(email)}
               sx={{
                 bgcolor: "#002D5B",
                 borderRadius: 2,
                 px: 3,
                 textTransform: "none",
+                '&:disabled': {
+                  bgcolor: 'grey.400'
+                }
               }}
             >
-              Subscribe
+              {loading ? 'Subscribing...' : 'Subscribe'}
             </Button>
           </Box>
         </Grid>
+        {/* Subscription Modal */}
+        <SubscriptionModal
+          open={modalOpen}
+          onClose={handleCloseModal}
+          status={modalStatus}
+          message={modalMessage}
+        />
+
+        {/* Snackbar for quick messages */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbar.severity}
+            sx={{ width: '100%' }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
         {/* Payment Methods */}
-        <Grid item xs={12} md={6} sx={{ textAlign: { xs: "left", md: "right" } }}>
-          <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+        <Grid item xs={12} md={5}>
+          <Typography variant="h6" fontWeight={600} sx={{ mb: 2, textAlign: { xs: "left", md: "right" } }}>
             Our Payment Methods
           </Typography>
           <Box
@@ -93,33 +179,25 @@ export default function Footer() {
             }}
           >
             {/* Fapshi */}
-
             <Box
               component="img"
-              src="/assets/images/payment-gateway-logo/fapshi.jpg"
+              src="/assets/images/payment-gateway-logo/fapshi.png"
               alt="Mobile Money"
-              sx={{
-                height: 40,
-
-              }}
+              sx={{ height: 40 }}
             />
             {/* Mtn */}
             <Box
               component="img"
-              src="/assets/images/payment-gateway-logo/mtn-mobile-money.png"
+              src="/assets/images/payment-gateway-logo/mobile-money.png"
               alt="PayPal"
-              sx={{
-                height: 40,
-              }} />
-
+              sx={{ height: 40 }}
+            />
             {/* Orange */}
             <Box
               component="img"
               src="/assets/images/payment-gateway-logo/orange-money.png"
               alt="PayPal"
-              sx={{
-                height: 40,
-              }}
+              sx={{ height: 40 }}
             />
           </Box>
         </Grid>
@@ -131,8 +209,8 @@ export default function Footer() {
           <Typography fontWeight={700} sx={{ mb: 2 }}>
             Tick-m events
           </Typography>
-          <Typography variant="body2">Douala - Rue des pavés Nyalla, avant l&apos;hôtel ZZ</Typography>
-          <Typography variant="body2" sx={{ mt: 1 }}>Hours: 8:00 - 17:00, Mon - Sat</Typography>
+          <Typography variant="body2">{t('address_1')}{t('address_2')}</Typography>
+          {/* <Typography variant="body2" sx={{ mt: 1 }}>Hours: 8:00 - 17:00, Mon - Sat</Typography> */}
           <Typography
             variant="body2"
             component="a"
@@ -171,7 +249,7 @@ export default function Footer() {
             links: [
               { name: "About Us", path: "/about-us" },
               { name: "Blog", path: "#" },
-              { name: "FAQ", path: "#" },
+              { name: "FAQ", path: "/about-us#faq" },
               { name: "Terms of Use", path: "#" },
               { name: "Privacy Policy", path: "#" },
               { name: "Contact", path: "/contact-us" }
@@ -195,6 +273,16 @@ export default function Footer() {
                 component={Link}
                 to={link.path}
                 variant="body2"
+                onClick={(e) => {
+                  if (link.name === "FAQ") {
+                    e.preventDefault();
+                    navigate('/about-us', { state: { scrollTo: 'faq' } });
+                  }
+                  if (link.name === "Blog") {
+                    e.preventDefault();
+                    navigate('/home', { state: { scrollTo: 'blog' } });
+                  }
+                }}
                 sx={{
                   mb: 1,
                   cursor: "pointer",

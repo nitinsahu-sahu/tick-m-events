@@ -51,7 +51,6 @@ export const publicHomeEventsFetch = () => async (dispatch) => {
  
     try {
         const response = await axios.get("/home-recommendations/get-home-events");
-        console.log("API Response:", response);
         dispatch({
             type: homeAndRecomConstants.PUBLIC_GET_SUCCESS,
             payload: {

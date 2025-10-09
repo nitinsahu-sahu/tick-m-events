@@ -6,8 +6,6 @@ export const getPromotionLogo = () => async (dispatch) => {
 
     try {
         const response = await axios.get('/admin/logo-promotion');
-        console.log(response);
-
         dispatch({
             type: customizationConstants.GET_PROMOTION_LOGOS_SUCCESS,
             payload: response.data.logos,

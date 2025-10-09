@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, TextField, Button, IconButton } from "@mui/material";
+import { Box, Grid, Typography, TextField, Button, IconButton, Tooltip } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
@@ -9,6 +9,7 @@ import TwitterIcon from "@mui/icons-material/Twitter";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from 'src/redux/store';
+import { Iconify } from "../iconify";
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -77,80 +78,87 @@ export default function Footer() {
             </Button>
           </Box>
         </Grid>
-{/* Payment Methods */}
-<Grid item xs={12} md={6} sx={{ textAlign: { xs: "left", md: "right" } }}>
-  <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-    Our Payment Methods
-  </Typography>
-  <Box
-    sx={{
-      display: "flex",
-      gap: 2,
-      justifyContent: { xs: "flex-start", md: "flex-end" },
-      alignItems: "center",
-      flexWrap: "wrap",
-    }}
-  >
-    {/* Fapshi */}
-   
-   <Box
-      component="img"
-      src="/assets/images/payment-gateway-logo/fapshi.jpg"
-      alt="Mobile Money"
-      sx={{ 
-        height:40, 
-       
-      }}
-    />
-    {/* Mtn */}
-    <Box
-      component="img"
-      src="/assets/images/payment-gateway-logo/mtn-mobile-money.png"
-      alt="PayPal"
-      sx={{ 
-        height:40, 
-      }}/>
+        {/* Payment Methods */}
+        <Grid item xs={12} md={6} sx={{ textAlign: { xs: "left", md: "right" } }}>
+          <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+            Our Payment Methods
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              justifyContent: { xs: "flex-start", md: "flex-end" },
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {/* Fapshi */}
 
-      {/* Orange */}
-      <Box
-      component="img"
-      src="/assets/images/payment-gateway-logo/orange-money.png"
-      alt="PayPal"
-      sx={{ 
-        height:40, 
-      }}
-    />
-  </Box>
-</Grid>
+            <Box
+              component="img"
+              src="/assets/images/payment-gateway-logo/fapshi.jpg"
+              alt="Mobile Money"
+              sx={{
+                height: 40,
 
+              }}
+            />
+            {/* Mtn */}
+            <Box
+              component="img"
+              src="/assets/images/payment-gateway-logo/mtn-mobile-money.png"
+              alt="PayPal"
+              sx={{
+                height: 40,
+              }} />
+
+            {/* Orange */}
+            <Box
+              component="img"
+              src="/assets/images/payment-gateway-logo/orange-money.png"
+              alt="PayPal"
+              sx={{
+                height: 40,
+              }}
+            />
+          </Box>
+        </Grid>
       </Grid>
 
       {/* Footer Links */}
-      <Grid container spacing={4} sx={{ mt: 6 }}>
+      <Grid container spacing={4} sx={{ mt: 6 }} justifyContent="space-around">
         <Grid item xs={12} md={3}>
           <Typography fontWeight={700} sx={{ mb: 2 }}>
             Tick-m events
           </Typography>
-          <Typography variant="body2">2356 Oakwood Drive, Suite 18, San Francisco, California 94111, US</Typography>
+          <Typography variant="body2">Douala - Rue des pavés Nyalla, avant l&apos;hôtel ZZ</Typography>
           <Typography variant="body2" sx={{ mt: 1 }}>Hours: 8:00 - 17:00, Mon - Sat</Typography>
-          <Typography variant="body2" sx={{ mt: 1 }}>support@tickm-events.com</Typography>
+          <Typography
+            variant="body2"
+            component="a"
+            href="mailto:tickmevents@gmail.com?subject=Inquiry&body=Hello, I would like to know more about..."
+            sx={{
+              mt: 1,
+              display: "block",
+              textDecoration: "none",
+              color: "inherit",
+              "&:hover": {
+                color: "primary.main",
+                textDecoration: "underline"
+              }
+            }}
+          >
+            tickmevents@gmail.com
+          </Typography>
           <Typography sx={{ mt: 1 }}>
             Need help? Call us <br />
             <>
               <Typography
                 component="a"
-                href="tel:+237655178302"
+                href="tel:+237 697 182 551"
                 sx={{ color: "primary.main", fontWeight: 600, mr: 1 }}
               >
-                +237 655 178 302
-              </Typography>
-              /
-              <Typography
-                component="a"
-                href="tel:+237673994445"
-                sx={{ color: "primary.main", fontWeight: 600, ml: 1 }}
-              >
-                673 994 445
+                +237 697 182 551
               </Typography>
             </>
 
@@ -158,8 +166,8 @@ export default function Footer() {
         </Grid>
 
         {[
-          { 
-            title: "Company", 
+          {
+            title: "Company",
             links: [
               { name: "About Us", path: "/about-us" },
               { name: "Blog", path: "#" },
@@ -167,47 +175,14 @@ export default function Footer() {
               { name: "Terms of Use", path: "#" },
               { name: "Privacy Policy", path: "#" },
               { name: "Contact", path: "/contact-us" }
-            ] 
+            ]
           },
-          { 
-            title: "Customer", 
+          {
+            title: "Support",
             links: [
-              { 
-                name: "My Booking", 
-                path: isAuthenticated ? "/ticket-management" : "/sign-in",
-                onClick: handleMyBookingClick
-              },
-              { 
-                name: "My Account", 
-                path: "/sign-in"   
-              },
-              { name: "Ticket Calculator", path: "#" },
-              { name: "Refunds Terms", path: "#" },
-              { name: "Privacy Policy", path: "#" }
-            ] 
-          },
-          { 
-            title: "Our Partners", 
-            links: [
-              { name: "Affiliates", path: "#" },
-              { name: "Travel Agents", path: "#" },
-              { name: "AARP Members", path: "#" },
-              { name: "Points Programs", path: "#" },
-              { name: "Military & Veterans", path: "#" },
-              { name: "Work with us", path: "#" },
-              { name: "Advertise with us", path: "#" }
-            ] 
-          },
-          { 
-            title: "Support", 
-            links: [
-              { name: "Forum support", path: "#" },
               { name: "Help Center", path: "/contact-us" },
-              { name: "Live chat", path: "#" },
-              { name: "How it works", path: "#" },
-              { name: "Security", path: "#" },
-              { name: "Refund Policy", path: "#" }
-            ] 
+              { name: "How it works", path: "/about-us" },
+            ]
           },
         ].map((section, idx) => (
           <Grid item xs={6} md={2} key={idx}>
@@ -219,15 +194,14 @@ export default function Footer() {
                 key={i}
                 component={Link}
                 to={link.path}
-                onClick={link.onClick}
                 variant="body2"
-                sx={{ 
-                  mb: 1, 
-                  cursor: "pointer", 
+                sx={{
+                  mb: 1,
+                  cursor: "pointer",
                   display: "block",
                   textDecoration: "none",
                   color: "inherit",
-                  "&:hover": { color: "primary.main" } 
+                  "&:hover": { color: "primary.main" }
                 }}
               >
                 {link.name}
@@ -254,10 +228,35 @@ export default function Footer() {
           © 2025 Tick-M Inc. All rights Reserved.
         </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
-          <IconButton sx={{ color: "#fff" }}><FacebookIcon /></IconButton>
-          <IconButton sx={{ color: "#fff" }}><InstagramIcon /></IconButton>
-          <IconButton sx={{ color: "#fff" }}><XIcon /></IconButton>
-          <IconButton sx={{ color: "#fff" }}><YouTubeIcon /></IconButton>
+          {/* Email */}
+          <Tooltip title="Email: tickmevents@gmail.com">
+            <IconButton
+              sx={{ color: "#fff" }}
+              onClick={() => window.open('mailto:tickmevents@gmail.com')}
+            >
+              <Iconify width={24} icon="ic:outline-email" />
+            </IconButton>
+          </Tooltip>
+
+          {/* Fax */}
+          <Tooltip title="Fax: +237 652 590 797">
+            <IconButton
+              sx={{ color: "#fff" }}
+              onClick={() => window.open('tel:+237652590797', '_blank')}
+            >
+              <Iconify width={24} icon="emojione-monotone:fax-machine" />
+            </IconButton>
+          </Tooltip>
+
+          {/* WhatsApp */}
+          <Tooltip title="WhatsApp: +237 697 182 551">
+            <IconButton
+              sx={{ color: "#fff" }}
+              onClick={() => window.open('https://wa.me/237697182551', '_blank')}
+            >
+              <Iconify width={24} icon="ic:baseline-whatsapp" />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
     </Box>

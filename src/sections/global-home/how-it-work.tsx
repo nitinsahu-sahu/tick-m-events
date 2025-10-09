@@ -1,55 +1,5 @@
 import { Box, Typography, Grid } from "@mui/material";
-import SmartphoneIcon from "@mui/icons-material/Smartphone";
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
-import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
-import ChatIcon from "@mui/icons-material/Chat";
-import LiveTvIcon from "@mui/icons-material/LiveTv";
-import CampaignIcon from "@mui/icons-material/Campaign";
-import PaymentIcon from "@mui/icons-material/Payment";
-import BarChartIcon from "@mui/icons-material/BarChart";
-
-const steps = [
-  {
-    icon: <SmartphoneIcon sx={{ fontSize: 40, color: "#000" }} />,
-    title: "Hybrid ticketing",
-    description: "Digital ticket, physical point of sale, WhatsApp",
-  },
-  {
-    icon: <CameraAltIcon sx={{ fontSize: 40, color: "#000" }} />,
-    title: "Personalized filter for each event",
-    description: "Participants can take a photo of themselves with an exclusive filter",
-  },
-  {
-    icon: <QrCodeScannerIcon sx={{ fontSize: 40, color: "#000" }} />,
-    title: "Event Entry",
-    description: "Entry via QR Code and/or Manual verification.",
-  },
-  {
-    icon: <ChatIcon sx={{ fontSize: 40, color: "#000" }} />,
-    title: "Contact",
-    description: "Chat organizer ↔ providers",
-  },
-  {
-    icon: <LiveTvIcon sx={{ fontSize: 40, color: "#000" }} />,
-    title: "Built-in Live Streaming",
-    description: "To stream your physical events online",
-  },
-  {
-    icon: <CampaignIcon sx={{ fontSize: 40, color: "#000" }} />,
-    title: "Integrated marketing",
-    description: "Push notifications, email campaigns, etc.",
-  },
-  {
-    icon: <PaymentIcon sx={{ fontSize: 40, color: "#000" }} />,
-    title: "Secure payments",
-    description: "Mobile Money, credit card, bank transfer, cash",
-  },
-  {
-    icon: <BarChartIcon sx={{ fontSize: 40, color: "#000" }} />,
-    title: "Real-time statistics",
-    description: "Sales, attendance, rates.",
-  },
-];
+import { flagship } from "./utills";
 
 export default function HowItWorks() {
   return (
@@ -67,7 +17,7 @@ export default function HowItWorks() {
 
         {/* Features Grid */}
         <Grid container spacing={4} justifyContent="center">
-          {steps.map((step, index) => (
+          {flagship.map((step, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
               <Box
                 sx={{

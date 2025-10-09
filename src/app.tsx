@@ -12,6 +12,7 @@ import { AppDispatch, RootState } from './redux/store';
 import { eventOrderFetch } from './redux/actions/eventOrder';
 import { recommTrandingPopularEventFetch } from './redux/actions/home-recommendation.action';
 import NotificationsHandler from './utils/notification-handle';
+import { getPromotionLogo } from './redux/actions/customization/promotion-logo';
 
 
 // ----------------------------------------------------------------------
@@ -26,6 +27,7 @@ export default function App() {
     dispatch(eventFetch());
     dispatch(eventOrderFetch())
     dispatch(todayEventFetch());
+    dispatch(getPromotionLogo())
     dispatch(recommTrandingPopularEventFetch());
   }, [dispatch]);
 

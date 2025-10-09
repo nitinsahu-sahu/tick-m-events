@@ -18,55 +18,23 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'src/redux/store';
 import { PromotionLogoBar } from 'src/components/brands-logo';
 
-const brands = [
-    { name: "trivago", img: "/assets/home-global-img/trivago.png" },
-    { name: "amadeus", img: "/assets/home-global-img/amadeus.png" },
-    { name: "Skyscanner", img: "/assets/home-global-img/Skyscanner.png" },
-    { name: "Expedia", img: "/assets/home-global-img/Expedia.png" },
-    { name: "Tripadvisor", img: "/assets/home-global-img/tripadvisor.png" },
-    { name: "Hotels.com", img: "/assets/home-global-img/Hotels.png" },
-    { name: "priceline", img: "/assets/home-global-img/priceline.png" },
-];
-
 // Carousel items with your specified points
 const carouselItems = [
     {
-        type: 'video',
-        src: '/assets/videos/concert-showcase.mp4', // Replace with your actual video path
-        title: 'Concerts in Full Light',
-        description: 'A concert in full light in the colours of TICK-M EVENTS',
-        poster: '/assets/home-banner/01.jpg' // Fallback image
+        type: 'image',
+        src: '/assets/home-banner/01.jpg',
+        title: 'Beautiful Wedding Events',
+        description: 'A smiling bride in a beautifully decorated room',
     },
     {
         type: 'image',
         src: '/assets/home-banner/02.jpg',
-        title: 'Beautiful Wedding Events',
-        description: 'A smiling bride in a beautifully decorated room',
-        poster: '/assets/home-banner/01.jpg' // Fallback image
-
-    },
-    {
-        type: 'image',
-        src: '/assets/images/e-ticket-users.jpg',
         title: 'Digital E-Tickets',
         description: 'Participants smiling with their phones displaying their e-ticket'
     },
     {
-        type: 'video',
-        src: '/assets/videos/qr-scanning.mp4',
-        title: 'Seamless Entry',
-        description: 'A scanned ticket at the entrance with QR Code animation',
-        poster: '/assets/images/qr-poster.jpg'
-    },
-    {
         type: 'image',
-        src: '/assets/images/photo-filter-event.jpg',
-        title: 'Personalized Experience',
-        description: 'Participants who take pictures of themselves with a personalized filter of the event'
-    },
-    {
-        type: 'image',
-        src: '/assets/images/professional-conference.jpg',
+        src: '/assets/home-banner/04.jpg',
         title: 'Professional Conferences',
         description: 'Host and attend high-quality professional conferences'
     }
@@ -129,7 +97,6 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
     useEffect(() => {
         if (events && events.length > 0) {
             const uniqueLocations = [...new Set(events.map((event: any) => {
-                // Extract city from location string or use full location
                 const locationParts = event.location.split(',');
                 return locationParts[0]?.trim() || event.location;
             }))];
@@ -144,12 +111,11 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
         let result = [...events];
 
         // Tab filter (Online vs Live events)
-        if (tab === 1) { // Online Events
+        if (tab === 1) {
             result = result.filter(event => event.format === 'Online');
-        } else if (tab === 2) { // Live Events
+        } else if (tab === 2) {
             result = result.filter(event => event.format === 'In-person');
         }
-        // tab === 0 shows All Events
 
         // Event Type filter
         if (filters.eventType && filters.eventType !== 'All') {
@@ -189,7 +155,6 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
     };
 
     const handleSearch = () => {
-        // Search is already handled by the useEffect, but you can add additional logic here
         console.log('Search triggered with filters:', filters);
     };
 
@@ -201,6 +166,13 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
             pricing: ''
         });
         setTab(0);
+    };
+
+    // Function to handle button clicks (redirect to registration/login)
+    const handleButtonClick = (buttonType: string) => {
+        // Replace with your actual routing logic
+        console.log(`Redirecting to ${buttonType} page`);
+        // Example: router.push('/auth/register') or window.location.href = '/auth/login'
     };
 
     return (
@@ -215,7 +187,7 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                     color: '#fff',
                 }}
             >
-                {/* Background Video/Image */}
+                {/* Background Video/Image with better visibility */}
                 <Box
                     sx={{
                         position: 'absolute',
@@ -226,35 +198,18 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                         zIndex: 0,
                     }}
                 >
-                    {currentItem.type === 'video' ? (
-                        <Box
-                            component="video"
-                            ref={videoRef}
-                            src={currentItem.src}
-                            poster={currentItem.poster}
-                            autoPlay
-                            muted
-                            loop
-                            sx={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                            }}
-                        />
-                    ) : (
-                        <Box
-                            component="img"
-                            src={currentItem.src}
-                            alt={currentItem.title}
-                            sx={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                            }}
-                        />
-                    )}
-                    {/* Overlay */}
                     <Box
+                        component="img"
+                        src={currentItem.src}
+                        alt={currentItem.title}
+                        sx={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                        }}
+                    />
+                    {/* Reduced overlay opacity for better background visibility */}
+                    {/* <Box
                         sx={{
                             position: 'absolute',
                             top: 0,
@@ -262,9 +217,9 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                             width: '100%',
                             height: '100%',
                             background: 'linear-gradient(120deg, #0d1f69, #071c5a)',
-                            opacity: 0.7,
+                            opacity: 0.5, // Reduced from 0.7 to 0.5 for better background visibility
                         }}
-                    />
+                    /> */}
                 </Box>
 
                 {/* Content */}
@@ -281,65 +236,81 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                         px: 2,
                     }}
                 >
+                    {/* Main Title */}
                     <Typography
                         variant="h3"
                         fontWeight="bold"
                         sx={{
                             fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
                             mb: 2,
+                            textShadow: '2px 2px 4px rgba(0,0,0,0.5)', // Added text shadow for better readability
                         }}
                     >
                         Organize. Book. Save time. TICK-M EVENTS is revolutionizing events in Africa
                     </Typography>
-                    <Typography
-                        variant="h6"
-                        fontWeight="mediam"
 
-                    >
-                        A single platform to manage your events, sell your tickets, find quality service
-                        providers and live unforgettable experiences.
-                    </Typography>
-
-                    {/* Current Slide Title */}
-                    <Typography
-                        variant="h4"
-                        fontWeight="bold"
-                        sx={{
-                            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
-                            mb: 1,
-                            color: '#00AEEF',
-                        }}
-                    >
-                        {currentItem.title}
-                    </Typography>
-
+                    {/* Subtitle */}
                     <Typography
                         variant="h6"
                         fontWeight="medium"
                         sx={{
                             mb: 4,
                             maxWidth: '800px',
+                            textShadow: '1px 1px 2px rgba(0,0,0,0.5)', // Added text shadow for better readability
                         }}
                     >
-                        {currentItem.description}
+                        A single platform to manage your events, sell your tickets, find quality service
+                        providers and live unforgettable experiences.
                     </Typography>
 
-                    <Grid container justifyContent="center" spacing={4}>
-                        {[
-                            "Create my even",
-                            "I'm looking for an event",
-                            "I find a service provider",
-                        ].map((text, index) => (
-                            <Grid item key={index}>
-                                <Box display="flex" alignItems="center" gap={1}>
-                                    <CheckCircleIcon sx={{ color: "white", fontSize: 20 }} />
-                                    <Typography sx={{ color: "white" }}>{text}</Typography>
-                                </Box>
-                            </Grid>
-                        ))}
-                    </Grid>
+                    {/* Three Action Buttons in Rounded Rectangle */}
+                    <Paper
+                        elevation={6}
+                        sx={{
+                            borderRadius: 4,
+                            p: 3,
+                            bgcolor: 'rgba(255, 255, 255, 0.15)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            mb: 4,
+                        }}
+                    >
+                        <Grid container justifyContent="center" spacing={3}>
+                            {[
+                                { text: "Create my event", path: "/auth/register" },
+                                { text: "I'm looking for an event", path: "/auth/register" },
+                                { text: "I find a service provider", path: "/auth/register" },
+                            ].map((item, index) => (
+                                <Grid item key={index}>
+                                    <Button
+                                        variant="contained"
+                                        startIcon={<CheckCircleIcon sx={{ color: "white" }} />}
+                                        onClick={() => handleButtonClick(item.text)}
+                                        sx={{
+                                            bgcolor: '#00AEEF',
+                                            color: 'white',
+                                            borderRadius: 3,
+                                            px: 4,
+                                            py: 1.5,
+                                            fontWeight: 'bold',
+                                            textTransform: 'none',
+                                            minWidth: '220px',
+                                            '&:hover': {
+                                                bgcolor: '#0088cc',
+                                                transform: 'translateY(-2px)',
+                                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                                            },
+                                            transition: 'all 0.3s ease',
+                                        }}
+                                    >
+                                        {item.text}
+                                    </Button>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Paper>
 
-
+                    {/* Removed individual slide titles and descriptions as requested */}
                 </Box>
             </Box>
 
@@ -539,14 +510,12 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                 </Box>
             </Paper>
 
-
             {/* BRANDS SECTION */}
             <PromotionLogoBar
                 brands={promotionLogos}
                 mainHead="Premium Brands"
                 subHead="Unveil the Finest Selection of High-End Vehicles"
             />
-
         </Box>
     );
 }

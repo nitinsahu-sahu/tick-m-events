@@ -204,26 +204,6 @@ export default function Header() {
               </Button>
             </Link>
 
-            <Link to="#" style={{ textDecoration: "none" }}>
-              <Button
-                sx={{
-                  color: "#0d2a4d",
-                  fontSize: { xs: "10px", sm: "12px" },
-                  textTransform: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  minWidth: "auto",
-                  border: "1px solid #0d2a4d",
-                  '&:hover': {
-                    backgroundColor: "#0d2a4d",
-                    color: "white",
-                  }
-                }}
-              >
-                <PersonIcon fontSize="small" /> Create Your Event
-              </Button>
-            </Link>
-
             {/* Language */}
             <Box display="flex" alignItems="center" gap={0.5}>
               <LanguageIcon sx={{ fontSize: 16, color: "#0d2a4d" }} />

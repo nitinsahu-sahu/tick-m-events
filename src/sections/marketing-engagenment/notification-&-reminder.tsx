@@ -28,7 +28,6 @@ interface Order {
   paymentStatus?: string;
 }
 
-
 interface EventType {
   _id: string;
   eventName: string;
@@ -36,7 +35,6 @@ interface EventType {
 }
 
 export function NotificationAndReminder({ selEvent }: any) {
-  console.log("ss", selEvent);
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -44,13 +42,36 @@ export function NotificationAndReminder({ selEvent }: any) {
   const [notificationType, setNotificationType] = useState('email');
   const [message, setMessage] = useState('');
   const [cta, setCta] = useState('');
+  const [ctaLink, setCtaLink] = useState('');
+  const [ctaLinkError, setCtaLinkError] = useState('');
   const [scheduledDate, setScheduledDate] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-  const toastMessages: Record<string, string> = {
-    ticketHolders: "all users",
-    interested: "interested users",
-    pending: "pending payment users",
+
+  // Define your TICK-M EVENTS base URL (adjust as needed)
+  const tickmBaseUrl = import.meta.env.VITE_FRONT_URL || 'https://tick-m.cloud/';
+
+  const validateCtaLink = (link: string) => {
+    if (!link.trim()) {
+      setCtaLinkError('');
+      return true; // Empty link is acceptable (optional field)
+    }
+
+    // Check if link starts with TICK-M EVENTS base URL or is a relative path
+    if (link.startsWith(tickmBaseUrl) || link.startsWith('/')) {
+      setCtaLinkError('');
+      return true;
+    }
+
+    // If we reach here, the link is invalid
+    setCtaLinkError(`CTA link must be an internal link starting with ${tickmBaseUrl} or a relative path (starting with /)`);
+    return false;
+  };
+
+  const handleCtaLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const link = e.target.value;
+    setCtaLink(link);
+    validateCtaLink(link);
   };
 
   const handleCheckboxChange = (label: string) => {
@@ -60,7 +81,14 @@ export function NotificationAndReminder({ selEvent }: any) {
         : [...prev, label]
     );
   };
+
   const handleSubmit = async () => {
+    // Validate CTA link before proceeding
+    if (!validateCtaLink(ctaLink)) {
+      toast.error("Please fix the CTA link error before sending notifications.");
+      return;
+    }
+
     if (selectedGroups.length === 0) {
       toast.error("Please select at least one recipient group.");
       return;
@@ -93,7 +121,6 @@ export function NotificationAndReminder({ selEvent }: any) {
             phone: order?.orderAddress?.number || "",
           };
         });
-
 
         return { emails };
       },
@@ -164,6 +191,7 @@ export function NotificationAndReminder({ selEvent }: any) {
         emails,
         message,
         cta,
+        ctalink: ctaLink.trim() || null, // Include CTA link in payload
         subject: `Notification for ${selEvent.eventName}`,
         notificationType,
         isScheduled: scheduleOption === "schedule",
@@ -194,11 +222,9 @@ export function NotificationAndReminder({ selEvent }: any) {
     const results = await Promise.all(notificationPromises);
     atLeastOneDispatched = results.filter(Boolean).length > 0;
 
-
     if (!atLeastOneDispatched) {
       toast.warn("No notifications were sent. All selected groups had no valid recipients.");
     }
-
   };
 
   useEffect(() => {
@@ -210,7 +236,6 @@ export function NotificationAndReminder({ selEvent }: any) {
 
     saveToken(); // invoke the async function
   }, [user, dispatch]);
-
 
   return (
     <Box p={3} boxShadow={3} mt={3} borderRadius={3} sx={{ border: "1px solid black" }}>
@@ -277,8 +302,6 @@ export function NotificationAndReminder({ selEvent }: any) {
                 </label>
               );
             })}
-
-
           </Box>
 
           <Typography fontWeight="bold" mb={1}>
@@ -288,7 +311,7 @@ export function NotificationAndReminder({ selEvent }: any) {
             fullWidth
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Example: 'Don’t miss the festival! Only 100 tickets left!'"
+            placeholder="Example: 'Don't miss the festival! Only 100 tickets left!'"
             sx={{ mb: 3 }}
           />
 
@@ -300,6 +323,20 @@ export function NotificationAndReminder({ selEvent }: any) {
             value={cta}
             onChange={(e) => setCta(e.target.value)}
             placeholder="CTA Button (e.g., 'Buy Now', 'Reserve', 'Share')"
+            sx={{ mb: 2 }}
+          />
+
+          {/* NEW: CTA Link Field */}
+          <Typography fontWeight="bold" mb={1}>
+            Add CTA Link
+          </Typography>
+          <TextField
+            fullWidth
+            value={ctaLink}
+            onChange={handleCtaLinkChange}
+            placeholder={`Internal link (e.g., "${tickmBaseUrl}/events" or "/events")`}
+            error={!!ctaLinkError}
+            helperText={ctaLinkError || "Must be an internal TICK-M EVENTS link"}
             sx={{ mb: 3 }}
           />
 
@@ -340,7 +377,6 @@ export function NotificationAndReminder({ selEvent }: any) {
             </Box>
           )}
 
-
           <Button
             fullWidth
             sx={{
@@ -351,6 +387,7 @@ export function NotificationAndReminder({ selEvent }: any) {
               "&:hover": { bgcolor: "#083048" },
             }}
             onClick={handleSubmit}
+            disabled={!!ctaLinkError} // Disable button if there's a CTA link error
           >
             Send Notifications
           </Button>

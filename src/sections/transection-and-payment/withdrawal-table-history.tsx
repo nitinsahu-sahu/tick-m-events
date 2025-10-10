@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { AppDispatch, RootState } from 'src/redux/store';
 
-import { getAllWithdrawals } from 'src/redux/actions/transactionPaymentActions';
+import { getUserWithdrawals } from 'src/redux/actions/transactionPaymentActions';
 import { TransactionAndPaymentTable } from "src/components/tables/transaction-&-payment-table";
 import { WithdrawalTableHeaders } from "./utils";
 
@@ -38,7 +38,7 @@ export function WithdrawalTableHistory() {
     const withdrawals = useSelector((state: RootState) => state?.transactions.withdrawals) as Withdrawal[];
 
     useEffect(() => {
-        dispatch(getAllWithdrawals());
+        dispatch(getUserWithdrawals());
     }, [dispatch]);
 
     const tableData = withdrawals.map((item) => ({

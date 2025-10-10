@@ -175,12 +175,12 @@ export function RefundManagementHistory({ selectedEvent }: RefundManagementHisto
                                 fullWidth
                                 variant="contained"
                                 sx={{ mt: 3, backgroundColor: "#0B2E4C", color: "white", py: 1.5 }}
-                                onClick={() => {
-                                    console.log("Navigating with selectedEvent:", selectedEvent);
-                                    navigate("/ticket-and-reservation-management", {
-                                        state: { selectedEvent }
-                                    });
-                                }}
+                                // onClick={() => {
+                                //     console.log("Navigating with selectedEvent:", selectedEvent);
+                                //     navigate("/ticket-and-reservation-management", {
+                                //         state: { selectedEvent }
+                                //     });
+                                // }}
                             >
                                 Process Refund
                             </Button>

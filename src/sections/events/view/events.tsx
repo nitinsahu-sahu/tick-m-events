@@ -106,9 +106,9 @@ export function EventsView() {
                 <CircularProgress size={60} />
               </Box>
             ) : (
-              <Grid container spacing={4}>
+              <Grid container spacing={2}>
                 {approvedEvents.map((event: any, index: number) => (
-                  <Fade in={showEvents} timeout={500 + index * 200} key={event.id || index}>
+                  <Fade in={showEvents} timeout={500 + index * 200} key={event._id || index}>
                     <Grid item xs={12} sm={6} md={4}>
                       <PopularEvent event={event} />
                     </Grid>

@@ -7,7 +7,7 @@ export interface PaymentOption {
 }
  
 const paymentIcons: Record<string, string> = {
-  "Mobile Money": "./assets/images/payment-gateway-logo/mtn-mobile-money.png",
+  "Mobile Money": "./assets/images/payment-gateway-logo/mobile-money.png",
   "Cash": "./assets/images/payment-gateway-logo/bank-transfer.png",
   "Orange Money": "./assets/images/payment-gateway-logo/orange-money.png",
   "Bank Card": "./assets/images/payment-gateway-logo/bank-card.jpg",

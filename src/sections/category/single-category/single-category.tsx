@@ -19,61 +19,7 @@ export function SingleCategoriesView() {
   useEffect(() => {
     dispatch(categoryByIdFetch(categoryId));
   }, [dispatch, categoryId]);
-  // Example category data with a beautiful arts/culture banner image
-  const category = {
-    id: '1',
-    name: 'Cultural & Artistic Events',
-    cover: {
-      url: 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80', // Beautiful cultural events banner
-    },
-    subcategories: [
-      { id: '1', name: 'Art Exhibitions' },
-      { id: '2', name: 'Theater' },
-      { id: '3', name: 'Dance Performances' },
-      { id: '4', name: 'Cultural Festivals' },
-      { id: '5', name: 'Music Concerts' },
-      { id: '6', name: 'Poetry Slams' },
-      { id: '7', name: 'Film Screenings' },
-    ],
-    events: [
-      {
-        id: 1,
-        title: 'Festival Urban Music',
-        image: 'festival.png',
-        location: 'Douala',
-        date: '10/02/2025',
-        time: '5:00 PM',
-        status: '5,000 XAF',
-        statusColor: '#0B2E4C',
-        rating: 4.8,
-        viewPromo: true,
-      },
-      {
-        id: 2,
-        title: 'Startup Summit 2025',
-        image: 'startup.png',
-        location: 'Yaoundé',
-        date: '10/02/2025',
-        time: '5:00 PM',
-        status: 'Free',
-        statusColor: '#0B2E4C',
-        rating: 4.8,
-        viewPromo: false,
-      },
-      {
-        id: 3,
-        title: 'Tech Expo 2025',
-        image: 'tech.png',
-        location: 'Douala',
-        date: '15/02/2025',
-        time: '6:00 PM',
-        status: '$50',
-        statusColor: '#0B2E4C',
-        rating: 5.0,
-        viewPromo: false,
-      },
-    ],
-  };
+  
 
   return (
     <Box key={_id}>
@@ -116,7 +62,7 @@ export function SingleCategoriesView() {
           }}
         >
           <HeadingCommon
-            title={category.name}
+            title={name}
             weight={600}
             baseSize="34px"
             variant="h4"
@@ -128,7 +74,7 @@ export function SingleCategoriesView() {
             <Marquee speed={40} gradient={false}>
               {subcategories?.map((subcat: any, index: any) => (
                 <React.Fragment key={subcat._id || index}>
-                  {index < category.subcategories.length - 1 && (
+                  {index < subcategories.length - 1 && (
                     <Box
                       component="span"
                       sx={{

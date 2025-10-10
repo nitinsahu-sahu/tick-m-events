@@ -13,6 +13,7 @@ import { eventOrderFetch } from './redux/actions/eventOrder';
 import { recommTrandingPopularEventFetch } from './redux/actions/home-recommendation.action';
 import NotificationsHandler from './utils/notification-handle';
 import { getPromotionLogo } from './redux/actions/customization/promotion-logo';
+import { LanguageProvider } from './redux/contexts/LanguageContext';
 
 
 // ----------------------------------------------------------------------
@@ -94,10 +95,11 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <Router />
-      <ToastContainer />
-      {user && <NotificationsHandler user={user} />}
-
+      <LanguageProvider>
+        <Router />
+        <ToastContainer />
+        {user && <NotificationsHandler user={user} />}
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

@@ -47,7 +47,7 @@ export function PromotionLogoBar({ brands, mainHead, subHead }: any) {
                             sx={{
                                 display: 'flex',
                                 gap: 3,
-                                animation: 'marquee 30s linear infinite',
+                                animation: 'marquee 20s linear infinite',
                                 '&:hover': {
                                     animationPlayState: 'paused',
                                 },
@@ -122,7 +122,7 @@ export function PromotionLogoBar({ brands, mainHead, subHead }: any) {
                             ))}
 
                             {/* Second set of logos (duplicate for seamless loop) */}
-                            {brands?.map((item: any, index: number) => (
+                            {/* {brands?.map((item: any, index: number) => (
                                 <Paper
                                     key={`second-${item._id || item.name || index}`}
                                     sx={{
@@ -179,7 +179,7 @@ export function PromotionLogoBar({ brands, mainHead, subHead }: any) {
                                         </Typography>
                                     </Box>
                                 </Paper>
-                            ))}
+                            ))} */}
                         </Box>
                     </Box>
                 </Box>

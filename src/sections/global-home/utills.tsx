@@ -44,3 +44,27 @@ export const flagship = [
     description: "Sales, attendance, rates.",
   },
 ];
+
+export const carouselItems = [
+    {
+        type: 'image',
+        src: '/assets/home-banner/03.png',
+        title: 'Professional Conferences',
+        description: 'Host and attend high-quality professional conferences'
+    },
+    {
+        type: 'image',
+        src: '/assets/home-banner/01.png',
+        title: 'Beautiful Wedding Events',
+        description: 'A smiling bride in a beautifully decorated room',
+    },
+    {
+        type: 'image',
+        src: '/assets/home-banner/02.jpg',
+        title: 'Digital E-Tickets',
+        description: 'Participants smiling with their phones displaying their e-ticket'
+    },
+];
+
+export const eventTypes = ['All', 'Public', 'Private'];
+export const pricingOptions = ['All', 'Free', 'Paid'];

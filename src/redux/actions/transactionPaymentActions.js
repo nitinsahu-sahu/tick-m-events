@@ -127,3 +127,20 @@ export const processWithdrawalPayout = (withdrawalId) => async (dispatch) => {
     throw new Error(errorMessage);
   }
 };
+
+export const getUserWithdrawals = () => async (dispatch) => {
+  dispatch({ type: transactionPaymentConstants.GET_LOGGED_USER_WITHDRAWALS_REQUEST });
+ 
+  try {
+    const response = await axios.get("/transaction-payment/get-user-withdrawals");
+    dispatch({
+      type: transactionPaymentConstants.GET_LOGGED_USER_WITHDRAWALS_SUCCESS,
+      payload: response.data.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: transactionPaymentConstants.GET_LOGGED_USER_WITHDRAWALS_FAILURE,
+      payload: error?.response?.data?.message || "Server error",
+    });
+  }
+};

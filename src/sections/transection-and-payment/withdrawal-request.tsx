@@ -27,7 +27,6 @@ export function WithdrawalRequest({ availableBalance, eventId }: WithdrawalReque
     const dispatch = useDispatch<AppDispatch>();
     const { loading, error, success, withDrawalGateway } = useSelector((state: RootState) => state.paymentSettings);
     const { user } = useSelector((state: RootState) => state?.auth);
-    console.log(withDrawalGateway);
 
     useEffect(() => {
         dispatch(getPaymentSettings())

@@ -27,31 +27,8 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ events, onEventsFiltered }: HeroSectionProps) {
-    const [currentSlide, setCurrentSlide] = useState(0);
-    const [isPlaying, setIsPlaying] = useState<boolean>(true);
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const { promotionLogos } = useSelector((state: RootState) => state.customization);
-  const { t } = useTranslation();
-
-    // Auto-scroll functionality
-    useEffect(() => {
-        if (isPlaying) {
-            intervalRef.current = setInterval(() => {
-                setCurrentSlide((prev) => (prev + 1) % carouselItems.length);
-            }, 5000); // 5 seconds
-        } else if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-        }
-
-        // Cleanup function
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
-        };
-    }, [isPlaying]);
-
-    const currentItem = carouselItems[currentSlide];
+    const { t } = useTranslation();
 
     const [tab, setTab] = useState(0);
     const [filters, setFilters] = useState({
@@ -158,13 +135,24 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
             <Box
                 sx={{
                     position: 'relative',
-                    height: '90vh',
-                    minHeight: '500px',
+                    height: {
+                        xs: '80vh', // Smaller height for mobile
+                        sm: '85vh', // Slightly taller for small devices
+                        md: '90vh', // Original height for medium
+                        lg: '90vh', // Maintain for large
+                        xl: '95vh'  // Taller for extra large screens
+                    },
+                    minHeight: {
+                        xs: '400px', // Smaller min-height for mobile
+                        sm: '450px',
+                        md: '500px', // Original
+                        lg: '550px',
+                        xl: '600px'
+                    },
                     overflow: 'hidden',
                     color: '#fff',
                 }}
             >
-                {/* Background Video/Image with better visibility */}
                 <Box
                     sx={{
                         position: 'absolute',
@@ -177,8 +165,8 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                 >
                     <Box
                         component="img"
-                        src={currentItem.src}
-                        alt={currentItem.title}
+                        src='/assets/home-banner/01.png'
+                        alt='banner_01'
                         sx={{
                             width: '100%',
                             height: '100%',
@@ -199,7 +187,12 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                         justifyContent: 'center',
                         alignItems: 'center',
                         textAlign: 'center',
-                        px: 2,
+                        px: {
+                            xs: 1, // Less padding on mobile
+                            sm: 2, // Standard padding for small
+                            md: 3, // More padding for medium and up
+                            lg: 4
+                        },
                     }}
                 >
                     {/* Main Title */}
@@ -207,9 +200,24 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                         variant="h3"
                         fontWeight="bold"
                         sx={{
-                            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
-                            mb: 2,
-                            textShadow: '2px 2px 4px rgba(0,0,0,0.5)', // Added text shadow for better readability
+                            fontSize: {
+                                xs: '1.5rem', // Smaller for mobile
+                                sm: '2rem',   // Medium for small devices
+                                md: '2.5rem', // Original size
+                                lg: '3rem',   // Larger for desktop
+                                xl: '3.5rem'  // Even larger for big screens
+                            },
+                            mb: {
+                                xs: 1, // Less margin on mobile
+                                sm: 1.5,
+                                md: 2, // Original
+                                lg: 2.5
+                            },
+                            textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                            px: {
+                                xs: 1, // Horizontal padding for very small screens
+                                sm: 0
+                            }
                         }}
                     >
                         {t('homeBanner_t1')}
@@ -220,9 +228,30 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                         variant="h6"
                         fontWeight="medium"
                         sx={{
-                            mb: 4,
-                            maxWidth: '800px',
-                            textShadow: '1px 1px 2px rgba(0,0,0,0.5)', // Added text shadow for better readability
+                            mb: {
+                                xs: 2, // Less margin on mobile
+                                sm: 3,
+                                md: 4, // Original
+                                lg: 4
+                            },
+                            maxWidth: {
+                                xs: '90%', // Use more width on mobile
+                                sm: '85%',
+                                md: '800px', // Original
+                                lg: '900px',
+                                xl: '1000px'
+                            },
+                            fontSize: {
+                                xs: '0.9rem', // Smaller text on mobile
+                                sm: '1rem',   // Standard for small
+                                md: '1.1rem', // Slightly larger for medium
+                                lg: '1.2rem'  // Larger for desktop
+                            },
+                            textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                            px: {
+                                xs: 1, // Horizontal padding for very small screens
+                                sm: 0
+                            }
                         }}
                     >
                         {t('homeBanner_t2')}
@@ -232,21 +261,56 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                     <Paper
                         elevation={6}
                         sx={{
-                            borderRadius: 4,
-                            p: 3,
+                            borderRadius: {
+                                xs: 2, // Smaller border radius on mobile
+                                sm: 3,
+                                md: 4  // Original
+                            },
+                            p: {
+                                xs: 2, // Less padding on mobile
+                                sm: 2.5,
+                                md: 3  // Original
+                            },
                             bgcolor: 'rgba(255, 255, 255, 0.15)',
                             backdropFilter: 'blur(10px)',
                             border: '1px solid rgba(255, 255, 255, 0.2)',
-                            mb: 4,
+                            mb: {
+                                xs: 2, // Less margin on mobile
+                                sm: 3,
+                                md: 4  // Original
+                            },
+                            mx: {
+                                xs: 1, // Horizontal margin on mobile
+                                sm: 2,
+                                md: 0
+                            },
+                            width: {
+                                xs: '95%', // Full width with small margins on mobile
+                                sm: '90%',
+                                md: '78%' // Auto width for larger screens
+                            }
                         }}
                     >
-                        <Grid container justifyContent="center" spacing={3}>
+                        <Grid
+                            container
+                            justifyContent="center"
+                            spacing={{
+                                xs: 2, // Smaller spacing on mobile
+                                sm: 2.5,
+                                md: 3   // Original
+                            }}
+                        >
                             {[
                                 { text: "Create my event", path: "/auth/register" },
                                 { text: "I'm looking for an event", path: "/auth/register" },
                                 { text: "I find a service provider", path: "/auth/register" },
                             ].map((item, index) => (
-                                <Grid item key={index}>
+                                <Grid item
+                                    key={index}
+                                    xs={12} // Full width on extra small screens
+                                    sm={6}  // 2 columns on small screens
+                                    md={4}  // 3 columns on medium and up
+                                >
                                     <Button
                                         variant="contained"
                                         startIcon={<CheckCircleIcon sx={{ color: "white" }} />}
@@ -254,15 +318,43 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                                         sx={{
                                             bgcolor: '#00AEEF',
                                             color: 'white',
-                                            borderRadius: 3,
-                                            px: 4,
-                                            py: 1.5,
+                                            borderRadius: {
+                                                xs: 2, // Smaller on mobile
+                                                sm: 2.5,
+                                                md: 3   // Original
+                                            },
+                                            px: {
+                                                xs: 3, // Less horizontal padding on mobile
+                                                sm: 3.5,
+                                                md: 4   // Original
+                                            },
+                                            py: {
+                                                xs: 1, // Less vertical padding on mobile
+                                                sm: 1.25,
+                                                md: 1.5 // Original
+                                            },
                                             fontWeight: 'bold',
                                             textTransform: 'none',
-                                            minWidth: '220px',
+                                            minWidth: {
+                                                xs: '100%', // Full width on mobile
+                                                sm: '200px', // Fixed width on small and up
+                                                md: '220px'  // Original
+                                            },
+                                            width: {
+                                                xs: '100%', // Full width on mobile
+                                                sm: 'auto'   // Auto width on larger screens
+                                            },
+                                            fontSize: {
+                                                xs: '0.8rem', // Smaller text on mobile
+                                                sm: '0.9rem',
+                                                md: '1rem'    // Original
+                                            },
                                             '&:hover': {
                                                 bgcolor: '#0088cc',
-                                                transform: 'translateY(-2px)',
+                                                transform: {
+                                                    xs: 'translateY(-1px)', // Smaller transform on mobile
+                                                    sm: 'translateY(-2px)'  // Original
+                                                },
                                                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                                             },
                                             transition: 'all 0.3s ease',
@@ -274,8 +366,6 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                             ))}
                         </Grid>
                     </Paper>
-
-                    {/* Removed individual slide titles and descriptions as requested */}
                 </Box>
             </Box>
 

@@ -33,7 +33,7 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-  const isFreeEvent = Number(tickets?.totalAmount) === 0;
+        const isFreeEvent = Number(tickets?.totalAmount) === 0;
         const orderFormEntry = new FormData();
         orderFormEntry.append("eventId", tickets.eventId);
         orderFormEntry.append("orderAddress", JSON.stringify(orderDetails.orderAddress));
@@ -41,7 +41,7 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
         orderFormEntry.append("tickets", JSON.stringify(tickets));
         orderFormEntry.append("deviceUsed", getDeviceType());
         orderFormEntry.append("totalAmount", tickets?.totalAmount);
-    orderFormEntry.append(
+        orderFormEntry.append(
             "paymentMethod",
             isFreeEvent ? "freeEvent" : selectedPayment?.value
         );

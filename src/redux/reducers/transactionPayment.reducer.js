@@ -14,6 +14,27 @@ const transactionPaymentReducer = (state, action) => {
   }
 
   switch (action.type) {
+    case transactionPaymentConstants.GET_LOGGED_USER_WITHDRAWALS_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+
+    case transactionPaymentConstants.GET_LOGGED_USER_WITHDRAWALS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        withdrawals: action.payload,
+      };
+
+    case transactionPaymentConstants.GET_LOGGED_USER_WITHDRAWALS_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+
     // CREATE WITHDRAWAL
     case transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_REQUEST:
       return {

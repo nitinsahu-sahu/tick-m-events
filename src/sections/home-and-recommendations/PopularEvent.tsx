@@ -17,6 +17,7 @@ interface ApiResult {
 }
 
 export function PopularEvent({ event, handleEventDetails, flag }: any) {
+  
   const dispatch = useDispatch<AppDispatch>();
   const { authenticate } = useSelector((state: RootState) => state?.auth)
   const navigate = useNavigate();

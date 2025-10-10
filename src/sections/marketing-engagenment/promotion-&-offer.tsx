@@ -388,10 +388,10 @@ export function PromotionsAndOffers({ selEvent }: any) {
                   type="date"
                   value={promotionFormData.validityPeriodStart}
                   onChange={handlePromotionChange}
-                  inputProps={{
-                    min: today,
-                    max: purchaseDeadline,
-                  }}
+                  // inputProps={{
+                  //   min: today,
+                  //   max: purchaseDeadline,
+                  // }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -403,10 +403,10 @@ export function PromotionsAndOffers({ selEvent }: any) {
                   type="date"
                   value={promotionFormData.validityPeriodEnd}
                   onChange={handlePromotionChange}
-                  inputProps={{
-                    min: promotionFormData.validityPeriodStart || today,
-                    max: purchaseDeadline,
-                  }}
+                  // inputProps={{
+                  //   min: promotionFormData.validityPeriodStart || today,
+                  //   max: purchaseDeadline,
+                  // }}
                 />
               </Grid>
             </Grid>

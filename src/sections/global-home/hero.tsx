@@ -14,35 +14,12 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
+import { useTranslation } from 'react-i18next';
+
 import { useSelector } from 'react-redux';
 import { RootState } from 'src/redux/store';
 import { PromotionLogoBar } from 'src/components/brands-logo';
-
-// Carousel items with your specified points
-const carouselItems = [
-    {
-        type: 'image',
-        src: '/assets/home-banner/01.jpg',
-        title: 'Beautiful Wedding Events',
-        description: 'A smiling bride in a beautifully decorated room',
-    },
-    {
-        type: 'image',
-        src: '/assets/home-banner/02.jpg',
-        title: 'Digital E-Tickets',
-        description: 'Participants smiling with their phones displaying their e-ticket'
-    },
-    {
-        type: 'image',
-        src: '/assets/home-banner/04.jpg',
-        title: 'Professional Conferences',
-        description: 'Host and attend high-quality professional conferences'
-    }
-];
-
-// Static options for filters
-const eventTypes = ['All', 'Public', 'Private'];
-const pricingOptions = ['All', 'Free', 'Paid'];
+import { carouselItems, eventTypes, pricingOptions } from './utills';
 
 interface HeroSectionProps {
     events: any[];
@@ -52,9 +29,9 @@ interface HeroSectionProps {
 export default function HeroSection({ events, onEventsFiltered }: HeroSectionProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isPlaying, setIsPlaying] = useState<boolean>(true);
-    const videoRef = useRef(null);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const { promotionLogos, loading } = useSelector((state: RootState) => state.customization);
+    const { promotionLogos } = useSelector((state: RootState) => state.customization);
+  const { t } = useTranslation();
 
     // Auto-scroll functionality
     useEffect(() => {
@@ -181,8 +158,8 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
             <Box
                 sx={{
                     position: 'relative',
-                    height: '100vh',
-                    minHeight: '600px',
+                    height: '90vh',
+                    minHeight: '500px',
                     overflow: 'hidden',
                     color: '#fff',
                 }}
@@ -206,20 +183,9 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                             width: '100%',
                             height: '100%',
                             objectFit: 'cover',
+                            opacity: 0.9
                         }}
                     />
-                    {/* Reduced overlay opacity for better background visibility */}
-                    {/* <Box
-                        sx={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            background: 'linear-gradient(120deg, #0d1f69, #071c5a)',
-                            opacity: 0.5, // Reduced from 0.7 to 0.5 for better background visibility
-                        }}
-                    /> */}
                 </Box>
 
                 {/* Content */}
@@ -246,7 +212,7 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                             textShadow: '2px 2px 4px rgba(0,0,0,0.5)', // Added text shadow for better readability
                         }}
                     >
-                        Organize. Book. Save time. TICK-M EVENTS is revolutionizing events in Africa
+                        {t('homeBanner_t1')}
                     </Typography>
 
                     {/* Subtitle */}
@@ -259,8 +225,7 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                             textShadow: '1px 1px 2px rgba(0,0,0,0.5)', // Added text shadow for better readability
                         }}
                     >
-                        A single platform to manage your events, sell your tickets, find quality service
-                        providers and live unforgettable experiences.
+                        {t('homeBanner_t2')}
                     </Typography>
 
                     {/* Three Action Buttons in Rounded Rectangle */}

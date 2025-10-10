@@ -5,15 +5,17 @@ import {
     Typography,
     TextField,
     Button,
-    IconButton,
+    IconButton, Tooltip
 } from '@mui/material';
 
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import GoogleIcon from '@mui/icons-material/Google';
+import { useTranslation } from 'react-i18next';
 
 import Header from 'src/components/Header';
+import { Iconify } from 'src/components/iconify';
 
 import axios from '../../redux/helper/axios';
 
@@ -23,6 +25,8 @@ interface SubmitStatus {
 }
 
 export function Contact() {
+    const { t } = useTranslation();
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -96,17 +100,47 @@ export function Contact() {
                                 mb: 2,
                             }}
                         >
-                            Contact Us
+                            {t('cu')}
                         </Typography>
-
-                        <Typography color="text.secondary">Our mailing address is:</Typography>
-                        <Typography color="text.secondary">152A Charlotte Street,</Typography>
-                        <Typography color="text.secondary">Peterborough ON</Typography>
-                        <Typography color="text.secondary" sx={{ mb: 3 }}>
-                            Phone: 705-742-3221
+                        <Typography fontSize={{ sm: 14, md: 16 }}>
+                            {t('oa')}: <span style={{ color: "#73BAFB" }}>{t('address_1')}</span>
                         </Typography>
+                        <Typography fontSize={{ sm: 14, md: 16 }} color="text.secondary">{t('address_2')}</Typography>
+                        <Typography sx={{ mb: 3 }} fontSize={{ sm: 14, md: 16 }}>
+                            {t('pn')}: <span style={{ color: "#73BAFB" }}>+237 697 182 551</span>
+                        </Typography>
+                        <Box sx={{ display: "flex", gap: 2 }}>
+                            {/* Email */}
+                            <Tooltip title="Email: tickmevents@gmail.com">
+                                <IconButton
+                                    sx={{ color: "black" }}
+                                    onClick={() => window.open('mailto:tickmevents@gmail.com')}
+                                >
+                                    <Iconify width={24} icon="ic:outline-email" />
+                                </IconButton>
+                            </Tooltip>
 
-                        <Box sx={{ display: 'flex', gap: 1 }}>
+                            {/* Fax */}
+                            <Tooltip title="Fax: +237 652 590 797">
+                                <IconButton
+                                    sx={{ color: "black" }}
+                                    onClick={() => window.open('tel:+237652590797', '_blank')}
+                                >
+                                    <Iconify width={24} icon="emojione-monotone:fax-machine" />
+                                </IconButton>
+                            </Tooltip>
+
+                            {/* WhatsApp */}
+                            <Tooltip title="WhatsApp: +237 697 182 551">
+                                <IconButton
+                                    sx={{ color: "black" }}
+                                    onClick={() => window.open('https://wa.me/237697182551', '_blank')}
+                                >
+                                    <Iconify width={24} icon="ic:baseline-whatsapp" />
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+                        {/* <Box sx={{ display: 'flex', gap: 1 }}>
                             <IconButton sx={{ color: 'black' }}>
                                 <FacebookIcon />
                             </IconButton>
@@ -119,7 +153,7 @@ export function Contact() {
                             <IconButton sx={{ color: 'black' }}>
                                 <GoogleIcon />
                             </IconButton>
-                        </Box>
+                        </Box> */}
                     </Grid>
 
                     {/* Right Section - Form */}
@@ -130,9 +164,7 @@ export function Contact() {
                                 mb: 3,
                             }}
                         >
-                            Great vision without great people is irrelevant.
-                            <br />
-                            Let’s work together.
+                            {t("contact_txt")}
                         </Typography>
 
                         <Box component="form" noValidate onSubmit={handleSubmit}>
@@ -194,7 +226,7 @@ export function Contact() {
                                     },
                                 }}
                             >
-                                {submitting ? 'Submitting...' : 'Submit'}
+                                {submitting ? `${t("submitting...")}` : `${t("submit")}`}
                             </Button>
                         </Box>
                     </Grid>

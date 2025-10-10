@@ -1,7 +1,8 @@
 import { Box, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "src/redux/store";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import { publicHomeEventsFetch } from "src/redux/actions/home-recommendation.action";
 import Header from "src/components/Header";
@@ -22,6 +23,8 @@ export function GlobalHome() {
     const dispatch = useDispatch<AppDispatch>();
     const { upcomingHomeEvents, loading } = useSelector((state: any) => state.homeRecom);
     const [filteredEvents, setFilteredEvents] = useState([]);
+    const faqSectionRef = useRef<HTMLDivElement>(null);
+    const location = useLocation();
 
     useEffect(() => {
         dispatch(getPromotionLogo())
@@ -38,6 +41,14 @@ export function GlobalHome() {
     const handleEventsFiltered = (events: any) => {
         setFilteredEvents(events);
     };
+
+    useEffect(() => {
+        if (location.state?.scrollTo === 'blog' && faqSectionRef.current) {
+            faqSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+            // Clear the state to prevent scrolling on every render
+            window.history.replaceState({}, document.title);
+        }
+    }, [location]);
 
     return (
         <Box>
@@ -60,7 +71,10 @@ export function GlobalHome() {
             <UpcomingEvents
                 title="Events Listings" des="Find the perfect events for any occasion" />
             <TrustedExpertise />
-            <EventsBlog />
+            <div ref={faqSectionRef}>
+                <EventsBlog />
+
+            </div>
             <Footer />
         </Box>
     )

@@ -13,31 +13,35 @@ import {
   ListItemText,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import PhoneIcon from "@mui/icons-material/Phone";
-import EmailIcon from "@mui/icons-material/Email";
 import PersonIcon from "@mui/icons-material/Person";
-import SearchIcon from "@mui/icons-material/Search";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LanguageIcon from "@mui/icons-material/Language";
 import { useState } from "react";
-// OR if using React Router:
 import { Link } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from "src/redux/contexts/LanguageContext";
+
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useTranslation();
+  const { currentLanguage, changeLanguage } = useLanguage();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleLanguageChange = (event:any) => {
+    changeLanguage(event.target.value);
   };
 
   const drawer = (
     <Box sx={{ width: 250, p: 2 }}>
       <List>
         {[
-          { text: "About Us", path: "/about-us" },
-          { text: "Sell Your Event", path: "/sell-event" },
-          { text: "Advertise Your Event", path: "/advertise-event" },
-          { text: "Contact", path: "/contact-us" },
+          { text: t('aboutUs'), path: "/about-us" },
+          { text: t('sellYourEvent'), path: "/sell-event" },
+          { text: t('advertiseYourEvent'), path: "/advertise-event" },
+          { text: t('contactUs'), path: "/contact-us" },
         ].map((item, index) => (
           <ListItem 
             button 
@@ -107,7 +111,7 @@ export default function Header() {
                   }
                 }}
               >
-                Home <ExpandMoreIcon sx={{ fontSize: 16 }} />
+                {t('home')}
               </Typography>
             </Link>
 
@@ -121,7 +125,7 @@ export default function Header() {
                   }
                 }}
               >
-                Events
+                {t('events')}
               </Typography>
             </Link>
             
@@ -135,7 +139,7 @@ export default function Header() {
                   }
                 }}
               >
-                Blog
+                {t('blog')}
               </Typography>
             </Link>
             
@@ -149,7 +153,7 @@ export default function Header() {
                   }
                 }}
               >
-                B2B Marketplace
+                {t('b2bMarketplace')}
               </Typography>
             </Link>
             
@@ -163,7 +167,7 @@ export default function Header() {
                   }
                 }}
               >
-                About
+                {t('about')}
               </Typography>
             </Link>
             
@@ -177,7 +181,7 @@ export default function Header() {
                   }
                 }}
               >
-                Contact
+                {t('contact')}
               </Typography>
             </Link>
           </Box>
@@ -200,15 +204,16 @@ export default function Header() {
                   }
                 }}
               >
-                <PersonIcon fontSize="small" /> Sign in
+                <PersonIcon fontSize="small" /> {t('signIn')}
               </Button>
             </Link>
 
-            {/* Language */}
+            {/* Language Selector */}
             <Box display="flex" alignItems="center" gap={0.5}>
               <LanguageIcon sx={{ fontSize: 16, color: "#0d2a4d" }} />
               <Select
-                defaultValue="EN"
+                value={currentLanguage}
+                onChange={handleLanguageChange}
                 size="small"
                 sx={{
                   fontSize: "12px",
@@ -219,8 +224,8 @@ export default function Header() {
                 }}
                 variant="outlined"
               >
-                <MenuItem value="EN">EN</MenuItem>
-                <MenuItem value="FR">FR</MenuItem>
+                <MenuItem value="en">EN</MenuItem>
+                <MenuItem value="fr">FR</MenuItem>
               </Select>
             </Box>
 

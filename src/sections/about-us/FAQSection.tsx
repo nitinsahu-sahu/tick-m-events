@@ -122,7 +122,7 @@ export default function FAQSection() {
     const navigate = useNavigate();
 
     return (
-        <Box sx={{ bgcolor: "#fff" }}>
+        <Box sx={{ bgcolor: "#fff" }} id="faq">
             {/* ========== FAQ SECTION ========== */}
             <Box
                 sx={{

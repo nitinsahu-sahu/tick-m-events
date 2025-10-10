@@ -30,9 +30,9 @@ const blogs = [
 
 export default function EventsBlog() {
   return (
-    <Box sx={{ p: { xs: 2, md: 6 }, bgcolor: "#F9FAFB" }}>
+    <Box sx={{ p: { xs: 2, md: 6 }, bgcolor: "#F9FAFB" }} id="blog">
       {/* Header */}
-      <Box
+      <Box 
         sx={{
           display: "flex",
           justifyContent: "space-between",

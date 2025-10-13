@@ -186,7 +186,6 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
             // Process admin fee payment first
             try {
                 const paymentResponse = await axios.post('/payment/initiate', fapshiPayload);
-                console.log(paymentResponse);
 
                 if (paymentResponse.status === 200) {
                     const paymentWindow = window.open(paymentResponse.data.paymentInfo.paymentLink, '_self');

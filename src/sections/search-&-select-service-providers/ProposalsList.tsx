@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Box, Typography, Avatar, Grid, Button, Paper, Divider, Tooltip,
   Dialog, DialogTitle, DialogContent, DialogActions, Chip, IconButton
@@ -18,6 +18,7 @@ import { CheckCircle } from "@mui/icons-material";
 import { updateAwardedBid } from 'src/redux/actions/organizer/pageEvents';
 import { AppDispatch } from 'src/redux/store';
 import { SocialLinks } from './socialLinks';
+import axios from "../../redux/helper/axios";
 
 interface StatusUpdateResponse {
   status: number;
@@ -27,6 +28,7 @@ interface StatusUpdateResponse {
 }
 
 export function ProposalsCard({ proposals }: any) {
+  const location = useLocation();
 
   const dispatch = useDispatch<AppDispatch>();
   const [selectedProposal, setSelectedProposal] = useState<any>(null);
@@ -42,14 +44,42 @@ export function ProposalsCard({ proposals }: any) {
     setSelectedProposal(null);
   };
 
-  const handleAwardedProject = useCallback(async (id: any, status: any) => {
-    // Handle accept logic here
-    const res = await dispatch(updateAwardedBid(id, status)) as unknown as StatusUpdateResponse;
+  const handleAwardedProject = useCallback(async (id: any, status: any, proposal: any) => {
+    if (status === 'accepted') {
+      console.log('proposal', proposal);
 
-    if (res?.status === 200) {
-      setDialogOpen(false);
+      // Calculate 10% admin fee
+      const bidAmount = proposal?.providerProposal?.amount || 0;
+      const adminFee = bidAmount * 0.1;
+      const fapshiPayload = {
+        eventrequests: proposal?._id,
+        serviceReqId: proposal?.serviceRequestId?._id,
+        eventId: proposal.eventId,
+        amount: Math.round(adminFee), // Round to whole number
+        email: proposal?.providerId?.email,
+        userId: proposal?.providerId?._id.toString(),
+        redirectUrl: `${window.location.origin}${location.pathname}?projectId=${proposal?.serviceRequestId?._id}&bidId=${proposal?._id}&adminFee=true`,
+
+      };
+      // Process admin fee payment first
+      try {
+        const paymentResponse = await axios.post('/payment/initiate', fapshiPayload);
+
+        if (paymentResponse.status === 200) {
+          const paymentWindow = window.open(paymentResponse.data.paymentInfo.paymentLink, '_self');
+        }
+      } catch (error) {
+        console.error('Payment initiation failed:', error);
+        alert('Payment initiation failed. Please try again.');
+      }
+    } else {
+      const res = await dispatch(updateAwardedBid(id, status)) as unknown as StatusUpdateResponse;
+      if (res?.status === 200) {
+        setDialogOpen(false);
+      }
     }
-  }, [dispatch])
+
+  }, [dispatch,location.pathname])
 
   const manualBids = proposals || [];
 
@@ -86,7 +116,7 @@ export function ProposalsCard({ proposals }: any) {
           <Button
             variant="outlined"
             color="error"
-            onClick={() => handleAwardedProject(selectedProposal?._id, 'rejected')}
+            onClick={() => handleAwardedProject(selectedProposal?._id, 'rejected', selectedProposal)}
             sx={{ minWidth: 120 }}
           >
             Reject Request
@@ -95,7 +125,7 @@ export function ProposalsCard({ proposals }: any) {
             startIcon={<CheckCircle />}
             variant="contained"
             color="success"
-            onClick={() => handleAwardedProject(selectedProposal?._id, 'accepted')}
+            onClick={() => handleAwardedProject(selectedProposal?._id, 'accepted', selectedProposal)}
 
             disabled={selectedProposal?.providerProposal?.isSigned}
           >

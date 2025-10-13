@@ -46,14 +46,12 @@ export function ProposalsCard({ proposals }: any) {
 
   const handleAwardedProject = useCallback(async (id: any, status: any, proposal: any) => {
     if (status === 'accepted') {
-      console.log('proposal', proposal);
-
       // Calculate 10% admin fee
       const bidAmount = proposal?.providerProposal?.amount || 0;
       const adminFee = bidAmount * 0.1;
       const fapshiPayload = {
-        eventrequests: proposal?._id,
-        serviceReqId: proposal?.serviceRequestId?._id,
+        placeABidId: proposal?._id,
+        bidId: proposal?.serviceRequestId?._id,
         eventId: proposal.eventId,
         amount: Math.round(adminFee), // Round to whole number
         email: proposal?.providerId?.email,

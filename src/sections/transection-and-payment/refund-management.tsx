@@ -121,72 +121,73 @@ export function RefundManagementHistory({ selectedEvent }: RefundManagementHisto
                         type="2"
                     />
 
-                    <Box mt={3}>
-                        <Typography variant="h6" fontWeight="bold" gutterBottom>
-                            Configurable Refund Policies
-                        </Typography>
+                     <Box mt={3}>
+                                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                                    Configurable Refund Policies
+                                </Typography>
 
-                        {noRefundPolicyAvailable ? (
-                            <Typography color="error" fontWeight="bold" sx={{ mt: 2 }}>
-                                No refund policy is configured for this event.
-                            </Typography>
-                        ) : (
-                            <RadioGroup
-                                value={selectedPolicy}
-                                onChange={(e) => setSelectedPolicy(e.target.value)}
-                                sx={{ mt: 2 }}
-                            >
-                                {refundPolicy.fullRefund && (
-                                    <FormControlLabel
-                                        value="full_refund"
-                                        control={<Radio />}
-                                        label={`Full refund up to ${refundPolicy.fullRefundDaysBefore || "X"} days before the event`}
-                                    />
+                                {noRefundPolicyAvailable ? (
+                                    <Typography color="error" fontWeight="bold" sx={{ mt: 2 }}>
+                                        No refund policy is configured for this event.
+                                    </Typography>
+                                ) : (
+                                    <RadioGroup
+                                        value={selectedPolicy}
+                                        onChange={(e) => setSelectedPolicy(e.target.value)}
+                                        sx={{ mt: 2 }}
+                                    >
+                                        {refundPolicy.fullRefund && (
+                                            <FormControlLabel
+                                                value="full_refund"
+                                                control={<Radio />}
+                                                label={`Full refund up to ${refundPolicy.fullRefundDaysBefore || "X"} days before the event`}
+                                            />
+                                        )}
+
+                                        {refundPolicy.partialRefund && (
+                                            <FormControlLabel
+                                                value="partial_refund"
+                                                control={<Radio />}
+                                                label={`Partial Refund with Fee (${refundPolicy.partialRefundPercent || "X"}% of ticket price retained)`}
+                                            />
+                                        )}
+
+                                        {refundPolicy.noRefundAfterPurchase && (
+                                            <FormControlLabel
+                                                value="no_refund_purchase"
+                                                control={<Radio />}
+                                                label="No refund after ticket purchase"
+                                            />
+                                        )}
+
+                                        {refundPolicy.noRefundAfterDate && (
+                                            <FormControlLabel
+                                                value="no_refund_date"
+                                                control={<Radio />}
+                                                label={`No refund after ${formatDateWithDay(refundPolicy.noRefundDate)}`}
+                                            />
+                                        )}
+                                    </RadioGroup>
                                 )}
 
-                                {refundPolicy.partialRefund && (
-                                    <FormControlLabel
-                                        value="partial_refund"
-                                        control={<Radio />}
-                                        label={`Partial Refund with Fee (${refundPolicy.partialRefundPercent || "X"}% of ticket price retained)`}
-                                    />
-                                )}
+                                <Box sx={{ mt: 3, textAlign: "center" }}>
+                                    <Button
+                                        fullWidth
+                                        variant="contained"
+                                        sx={{ mt: 3, backgroundColor: "#0B2E4C", color: "white", py: 1.5 }}
+                                    // onClick={() => {
+                                    //     console.log("Navigating with selectedEvent:", selectedEvent);
+                                    //     navigate("/ticket-and-reservation-management", {
+                                    //         state: { selectedEvent }
+                                    //     });
+                                    // }}
+                                    >
+                                        Process Refund
+                                    </Button>
 
-                                {refundPolicy.noRefundAfterPurchase && (
-                                    <FormControlLabel
-                                        value="no_refund_purchase"
-                                        control={<Radio />}
-                                        label="No refund after ticket purchase"
-                                    />
-                                )}
+                                </Box>
+                            </Box>
 
-                                {refundPolicy.noRefundAfterDate && (
-                                    <FormControlLabel
-                                        value="no_refund_date"
-                                        control={<Radio />}
-                                        label={`No refund after ${formatDateWithDay(refundPolicy.noRefundDate)}`}
-                                    />
-                                )}
-                            </RadioGroup>
-                        )}
-
-                        <Box sx={{ mt: 3, textAlign: "center" }}>
-                            <Button
-                                fullWidth
-                                variant="contained"
-                                sx={{ mt: 3, backgroundColor: "#0B2E4C", color: "white", py: 1.5 }}
-                                // onClick={() => {
-                                //     console.log("Navigating with selectedEvent:", selectedEvent);
-                                //     navigate("/ticket-and-reservation-management", {
-                                //         state: { selectedEvent }
-                                //     });
-                                // }}
-                            >
-                                Process Refund
-                            </Button>
-
-                        </Box>
-                    </Box>
                 </Box>
             )}
         </>

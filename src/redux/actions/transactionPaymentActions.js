@@ -30,7 +30,7 @@ export const createWithdrawal = (withdrawalData) => async (dispatch) => {
       payload: { message, error: status },
     });
 
-    return null; 
+    return null;
   }
 };
 
@@ -97,10 +97,10 @@ export const getAllWithdrawals = () => async (dispatch) => {
 
 export const processWithdrawalPayout = (withdrawalId) => async (dispatch) => {
   dispatch({ type: transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_REQUEST });
- 
+
   try {
     const { data } = await axios.post(`/transaction-payment/withdrawals/${withdrawalId}/payout`);
- 
+
     dispatch({
       type: transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_SUCCESS,
       payload: {
@@ -108,9 +108,9 @@ export const processWithdrawalPayout = (withdrawalId) => async (dispatch) => {
         message: data.message
       }
     });
- 
+
     dispatch(getAllWithdrawals());
- 
+
   } catch (error) {
     // 🧠 Smart error message selection
     const errorMessage =
@@ -118,19 +118,19 @@ export const processWithdrawalPayout = (withdrawalId) => async (dispatch) => {
       error?.response?.data?.message ||        // <- From your own API
       error?.message ||                        // <- Axios / generic error
       "Payout failed";
- 
+
     dispatch({
       type: transactionPaymentConstants.PROCESS_WITHDRAWAL_PAYOUT_FAILURE,
       payload: errorMessage
     });
- 
+
     throw new Error(errorMessage);
   }
 };
 
 export const getUserWithdrawals = () => async (dispatch) => {
   dispatch({ type: transactionPaymentConstants.GET_LOGGED_USER_WITHDRAWALS_REQUEST });
- 
+
   try {
     const response = await axios.get("/transaction-payment/get-user-withdrawals");
     dispatch({
@@ -144,3 +144,4 @@ export const getUserWithdrawals = () => async (dispatch) => {
     });
   }
 };
+

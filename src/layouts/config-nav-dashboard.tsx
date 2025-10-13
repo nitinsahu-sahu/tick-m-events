@@ -113,7 +113,7 @@ export const navData: NavItem[] = [
         path: '/place-a-bid/bids/awarded',
         icon: icon('ic_awarded'),
       }
-      
+
     ],
   },
   {
@@ -242,10 +242,16 @@ export const navData: NavItem[] = [
     icon: icon('ic_supervision'),
     roles: ['admin'],
   },
-    {
+  {
     title: 'WithDrawal',
     path: '/withdrawal',
     icon: icon('ic_supervision'),
+    roles: ['admin'],
+  },
+  {
+    title: 'Refund Requests',
+    path: '/refund-requests',
+    icon: icon('ic_global_overview'),
     roles: ['admin'],
   },
   {
@@ -287,7 +293,7 @@ export const navData: NavItem[] = [
       //   path: '/place-a-bid/bids/awarded',
       //   icon: icon('ic_awarded'),
       // }
-      
+
     ],
   },
 ];

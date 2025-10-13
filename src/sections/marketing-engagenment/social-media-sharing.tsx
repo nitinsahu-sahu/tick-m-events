@@ -57,7 +57,7 @@ export function SocialMediaSharing({ selEvent }: any) {
 
     useEffect(() => {
         if (selEvent?._id) {
-            const fullReservationLink = `https://tick-m-events.vercel.app/our-event/${selEvent._id}`;
+            const fullReservationLink = `${import.meta.env.VITE_Live_URL}/our-event/${selEvent._id}`;
             setReservationLink(fullReservationLink);
         }
     }, [selEvent]);
@@ -139,7 +139,8 @@ export function SocialMediaSharing({ selEvent }: any) {
                     alert("Missing event ID or post ID");
                     return;
                 }
-                const shareUrl = `https://tick-m-events-server.onrender.com/api/v1/promotion/social-share/${savedPostData._id}`;
+                
+                const shareUrl = `${import.meta.env.VITE_Live_URL}/api/v1/promotion/social-share/${savedPostData._id}`;
                 const encodedUrl = encodeURIComponent(shareUrl);
                 window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank');
                 break;
@@ -149,7 +150,7 @@ export function SocialMediaSharing({ selEvent }: any) {
                     alert("Missing event ID or post ID");
                     return;
                 }
-                const shareUrl = `https://tick-m-events-server.onrender.com/api/v1/promotion/social-share/${savedPostData._id}`;
+                const shareUrl = `${import.meta.env.VITE_Live_URL}/api/v1/promotion/social-share/${savedPostData._id}`;
                 const encodedUrl = encodeURIComponent(shareUrl);
                 window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`, '_blank');
                 break;

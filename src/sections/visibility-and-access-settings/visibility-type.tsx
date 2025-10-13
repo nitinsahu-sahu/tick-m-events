@@ -29,7 +29,8 @@ interface VisibilityTypeProps {
 
 // Generate URL based on visibility type
 const generateDefaultUrl = (visibilityType: string, eventId: string) => {
-  const baseUrl = "https://tick-m-events.vercel.app/our-event";
+  
+  const baseUrl = `${import.meta.env.VITE_Live_URL}/our-event`;
   return visibilityType === 'public' ? baseUrl : `${baseUrl}/${eventId}`;
 };
 

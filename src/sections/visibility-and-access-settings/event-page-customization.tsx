@@ -13,9 +13,11 @@ export const EventCustomization = ({ eventId }: any) => {
   const [secondaryColor, setSecondaryColor] = useState('#3F51B5');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [eventLogoPreview, setEventLogoPreview] = useState<string | null>(null);
+  const [portraitImagePreview, setPortraitImagePreview] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const eventBannerRef = useRef<HTMLInputElement>(null);
+  const portraitImageRef = useRef<HTMLInputElement>(null);
 
   // Fetch existing customization on event change
   useEffect(() => {
@@ -23,7 +25,7 @@ export const EventCustomization = ({ eventId }: any) => {
       if (!eventId) return; // Don't run if no eventId is selected
 
       const result = await dispatch(eventCustomizationPageFetch(eventId));
-
+      console.log("event", result);
       if ('customization' in result && result.status === 200) {
         const customization = result.customization;
 
@@ -34,8 +36,12 @@ export const EventCustomization = ({ eventId }: any) => {
           setEventLogoPreview(customization.eventLogo.url);
         }
 
-        if (customization?.event?.coverImage?.url) {
-          setPreviewImage(customization.event.coverImage.url);
+        if (customization?.coverImage?.url) {
+          setPreviewImage(customization.coverImage.url);
+        }
+
+        if (customization?.portraitImage?.url) {
+          setPortraitImagePreview(customization.portraitImage.url);
         }
       }
     };
@@ -71,6 +77,7 @@ export const EventCustomization = ({ eventId }: any) => {
     const formData = new FormData();
     const eventLogo = fileInputRef.current?.files;
     const eventBanner = eventBannerRef.current?.files;
+    const portraitImage = portraitImageRef.current?.files;
 
     formData.append('themeColor', primaryColor);
     formData.append('customColor', secondaryColor);
@@ -80,7 +87,9 @@ export const EventCustomization = ({ eventId }: any) => {
     if (eventBanner && eventBanner.length > 0) {
       formData.append('coverImage', eventBanner[0]);
     }
-
+    if (portraitImage && portraitImage.length > 0) {
+      formData.append('portraitImage', portraitImage[0]);
+    }
     const updatedEvent = { _id: eventId, formData };
     const result = await dispatch(eventCustomizationPageUpdate(updatedEvent));
 
@@ -127,44 +136,103 @@ export const EventCustomization = ({ eventId }: any) => {
 
         {/* Background Image Upload */}
         <Box mt={4}>
-          <HeadingCommon title="Background Image Upload" baseSize="20px" />
-          <Input
-            type="file"
-            fullWidth
-            disableUnderline
-            name="eventBanner"
-            onChange={handleEventBanner}
-            inputRef={eventBannerRef}
-            inputProps={{ accept: 'image/*' }}
-            sx={{
-              border: '1px solid #ccc',
-              borderRadius: 1,
-              padding: '8px',
-              marginBottom: 2
-            }}
-          />
+          <HeadingCommon title="Background & Portrait Images" baseSize="20px" />
+
           <Box
-            sx={{
-              width: "100%",
-              height: "250px",
-              borderRadius: "12px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "#FFF",
-              boxShadow: 2,
-              border: "1px solid #D3D3D3",
-              overflow: "hidden",
-              marginBottom: 4,
-            }}
+            display="flex"
+            flexDirection={{ xs: 'column', sm: 'row' }} // Column on mobile, row on larger screens
+            gap={2} // Space between boxes
+            mt={2}
           >
-            {previewImage ? (
-              <img src={previewImage} alt="Banner" style={{ width: '100%', borderRadius: 8, maxHeight: '300px', objectFit: 'cover' }} />
-            ) : (
-              <Typography variant="body2" color="textSecondary">No Event Banner</Typography>
-            )}
+            {/* Cover Image Box - 60% width on desktop */}
+            <Box flex={{ xs: '1 1 100%', sm: '0 0 60%' }}>
+              <Input
+                type="file"
+                fullWidth
+                disableUnderline
+                name="eventBanner"
+                onChange={handleEventBanner}
+                inputRef={eventBannerRef}
+                inputProps={{ accept: 'image/*' }}
+                sx={{
+                  border: '1px solid #ccc',
+                  borderRadius: 1,
+                  padding: '8px',
+                  marginBottom: 2
+                }}
+              />
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "250px",
+                  borderRadius: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#FFF",
+                  boxShadow: 2,
+                  border: "1px solid #D3D3D3",
+                  overflow: "hidden",
+                  marginBottom: 4,
+                }}
+              >
+                {previewImage ? (
+                  <img
+                    src={previewImage}
+                    alt="Banner"
+                    style={{ width: '100%', borderRadius: 8, maxHeight: '300px', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <Typography variant="body2" color="textSecondary">No Event Banner</Typography>
+                )}
+              </Box>
+            </Box>
+
+            {/* Portrait Image Box - 40% width on desktop */}
+            <Box flex={{ xs: '1 1 100%', sm: '0 0 40%' }}>
+              <Input
+                type="file"
+                fullWidth
+                disableUnderline
+                name="portraitImage"
+                inputRef={portraitImageRef}
+                inputProps={{ accept: 'image/*' }}
+                sx={{
+                  border: '1px solid #ccc',
+                  borderRadius: 1,
+                  padding: '8px',
+                  marginBottom: 2
+                }}
+              />
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "250px",
+                  borderRadius: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#FFF",
+                  boxShadow: 2,
+                  border: "1px solid #D3D3D3",
+                  overflow: "hidden",
+                  marginBottom: 4,
+                }}
+              >
+                {portraitImagePreview ? (
+                  <img
+                    src={portraitImagePreview} // State to hold portrait image URL
+                    alt="Portrait"
+                    style={{ width: '100%', borderRadius: 8, maxHeight: '300px', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <Typography variant="body2" color="textSecondary">No Portrait Image</Typography>
+                )}
+              </Box>
+            </Box>
           </Box>
         </Box>
+
 
         {/* Event Logo Upload */}
         <Box mt={3}>

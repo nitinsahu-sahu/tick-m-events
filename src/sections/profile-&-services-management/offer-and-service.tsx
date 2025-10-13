@@ -95,7 +95,7 @@ export function OfferAndService() {
                         }
                     }}
                 >
-                    Add Service
+                    Add Services
                 </Button>
             </Box>
             {/* Table */}

@@ -41,7 +41,7 @@ interface Project {
     providerId: string;
     status: string;
     contractStatus: string;
-    orgBudget: number;
+    orgBudget: string;
     orgRequirement: string;
     createdAt: string;
     updatedAt: string;
@@ -274,7 +274,7 @@ export function TabWithTableView() {
                                         <DetailItem title="Service Type" value={selectedProject?.serviceRequestId?.serviceType || 'N/A'} />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
-                                        <DetailItem title="Organizer Budget" value={selectedProject?.serviceRequestId?.budget || 'N/A'} />
+                                        <DetailItem title="Organizer Budget" value={selectedProject?.orgBudget || 'N/A'} />
                                     </Grid>
                                     <Grid item xs={12}>
                                         <DetailItem title="Organizer" value={selectedProject?.organizerId?.name || 'N/A'} />

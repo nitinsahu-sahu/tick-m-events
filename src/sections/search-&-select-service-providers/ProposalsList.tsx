@@ -3,6 +3,8 @@ import {
   Box, Typography, Avatar, Grid, Button, Paper, Divider, Tooltip,
   Dialog, DialogTitle, DialogContent, DialogActions, Chip, IconButton
 } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info'; // or your preferred info icon
+
 import { useCallback, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import StarIcon from '@mui/icons-material/Star';
@@ -11,6 +13,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { useDispatch } from 'react-redux';
+import { CheckCircle } from "@mui/icons-material";
 
 import { updateAwardedBid } from 'src/redux/actions/organizer/pageEvents';
 import { AppDispatch } from 'src/redux/store';
@@ -41,8 +44,8 @@ export function ProposalsCard({ proposals }: any) {
 
   const handleAwardedProject = useCallback(async (id: any, status: any) => {
     // Handle accept logic here
-    const res = await dispatch(updateAwardedBid(id, status))as unknown as StatusUpdateResponse;
-  
+    const res = await dispatch(updateAwardedBid(id, status)) as unknown as StatusUpdateResponse;
+
     if (res?.status === 200) {
       setDialogOpen(false);
     }
@@ -89,13 +92,31 @@ export function ProposalsCard({ proposals }: any) {
             Reject Request
           </Button>
           <Button
+            startIcon={<CheckCircle />}
+            variant="contained"
+            color="success"
+            onClick={() => handleAwardedProject(selectedProposal?._id, 'accepted')}
+
+            disabled={selectedProposal?.providerProposal?.isSigned}
+          >
+            Award Request
+            {selectedProposal?.providerProposal?.amount && (
+              <Tooltip
+                title={`10% admin fee: ${(parseFloat(selectedProposal?.providerProposal?.amount) * 0.1).toFixed(2)} XAF will be deducted`}
+                placement="top"
+              >
+                <InfoIcon fontSize="small" sx={{ ml: 1 }} />
+              </Tooltip>
+            )}
+          </Button>
+          {/* <Button
             variant="contained"
             color="primary"
             onClick={() => handleAwardedProject(selectedProposal?._id, 'accepted')}
             sx={{ minWidth: 120 }}
           >
             Award Request
-          </Button>
+          </Button> */}
         </DialogActions>
       </Dialog>
     </Box>

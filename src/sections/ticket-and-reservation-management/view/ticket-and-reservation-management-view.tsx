@@ -31,6 +31,7 @@ export function TicketAndReservationManagementView() {
 
   const dispatch = useDispatch<AppDispatch>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  
   const handleEventSelect = (event: Event | null) => {
     setSelectedEvent(event);
     // Do something with the selected event data

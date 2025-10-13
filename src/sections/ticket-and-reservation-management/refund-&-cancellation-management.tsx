@@ -16,7 +16,7 @@ import { toast } from 'react-toastify';
 import { updateRefundPolicy } from "../../redux/actions/ticket-&-reservation-management.action";
 
 export function RefundAndCancellationManangement({ orderList }: any) {
-  const { order, tickets } = orderList
+  const {  tickets, refundRequests } = orderList
 
   const dispatch = useDispatch<AppDispatch>();
   const refundCancelationTableHeaders = ["Transaction", "Participant", "Ticket Type", "Purchase Date", "Amount", "Status", "Actions"];
@@ -27,6 +27,7 @@ export function RefundAndCancellationManangement({ orderList }: any) {
   const [cutoffDate, setCutoffDate] = useState("");
   const [isModified, setIsModified] = useState(false);
   const initialPolicyRef = useRef<any>(null);
+
   useEffect(() => {
     if (!tickets || tickets.length === 0) return;
 
@@ -168,7 +169,7 @@ export function RefundAndCancellationManangement({ orderList }: any) {
       ) : (
         <>
           {/* Table */}
-          <TicketReservationManagementTable headers={refundCancelationTableHeaders} data={order} type="4" />
+          <TicketReservationManagementTable headers={refundCancelationTableHeaders} data={refundRequests} type="4" />
 
           {/* Refund Policy Configuration */}
           <Box mt={4}>

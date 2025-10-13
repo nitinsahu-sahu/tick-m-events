@@ -88,35 +88,49 @@ export const eventUpdate = (updatedEvent) => async (dispatch) => {
 };
 
 export const eventCustomizationPageUpdate = (updatedEvent) => async (dispatch) => {
+    const eventId = updatedEvent?._id;
+    const formData = updatedEvent?.formData;
 
-    const eventId = updatedEvent?._id
     dispatch({ type: eventConstants.EVENT_CUSTOMIZATION_UPDATE_REQUEST });
 
     try {
-        const response = await axios.patch(`/event/eventPageCustomization/${eventId}`, updatedEvent.formData);
+        const response = await axios.patch(
+            `/event/eventPageCustomization/${eventId}`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',  // <-- important!
+                },
+            }
+        );
+
         dispatch({
             type: eventConstants.EVENT_CUSTOMIZATION_UPDATE_SUCCESS,
             payload: { message: response?.data?.message },
-
         });
+
         return {
             type: eventConstants.EVENT_CUSTOMIZATION_UPDATE_SUCCESS,
             status: response.status,
-            message: response?.data?.message
+            message: response?.data?.message,
         };
     } catch (error) {
         dispatch({
             type: eventConstants.EVENT_CUSTOMIZATION_UPDATE_FAILURE,
-            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+            payload: {
+                message: error?.response?.data?.message || 'Server error',
+                error: error?.response?.status,
+            },
         });
 
         return {
             type: eventConstants.EVENT_CUSTOMIZATION_UPDATE_FAILURE,
-            message: error?.response?.data?.message || "Server error",
-            status: error.status
+            message: error?.response?.data?.message || 'Server error',
+            status: error?.response?.status,
         };
     }
 };
+
 
 export const wishlistEventFetch = () => async (dispatch) => {
     dispatch({ type: eventConstants.WISHLIST_GET_REQUEST });

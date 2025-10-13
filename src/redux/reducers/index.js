@@ -24,9 +24,11 @@ import { notificationReducer } from './notification.reducer';
 import placeABidReducer from './provider/Home-Global-View/freelancer.reducer'
 import { rewardReducer } from './rewardReducer'
 import customizationReducer from './customization/promotion-logos'
+import reqAndRefundsReducer from './admin/refund-request/refundreuest.reducer'
 
 const rootReducer = combineReducers({
-    customization:customizationReducer,
+    admin: reqAndRefundsReducer,
+    customization: customizationReducer,
     provider: placeABidReducer,
     organizer: pageEventReducer,
     gogs: globalOverviewGeneralStatisticsReducer,

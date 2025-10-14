@@ -27,7 +27,7 @@ export interface Event {
   category?: string;
   eventType?: string;
   validationOptions?: ValidationOptions;
-  statistics?:any
+  statistics?: any
   // Add other event properties as needed
 }
 
@@ -64,14 +64,14 @@ export function EventValidationView() {
           title="Entry Validation (QR Code Scan)"
         />
         {
-          view === 'scan' ? <TicketScanner /> : <EnterTicketCode _selectEve={selectedEvent?.validationOptions}/>
+          view === 'scan' ? <TicketScanner /> : <EnterTicketCode _selectEve={selectedEvent?.validationOptions} />
         }
 
         {/* Entry List Section */}
         <EntryListView />
 
         {/* Statistics Section */}
-        <RealTimeStatistics statistics={selectedEvent?.statistics}/>
+        <RealTimeStatistics statistics={selectedEvent?.statistics} />
       </DashboardContent>
     </>
   );

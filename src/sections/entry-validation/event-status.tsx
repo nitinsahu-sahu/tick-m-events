@@ -1,4 +1,4 @@
-import { Box, Button, Select, MenuItem, Typography, Stack, FormControl,ListSubheader } from "@mui/material";
+import { Box, Button, Select, MenuItem, Typography, Stack, FormControl, ListSubheader } from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -26,14 +26,11 @@ function StatusChip({ label, color }: { label: string; color: string }) {
 export function EventBreadCrum({ _selectEve, view, setView, eventInformation, events, onEventSelect, enableComparison = false }: any) {
     const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine); // Track online status
     const location = useLocation();
-    const dispatch = useDispatch<AppDispatch>();
-
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(eventInformation || null);
     const [comparisonEvent, setComparisonEvent] = useState<Event | null>(null);
-    // Define the specific URL path where the section should appear
     const showSection = location.pathname === '/entry-validation';
     const statisticsAndReport = location.pathname === '/statistics-&-reports';
-
+const [availableViews, setAvailableViews] = useState<('scan' | 'list')[]>(['scan']); // Default to scan only
     useEffect(() => {
         const handleOnline = () => setIsOnline(true);
         const handleOffline = () => setIsOnline(false);
@@ -61,10 +58,43 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
     }, [events, selectedEvent, eventInformation, onEventSelect]);
 
     useEffect(() => {
+        // Determine available views based on validationOptions
         if (_selectEve?.validationOptions?.selectedView) {
-            setView(_selectEve.validationOptions.selectedView);
+            const selectedView = _selectEve.validationOptions.selectedView;
+
+            if (Array.isArray(selectedView)) {
+                // If it's an array, use it directly
+                setAvailableViews(selectedView);
+            } else if (selectedView === 'both') {
+                // If it's 'both', enable both views
+                setAvailableViews(['scan', 'list']);
+            } else {
+                // If it's a single view, use that view only
+                setAvailableViews([selectedView]);
+            }
+
+            // Set initial view to the first available view if current view is not available
+            if (!availableViews.includes(view)) {
+                setView(availableViews[0]);
+            }
+        } else {
+            // Default to scan only if no validation options
+            setAvailableViews(['scan']);
         }
-    }, [_selectEve, setView]);
+    }, [_selectEve, setView, view, availableViews]);
+
+   
+    // Check if a view is available
+    const isViewAvailable = (viewType: 'scan' | 'list') => availableViews.includes(viewType);
+
+    // Check if a view should be disabled
+    const isViewDisabled = (viewType: 'scan' | 'list') => !isViewAvailable(viewType);
+
+    const handleViewChange = (newView: 'scan' | 'list') => {
+        if (isViewAvailable(newView)) {
+            setView(newView);
+        }
+    };
 
     const handleChange = (e: any) => {
         const selectedId = e.target.value;
@@ -166,8 +196,8 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
                     <Box display="flex" gap={1}>
                         <Button
                             variant={view === 'scan' ? 'contained' : 'outlined'}
-                            onClick={() => setView('scan')}
-                            disabled={view === 'list'} // Disable when list view is active
+                            onClick={() => handleViewChange('scan')}
+                            disabled={isViewDisabled('scan')}
                             sx={{
                                 fontSize: 10,
                                 width: 100,
@@ -187,8 +217,8 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
                         </Button>
                         <Button
                             variant={view === 'list' ? 'contained' : 'outlined'}
-                            onClick={() => setView('list')}
-                            disabled={view === 'scan'} // Disable when scan view is active
+                            onClick={() => handleViewChange('list')}
+                            disabled={isViewDisabled('list')}
                             sx={{
                                 fontSize: 10,
                                 width: 100,
@@ -252,8 +282,6 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
                     </FormControl>
                 </Box>
             )}
-
-           
         </Box>
     )
 }

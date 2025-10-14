@@ -9,6 +9,7 @@ import { WithdrawalTableHeaders } from "./utils";
 
 // ✅ Type moved outside the component
 type Withdrawal = {
+    eventId: string,
     withdrawalId: string;
     amount: number;
     payment?: {
@@ -32,7 +33,7 @@ function formatPaymentMethod(method: string = ""): string {
         .join(" ");
 }
 
-export function WithdrawalTableHistory() {
+export function WithdrawalTableHistory({ selectedEvent }: any) {
     const dispatch = useDispatch<AppDispatch>();
 
     const withdrawals = useSelector((state: RootState) => state?.transactions.withdrawals) as Withdrawal[];
@@ -41,12 +42,16 @@ export function WithdrawalTableHistory() {
         dispatch(getUserWithdrawals());
     }, [dispatch]);
 
-    const tableData = withdrawals.map((item) => ({
+    const filteredWithdrawals = selectedEvent
+        ? withdrawals.filter(w => w.eventId === selectedEvent._id)
+        : [];
+
+    const tableData = filteredWithdrawals.map((item) => ({
         withdrawalId: item.withdrawalId,
         "Date": formatDate(item.createdAt),
         amount: item.amount,
         paymentMethod: formatPaymentMethod(item.payment?.paymentMethod || "N/A"),
-        action: [item.status],
+        action: item.status,
     }));
 
     return (

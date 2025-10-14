@@ -9,7 +9,32 @@ export function TransactionAndPaymentTable({ headers = [], data = [], type }: an
 
     const [open, setOpen] = useState({ open: false, rowData: null });
     const theme = useTheme();
+    const WithdrawalStatus = {
+        Pending: 'pending',
+        Approved: 'approved',
+        Rejected: 'rejected',
+        Completed: 'completed',
+    };
 
+    // Status color configuration
+    const STATUS_COLORS = {
+        [WithdrawalStatus.Pending]: {
+            background: '#FFA726', // Orange
+            hover: '#F57C00',
+        },
+        [WithdrawalStatus.Approved]: {
+            background: '#4CAF50', // Green
+            hover: '#388E3C',
+        },
+        [WithdrawalStatus.Rejected]: {
+            background: '#F44336', // Red
+            hover: '#D32F2F',
+        },
+        [WithdrawalStatus.Completed]: {
+            background: '#2196F3', // Blue
+            hover: '#1976D2',
+        },
+    };
     return (
         <TableContainer component={Paper}>
             <Table>
@@ -151,29 +176,23 @@ export function TransactionAndPaymentTable({ headers = [], data = [], type }: an
                                             </Box>
                                         ) : key === "action" && type === "5" ? (
                                             <Box sx={{ display: 'flex', gap: 1, justifyContent: "center" }}>
-                                                {row.status !== 'Approved' && row[key].map((action: string, actionIdx: number) => (
-                                                    <Button
-                                                        key={actionIdx}
-                                                        variant="contained"
-                                                        sx={{
-                                                            backgroundColor: action === 'Accept'
-                                                                ? theme.palette.success.main
-                                                                : theme.palette.error.main,
-                                                            color: 'white',
-                                                            "&:hover": {
-                                                                backgroundColor: action === 'Accept'
-                                                                    ? theme.palette.success.dark
-                                                                    : theme.palette.error.dark
-                                                            },
-                                                            fontSize: { xs: "0.7rem", sm: "0.8rem" },
-                                                            px: 2,
-                                                            textTransform: 'none'
-                                                        }}
-                                                    >
-                                                        {action}
-                                                    </Button>
-                                                ))}
-
+                                                <Button
+                                                    variant="contained"
+                                                    sx={{
+                                                        
+                                                        backgroundColor: STATUS_COLORS[row.action]?.background || '#666666',
+                                                        color: 'white',
+                                                        "&:hover": {
+                                                            backgroundColor: STATUS_COLORS[row.action]?.hover || '#555555'
+                                                        },
+                                                        fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                                                        px: 2,
+                                                        textTransform: 'capitalize',
+                                                        fontWeight: 'bold'
+                                                    }}
+                                                >
+                                                    {row.action}
+                                                </Button>
                                             </Box>
                                         ) : (
                                             row[key]

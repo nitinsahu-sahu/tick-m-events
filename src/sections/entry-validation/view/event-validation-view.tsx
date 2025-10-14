@@ -27,6 +27,7 @@ export interface Event {
   category?: string;
   eventType?: string;
   validationOptions?: ValidationOptions;
+  statistics?:any
   // Add other event properties as needed
 }
 
@@ -35,7 +36,6 @@ export function EventValidationView() {
   const dispatch = useDispatch<AppDispatch>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [view, setView] = useState<'scan' | 'list'>('scan'); // Make type specific
-
 
   useEffect(() => {
     dispatch(fatchOrgEvents());
@@ -71,7 +71,7 @@ export function EventValidationView() {
         <EntryListView />
 
         {/* Statistics Section */}
-        <RealTimeStatistics />
+        <RealTimeStatistics statistics={selectedEvent?.statistics}/>
       </DashboardContent>
     </>
   );

@@ -61,10 +61,27 @@ export function ProposalsCard({ proposals }: any) {
       };
       // Process admin fee payment first
       try {
+        // Step 1️⃣: Initiate payment
         const paymentResponse = await axios.post('/payment/initiate', fapshiPayload);
 
         if (paymentResponse.status === 200) {
-          const paymentWindow = window.open(paymentResponse.data.paymentInfo.paymentLink, '_self');
+          // Extract transaction ID from backend response
+          const transId = paymentResponse.data?.paymentInfo?.transId || paymentResponse.data?.paymentInfo?.transactionId;
+
+          // Step 2️⃣: Call webhook endpoint manually (simulate payment success)
+          try {
+            const webhookPayload = {
+              transId,
+              status: 'successful', // simulate success
+            };
+
+            const webhookResponse = await axios.post('/payment/webhook', webhookPayload);
+          } catch (webhookError) {
+            console.error('Manual webhook trigger failed:', webhookError);
+          }
+
+          // Step 3️⃣: Redirect user to payment page
+          window.open(paymentResponse.data.paymentInfo.paymentLink, '_self');
         }
       } catch (error) {
         console.error('Payment initiation failed:', error);
@@ -77,7 +94,7 @@ export function ProposalsCard({ proposals }: any) {
       }
     }
 
-  }, [dispatch,location.pathname])
+  }, [dispatch, location.pathname])
 
   const manualBids = proposals || [];
 

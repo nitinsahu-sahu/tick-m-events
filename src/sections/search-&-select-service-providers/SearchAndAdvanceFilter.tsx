@@ -108,29 +108,94 @@ export const SearchAndAdvanceFilter = ({ onChange, onFiltersApplied }: any) => {
               label="Select Service Category"
               value={filters.serviceCategory}
               onChange={handleCategoryChange}
+              sx={{
+                '& .MuiSelect-select': {
+                  py: {
+                    xs: 1.5, // More padding for touch on mobile
+                    sm: 1.75,
+                    md: 2
+                  }
+                }
+              }}
             >
               <MenuItem value="" disabled>
                 <em>Select Service Category</em>
               </MenuItem>
               {categories?.map((category: any) => (
-                <MenuItem key={category._id} value={category.name}>
-                  {category.name} {category.subcategories?.map((subcategory: any) => (
+                <div key={category._id}>
+                  {/* Main Category Item */}
+                  <MenuItem
+                    value={category.name}
+                    sx={{
+                      fontWeight: 'bold',
+                      fontSize: {
+                        xs: '0.9rem', // Slightly smaller on mobile
+                        sm: '1rem'     // Normal on larger screens
+                      },
+                      py: {
+                        xs: 1.5, // More padding for touch
+                        sm: 1.25 // Less padding on larger screens
+                      }
+                    }}
+                  >
+                    {category.name}
+                  </MenuItem>
+
+                  {/* Subcategories as disabled items */}
+                  {category.subcategories?.map((subcategory: any) => (
                     <MenuItem
                       key={subcategory._id}
+                      value={subcategory.name}
+                      disabled
                       sx={{
-                        pl: 4,
+                        pl: {
+                          xs: 3, // Less indentation on mobile
+                          sm: 4  // More indentation on larger screens
+                        },
+                        fontSize: {
+                          xs: '0.8rem', // Smaller font on mobile
+                          sm: '0.9rem'  // Slightly larger on larger screens
+                        },
                         fontStyle: 'italic',
                         color: 'text.disabled',
-                        pointerEvents: 'none' // Disables clicking
+                        py: {
+                          xs: 1, // Less padding for subcategories
+                          sm: 0.75
+                        },
+                        minHeight: 'auto', // Reduce height for subcategories
+                        // Visual separator for better hierarchy on mobile
+                        borderLeft: {
+                          xs: '2px solid',
+                          sm: 'none'
+                        },
+                        borderColor: 'divider',
+                        mx: {
+                          xs: 1, // Add margin on mobile
+                          sm: 0  // No margin on larger screens
+                        }
                       }}
                     >
                       {subcategory.name}
                     </MenuItem>
                   ))}
-                </MenuItem>
 
+                  {/* Divider between categories for better mobile readability */}
+                  <Box
+                    sx={{
+                      borderBottom: '1px solid',
+                      borderColor: 'divider',
+                      my: {
+                        xs: 0.5, // Less space on mobile
+                        sm: 1    // More space on larger screens
+                      },
+                      mx: {
+                        xs: 1,   // Horizontal margin on mobile
+                        sm: 0    // No margin on larger screens
+                      }
+                    }}
+                  />
+                </div>
               ))}
-
             </Select>
           </FormControl>
         </Grid>

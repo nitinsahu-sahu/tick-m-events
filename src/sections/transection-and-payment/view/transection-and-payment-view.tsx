@@ -65,10 +65,10 @@ export function TransectionAndPaymentView() {
         <PaymentHistory selectedEvent={selectedEvent} />
 
         {/* Payment History */}
-        <WithdrawalRequest availableBalance={selectedEvent?.availableBalance || 0} />
+        <WithdrawalRequest availableBalance={selectedEvent?.availableBalance || 0} eventId={selectedEvent?._id}  />
 
         {/* Withdrawal Table History */}
-        <WithdrawalTableHistory />
+        <WithdrawalTableHistory selectedEvent={selectedEvent}/>
 
         {/* Refund Management History */}
         <RefundManagementHistory selectedEvent={selectedEvent} />

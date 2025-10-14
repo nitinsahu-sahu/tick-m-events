@@ -30,8 +30,9 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
   const [recordedVideoURL, setRecordedVideoURL] = useState<string | null>(null);
+  const [cameraRestartTrigger, setCameraRestartTrigger] = useState(0); // For restarting camera
 
-  // Start camera on mount
+  // Start camera on mount and when restart is triggered
   useEffect(() => {
     const localVideoRef = videoRef.current;
 
@@ -67,18 +68,45 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
       setMediaRecorder(null);
       setRecordedChunks([]);
     };
-  }, [mode]);
-
+  }, [mode, cameraRestartTrigger]); // Added cameraRestartTrigger dependency
 
   const handleCapture = () => {
     if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext('2d');
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
       if (context) {
-        context.drawImage(videoRef.current, 0, 0, 400, 300);
-        const imageData = canvasRef.current.toDataURL('image/png');
+        // Calculate aspect ratio to maintain video proportions
+        const videoAspect = video.videoWidth / video.videoHeight;
+        const canvasAspect = canvas.width / canvas.height;
+        
+        let drawWidth;
+        let drawHeight;
+        let offsetX;
+        let offsetY;
+        
+        if (videoAspect > canvasAspect) {
+          // Video is wider than canvas
+          drawHeight = canvas.height;
+          drawWidth = drawHeight * videoAspect;
+          offsetX = (canvas.width - drawWidth) / 2;
+          offsetY = 0;
+        } else {
+          // Video is taller than canvas
+          drawWidth = canvas.width;
+          drawHeight = drawWidth / videoAspect;
+          offsetX = 0;
+          offsetY = (canvas.height - drawHeight) / 2;
+        }
+        
+        // Clear canvas and draw video frame with proper aspect ratio
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
+        
+        const imageData = canvas.toDataURL('image/png');
         setCapturedPhoto(imageData);
         // Auto-center on capture
-        setOffset({ x: 200, y: 150 }); // Half of canvas width/height
+        setOffset({ x: canvas.width / 2, y: canvas.height / 2 });
         setZoom(1); // Reset zoom
 
         setShowFilterEdit(true);
@@ -109,6 +137,7 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
     const delta = -e.deltaY;
     setZoom((prev) => Math.max(0.5, Math.min(3, prev + delta * 0.001)));
   };
+  
   const generateFinalImage = (): Promise<string | null> =>
     new Promise((resolve) => {
       if (!capturedPhoto || !canvasRef.current) {
@@ -177,6 +206,26 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
       setRecordedVideoURL(url);
     }
   }, [recordedChunks, mediaRecorder]);
+
+  // Handle retake - restart camera and reset states
+  const handleRetake = () => {
+    // Stop current camera stream
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    
+    // Reset states
+    setCapturedPhoto(null);
+    setShowFilterEdit(false);
+    setZoom(1);
+    setOffset({ x: 0, y: 0 });
+    setSelectedFilter('none');
+    
+    // Trigger camera restart
+    setCameraRestartTrigger(prev => prev + 1);
+  };
 
   return (
     <Box
@@ -411,24 +460,23 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
 
 
       {/* Action Buttons */}
-      <Grid container spacing={2}>
+      <Grid container spacing={2} justifyContent="center">
         {mode === 'photo' && !capturedPhoto ? (
-          <Grid container spacing={2} justifyContent="center">
-            <Grid item xs={12} sm="auto">
-              <Button
-                onClick={handleCapture}
-                disabled={mode !== 'photo'}
-                variant="contained"
-                sx={{
-                  backgroundColor: '#0B2E4C',
-                  borderRadius: 1,
-                  textTransform: 'none',
-                  px: 5,
-                }}
-              >
-                Capture
-              </Button>
-            </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <Button
+              onClick={handleCapture}
+              disabled={mode !== 'photo'}
+              variant="contained"
+              fullWidth
+              sx={{
+                backgroundColor: '#0B2E4C',
+                borderRadius: 1,
+                textTransform: 'none',
+                py: 1.2,
+              }}
+            >
+              Capture
+            </Button>
           </Grid>
         ) : mode === 'video' ? (
           <>
@@ -450,8 +498,8 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
                   </video>
 
                   {/* Action Buttons */}
-                  <Grid container spacing={2} justifyContent="center" sx={{ mt: 1 }}>
-                    <Grid item xs={12} sm={4}>
+                  <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
+                    <Grid item xs={12} sm={6} md={4}>
                       <Button
                         fullWidth
                         onClick={() => {
@@ -461,12 +509,17 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
                           a.click();
                         }}
                         variant="contained"
-                        sx={{ backgroundColor: '#0B2E4C', borderRadius: 1, textTransform: 'none' }}
+                        sx={{ 
+                          backgroundColor: '#0B2E4C', 
+                          borderRadius: 1, 
+                          textTransform: 'none',
+                          py: 1.2,
+                        }}
                       >
                         Save
                       </Button>
                     </Grid>
-                    <Grid item xs={12} sm={4}>
+                    <Grid item xs={12} sm={6} md={4}>
                       <Button
                         fullWidth
                         onClick={() => {
@@ -474,7 +527,13 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
                           setRecordedVideoURL(null);
                         }}
                         variant="outlined"
-                        sx={{ borderColor: '#0B2E4C', color: '#0B2E4C', borderRadius: 1, textTransform: 'none' }}
+                        sx={{ 
+                          borderColor: '#0B2E4C', 
+                          color: '#0B2E4C', 
+                          borderRadius: 1, 
+                          textTransform: 'none',
+                          py: 1.2,
+                        }}
                       >
                         Retake
                       </Button>
@@ -483,7 +542,7 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
                 </>
               ) : (
                 <Grid container spacing={2} justifyContent="center">
-                  <Grid item xs={12} sm="auto">
+                  <Grid item xs={12} sm={6} md={4}>
                     <Button
                       onClick={() => {
                         if (mediaRecorder && mediaRecorder.state !== 'recording') {
@@ -493,17 +552,30 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
                       }}
                       disabled={!mediaRecorder || mediaRecorder.state === 'recording'}
                       variant="contained"
-                      sx={{ backgroundColor: '#0B2E4C', borderRadius: 1, textTransform: 'none', px: 5 }}
+                      fullWidth
+                      sx={{ 
+                        backgroundColor: '#0B2E4C', 
+                        borderRadius: 1, 
+                        textTransform: 'none',
+                        py: 1.2,
+                      }}
                     >
                       Start Recording
                     </Button>
                   </Grid>
-                  <Grid item xs={12} sm="auto">
+                  <Grid item xs={12} sm={6} md={4}>
                     <Button
                       onClick={() => mediaRecorder?.state === 'recording' && mediaRecorder.stop()}
                       disabled={!mediaRecorder || mediaRecorder.state !== 'recording'}
                       variant="outlined"
-                      sx={{ borderColor: '#0B2E4C', color: '#0B2E4C', borderRadius: 1, textTransform: 'none', px: 5 }}
+                      fullWidth
+                      sx={{ 
+                        borderColor: '#0B2E4C', 
+                        color: '#0B2E4C', 
+                        borderRadius: 1, 
+                        textTransform: 'none',
+                        py: 1.2,
+                      }}
                     >
                       Stop Recording
                     </Button>
@@ -515,7 +587,7 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
         ) : (
           // PHOTO MODE with capturedPhoto (existing Save/Retake buttons)
           <>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={6} md={4}>
               <Button
                 fullWidth
                 onClick={downloadImage}
@@ -524,28 +596,24 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
                   backgroundColor: '#0B2E4C',
                   borderRadius: 1,
                   textTransform: 'none',
+                  py: 1.2,
                 }}
               >
                 Save
               </Button>
             </Grid>
 
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={6} md={4}>
               <Button
                 fullWidth
-                onClick={() => {
-                  setCapturedPhoto(null);
-                  setShowFilterEdit(false);
-                  setZoom(1);
-                  setOffset({ x: 0, y: 0 });
-                  setSelectedFilter('none');
-                }}
+                onClick={handleRetake}
                 variant="outlined"
                 sx={{
                   borderColor: '#0B2E4C',
                   color: '#0B2E4C',
                   borderRadius: 1,
                   textTransform: 'none',
+                  py: 1.2,
                 }}
               >
                 Retake

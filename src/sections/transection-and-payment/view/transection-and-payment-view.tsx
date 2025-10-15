@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 import { AppDispatch, RootState } from "src/redux/store";
 import { DashboardContent } from "src/layouts/dashboard";
@@ -22,7 +23,8 @@ export function TransectionAndPaymentView() {
   const dispatch = useDispatch<AppDispatch>();
   const { eventsWithOrdersAndParticiapnt } = useSelector((state: RootState) => state?.promotionList);
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
-
+  const withdrawalReqSectionRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   useEffect(() => {
     dispatch(promotionEvents())
   }, [dispatch])
@@ -32,21 +34,29 @@ export function TransectionAndPaymentView() {
       setSelectedEvent(null);
       return;
     }
- 
+
     // Calculate availableBalance by summing confirmed orders
     const totalConfirmedSales = event.orders
       ?.filter(order => order.paymentStatus === "confirmed")
       .reduce((sum, order) => sum + order.totalAmount, 0) || 0;
- 
+
     const baseBalance = totalConfirmedSales * 0.9;
     const withdrawals = event.totalApprovedWithdrawals || 0;
- 
+
     const availableBalance = baseBalance - withdrawals;
     setSelectedEvent({
       ...event,
       availableBalance,
     });
   };
+
+  useEffect(() => {
+    if (location.state?.scrollTo === 't&pay' && withdrawalReqSectionRef.current) {
+      withdrawalReqSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+      // Clear the state to prevent scrolling on every render
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   return (
     <>
@@ -65,15 +75,18 @@ export function TransectionAndPaymentView() {
         <PaymentHistory selectedEvent={selectedEvent} />
 
         {/* Payment History */}
-        <WithdrawalRequest availableBalance={selectedEvent?.availableBalance || 0} eventId={selectedEvent?._id}  />
+        <div ref={withdrawalReqSectionRef}>
+          <WithdrawalRequest availableBalance={selectedEvent?.availableBalance || 0} eventId={selectedEvent?._id} />
+        </div>
+
 
         {/* Withdrawal Table History */}
-        <WithdrawalTableHistory selectedEvent={selectedEvent}/>
+        <WithdrawalTableHistory selectedEvent={selectedEvent} />
 
         {/* Refund Management History */}
         <RefundManagementHistory selectedEvent={selectedEvent} />
         {/* Invoice History */}
-        <InvoiceHistory selectedEvent={selectedEvent}/>
+        <InvoiceHistory selectedEvent={selectedEvent} />
 
         {/* Payment Setting and Prefrence History */}
         <PaymentSettingAndPrefrenceHistory />

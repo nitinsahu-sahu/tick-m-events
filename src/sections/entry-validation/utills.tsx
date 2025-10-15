@@ -95,4 +95,4 @@ export const entries = [
 ];
 
 
-export const entryValidationHeaders = ["Name", "Ticket Type", "Entry Time", "Status"]
+export const entryValidationHeaders = ["Order Code", "Name", "Ticket Type", "Entry Time", "Status"]

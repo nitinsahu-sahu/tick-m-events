@@ -44,6 +44,7 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
     tiktok: false,
     whatsapp: false,
   });
+  const [isUploading, setIsUploading] = useState(false); // 🆕 Add loading state
 
   // const handleSocialChange = (event: any) => {
   //   setSelectedSocial({
@@ -138,56 +139,71 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
 
   const eventCoverImage = __events?.customization?.eventLogo?.url || '/assets/images/cover/1.png';
 
-  const handleApplyFilter = async () => {
-    if (!__events?._id) {
-      toast.warning("Please select an event before applying.");
-      return;
-    }
+ const handleApplyFilter = async () => {
+  if (!__events?._id) {
+    toast.warning("Please select an event before applying.");
+    return;
+  }
 
-    if (filesToUpload.length === 0) {
-      toast.warning("Please select filter images to apply.");
-      return;
-    }
+  if (filesToUpload.length === 0) {
+    toast.warning("Please select filter images to apply.");
+    return;
+  }
 
-    try {
-      const uploadedUrls: string[] = [];
+  setIsUploading(true);
 
-      await Promise.all(filesToUpload.map(async (file) => {
-        const formData = new FormData();
-        formData.append("eventId", __events?._id);
-        formData.append("frame", file);
+  try {
+    const uploadedUrls: string[] = [];
 
-        try {
-          const response = await axios.post("/custom-frame/save-frame", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          });
+    await Promise.all(filesToUpload.map(async (file) => {
+      const formData = new FormData();
+      formData.append("eventId", __events?._id);
+      formData.append("frame", file);
 
-          if (response.status === 200 || response.status === 201) {
-            toast.success("Frame saved successfully!");
-            const frameData = response.data?.data;
-            const latestUrl = frameData?.frameUrls?.slice(-1)[0]; // Get the newest added URL
-            if (latestUrl) uploadedUrls.push(latestUrl);
-          } else {
-            toast.error("Failed to upload frame.");
-          }
+      try {
+        const response = await axios.post("/custom-frame/save-frame", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
 
-        } catch (err: any) {
-          const backendMessage = err?.response?.data?.message || "Upload failed.";
-          toast.error(backendMessage);
+        if (response.status === 200 || response.status === 201) {
+          toast.success("Frame saved successfully!");
+          const frameData = response.data?.data;
+          const latestUrl = frameData?.frameUrls?.slice(-1)[0];
+          if (latestUrl) uploadedUrls.push(latestUrl);
+        } else {
+          toast.error("Failed to upload frame.");
         }
-      }));
 
-      // Add real URLs to preview grid
-      setFilterImages((prev) => [...prev, ...uploadedUrls]);
+      } catch (err: any) {
+        const backendMessage = err?.response?.data?.message || "Upload failed.";
+        toast.error(backendMessage);
+      }
+    }));
 
-      // Clear uploaded files
-      setFilesToUpload([]);
-
-    } catch (error) {
-      toast.error("Upload failed. Try again.");
-      console.error(error);
+    // 🆕 IMPORTANT: Replace temporary blob URLs with server URLs
+    if (uploadedUrls.length > 0) {
+      // Remove temporary previews and add server URLs
+      const tempUrls = filterImages.filter(url => url.startsWith('blob:'));
+      const permanentUrls = filterImages.filter(url => !url.startsWith('blob:'));
+      
+      // Clean up blob URLs
+      tempUrls.forEach(url => URL.revokeObjectURL(url));
+      
+      // Set new filter images with server URLs
+      setFilterImages([...permanentUrls, ...uploadedUrls]);
     }
-  };
+
+    // Clear uploaded files
+    setFilesToUpload([]);
+
+  } catch (error) {
+    toast.error("Upload failed. Try again.");
+    console.error(error);
+  } finally {
+    setIsUploading(false);
+  }
+};
+
   const applySelectedFilter = async () => {
     if (!__events?._id) {
       toast.warning("Please select an event before applying.");
@@ -214,6 +230,50 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
       toast.error(backendMessage);
     }
   };
+
+  
+ // 🆕 Always call delete API for all images
+const handleDeleteFilter = async (filename: string, index: number) => {
+  if (!__events?._id) {
+    toast.warning("No event selected.");
+    return;
+  }
+
+  try {
+    const res = await axios.delete("/custom-frame/delete-frame", {
+      params: {
+        eventId: __events?._id,
+        frameUrl: filename,
+      },
+    });
+    
+    if (res.status === 200) {
+      toast.success("Filter deleted successfully!");
+      // Remove from local state
+      setFilterImages((prev) => prev.filter((_, i) => i !== index));
+      setFilesToUpload((prev) => prev.filter((_, i) => i !== index));
+      
+      // Clean up blob URLs to free memory
+      if (filename.startsWith('blob:')) {
+        URL.revokeObjectURL(filename);
+      }
+    } else {
+      toast.error("Failed to delete filter.");
+    }
+  } catch (error) {
+    toast.error("Error deleting filter.");
+    console.error(error);
+  }
+
+  // Clear selection if deleted filter was selected
+  if (selectedFilter === filename) {
+    setSelectedFilter(null);
+  }
+
+  if (fileInputRef.current) {
+    fileInputRef.current.value = "";
+  }
+};
 
   return (
     <Box boxShadow={3} borderRadius={3} p={{ xs: 2, sm: 3, md: 4 }} bgcolor="white" mt={3}>
@@ -243,8 +303,6 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
             Choose Filter Template
           </Typography>
           <Grid container spacing={2}>
-
-
             <Grid container spacing={2}>
               {filterImages.map((filename, index) => (
                 <Grid item xs={6} sm={3} mt={3} key={index}>
@@ -258,40 +316,9 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
                     }}
                   >
                     <Box
-                      onClick={async (e) => {
+                      onClick={(e) => {
                         e.stopPropagation();
-                        const isUploadedUrl = filename.startsWith('http') || filename.includes('/uploads/');
-                        if (isUploadedUrl && __events?._id) {
-                          try {
-                            const res = await axios.delete("/custom-frame/delete-frame", {
-                              params: {
-                                eventId: __events?._id,
-                                frameUrl: filename,
-                              },
-                            });
-                            if (res.status === 200) {
-                              toast.success("Filter deleted .");
-                            } else {
-                              toast.error("Failed to delete filter.");
-                            }
-                          } catch (error) {
-                            toast.error("Error deleting filter.");
-                            console.error(error);
-                          }
-                        }
-
-                        setFilterImages((prev) => prev.filter((_, i) => i !== index));
-                        const updatedFiles = [...filesToUpload];
-                        updatedFiles.splice(index, 1);
-                        setFilesToUpload(updatedFiles);
-
-                        if (fileInputRef.current) {
-                          fileInputRef.current.value = "";
-                        }
-
-                        if (selectedFilter === filename) {
-                          setSelectedFilter(null);
-                        }
+                        handleDeleteFilter(filename, index); // 🆕 Use the new delete function
                       }}
                       sx={{
                         position: 'absolute',
@@ -309,6 +336,9 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
                         zIndex: 3,
                         cursor: 'pointer',
                         boxShadow: 1,
+                        '&:hover': {
+                          background: '#f0f0f0',
+                        },
                       }}
                     >
                       ×
@@ -325,9 +355,7 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
                   </Box>
                 </Grid>
               ))}
-
             </Grid>
-
           </Grid>
         </Box>
 
@@ -358,15 +386,20 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
             />
             <Button
               variant="contained"
+              disabled={filesToUpload.length === 0 || isUploading} // 🆕 Disable when no files or uploading
               sx={{
-                backgroundColor: "#0B2E4C",
+                backgroundColor: filesToUpload.length === 0 || isUploading ? "#ccc" : "#0B2E4C", // 🆕 Change color when disabled
                 color: "#fff",
                 padding: "11px",
                 width: "70%",
+                '&:disabled': {
+                  backgroundColor: '#ccc',
+                  color: '#666',
+                }
               }}
               onClick={handleApplyFilter}
             >
-              Apply Upload Filter
+              {isUploading ? 'Uploading...' : 'Apply Upload Filter'} {/* 🆕 Show loading text */}
             </Button>
           </Box>
         </Box>

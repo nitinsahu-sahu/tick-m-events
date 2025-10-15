@@ -6,10 +6,16 @@ import {
     Paper,
     TableHead,
     TableCell,
+    Avatar,
+    Box,
+    Chip,
+    Typography
 } from "@mui/material";
-import { formatTimeToAMPM } from "src/hooks/formate-time";
-
-import { headerStyle, cellStyle } from "./utils";
+import { formatDateTimeCustom, formatTimeToAMPM } from "src/hooks/formate-time";
+import {
+    NoAccounts as NoAccountsIcon
+} from '@mui/icons-material';
+import { headerStyle } from "./utils";
 
 interface TableData {
     _id: string,
@@ -21,7 +27,8 @@ interface TableData {
     userId: {
         name: string;
     };
-    verifyEntry: boolean;
+    ticketCode:any,
+    validation: boolean;
     tickets?: Array<{
         ticketType: string;
         // other ticket properties...
@@ -50,22 +57,43 @@ export function EventValidationTable({ headers, data }: EventValidationTableProp
                 </TableHead>
 
                 {
-                    data?.length ? <TableBody>
+                    data?.length ? (<TableBody>
                         {data.map((row, index) => (
                             <TableRow key={index} sx={{
                                 backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#e0e0e0",
                             }}>
+                                <TableCell align="center" sx={{fontWeight:600}}>{row.ticketCode}</TableCell>
                                 <TableCell align="center">{row.name}</TableCell>
                                 <TableCell align="center">
                                     {row.ticketType || 'N/A'}
                                 </TableCell>
-                                <TableCell align="center">{formatTimeToAMPM(row.entryTime || 'N/A')}</TableCell>
-                                <TableCell align="center">
-                                    {row.verifyEntry ? 'Validated' : 'Invalid'}
+                                <TableCell align="center">{formatDateTimeCustom(row.entryTime || 'N/A')}</TableCell>
+                                <TableCell align="center" sx={{fontWeight:600, color:"green"}}>
+                                    {row.validation ? 'Validated' : 'Invalid'}
                                 </TableCell>
                             </TableRow>
                         ))}
-                    </TableBody> : 'No entry yet'
+                    </TableBody>) : (
+                        <TableRow>
+                            <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    color: 'text.secondary'
+                                }}>
+                                    <NoAccountsIcon sx={{ fontSize: 64, color: '#ccc', mb: 2 }} />
+                                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 500 }}>
+                                        No Entries Yet
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ maxWidth: 300, textAlign: 'center' }}>
+                                        Attendees who have entered the event will appear here.
+                                        Check back later for real-time updates.
+                                    </Typography>
+                                </Box>
+                            </TableCell>
+                        </TableRow>
+                    )
                 }
 
             </Table>

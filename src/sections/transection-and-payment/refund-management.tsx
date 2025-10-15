@@ -170,22 +170,17 @@ export function RefundManagementHistory({ selectedEvent }: RefundManagementHisto
                                     </RadioGroup>
                                 )}
 
-                                <Box sx={{ mt: 3, textAlign: "center" }}>
+                                {/* <Box sx={{ mt: 3, textAlign: "center" }}>
                                     <Button
                                         fullWidth
                                         variant="contained"
                                         sx={{ mt: 3, backgroundColor: "#0B2E4C", color: "white", py: 1.5 }}
-                                    // onClick={() => {
-                                    //     console.log("Navigating with selectedEvent:", selectedEvent);
-                                    //     navigate("/ticket-and-reservation-management", {
-                                    //         state: { selectedEvent }
-                                    //     });
-                                    // }}
+                                  
                                     >
                                         Process Refund
                                     </Button>
 
-                                </Box>
+                                </Box> */}
                             </Box>
 
                 </Box>

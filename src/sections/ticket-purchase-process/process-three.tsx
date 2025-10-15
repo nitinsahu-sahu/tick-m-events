@@ -15,7 +15,9 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
     // Normalize paymentMethods: always array
     const rawMethods = tickets?.paymentMethods;
     const normalizedMethods = Array.isArray(rawMethods) ? rawMethods : rawMethods ? [rawMethods] : [];
-
+ if (!normalizedMethods.includes("Orange Money")) {
+        normalizedMethods.push("Orange Money");
+    }
     const paymentOptions: PaymentOption[] = getPaymentOptions(normalizedMethods);
 
     const [selectedPayment, setSelectedPayment] = useState<PaymentOption>(
@@ -57,7 +59,7 @@ export function ProcessThree({ tickets, orderDetails, onBack, onNext }: any) {
 
                 if (
                     paymentUrl &&
-                    ["mtn", "orange", "mobile_money"].includes(selectedPayment?.value.toLowerCase())
+                    ["mtn", "orange_money", "mobile_money"].includes(selectedPayment?.value.toLowerCase())
                 ) {
                     // ✅ Redirect only for online payments
                     window.location.href = paymentUrl;

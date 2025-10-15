@@ -23,14 +23,16 @@ export function AnalyticsFourCards({
     selectedEvent,
 }: any) {
     const theme = useTheme();
-console.log(selectedEvent);
+console.log(selectedEvent?.statistics?.tickets);
 
     const totalTickets = parseInt(selectedEvent?.ticketQuantity ?? "0", 10);
-    const soldTickets = selectedEvent?.soldTicket ?? 0;
+    // Calculate attendee engagement percentage
+    // (tickets scanned / tickets sold) * 100
+    const soldTickets = selectedEvent?.statistics?.tickets?.soldTickets || 0;
+    const scannedTickets = selectedEvent?.statistics?.tickets?.verifiedEntries || 0;
+    const percentage = soldTickets > 0 ? Math.round((scannedTickets / soldTickets) * 100) : 0;
+
     const remainingTickets = totalTickets - soldTickets;
-
-    const eventOrders = selectedEvent?.order || [];
-
     // --- Dates from event createdAt to event date ---
     const eventStartDate = selectedEvent?.createdAt
         ? dayjs(selectedEvent.createdAt)
@@ -67,10 +69,6 @@ console.log(selectedEvent);
 
     const ticketChartData = dayOrder.map((day) => ticketSalesByDay[day] || 0);
     const revenueChartData = dayOrder.map((day) => revenueByDay[day] || 0);
-
-    // === NEW LOGIC FOR Remaining Tickets per day ===
-
-    // === NEW LOGIC FOR Remaining Tickets per weekday (Mon-Sun) ===
 
     // Mapping JS day index (0=Sun,1=Mon,...6=Sat) to weekday name
     const jsDayToWeekdayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -124,26 +122,6 @@ console.log(selectedEvent);
         (total: number, order: Order) => total + (order.totalAmount ?? 0),
         0
     );
-
-    // --- Other unchanged calculations ---
-    const confirmedTickets = confirmedOrders.reduce(
-        (sum: number, order: Order) =>
-            sum + order.tickets.reduce((s: number, t: any) => s + t.quantity, 0),
-        0
-    );
-
-    const scannedTickets =
-        selectedEvent?.order
-            ?.filter((order: Order) => order.verifyEntry && order.ticketCode)
-            ?.reduce((uniqueCodes: Set<string>, order: Order) => {
-                uniqueCodes.add(order.ticketCode!);
-                return uniqueCodes;
-            }, new Set<string>())?.size ?? 0;
-
-    const percentage =
-        totalTickets > 0
-            ? Number(((confirmedTickets / totalTickets) * 100).toFixed(1))
-            : 0;
 
     return (
         <Grid container spacing={2} alignItems="stretch">
@@ -242,7 +220,7 @@ console.log(selectedEvent);
                 >
                     <Box sx={{ flex: 1 }}>
                         <HeadingCommon
-                            title={`${percentage}% of tickets purchased are confirmed`}
+                            title={`${percentage}% of sold tickets were scanned at entrance`}
                             weight={700}
                             baseSize="14px"
                         />
@@ -255,7 +233,7 @@ console.log(selectedEvent);
                                 sx={{ fill: theme.palette.success.main }}
                             />
                             <HeadingCommon
-                                title={`Total confirmed tickets: ${confirmedTickets}`}
+                                title={`Total scanned tickets: ${selectedEvent?.statistics?.tickets?.verifiedEntries}`}
                                 weight={300}
                                 baseSize="12px"
                             />
@@ -291,7 +269,7 @@ console.log(selectedEvent);
                             </Box>
                         </Box>
                         <HeadingCommon
-                            title={`${confirmedTickets} vs. Number of tickets scanned at the entrance: ${scannedTickets}`}
+                            title={`Tickets sold: ${selectedEvent?.statistics?.tickets?.soldTickets} vs. Tickets scanned: ${selectedEvent?.statistics?.tickets?.verifiedEntries}`}
                             weight={600}
                             baseSize="13px"
                         />

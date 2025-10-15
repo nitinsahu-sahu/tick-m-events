@@ -58,15 +58,13 @@ interface ApiResult {
     ticket: Ticket;
 }
 
-export function EnterTicketCode({ _selectEve }: any) {
-    console.log('====================================');
-    console.log(_selectEve.listViewMethods);
-    console.log('====================================');
+export function EnterTicketCode({ _selectEve,eventSelected }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const [verifyData, setVerifyData] = useState({
         ticketCode: "",
         participantId: "",
-        name: ""
+        name: "",
+        eventId:eventSelected?._id
     });
 
     const [flag, setFlag] = useState<FlagState>({
@@ -121,6 +119,7 @@ export function EnterTicketCode({ _selectEve }: any) {
 
     const handleVerifyTicketCode = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
+console.log(verifyData);
 
         try {
             const result = await dispatch(verifyTicketCode(verifyData)) as ApiResult;
@@ -163,7 +162,8 @@ export function EnterTicketCode({ _selectEve }: any) {
         setVerifyData({
             ticketCode: "",
             participantId: "",
-            name: ""
+            name: "",
+            eventId:null
         })
     };
 
@@ -235,6 +235,7 @@ export function EnterTicketCode({ _selectEve }: any) {
                                 ticketCode: "",
                                 participantId: "",
                                 name: "",
+                                eventId:null
                             });
                         }, 4000);
                     } else {
@@ -334,28 +335,26 @@ export function EnterTicketCode({ _selectEve }: any) {
                     })()}
 
                     {/* Verify Button - Only show if at least one field is visible */}
-                    {flag.counter !== 'granted' && listViewMethods.length > 0 && (
-                        <Grid item xs={12} sm={6} md={4} mt={2}>
-                            <Button
-                                variant="contained"
-                                fullWidth
-                                type="submit"
-                                sx={{
-                                    backgroundColor: "#0B2A4A",
-                                    color: "white",
-                                    textTransform: "none",
-                                    fontWeight: "bold",
-                                    borderRadius: "8px",
-                                    height: "40px",
-                                    '&:hover': {
-                                        backgroundColor: '#0A2351'
-                                    }
-                                }}
-                            >
-                                Verify
-                            </Button>
-                        </Grid>
-                    )}
+                    <Grid item xs={12} sm={6} md={4} mt={2}>
+                        <Button
+                            variant="contained"
+                            fullWidth
+                            type="submit"
+                            sx={{
+                                backgroundColor: "#0B2A4A",
+                                color: "white",
+                                textTransform: "none",
+                                fontWeight: "bold",
+                                borderRadius: "8px",
+                                height: "40px",
+                                '&:hover': {
+                                    backgroundColor: '#0A2351'
+                                }
+                            }}
+                        >
+                            Verify
+                        </Button>
+                    </Grid>
                 </Grid>
             </form>
 
@@ -498,7 +497,8 @@ export function EnterTicketCode({ _selectEve }: any) {
                                                                 onClick={() => handleConfirmEntry(null, {
                                                                     ticketCode: flag.ticket.ticketCode || "",
                                                                     participantId: p._id,
-                                                                    name: ""
+                                                                    name: "",
+                                                                    eventId:eventSelected._id
                                                                 })}
                                                             >
                                                                 {p.validation ? "✔ Entered" : "Confirm"}

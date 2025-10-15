@@ -1,5 +1,5 @@
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Chart } from "src/components/chart";
 import { ApexOptions } from "apexcharts";
 
@@ -8,6 +8,8 @@ type WalletBalanceProps = {
 };
 
 export function WalletBalance({ selectedEvent }: WalletBalanceProps) {
+      const navigate = useNavigate();
+    
     // Calculate total confirmed sales
     const totalConfirmedSales = selectedEvent?.order
         ?.filter((order: any) => order.paymentStatus === "confirmed")
@@ -99,12 +101,17 @@ export function WalletBalance({ selectedEvent }: WalletBalanceProps) {
                 </Typography>
 
                 <Box display="flex" gap={2} mt={1}>
-                    <Button variant="contained" color="secondary">
+                    <Button variant="contained" color="secondary"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/transaction-and-payment', { state: { scrollTo: 't&pay' } });
+                        }}
+                    >
                         Withdraw
                     </Button>
-                    <Button variant="contained" color="warning">
+                    {/* <Button variant="contained" color="warning">
                         Top Up
-                    </Button>
+                    </Button> */}
                 </Box>
 
                 <Typography variant="body2" mt={1}>

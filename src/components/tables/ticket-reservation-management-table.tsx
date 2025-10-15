@@ -244,11 +244,10 @@ export function TicketReservationManagementTable({
                                     }
 
                                     {
-                                        type === "3" ? <TableCell align="center">
-                                            {row.userId.email}
-                                        </TableCell> : type === "4" ? <TableCell align="center">
+                                        type === "4" ? <TableCell align="center">
                                             {row.userId.name}
-                                        </TableCell> : <TableCell align="center" >
+                                        </TableCell> : type!=="3"?(
+                                            <TableCell align="center" >
                                             {editingId === row._id ? (
                                                 <TextField
                                                     value={editedData.price}
@@ -260,6 +259,7 @@ export function TicketReservationManagementTable({
                                                 <span style={{ textTransform: row.price ? 'uppercase' : 'capitalize' }}>{row.price || row.email}</span>
                                             )}
                                         </TableCell>
+                                        ):null
                                     }
 
                                     {

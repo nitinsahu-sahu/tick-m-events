@@ -257,7 +257,7 @@ export function WithdrawalRequest({ availableBalance, eventId }: WithdrawalReque
     };
 
     return (
-        <>
+        <Box id="t&pay">
             <Typography variant="h5" fontSize={{ xs: 20, sm: 25, md: 33 }} fontWeight={600} sx={{ mt: 3 }}>
                 Withdrawal Requests
             </Typography>
@@ -524,6 +524,6 @@ export function WithdrawalRequest({ availableBalance, eventId }: WithdrawalReque
                     </Button>
                 </Paper>
             </Box>
-        </>
+        </Box>
     );
 }

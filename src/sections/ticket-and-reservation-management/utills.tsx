@@ -73,4 +73,4 @@ export const chartRealTimeOptions: ApexOptions = {
     responsive: [{ breakpoint: 768, options: { legend: { position: "bottom" } } }],
 };
 
-export const reservationManagementTableHeaders = ["Name", "Email", "Ticket Type", "Purchase Date", "Status"];
+export const reservationManagementTableHeaders = ["Name", "Ticket Type", "Purchase Date", "Status"];

@@ -2,16 +2,15 @@ import { Typography, Grid, Box, Paper, Button, IconButton, CircularProgress } fr
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
 
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { TicketCard } from 'src/components/event-card/event-card';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { AppDispatch, RootState } from 'src/redux/store';
-import { recommTrandingPopularEventFetch } from 'src/redux/actions/home-recommendation.action';
 import { fetchLatestEventCreatedActivity } from 'src/redux/actions/activityActions';
-import { useNavigate } from 'react-router-dom';
-import { toast } from "react-toastify";
+
 import { UpComingCard } from '../UpComingCard';
 import { PopularEvent } from '../PopularEvent';
 import { ExploreMoreSection } from '../ExploreMore';
@@ -364,7 +363,6 @@ export function HomeAndRecommendationsView() {
               sx={{
                 maxHeight: { xs: '250px', sm: '300px' },
                 overflowY: 'auto',
-                // ...styles
               }}
             >
               {visibleNotifications.length > 0 ? (
@@ -384,20 +382,23 @@ export function HomeAndRecommendationsView() {
                       opacity: item.disabled ? 0.5 : 1,
                     }}
                   >
-                    <Typography sx={{ fontWeight: 500, mb: { xs: 1, sm: 0 } }}>{item.text}</Typography>
+                    {/* Text on the LEFT side */}
+                    <Box sx={{ flexGrow: 1, mb: { xs: 1, sm: 0 } }} width={{ md: '60%' }}>
+                      <Typography sx={{ fontWeight: 500 }} fontSize={{ xs: 12, sm: 14, md: 16 }}>{item.text}</Typography>
+                    </Box>
+
+                    {/* Buttons on the RIGHT side */}
                     <Box
-                      mt={{ xs: 1, sm: 0 }}
                       sx={{
-                        width: { xs: '100%', sm: 'auto' },
+                        width: { xs: '100%', sm: 'auto', md: '40%' },
                         display: 'flex',
                         justifyContent: { xs: 'flex-start', sm: 'flex-end' },
-                        flexGrow: 1,
                       }}
                     >
                       <Grid container spacing={1} sx={{ maxWidth: { sm: 360, md: 400 } }}>
                         {[{ text: 'View Event', color: 'primary' as const }, { text: 'Mark as Read', custom: true }].map(
                           ({ text: buttonText, color, custom }) => (
-                            <Grid item xs={12} sm={4} key={buttonText}>
+                            <Grid item xs={6} sm={4} md={6} key={buttonText}>
                               <Button
                                 fullWidth
                                 size="small"

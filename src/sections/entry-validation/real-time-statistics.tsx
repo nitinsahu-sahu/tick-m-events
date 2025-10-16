@@ -17,12 +17,12 @@ export function RealTimeStatistics({ statistics }: any) {
     // Enhanced chart data showing ticket distribution
     const CHART_SERIES = [
         tickets?.verifiedEntries || 0,
-        (tickets?.soldTickets || 0) - (tickets?.verifiedEntries || 0),
+        (tickets?.soldTickets || 0),
         tickets?.pendingTickets || 0,
-        (tickets?.totalTicketQuantity || 0) - (tickets?.soldTickets || 0) - (tickets?.pendingTickets || 0)
+        (tickets?.availableTickets || 0),
     ];
 
-    const CHART_LABELS = ["Validated", "Sold (Not Validated)", "Pending Payment", "Available"];
+    const CHART_LABELS = ["Validated", "Sold (Not Validated)", "Pending", "Available"];
 
     const CHART_OPTIONS: ApexOptions = {
         chart: {
@@ -43,6 +43,7 @@ export function RealTimeStatistics({ statistics }: any) {
                 return `${legendName}: ${opts.w.globals.series[opts.seriesIndex]}`;
             }
         },
+       
         dataLabels: {
             enabled: true,
             formatter(val: number, opts: any) {
@@ -57,8 +58,8 @@ export function RealTimeStatistics({ statistics }: any) {
         colors: ["#4CAF50", "#2196F3", "#FFC107", "#9E9E9E"],
         tooltip: {
             y: {
-                formatter(value: number, { seriesIndex }: any) {
-                    return `${CHART_LABELS[seriesIndex]}: ${value}`;
+                formatter(value: number) {
+                    return `${value}`; // just show the number
                 }
             }
         },
@@ -73,7 +74,11 @@ export function RealTimeStatistics({ statistics }: any) {
                             label: 'Total Tickets',
                             color: '#373d3f',
                             formatter(w) {
-                                return w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0);
+                                const soldIndex = CHART_LABELS.indexOf("Sold");
+                                const availableIndex = CHART_LABELS.indexOf("Available");
+                                const sold = w.globals.series[soldIndex] || 0;
+                                const available = w.globals.series[availableIndex] || 0;
+                                return sold + available;
                             }
                         }
                     }

@@ -17,7 +17,7 @@ interface ApiResult {
 }
 
 export function PopularEvent({ event, handleEventDetails, flag }: any) {
-  
+
   const dispatch = useDispatch<AppDispatch>();
   const { authenticate } = useSelector((state: RootState) => state?.auth)
   const navigate = useNavigate();
@@ -71,41 +71,7 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
       <Box sx={{ position: 'relative' }}>
         <PromotionBadge promotions={event?.promotion} />
       </Box>
-      
-      {/* <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: 90,
-            height: 90,
-            overflow: 'hidden',
 
-            borderTopLeftRadius: 24, // match card's radius (borderRadius: 3 = 24px)
-            zIndex: 1,
-            backgroundColor: 'transparent',
-          }}
-        >
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 26,
-              left: -25,
-              backgroundColor: '#0B2E4C',
-              color: '#fff',
-              px: 2,
-              py: '2px',
-              fontSize: '10px',
-              fontWeight: 600,
-              transform: 'rotate(-45deg)',
-              width: '120px',
-              textAlign: 'center',
-              boxShadow: 2,
-            }}
-          >
-            View Promo
-          </Box>
-        </Box> */}
       <CardContent sx={{ textAlign: 'center', position: 'relative' }}>
         <Link to={`/our-event/${event._id}`} target='__blank' style={{ textDecoration: 'none' }}>
 
@@ -130,7 +96,7 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
             fontWeight={700}
             textTransform="capitalize"
             fontSize={{ xs: '8px', sm: '12px', md: '18px' }}
-            sx={{ color: event.payStatus==='free'?'green':'pink', fontWeight: 700, mt: 1 }}
+            sx={{ color: event.payStatus === 'free' ? 'green' : 'pink', fontWeight: 700, mt: 1 }}
           >
             {event?.payStatus}
           </Typography>
@@ -185,7 +151,9 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
                       variant="contained"
                       onClick={() => {
                         if (text === "View Details") {
-                          handleViewEvent({ selectedViewEvent: event });
+                          navigate(`/our-event/${event._id}`)
+
+                          // handleViewEvent({ selectedViewEvent: event });
                         } else if (text === "Share") {
                           const eventUrl = `${import.meta.env.VITE_Live_URL}/our-event/${event?._id}`;
                           const eventTitle = `*${event?.eventName || "Exciting Event"}*`;

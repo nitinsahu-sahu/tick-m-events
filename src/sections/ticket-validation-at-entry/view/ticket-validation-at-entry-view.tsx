@@ -33,6 +33,7 @@ export function TicketValidationAtEntryView() {
     const [tickets, setTickets] = useState<Event[]>([]);
     const [upcomingQrTicket, setUpcomingQrTicket] = useState<Ticket | null>(null);
     const _id = useSelector((state: RootState) => state.auth.user?._id);
+console.log('selectedEventOrder>>',selectedEventOrder);
 
     const handleEventSelectOrder = (order: Order | null) => {
         setSelectedEventOrder(order);
@@ -45,9 +46,9 @@ export function TicketValidationAtEntryView() {
         async function fetchTickets() {
             try {
                 const response = await axios.get(`/event-order/user/${_id}`);
+console.log('response>>',response);
+
                 const orders: any[] = response.data;
-                console.log("orde",orders);
-                console.log("respopn",response.data);
                 const groupedEvents: Event[] = orders.reduce((acc: Event[], order) => {
                     const eventId = order.eventDetails?._id;
                     if (!eventId) return acc;
@@ -80,8 +81,6 @@ export function TicketValidationAtEntryView() {
 
                     return acc;
                 }, []);
-
-                console.log("transformed events", groupedEvents);
                 setTickets(groupedEvents); // <-- pass this to <SelectTickets />
             } catch (error) {
                 console.error("Error fetching tickets:", error);

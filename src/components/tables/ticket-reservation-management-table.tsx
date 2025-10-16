@@ -91,7 +91,7 @@ export function TicketReservationManagementTable({
         setLoading(true);
         try {
             const payload = {
-                status: modalType,
+                status: modalType === 'approve' ? 'processed' : 'denied',
                 ...(modalType === 'deny' && { adminNotes })
             };
 
@@ -246,20 +246,20 @@ export function TicketReservationManagementTable({
                                     {
                                         type === "4" ? <TableCell align="center">
                                             {row.userId.name}
-                                        </TableCell> : type!=="3"?(
+                                        </TableCell> : type !== "3" ? (
                                             <TableCell align="center" >
-                                            {editingId === row._id ? (
-                                                <TextField
-                                                    value={editedData.price}
-                                                    onChange={(e) => handleFieldChange('price', e.target.value)}
-                                                    sx={{ width: '100px' }}
-                                                    size="small"
-                                                />
-                                            ) : (
-                                                <span style={{ textTransform: row.price ? 'uppercase' : 'capitalize' }}>{row.price || row.email}</span>
-                                            )}
-                                        </TableCell>
-                                        ):null
+                                                {editingId === row._id ? (
+                                                    <TextField
+                                                        value={editedData.price}
+                                                        onChange={(e) => handleFieldChange('price', e.target.value)}
+                                                        sx={{ width: '100px' }}
+                                                        size="small"
+                                                    />
+                                                ) : (
+                                                    <span style={{ textTransform: row.price ? 'uppercase' : 'capitalize' }}>{row.price || row.email}</span>
+                                                )}
+                                            </TableCell>
+                                        ) : null
                                     }
 
                                     {

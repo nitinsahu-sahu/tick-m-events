@@ -12,7 +12,6 @@ interface FilterCardProps {
 }
 
 export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onShare, frameSize }) => {
-  console.log("dd", frameSize);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { selectedFrame } = useFrame();

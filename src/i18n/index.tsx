@@ -24,6 +24,7 @@ interface TranslationKeys {
 const resources = {
   en: {
     translation: {
+      // Nav Bar
       home: "Home",
       events: "Events",
       blog: "Blog",
@@ -39,6 +40,7 @@ const resources = {
         EN: "English",
         FR: "French"
       },
+      // Contact Page
       oa: 'Office Address',
       pn: "Phone number",
       cu: "Contact Us",
@@ -47,12 +49,14 @@ const resources = {
       contact_txt: "Great vision without great people is irrelevant. Let’s work together.",
       address_1: "Douala - Nyalla Cobblestone Street,",
       address_2: "before the ZZ Hotel.",
+      // Home Page
       homeBanner_t1: "Organize. Book. Save time. TICK-M EVENTS is revolutionizing events in Africa",
       homeBanner_t2: "A single platform to manage your events, sell your tickets, find quality service providers and live unforgettable experiences."
     }
   },
   fr: {
     translation: {
+      // Nav Bar
       home: "Accueil",
       events: "Événements",
       blog: "Blog",
@@ -68,6 +72,7 @@ const resources = {
         EN: "Anglais",
         FR: "Français"
       },
+      // Contact Page
       submit: "Soumettre",
       submitting: "Soumission",
       contact_txt: "Une grande vision sans des personnes exceptionnelles est inutile. Travaillons ensemble.",
@@ -76,6 +81,7 @@ const resources = {
       pn: "Numéro de téléphone",
       address_1: "Douala - Rue des pavés Nyalla,",
       address_2: "avant l'hôtel ZZ.",
+      // Home Page
       homeBanner_t1: "Organisez. Réservez. Gagnez du temps. TICK-M EVENTS révolutionne l'événementiel en Afrique.",
       homeBanner_t2: "Une plateforme unique pour gérer vos événements, vendre vos billets, trouver des prestataires de qualité et vivre des expériences inoubliables."
 

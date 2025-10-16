@@ -35,7 +35,6 @@ const modalStyle = {
 
 const headers = ["#", "Type", "Quantity", "UnitPrice", "Total"]
 export function TicketQRDisplay({ selectedOrder }: any) {
-    console.log("selectedOrder full data:", selectedOrder);
     const [isHovered, setIsHovered] = useState(false);
     const [openModal, setOpenModal] = useState(false);
 

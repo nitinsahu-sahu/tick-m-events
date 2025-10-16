@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import { Box, keyframes } from '@mui/material';
 
 // Define types for our promotions
 interface Promotion {
@@ -30,44 +30,70 @@ const isPromotionActive = (promotion: Promotion): boolean => {
 // Define the type mapping with index signature
 type PromotionTypeMap = {
   [key: string]: string;
+  earlyBuyerDiscount: string;
   percentageDiscount: string;
-  fixedDiscount: string;
-  buyOneGetOne: string;
-  earlyBird: string;
+  fixedValueDiscount: string;
 };
 
 // Helper function to format promotion type for display
 const formatPromotionType = (promotionType: string): string => {
   const typeMap: PromotionTypeMap = {
+    earlyBuyerDiscount: 'Early Bird',
     percentageDiscount: 'Discount',
-    fixedDiscount: 'Fixed Off',
-    buyOneGetOne: 'BOGO',
-    earlyBird: 'Early Bird',
-    // Add more mappings as needed
+    fixedValueDiscount: 'Fixed Off',
   };
   
   return typeMap[promotionType] || promotionType;
 };
 
+// Filter and sort promotions by priority
+const filterAndSortPromotions = (promotions: Promotion[]): Promotion[] => {
+  const allowedTypes = ['earlyBuyerDiscount', 'percentageDiscount', 'fixedValueDiscount'];
+  
+  return promotions
+    .filter(promotion => allowedTypes.includes(promotion.promotionType))
+    .sort((a, b) => {
+      // Sort by priority: earlyBuyerDiscount > percentageDiscount > fixedValueDiscount
+      const priority: { [key: string]: number } = {
+        earlyBuyerDiscount: 1,
+        percentageDiscount: 2,
+        fixedValueDiscount: 3,
+      };
+      return priority[a.promotionType] - priority[b.promotionType];
+    });
+};
+
+// Define marquee animation using keyframes
+const marquee = keyframes`
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+`;
+
 // Promotion Badge Component
 export function PromotionBadge({ promotions }: { promotions?: Promotion[] }) {
-    console.log('promotions',promotions);
-    
-  // Filter active promotions
+  console.log(promotions);
+  
+  // Filter active promotions and only allow specified types
   const activePromotions = promotions?.filter(isPromotionActive) || [];
+  const filteredPromotions = filterAndSortPromotions(activePromotions);
   
   // If no active promotions, don't render anything
-  if (activePromotions.length === 0) return null;
+  if (filteredPromotions.length === 0) return null;
   
-  // Get unique promotion types
-  const promotionTypes = [...new Set(activePromotions.map((p: Promotion) => p.promotionType))];
-    console.log('promotionTypes',promotionTypes);
-    console.log('activePromotions',activePromotions);
+  // Get unique promotion types (after filtering)
+  const promotionTypes = [...new Set(filteredPromotions.map((p: Promotion) => p.promotionType))];
   
   // Format text for display
-  const badgeText = promotionTypes.map(formatPromotionType).join(' | ');
-    console.log('badgeText',badgeText);
+  const badgeText = promotionTypes.map(formatPromotionType);
   
+  // Determine if we need marquee effect (more than 2 promotions)
+  const needsMarquee = badgeText.length > 2;
+  const displayText = badgeText.join(' | ');
+
   return (
     <Box
       sx={{
@@ -97,9 +123,19 @@ export function PromotionBadge({ promotions }: { promotions?: Promotion[] }) {
           width: '120px',
           textAlign: 'center',
           boxShadow: 2,
+          overflow: 'hidden',
         }}
       >
-        {badgeText}
+        <Box
+          sx={{
+            display: 'inline-block',
+            whiteSpace: 'nowrap',
+            animation: needsMarquee ? `${marquee} 8s linear infinite` : 'none',
+            paddingLeft: needsMarquee ? '100%' : '0',
+          }}
+        >
+          {displayText}
+        </Box>
       </Box>
     </Box>
   );

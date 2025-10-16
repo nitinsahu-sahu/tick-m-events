@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback,useEffect, useRef ,useState} from 'react';
 import {
   Box, Typography, TableContainer, Table, TableHead, TableRow, TableCell,
   TableBody, Paper, Chip, IconButton, Button, Dialog, DialogActions, Tooltip,
   DialogContent, DialogContentText, DialogTitle, Grid, Stack, TextField,
-  Divider, MenuItem, CircularProgress, Collapse, Select, FormControl, InputLabel
+  Divider, MenuItem, CircularProgress, Select, FormControl, InputLabel,
+  Avatar
 } from '@mui/material';
-import InfoIcon from '@mui/icons-material/Info'; // or your preferred info icon
-
+import InfoIcon from '@mui/icons-material/Info';
 import {
   Visibility as EyeIcon,
   Chat as ChatIcon,
@@ -14,8 +14,14 @@ import {
   Delete as DeleteIcon,
   Add as AddIcon,
   Remove as RemoveIcon,
-  KeyboardArrowDown as ArrowDownIcon,
-  KeyboardArrowUp as ArrowUpIcon
+  Close as CloseIcon,
+  Print as PrintIcon,
+  Event as EventIcon,
+  Schedule as ScheduleIcon,
+  AttachMoney as AttachMoneyIcon,
+  Description as DescriptionIcon,
+  Person as PersonIcon,
+  Assignment as AssignmentIcon
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from 'src/redux/store';
@@ -29,18 +35,14 @@ import { confirmAcceptanceProvider } from 'src/redux/actions/organizer/pageEvent
 export function ProviderBidsList() {
   const dispatch = useDispatch<AppDispatch>();
   const { _mybids } = useSelector((state: RootState) => state?.provider);
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const [statusUpdates, setStatusUpdates] = useState<Record<string, string>>({});
+  const [openDetailModal, setOpenDetailModal] = useState(false);
+  const [selectedBidDetail, setSelectedBidDetail] = useState<any>(null);
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedBid, setSelectedBid] = useState<any>(null);
   const [openViewDialog, setOpenViewDialog] = useState(false);
   const [selectedOrg, setSelectedOrg] = useState<any>({});
 
-  const handleViewOpenDialog = (bid: any) => {
-    setSelectedOrg(bid);
-    setOpenViewDialog(true);
-  };
   // ✨ New state for Edit Form
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [bidData, setBidData] = useState<any>({
@@ -56,23 +58,151 @@ export function ProviderBidsList() {
   ]);
   const [charCount, setCharCount] = useState(0);
 
+  // Print functionality ref
+  const printRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     dispatch(getMyBids());
   }, [dispatch]);
+
+  const handleViewOpenDialog = (bid: any) => {
+    setSelectedOrg(bid);
+    setOpenViewDialog(true);
+  };
 
   const handleOpenDialog = (bid: any) => {
     setSelectedBid(bid);
     setOpenDialog(true);
   };
+
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setSelectedBid(null);
   };
+
   const handleWithdrawBid = async () => {
     if (selectedBid) {
       await dispatch(withdrawnMyBids(selectedBid?._id) as any);
       handleCloseDialog();
     }
+  };
+
+  // ---- Bid Detail Modal ----
+  const handleOpenDetailModal = (bid: any) => {
+    setSelectedBidDetail(bid);
+    setOpenDetailModal(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setOpenDetailModal(false);
+    setSelectedBidDetail(null);
+  };
+
+  // ---- Print Functionality ----
+  const handlePrint = () => {
+    const printContent = printRef.current;
+    if (!printContent) return;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    // Get all styles from the current document
+    const allStyles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+      .map(style => style.outerHTML)
+      .join('\n');
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Bid Details - ${selectedBidDetail?._id}</title>
+          <meta charset="utf-8">
+          <style>
+            @media print {
+              body { 
+                margin: 0; 
+                padding: 20px; 
+                background: white !important;
+                color: black !important;
+              }
+              .no-print { display: none !important; }
+              .print-section { 
+                break-inside: avoid;
+                margin-bottom: 20px;
+              }
+              * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+            }
+            body { 
+              font-family: 'Roboto', 'Arial', sans-serif;
+              line-height: 1.6;
+            }
+            .bid-header {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+              color: white !important;
+              padding: 20px;
+              border-radius: 8px 8px 0 0;
+              position: relative;
+            }
+            .watermark {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%) rotate(-30deg);
+              opacity: 0.03;
+              z-index: 0;
+              pointer-events: none;
+            }
+            .stamp {
+              background: linear-gradient(45deg, #ff6b6b 0%, #ff8e53 100%) !important;
+              color: white !important;
+              border: 2px solid white !important;
+            }
+            .section-paper {
+              border: 1px solid #e0e0e0;
+              border-radius: 8px;
+              padding: 20px;
+              margin-bottom: 20px;
+              background: white !important;
+              position: relative;
+            }
+            .status-chip {
+              border: 1px solid !important;
+              text-transform: capitalize;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            th, td {
+              border: 1px solid #ddd;
+              padding: 8px;
+              text-align: left;
+            }
+            th {
+              background-color: #f5f5f5;
+              font-weight: bold;
+            }
+          </style>
+          ${allStyles}
+        </head>
+        <body>
+          <div class="print-content">
+            ${printContent.innerHTML}
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(() => window.close(), 100);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   // ---- New Handlers for Edit ----
@@ -90,6 +220,7 @@ export function ProviderBidsList() {
     setCharCount(bid.proposal?.length || 0);
     setOpenEditDialog(true);
   };
+
   const handleEditClose = () => {
     setOpenEditDialog(false);
     setSelectedBid(null);
@@ -108,7 +239,7 @@ export function ProviderBidsList() {
     setLoading(true);
 
     const bidAmount = Number(bidData.bidAmount);
-    const milestoneSum = milestones.reduce((acc, m) => acc + Number(m.amount || 0), 0);
+    const milestoneSum = milestones.reduce((acc:any, m:any) => acc + Number(m.amount || 0), 0);
 
     // ✅ Proposal validation
     if (bidData.proposal.length < 100) {
@@ -139,26 +270,16 @@ export function ProviderBidsList() {
     }
   };
 
-
   const addMilestone = () => {
     setMilestones([...milestones, { id: Date.now(), milestorneName: '', amount: '', currency: 'XAF' }]);
   };
+
   const removeMilestone = (id: any) => {
-    setMilestones(milestones.filter(m => m.id !== id));
+    setMilestones(milestones.filter((m:any) => m.id !== id));
   };
+
   const handleMilestoneChange = (id: any, field: string, value: string) => {
-    setMilestones(milestones.map(m => m.id === id ? { ...m, [field]: value } : m));
-  };
-
-  const handleStatusChange = (bidId: string, newStatus: string) => {
-    setStatusUpdates(prev => ({
-      ...prev,
-      [bidId]: newStatus
-    }));
-  };
-
-  const toggleRowExpand = (bidId: string) => {
-    setExpandedRow(expandedRow === bidId ? null : bidId);
+    setMilestones(milestones.map((m:any) => m.id === id ? { ...m, [field]: value } : m));
   };
 
   const handleProviderAcceptance = useCallback(async (bid: any) => {
@@ -168,11 +289,412 @@ export function ProviderBidsList() {
 
     try {
       await dispatch(confirmAcceptanceProvider(data, bid?.projectId?._id, bid?._id));
-
+      handleCloseDetailModal(); // Close modal after acceptance
     } catch (error) {
       console.error("Verification error:", error);
     }
-  }, [dispatch])
+  }, [dispatch]);
+
+  // Format functions
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '-';
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  const formatDateTime = (dateString: string) => {
+    if (!dateString) return '-';
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    };
+    return new Date(dateString).toLocaleString('en-US', options);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'accepted': return 'success';
+      case 'ongoing': return 'info';
+      case 'completed': return 'success';
+      case 'cancelled': return 'error';
+      case 'rejected': return 'error';
+      case 'pending': return 'warning';
+      default: return 'default';
+    }
+  };
+
+  // Bid Details Content Component for Print
+  const BidDetailsContent = () => (
+    <div ref={printRef}>
+      {/* Header */}
+      <Box className="bid-header">
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box>
+            <Typography variant="h5" fontWeight="bold">
+              Bid Details & Proposal
+            </Typography>
+            <Typography variant="subtitle1">
+              Bid ID: {selectedBidDetail?._id}
+            </Typography>
+          </Box>
+
+          {/* Tick-M Events Stamp */}
+          <Box
+            sx={{
+              opacity: 0.9,
+              transform: 'rotate(5deg)',
+              background: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: '50%',
+              padding: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Box
+              className="stamp"
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 'bold',
+                fontSize: '12px',
+                textAlign: 'center',
+                lineHeight: 1.1
+              }}
+            >
+              TICK-M<br />EVENTS
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Content */}
+      <Box sx={{ py: 3, position: 'relative', background: 'white', color: 'black' }}>
+        {/* Watermark Stamp */}
+        <Box className="watermark">
+          <Typography
+            variant="h1"
+            fontWeight="bold"
+            sx={{
+              fontSize: '120px',
+              color: '#667eea',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            TICK-M EVENTS
+          </Typography>
+        </Box>
+
+        {/* Header Status Bar */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, position: 'relative', zIndex: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Chip
+              className="status-chip"
+              label={`Bid Status: ${selectedBidDetail?.status || 'active'}`}
+              color={getStatusColor(selectedBidDetail?.status)}
+              variant="outlined"
+            />
+            <Chip
+              className="status-chip"
+              label={`Organizer Acceptance: ${selectedBidDetail?.isOrgnizerAccepted ? 'Accepted' : 'Pending'}`}
+              color={selectedBidDetail?.isOrgnizerAccepted ? 'success' : 'warning'}
+              variant="outlined"
+            />
+            <Chip
+              className="status-chip"
+              label={`Your Acceptance: ${selectedBidDetail?.isProviderAccepted ? 'Accepted' : 'Pending'}`}
+              color={selectedBidDetail?.isProviderAccepted ? 'success' : 'warning'}
+              variant="outlined"
+            />
+          </Box>
+          <Chip
+            label={selectedBidDetail?.status === 'withdrawn' ? "Bid Withdrawn" : "Active Bid"}
+            color={selectedBidDetail?.status === 'withdrawn' ? "error" : "success"}
+            sx={{ fontWeight: 'bold' }}
+          />
+        </Box>
+
+        <Grid container spacing={3} position="relative" zIndex={1}>
+          {/* Left Column - Project Information */}
+          <Grid item xs={12} md={6}>
+            {/* Project Information */}
+            <Paper className="section-paper">
+              {/* Small stamp on project section */}
+              <Box
+                className="stamp"
+                sx={{
+                  position: 'absolute',
+                  top: -10,
+                  right: -10,
+                  width: 24,
+                  height: 24,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 'bold',
+                  fontSize: '10px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                }}
+              >
+                TM
+              </Box>
+
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold' }}>
+                <EventIcon sx={{ mr: 1 }} /> Project Information
+              </Typography>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">Event Name</Typography>
+                <Typography>{selectedBidDetail?.projectId?.eventId?.eventName}</Typography>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">Location</Typography>
+                <Typography>{selectedBidDetail?.projectId?.eventLocation}</Typography>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">Budget Range</Typography>
+                <Typography>{selectedBidDetail?.projectId?.orgBudget}</Typography>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">Service Time</Typography>
+                <Typography>{formatDateTime(selectedBidDetail?.projectId?.serviceTime)}</Typography>
+              </Box>
+              {selectedBidDetail?.isProviderAccepted && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" color="text.secondary">Project Status</Typography>
+                  <Typography textTransform="capitalize">
+                    {selectedBidDetail?.projectId?.status}
+                  </Typography>
+                </Box>
+              )}
+            </Paper>
+
+            {/* Client Information */}
+            <Paper className="section-paper">
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold' }}>
+                <PersonIcon sx={{ mr: 1 }} /> Client Information
+              </Typography>
+              <Box display="flex" alignItems="center" mb={2}>
+                <Avatar
+                  src={selectedBidDetail?.projectId?.createdBy?.avatar?.url}
+                  alt={selectedBidDetail?.projectId?.createdBy?.name}
+                  sx={{ width: 60, height: 60, mr: 2 }}
+                />
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {selectedBidDetail?.projectId?.createdBy?.name}
+                  </Typography>
+                  <Typography variant="body2">
+                    {selectedBidDetail?.projectId?.createdBy?.email}
+                  </Typography>
+                </Box>
+              </Box>
+            </Paper>
+          </Grid>
+
+          {/* Right Column - Bid Information */}
+          <Grid item xs={12} md={6}>
+            {/* Bid Information */}
+            <Paper className="section-paper">
+              {/* Small stamp on bid section */}
+              <Box
+                className="stamp"
+                sx={{
+                  position: 'absolute',
+                  top: -10,
+                  right: -10,
+                  width: 24,
+                  height: 24,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 'bold',
+                  fontSize: '10px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                }}
+              >
+                TM
+              </Box>
+
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold' }}>
+                <AttachMoneyIcon sx={{ mr: 1 }} /> Your Bid Information
+              </Typography>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">Bid Amount</Typography>
+                <Typography variant="h6" color="primary">
+                  {selectedBidDetail?.bidAmount} XAF
+                </Typography>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">Delivery Time</Typography>
+                <Typography>
+                  {selectedBidDetail?.deliveryTime} {selectedBidDetail?.deliveryUnit}
+                </Typography>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">Time to Bid</Typography>
+                <Typography>{formatEventDate(selectedBidDetail?.createdAt)}</Typography>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">Bid Rank</Typography>
+                <Typography>
+                  #{selectedBidDetail?.bidInfo?.yourBidRank} of {selectedBidDetail?.bidInfo?.totalBidsOnProject} bids
+                </Typography>
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">Winning Bid</Typography>
+                <Typography>
+                  {selectedBidDetail?.winningBid} XAF
+                </Typography>
+              </Box>
+            </Paper>
+
+            {/* Acceptance Status */}
+            <Paper className="section-paper">
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold' }}>
+                <AssignmentIcon sx={{ mr: 1 }} /> Acceptance Status
+              </Typography>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">Organizer Acceptance</Typography>
+                <Chip
+                  label={selectedBidDetail?.isOrgnizerAccepted ? "Accepted" : "Pending"}
+                  color={selectedBidDetail?.isOrgnizerAccepted ? "success" : "warning"}
+                  size="small"
+                />
+              </Box>
+              {selectedBidDetail?.isOrgnizerAccepted && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" color="text.secondary">Your Acceptance</Typography>
+                  {selectedBidDetail?.isProviderAccepted ? (
+                    <Chip label="Accepted" color="success" size="small" />
+                  ) : (
+                    <Typography variant="body2" color="warning.main">
+                      Pending your acceptance
+                    </Typography>
+                  )}
+                </Box>
+              )}
+            </Paper>
+          </Grid>
+        </Grid>
+
+        {/* Milestones Section */}
+        {selectedBidDetail?.milestones && selectedBidDetail.milestones.length > 0 && (
+          <Paper className="section-paper">
+            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold' }}>
+              <DescriptionIcon sx={{ mr: 1 }} /> Milestone Payments
+            </Typography>
+            <TableContainer component={Paper} variant="outlined">
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell><strong>Milestone Name</strong></TableCell>
+                    <TableCell align="right"><strong>Amount</strong></TableCell>
+                    <TableCell><strong>Currency</strong></TableCell>
+                    <TableCell><strong>Status</strong></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {selectedBidDetail.milestones?.map((milestone: any, idx: number) => (
+                    <TableRow key={idx}>
+                      <TableCell>{milestone.milestorneName}</TableCell>
+                      <TableCell align="right">{milestone.amount}</TableCell>
+                      <TableCell>{milestone.currency}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={milestone.isReleased ? 'Released' : 'Pending'}
+                          color={milestone.isReleased ? 'success' : 'default'}
+                          size="small"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        )}
+
+        {/* Proposal Section */}
+        <Paper className="section-paper">
+          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold' }}>
+            <DescriptionIcon sx={{ mr: 1 }} /> Your Proposal
+          </Typography>
+          <Paper sx={{ p: 2, backgroundColor: 'grey.50' }}>
+            <TextWithShowMore text={selectedBidDetail?.proposal} />
+          </Paper>
+        </Paper>
+
+        {/* Timeline Information */}
+        <Paper className="section-paper">
+          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold' }}>
+            <ScheduleIcon sx={{ mr: 1 }} /> Timeline
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">Bid Created</Typography>
+                <Typography>{formatDateTime(selectedBidDetail?.createdAt)}</Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">Last Updated</Typography>
+                <Typography>{formatDateTime(selectedBidDetail?.updatedAt)}</Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Paper>
+
+        {/* Footer Stamp for Print */}
+        <Box
+          sx={{
+            textAlign: 'center',
+            mt: 4,
+            pt: 2,
+            borderTop: '1px solid #e0e0e0',
+            opacity: 0.7,
+            fontSize: '12px',
+            color: 'text.secondary',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <Box
+            className="stamp"
+            sx={{
+              width: 20,
+              height: 20,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 'bold',
+              fontSize: '10px',
+              marginRight: '8px'
+            }}
+          >
+            TM
+          </Box>
+          Tick-M Events Official Document - Generated on {new Date().toLocaleDateString()}
+        </Box>
+      </Box>
+    </div>
+  );
 
   return (
     <Box sx={{ p: 3 }}>
@@ -190,13 +712,141 @@ export function ProviderBidsList() {
         </DialogActions>
       </Dialog>
 
+      {/* Updated Bid Detail Modal */}
+      <Dialog
+        open={openDetailModal}
+        onClose={handleCloseDetailModal}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+          py: 2,
+          position: 'relative'
+        }}>
+          <Box>
+            <Typography variant="h5" fontWeight="bold">
+              Bid Details & Proposal
+            </Typography>
+            <Typography variant="subtitle1">
+              Bid ID: {selectedBidDetail?._id}
+            </Typography>
+          </Box>
+          <IconButton onClick={handleCloseDetailModal} sx={{ color: 'white' }}>
+            <CloseIcon />
+          </IconButton>
+
+          {/* Tick-M Events Stamp */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 16,
+              right: 60,
+              opacity: 0.9,
+              transform: 'rotate(5deg)',
+              background: 'rgba(255, 255, 255, 0.2)',
+              borderRadius: '50%',
+              padding: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '50%',
+                background: 'linear-gradient(45deg, #ff6b6b 0%, #ff8e53 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '12px',
+                border: '2px solid white',
+                textAlign: 'center',
+                lineHeight: 1.1
+              }}
+            >
+              TICK-M<br />EVENTS
+            </Box>
+          </Box>
+        </DialogTitle>
+
+        <DialogContent dividers sx={{ py: 3, position: 'relative' }}>
+          <BidDetailsContent />
+        </DialogContent>
+
+        <DialogActions sx={{ px: 3, py: 2, position: 'relative', zIndex: 1 }}>
+          <Button onClick={handleCloseDetailModal} variant="outlined">
+            Close
+          </Button>
+          <Button onClick={handlePrint} variant="outlined" startIcon={<PrintIcon />}>
+            Print Bid Details
+          </Button>
+          {selectedBidDetail && !selectedBidDetail.isProviderAccepted && selectedBidDetail.isOrgnizerAccepted && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleProviderAcceptance(selectedBidDetail)}
+            >
+              Accept Project
+            </Button>
+          )}
+          {/* <Button
+            onClick={() => handleEditOpen(selectedBidDetail)}
+            variant="outlined"
+            startIcon={<EditIcon />}
+            disabled={selectedBidDetail?.status === 'withdrawn'}
+          >
+            Edit Bid
+          </Button> */}
+
+          {/* Footer Stamp */}
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 8,
+              right: 16,
+              opacity: 0.7,
+              fontSize: '10px',
+              color: 'text.secondary',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <Box
+              sx={{
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '8px',
+                marginRight: '4px'
+              }}
+            >
+              TM
+            </Box>
+            Tick-M Events Official Document
+          </Box>
+        </DialogActions>
+      </Dialog>
+
       {/* Edit Bid Form Dialog */}
       <Dialog open={openEditDialog} onClose={handleEditClose} maxWidth="md" fullWidth>
         <DialogTitle>Edit Your Bid</DialogTitle>
         <DialogContent>
           <Box component="form" onSubmit={handleSubmit} sx={{ p: 2 }}>
-
-            {/* --- Bid Amount & Delivery --- */}
             <Typography variant="h6" mb={2}>Bid Details</Typography>
             <Grid container spacing={2} mb={3}>
               <Grid item xs={12} md={5}>
@@ -234,7 +884,6 @@ export function ProviderBidsList() {
 
             <Divider sx={{ my: 3 }} />
 
-            {/* --- Proposal --- */}
             <Typography variant="h6" mb={1}>Proposal</Typography>
             <TextField
               fullWidth
@@ -249,9 +898,8 @@ export function ProviderBidsList() {
 
             <Divider sx={{ my: 3 }} />
 
-            {/* --- Milestones --- */}
             <Typography variant="h6" mb={2}>Milestone Payments</Typography>
-            {milestones.map((milestone, index) => (
+            {milestones.map((milestone: any, index: any) => (
               <Grid container spacing={2} key={milestone.id} mb={2}>
                 <Grid item xs={12} md={6}>
                   <TextField
@@ -295,7 +943,6 @@ export function ProviderBidsList() {
 
             <Button onClick={addMilestone} startIcon={<AddIcon />}>Add Milestone</Button>
 
-            {/* --- Submit --- */}
             <Button
               type="submit"
               fullWidth
@@ -326,216 +973,127 @@ export function ProviderBidsList() {
               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Bid Rank</TableCell>
               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Winning Bid</TableCell>
               <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Your Bid</TableCell>
-              <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Actions Taken</TableCell>
-              <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Client Information</TableCell>
-              <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Chat Initiated</TableCell>
-              <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Details</TableCell>
+              <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Client Details</TableCell>
+              <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Conversation</TableCell>
+              <TableCell sx={{ color: 'black', fontWeight: 'bold', py: 2 }}>Actions</TableCell>
+
             </TableRow>
           </TableHead>
           <TableBody>
             {
               _mybids?.length > 0 ? (
                 _mybids?.map((bid: any, index: number) => (
-                  <React.Fragment key={index}>
-                    <TableRow
-                      sx={{
-                        boxShadow: bid?.status === 'withdrawn' ? 'inset 0 0 8px rgba(244, 67, 54, 0.6)' : 'none',
-                        borderTop: '1px solid',
-                        borderColor: 'grey.700',
-                        '&:hover': { backgroundColor: 'grey.600' },
-                        cursor: 'pointer'
-                      }}
-                      onClick={() => toggleRowExpand(bid._id)}
-                    >
-                      <TableCell sx={{ py: 2 }}>
-                        <Typography
-                          component={Link}
-                          to={`/project/${bid.projectId?._id}`}
-                          sx={{
-                            color: 'black',
-                            textDecoration: 'none',
-                            cursor: 'pointer',
-                            '&:hover': {
-                              textDecoration: 'underline',
-                            }
-                          }}
-                        >
-                          {bid.projectId?.eventId?.eventName}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ py: 2 }}>{formatEventDate(bid?.createdAt)}</TableCell>
-                      <TableCell sx={{ py: 2 }}>#{bid?.bidInfo?.yourBidRank} of {bid?.bidInfo?.totalBidsOnProject} bids</TableCell>
-                      <TableCell sx={{ py: 2 }}>
-                        <Chip
-                          label={`${bid?.winningBid} XAF`}
+                  <TableRow
+                    key={index}
+                    sx={{
+                      boxShadow: bid?.status === 'withdrawn' ? 'inset 0 0 8px rgba(244, 67, 54, 0.6)' : 'none',
+                      borderTop: '1px solid',
+                      borderColor: 'grey.700',
+                      '&:hover': { backgroundColor: 'grey.600' },
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => handleOpenDetailModal(bid)}
+                  >
+                    <TableCell sx={{ py: 2 }}>
+                      <Typography
+                        component={Link}
+                        to={`/project/${bid.projectId?._id}`}
+                        fontSize={12}
+                        sx={{
+                          color: 'black',
+                          textDecoration: 'none',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            textDecoration: 'underline',
+                          }
+                        }}
+                      >
+                        {bid.projectId?.eventId?.eventName}
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ py: 2,fontSize:12 }}>{formatEventDate(bid?.createdAt)}</TableCell>
+                    <TableCell sx={{ py: 2 }}>#{bid?.bidInfo?.yourBidRank} of {bid?.bidInfo?.totalBidsOnProject} bids</TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Chip
+                        label={`${bid?.winningBid} XAF`}
+                        size="small"
+                        sx={{
+                          backgroundColor: 'primary.main',
+                          color: 'white',
+                          fontWeight: 'bold'
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>{bid?.bidAmount} XAF</TableCell>
+                    
+                    <TableCell sx={{ py: 2 }}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<EyeIcon />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewOpenDialog(bid?.projectId?.createdBy);
+                        }}
+                        disabled={bid?.status === 'withdrawn'}
+                        sx={{
+                          backgroundColor: bid.chat ? 'success.main' : 'grey.700',
+                          color: bid.chat ? 'white' : 'grey.400',
+                        }}
+                      >
+                        View
+                      </Button>
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<ChatIcon />}
+                        disabled={bid?.status === 'withdrawn'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/messaging-&-client-relationship");
+                          sessionStorage.setItem('currentChatProvider', JSON.stringify(bid.projectId?.createdBy?._id));
+                        }}
+                        sx={{
+                          backgroundColor: bid.chat ? 'success.main' : 'grey.700',
+                          color: bid.chat ? 'white' : 'grey.400',
+                        }}
+                      >
+                        Chat
+                      </Button>
+                    </TableCell>
+                    <TableCell sx={{ py: 2 }}>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <IconButton
                           size="small"
-                          sx={{
-                            backgroundColor: 'primary.main',
-                            color: 'white',
-                            fontWeight: 'bold'
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell sx={{ py: 2 }}>{bid?.bidAmount} XAF</TableCell>
-                      <TableCell sx={{ py: 2 }}>
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                          <IconButton size="small" sx={{ color: 'green' }}
-                            disabled={bid?.status === 'withdrawn'} onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditOpen(bid);
-                            }}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            sx={{ color: 'red' }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenDialog(bid);
-                            }}
-                            disabled={bid?.status === 'withdrawn'}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      </TableCell>
-                      <TableCell sx={{ py: 2 }}>
-                        <Button
-                          variant="contained"
-                          size="small"
-                          startIcon={<EyeIcon />}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewOpenDialog(bid?.projectId?.createdBy);
-                          }}
-                          disabled={bid?.status === 'withdrawn'}
-                          sx={{
-                            backgroundColor: bid.chat ? 'success.main' : 'grey.700',
-                            color: bid.chat ? 'white' : 'grey.400',
-                          }}
-                        >
-                          View
-                        </Button>
-                      </TableCell>
-                      <TableCell sx={{ py: 2 }}>
-                        <Button
-                          variant="contained"
-                          size="small"
-                          startIcon={<ChatIcon />}
+                          sx={{ color: 'green' }}
                           disabled={bid?.status === 'withdrawn'}
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate("/messaging-&-client-relationship");
-                            sessionStorage.setItem('currentChatProvider', JSON.stringify(bid.projectId?.createdBy?._id));
-                          }}
-                          sx={{
-                            backgroundColor: bid.chat ? 'success.main' : 'grey.700',
-                            color: bid.chat ? 'white' : 'grey.400',
+                            handleEditOpen(bid);
                           }}
                         >
-                          Chat
-                        </Button>
-                      </TableCell>
-                      <TableCell sx={{ py: 2 }}>
-                        <IconButton size="small" sx={{ color: 'black' }}>
-                          {expandedRow === bid._id ? <ArrowUpIcon sx={{ color: "black" }} /> : <ArrowDownIcon />}
+                          <EditIcon fontSize="small" />
                         </IconButton>
-                      </TableCell>
-                    </TableRow>
-
-                    {/* Expanded Row Content */}
-                    <TableRow>
-                      <TableCell style={{ padding: 0 }} colSpan={9}>
-                        <Collapse in={expandedRow === bid._id} timeout="auto" unmountOnExit>
-                          <Box sx={{ p: 3, backgroundColor: 'grey.100' }}>
-                            <Typography variant="h6" gutterBottom>
-                              Bid Details: {bid.projectId?.eventId?.eventName}
-                            </Typography>
-
-                            <Grid container spacing={3}>
-                              <Grid item xs={12} md={6}>
-                                <Typography variant="subtitle2" gutterBottom>Project Information</Typography>
-                                <Typography><strong>Event:</strong> {bid.projectId?.eventId?.eventName}</Typography>
-                                <Typography><strong>Location:</strong> {bid.projectId?.eventLocation}</Typography>
-                                <Typography><strong>Budget Range:</strong> {bid.projectId?.orgBudget}</Typography>
-                                <Typography><strong>Service Time:</strong> {new Date(bid.projectId?.serviceTime).toLocaleString()}</Typography>
-                                
-                                {bid?.isProviderAccepted &&<Typography textTransform="capitalize"><strong>Status:</strong> {bid.projectId?.status}</Typography>}
-                             
-                              </Grid>
-
-                              <Grid item xs={12} md={6}>
-                                <Typography variant="subtitle2" gutterBottom>Your Bid Information</Typography>
-                                <Typography><strong>Bid Amount:</strong> {bid.bidAmount} XAF</Typography>
-                                <Typography><strong>Delivery Time:</strong> {bid.deliveryTime} {bid.deliveryUnit}</Typography>
-                                <Typography><strong>Time to bid:</strong> {formatEventDate(bid?.createdAt)}</Typography>
-                                <Typography sx={{ color: bid.isOrgnizerAccepted ? 'green' : 'red' }}><strong style={{ color: "black" }}>Orgnizer Acceptance:</strong> {bid.isOrgnizerAccepted ? "Accepted" : "Pending"}</Typography>
-                                {
-                                  bid.isOrgnizerAccepted && (<Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <strong>Your Acceptance:</strong>
-                                    {bid.isProviderAccepted ? (
-                                      "Accepted"
-                                    ) : (
-                                      <Button
-                                        sx={{ height: 22 }}
-                                        variant="contained"
-                                        color="primary"
-                                        size="small"
-                                        onClick={() => handleProviderAcceptance(bid)}
-                                      >
-                                        Accept
-                                      </Button>
-                                    )}
-                                  </Typography>)
-                                }
-
-                              </Grid>
-
-                              {bid.milestones && bid.milestones.length > 0 && (
-                                <Grid item xs={12}>
-                                  <Typography variant="subtitle2" gutterBottom>Milestones</Typography>
-                                  <Table size="small">
-                                    <TableHead>
-                                      <TableRow>
-                                        <TableCell>Milestone Name</TableCell>
-                                        <TableCell align="right">Amount</TableCell>
-                                        <TableCell>Currency</TableCell>
-                                        <TableCell>Status</TableCell>
-                                      </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                      {bid.milestones?.map((milestone: any, idx: number) => (
-                                        <TableRow key={idx}>
-                                          <TableCell>{milestone.milestorneName}</TableCell>
-                                          <TableCell align="right">{milestone.amount}</TableCell>
-                                          <TableCell>{milestone.currency}</TableCell>
-                                          <TableCell sx={{ fontWeight: 700, color: milestone.isReleased ? 'green' : 'red' }}>
-                                            {milestone.isReleased ? 'Released' : 'Pending'}
-                                          </TableCell>
-                                        </TableRow>
-                                      ))}
-                                    </TableBody>
-                                  </Table>
-                                </Grid>
-                              )}
-
-                              <Grid item xs={12}>
-                                <Typography variant="subtitle2" gutterBottom>Proposal</Typography>
-                                <Paper sx={{ p: 2, backgroundColor: 'white' }}>
-                                  <TextWithShowMore text={bid.proposal} />
-                                </Paper>
-                              </Grid>
-                            </Grid>
-                          </Box>
-                        </Collapse>
-                      </TableCell>
-                    </TableRow>
-                  </React.Fragment>
+                        <IconButton
+                          size="small"
+                          sx={{ color: 'red' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenDialog(bid);
+                          }}
+                          disabled={bid?.status === 'withdrawn'}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={9} align="center">
+                  <TableCell colSpan={8} align="center">
                     <Box
                       sx={{
                         display: 'flex',
@@ -587,8 +1145,8 @@ export function ProviderBidsList() {
                         size="large"
                         startIcon={
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19"/>
-                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
                           </svg>
                         }
                         onClick={() => navigate('/project/view')}
@@ -601,20 +1159,14 @@ export function ProviderBidsList() {
                       >
                         Find Projects to Bid On
                       </Button>
-{/* 
-                      <Typography variant="body2" sx={{ mt: 3, color: 'text.secondary' }}>
-                        or <Link to="" style={{ color: '#1976d2', textDecoration: 'none' }}>learn how to place effective bids</Link>
-                      </Typography> */}
                     </Box>
                   </TableCell>
                 </TableRow>
               )
             }
-
           </TableBody>
         </Table>
       </TableContainer>
     </Box>
   );
 }
-

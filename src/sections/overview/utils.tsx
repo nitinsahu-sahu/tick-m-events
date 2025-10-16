@@ -4,8 +4,13 @@ export const donutChartOptions: ApexOptions = {
   chart: {
     type: 'donut', // Explicitly specify the type as 'donut'
   },
-  labels: ["Attendee Engagement"],
+  labels: ["Attendee Engagement", "Remaining"],
   colors: ["#2395D4"],
+   tooltip: {
+    y: {
+      formatter: (val: number) => `${val}%` 
+    }
+  },
   plotOptions: {
     pie: {
       donut: {
@@ -146,29 +151,29 @@ export interface ChartData {
 }
 
 export const ticketSalesData: Record<TicketTypes, Record<TimePeriod, number[]>> = {
-    VIP: {
-      daily: [50, 60, 70, 65, 75, 80, 90],
-      weekly: [350, 420, 490, 455, 525, 560, 630],
-      monthly: [1500, 1800, 2100, 1950, 2250, 2400, 2700]
-    },
-    Standard: {
-      daily: [100, 120, 110, 105, 115, 125, 130],
-      weekly: [700, 840, 770, 735, 805, 875, 910],
-      monthly: [3000, 3600, 3300, 3150, 3450, 3750, 3900]
-    },
-    EarlyBird: {
-      daily: [80, 90, 85, 95, 100, 110, 120],
-      weekly: [560, 630, 595, 665, 700, 770, 840],
-      monthly: [2400, 2700, 2550, 2850, 3000, 3300, 3600]
-    },
-    Group: {
-      daily: [30, 40, 35, 45, 50, 55, 60],
-      weekly: [210, 280, 245, 315, 350, 385, 420],
-      monthly: [900, 1200, 1050, 1350, 1500, 1650, 1800]
-    },
-    Student: {
-      daily: [60, 70, 65, 75, 80, 85, 90],
-      weekly: [420, 490, 455, 525, 560, 595, 630],
-      monthly: [1800, 2100, 1950, 2250, 2400, 2550, 2700]
-    }
-  };
+  VIP: {
+    daily: [50, 60, 70, 65, 75, 80, 90],
+    weekly: [350, 420, 490, 455, 525, 560, 630],
+    monthly: [1500, 1800, 2100, 1950, 2250, 2400, 2700]
+  },
+  Standard: {
+    daily: [100, 120, 110, 105, 115, 125, 130],
+    weekly: [700, 840, 770, 735, 805, 875, 910],
+    monthly: [3000, 3600, 3300, 3150, 3450, 3750, 3900]
+  },
+  EarlyBird: {
+    daily: [80, 90, 85, 95, 100, 110, 120],
+    weekly: [560, 630, 595, 665, 700, 770, 840],
+    monthly: [2400, 2700, 2550, 2850, 3000, 3300, 3600]
+  },
+  Group: {
+    daily: [30, 40, 35, 45, 50, 55, 60],
+    weekly: [210, 280, 245, 315, 350, 385, 420],
+    monthly: [900, 1200, 1050, 1350, 1500, 1650, 1800]
+  },
+  Student: {
+    daily: [60, 70, 65, 75, 80, 85, 90],
+    weekly: [420, 490, 455, 525, 560, 595, 630],
+    monthly: [1800, 2100, 1950, 2250, 2400, 2550, 2700]
+  }
+};

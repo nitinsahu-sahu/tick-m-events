@@ -25,8 +25,10 @@ import placeABidReducer from './provider/Home-Global-View/freelancer.reducer'
 import { rewardReducer } from './rewardReducer'
 import customizationReducer from './customization/promotion-logos'
 import reqAndRefundsReducer from './admin/refund-request/refundreuest.reducer'
+import entryValidationReducer from './participant/entry-validation/index'
 
 const rootReducer = combineReducers({
+    participant:entryValidationReducer,
     admin: reqAndRefundsReducer,
     customization: customizationReducer,
     provider: placeABidReducer,

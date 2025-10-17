@@ -566,7 +566,7 @@ export const ContractDetailsModal: React.FC<ContractDetailsModalProps> = ({
           Close
         </Button>
         <Button onClick={handlePrint} variant="outlined" startIcon={<PrintIcon />}>
-          Print Contract
+          Downlaod
         </Button>
         {!contract.isSigned && (
           <Button variant="contained" color="primary">

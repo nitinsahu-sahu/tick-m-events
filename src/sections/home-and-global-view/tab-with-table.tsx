@@ -193,7 +193,7 @@ export function TabWithTableView() {
 
             {tabValue === 0 && (
                 <>
-                    <MatrixOneCard metrics={metrics} />
+                    {/* <MatrixOneCard metrics={metrics} /> */}
                     <RequestTabSection
                         title="Available Projects (Organizer Requests)"
                         description=""

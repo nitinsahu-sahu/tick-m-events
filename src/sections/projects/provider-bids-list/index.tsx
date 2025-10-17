@@ -1,4 +1,4 @@
-import React, { useCallback,useEffect, useRef ,useState} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Box, Typography, TableContainer, Table, TableHead, TableRow, TableCell,
   TableBody, Paper, Chip, IconButton, Button, Dialog, DialogActions, Tooltip,
@@ -239,7 +239,7 @@ export function ProviderBidsList() {
     setLoading(true);
 
     const bidAmount = Number(bidData.bidAmount);
-    const milestoneSum = milestones.reduce((acc:any, m:any) => acc + Number(m.amount || 0), 0);
+    const milestoneSum = milestones.reduce((acc: any, m: any) => acc + Number(m.amount || 0), 0);
 
     // ✅ Proposal validation
     if (bidData.proposal.length < 100) {
@@ -275,11 +275,11 @@ export function ProviderBidsList() {
   };
 
   const removeMilestone = (id: any) => {
-    setMilestones(milestones.filter((m:any) => m.id !== id));
+    setMilestones(milestones.filter((m: any) => m.id !== id));
   };
 
   const handleMilestoneChange = (id: any, field: string, value: string) => {
-    setMilestones(milestones.map((m:any) => m.id === id ? { ...m, [field]: value } : m));
+    setMilestones(milestones.map((m: any) => m.id === id ? { ...m, [field]: value } : m));
   };
 
   const handleProviderAcceptance = useCallback(async (bid: any) => {
@@ -787,7 +787,7 @@ export function ProviderBidsList() {
             Close
           </Button>
           <Button onClick={handlePrint} variant="outlined" startIcon={<PrintIcon />}>
-            Print Bid Details
+            Download
           </Button>
           {selectedBidDetail && !selectedBidDetail.isProviderAccepted && selectedBidDetail.isOrgnizerAccepted && (
             <Button
@@ -1011,7 +1011,7 @@ export function ProviderBidsList() {
                         {bid.projectId?.eventId?.eventName}
                       </Typography>
                     </TableCell>
-                    <TableCell sx={{ py: 2,fontSize:12 }}>{formatEventDate(bid?.createdAt)}</TableCell>
+                    <TableCell sx={{ py: 2, fontSize: 12 }}>{formatEventDate(bid?.createdAt)}</TableCell>
                     <TableCell sx={{ py: 2 }}>#{bid?.bidInfo?.yourBidRank} of {bid?.bidInfo?.totalBidsOnProject} bids</TableCell>
                     <TableCell sx={{ py: 2 }}>
                       <Chip
@@ -1025,7 +1025,7 @@ export function ProviderBidsList() {
                       />
                     </TableCell>
                     <TableCell sx={{ py: 2 }}>{bid?.bidAmount} XAF</TableCell>
-                    
+
                     <TableCell sx={{ py: 2 }}>
                       <Button
                         variant="contained"

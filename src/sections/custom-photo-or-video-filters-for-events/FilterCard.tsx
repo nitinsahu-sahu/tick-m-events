@@ -19,24 +19,49 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
   const [selectedFilter, setSelectedFilter] = useState('none');
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [showFilterEdit, setShowFilterEdit] = useState(false);
-  const [zoom, setZoom] = useState(1); // Default zoom
-  const [offset, setOffset] = useState({ x: 0, y: 0 }); // For dragging
+  const [zoom, setZoom] = useState(1);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [startDrag, setStartDrag] = useState({ x: 0, y: 0 });
+  const [currentCamera, setCurrentCamera] = useState<'user' | 'environment'>('user');
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
   const [recordedVideoURL, setRecordedVideoURL] = useState<string | null>(null);
-  const [cameraRestartTrigger, setCameraRestartTrigger] = useState(0); // For restarting camera
+  const [cameraRestartTrigger, setCameraRestartTrigger] = useState(0);
+
+  // Get available cameras and switch between them
+  const switchCamera = async () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+
+    const newCamera = currentCamera === 'user' ? 'environment' : 'user';
+    setCurrentCamera(newCamera);
+
+    // Restart camera with new facing mode
+    setCameraRestartTrigger(prev => prev + 1);
+  };
 
   // Start camera on mount and when restart is triggered
   useEffect(() => {
     const localVideoRef = videoRef.current;
 
+    const constraints = {
+      video: { 
+        facingMode: currentCamera,
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }, 
+      audio: mode === 'video'
+    };
+
     navigator.mediaDevices
-      .getUserMedia({ video: true, audio: mode === 'video' })
+      .getUserMedia(constraints)
       .then((stream) => {
         if (localVideoRef) {
           localVideoRef.srcObject = stream;
@@ -57,63 +82,79 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
       })
       .catch((err) => {
         console.error('Error accessing camera:', err);
+        // Fallback to basic constraints if specific facing mode fails
+        navigator.mediaDevices.getUserMedia({ video: true, audio: mode === 'video' })
+          .then((stream) => {
+            if (localVideoRef) {
+              localVideoRef.srcObject = stream;
+            }
+          })
+          .catch((fallbackErr) => {
+            console.error('Fallback camera access failed:', fallbackErr);
+          });
       });
 
     return () => {
       if (localVideoRef && localVideoRef.srcObject) {
         (localVideoRef.srcObject as MediaStream).getTracks().forEach((track) => track.stop());
       }
-
       setMediaRecorder(null);
       setRecordedChunks([]);
     };
-  }, [mode, cameraRestartTrigger]); // Added cameraRestartTrigger dependency
+  }, [mode, cameraRestartTrigger, currentCamera]);
 
   const handleCapture = () => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
-      if (context) {
-        // Calculate aspect ratio to maintain video proportions
+      
+      if (context && video.videoWidth > 0 && video.videoHeight > 0) {
+        // Set canvas to match the display size (400x300)
+        canvas.width = 400;
+        canvas.height = 300;
+        
+        // Calculate the aspect ratios
         const videoAspect = video.videoWidth / video.videoHeight;
         const canvasAspect = canvas.width / canvas.height;
         
-        let drawWidth;
-        let drawHeight;
-        let offsetX;
-        let offsetY;
+        let renderWidth:number;
+        
+        let renderHeight: number;
+        let offsetX : number;
+        let  offsetY : number;
         
         if (videoAspect > canvasAspect) {
-          // Video is wider than canvas
-          drawHeight = canvas.height;
-          drawWidth = drawHeight * videoAspect;
-          offsetX = (canvas.width - drawWidth) / 2;
-          offsetY = 0;
-        } else {
-          // Video is taller than canvas
-          drawWidth = canvas.width;
-          drawHeight = drawWidth / videoAspect;
+          // Video is wider than canvas - fit to width
+          renderWidth = canvas.width;
+          renderHeight = renderWidth / videoAspect;
           offsetX = 0;
-          offsetY = (canvas.height - drawHeight) / 2;
+          offsetY = (canvas.height - renderHeight) / 2;
+        } else {
+          // Video is taller than canvas - fit to height
+          renderHeight = canvas.height;
+          renderWidth = renderHeight * videoAspect;
+          offsetX = (canvas.width - renderWidth) / 2;
+          offsetY = 0;
         }
         
-        // Clear canvas and draw video frame with proper aspect ratio
+        // Clear canvas and draw video frame maintaining aspect ratio
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
+        context.drawImage(video, offsetX, offsetY, renderWidth, renderHeight);
         
         const imageData = canvas.toDataURL('image/png');
         setCapturedPhoto(imageData);
-        // Auto-center on capture
+        
+        // Reset zoom and center for editing
+        setZoom(1);
         setOffset({ x: canvas.width / 2, y: canvas.height / 2 });
-        setZoom(1); // Reset zoom
-
         setShowFilterEdit(true);
       }
     }
   };
 
   const filters = ['none', 'sepia', 'grayscale', 'blur'];
+  
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
     setStartDrag({ x: e.clientX, y: e.clientY });
@@ -175,8 +216,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
           frameImg.onload = () => {
             ctx.filter = 'none';
             ctx.drawImage(frameImg, 0, 0, 400, 300);
-
-            // Resolve with final image
             const finalImage = canvas.toDataURL('image/png');
             resolve(finalImage);
           };
@@ -186,7 +225,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
         }
       };
     });
-
 
   const downloadImage = async () => {
     const finalImage = await generateFinalImage();
@@ -206,23 +244,18 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
     }
   }, [recordedChunks, mediaRecorder]);
 
-  // Handle retake - restart camera and reset states
   const handleRetake = () => {
-    // Stop current camera stream
     if (videoRef.current && videoRef.current.srcObject) {
       const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
       tracks.forEach(track => track.stop());
       videoRef.current.srcObject = null;
     }
     
-    // Reset states
     setCapturedPhoto(null);
     setShowFilterEdit(false);
     setZoom(1);
     setOffset({ x: 0, y: 0 });
     setSelectedFilter('none');
-    
-    // Trigger camera restart
     setCameraRestartTrigger(prev => prev + 1);
   };
 
@@ -238,8 +271,8 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
     >
       <HeadingCommon title={title} weight={600} baseSize="20px" />
 
-      {/* Mode Switch */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 2, justifyContent: 'center' }}>
+      {/* Mode Switch and Camera Controls */}
+      <Box sx={{ display: 'flex', gap: 2, mb: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
         <Button
           variant={mode === 'photo' ? 'contained' : 'outlined'}
           onClick={() => {
@@ -272,6 +305,23 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
         >
           Video Mode
         </Button>
+        
+        {/* Camera Switch Button - Only show when not in captured photo mode */}
+        {!capturedPhoto && (
+          <Button
+            onClick={switchCamera}
+            variant="outlined"
+            sx={{
+              borderColor: '#0B2E4C',
+              color: '#0B2E4C',
+              borderRadius: 1,
+              textTransform: 'none',
+              minWidth: 130,
+            }}
+          >
+            Switch Camera ({currentCamera === 'user' ? 'Front' : 'Back'})
+          </Button>
+        )}
       </Box>
 
       {/* Camera Preview or Captured Image */}
@@ -327,7 +377,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
             )}
           </Box>
         ) : mode === 'video' && recordedVideoURL ? (
-          // 🎥 Recorded video preview
           <Box
             sx={{
               position: 'relative',
@@ -369,9 +418,7 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
               />
             )}
           </Box>
-
         ) : (
-          // 📷 Live camera preview
           <Box
             sx={{
               position: 'relative',
@@ -415,7 +462,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
               />
             )}
           </Box>
-
         )}
 
         <canvas
@@ -425,8 +471,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
           style={{ display: 'none' }}
         />
       </Box>
-
-
 
       {/* Filter Options */}
       {capturedPhoto && showFilterEdit && (
@@ -451,12 +495,12 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
           ))}
         </Box>
       )}
+      
       {capturedPhoto && showFilterEdit && (
         <Box sx={{ textAlign: 'center', m: 1, color: '#666', fontSize: 14 }}>
           Use your mouse wheel to zoom in/out. Click and drag to reposition the photo.
         </Box>
       )}
-
 
       {/* Action Buttons */}
       <Grid container spacing={2} justifyContent="center">
@@ -464,7 +508,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
           <Grid item xs={12} sm={6} md={4}>
             <Button
               onClick={handleCapture}
-              disabled={mode !== 'photo'}
               variant="contained"
               fullWidth
               sx={{
@@ -482,7 +525,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
             <Box sx={{ textAlign: 'center', mb: 2 }}>
               {recordedVideoURL ? (
                 <>
-                  {/* Video Preview */}
                   <video
                     src={recordedVideoURL}
                     controls
@@ -496,7 +538,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
                     <track kind="captions" srcLang="en" label="English captions" />
                   </video>
 
-                  {/* Action Buttons */}
                   <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
                     <Grid item xs={12} sm={6} md={4}>
                       <Button
@@ -584,7 +625,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
             </Box>
           </>
         ) : (
-          // PHOTO MODE with capturedPhoto (existing Save/Retake buttons)
           <>
             <Grid item xs={12} sm={6} md={4}>
               <Button

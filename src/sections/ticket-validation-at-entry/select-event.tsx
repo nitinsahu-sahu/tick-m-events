@@ -21,7 +21,8 @@ export interface Order {
     verifyEntry: boolean;
     ticketCode: string;
     createdAt: string;
-     qrCode?: string | null; 
+    qrCode?: string | null;
+    participantDetails?: any
 }
 
 interface Ticket {
@@ -36,24 +37,64 @@ interface SelectTicketsProps {
     events: Event[];
     onEventSelectOrder: (order: Order | null) => void;
     selectedEventOrder: Order | null;
+    selectedParticipant: any;
+    onParticipantSelect: (participant: any) => void;
+    onPaymentStatusCheck: (isConfirmed: boolean) => void; // New prop
 }
 
-export function SelectTickets({ events, onEventSelectOrder, selectedEventOrder }: SelectTicketsProps) {
+interface Participant {
+    _id: string;
+    name: string;
+    age: string;
+    gender: string;
+    validation: boolean;
+    entryTime?: string;
+}
+
+export function SelectTickets({ 
+    events, 
+    onEventSelectOrder, 
+    selectedParticipant, 
+    selectedEventOrder, 
+    onParticipantSelect,
+    onPaymentStatusCheck 
+}: SelectTicketsProps) {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [orders, setOrders] = useState<Order[]>([]);
-    console.log('orders>>',orders);
-    console.log('events>>',events);
-    
+    const [participants, setParticipants] = useState<Participant[]>([]);
+    const [isPaymentConfirmed, setIsPaymentConfirmed] = useState<boolean>(true);
+
     const handleEventChange = (eventId: string) => {
-        const selected = events.find(e => e._id === eventId) || null;
+        const selected = events.find((e: any) => e._id === eventId) || null;
         setSelectedEvent(selected);
         setOrders(selected?.order || []);
+        setParticipants([]);
+        setIsPaymentConfirmed(true); // Reset payment status
         onEventSelectOrder(null); // Reset order selection when event changes
+        onParticipantSelect?.(null); // Reset participant selection
+        onPaymentStatusCheck?.(true); // Reset payment status check
     };
 
     const handleOrderChange = (orderId: string) => {
         const selected = orders.find(o => o._id === orderId) || null;
         onEventSelectOrder(selected);
+        
+        // Check payment status
+        const paymentConfirmed = selected?.paymentStatus === 'confirmed';
+        setIsPaymentConfirmed(paymentConfirmed);
+        onPaymentStatusCheck?.(paymentConfirmed);
+        
+        if (paymentConfirmed) {
+            setParticipants(selected?.participantDetails || []);
+        } else {
+            setParticipants([]);
+        }
+        onParticipantSelect?.(null); // Reset participant selection when order changes
+    };
+
+    const handleParticipantChange = (participantId: string) => {
+        const selected = participants.find(p => p._id === participantId) || null;
+        onParticipantSelect?.(selected);
     };
 
     return (
@@ -116,6 +157,50 @@ export function SelectTickets({ events, onEventSelectOrder, selectedEventOrder }
                     </Select>
                 </>
             )}
+
+            {/* Only show participant selection if payment is confirmed */}
+            {selectedEventOrder && isPaymentConfirmed && participants.length > 0 && (
+                <>
+                    <HeadingCommon variant="body1" mt={2} title="Select Participant:" weight={600} />
+
+                    <Select
+                        fullWidth
+                        value={selectedParticipant?._id || ''}
+                        onChange={(e) => handleParticipantChange(e.target.value as string)}
+                        sx={{
+                            textTransform: 'capitalize',
+                        }}
+                    >
+                        <MenuItem value="" disabled>
+                            Select a Participant
+                        </MenuItem>
+                        {participants.map((participant: Participant) => (
+                            <MenuItem
+                                key={participant._id}
+                                value={participant._id}
+                                sx={{
+                                    fontSize: '0.8rem',
+                                    minHeight: '32px',
+                                    textTransform: 'capitalize',
+                                }}
+                            >
+                                {`${participant.name} (${participant.gender}, ${participant.age}) ${participant.validation ? '✓' : ''}`}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </>
+            )}
+
+            {/* Show payment denied message if payment is not confirmed */}
+            {/* {selectedEventOrder && !isPaymentConfirmed && (
+                <HeadingCommon 
+                    variant="body2" 
+                    mt={2} 
+                    title="Payment not confirmed. Ticket validation denied." 
+                    color="error" 
+                    weight={600} 
+                />
+            )} */}
         </Card>
     );
 }

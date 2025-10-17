@@ -18,35 +18,50 @@ interface Order {
     ticketCode: string;
     createdAt: string;
     qrCode?: string | null;
+    validation?: any
 }
 
 interface TicketsStatusProps {
-    selectedOrder: Order | null;
+    participant: Order | null;
+    order: Order | null;
+    isPaymentConfirmed: boolean;
 }
 
-export function TicketsStatus({ selectedOrder }: TicketsStatusProps) {
-    const [status, setStatus] = useState<'pending' | 'validated' | 'denied'>('pending');
+export function TicketsStatus({ participant, order, isPaymentConfirmed }: TicketsStatusProps) {
+    const [status, setStatus] = useState<'pending' | 'validated' | 'denied' | 'select-participant'>('select-participant');
     const [showRetry, setShowRetry] = useState(false);
 
     useEffect(() => {
-        if (!selectedOrder) return;
+        // Reset status when order changes
+        if (!order) {
+            setStatus('select-participant');
+            setShowRetry(false);
+            return;
+        }
 
-        // Simulate different statuses based on verifyEntry and potential errors
-        if (selectedOrder.verifyEntry) {
+        // Check payment status first - IMMEDIATE DENIED if payment not confirmed
+        if (!isPaymentConfirmed) {
+            setStatus('denied');
+            setShowRetry(true);
+            return;
+        }
+
+        // If payment is confirmed but no participant selected yet
+        if (!participant) {
+            setStatus('select-participant');
+            setShowRetry(false);
+            return;
+        }
+
+        // If payment is confirmed and participant is selected, check validation status
+        if (participant.validation) {
             setStatus('validated');
             setShowRetry(false);
         } else {
             setStatus('pending');
             setShowRetry(false);
-
-            // Simulate potential error case (you might have actual error handling)
-            // For demo, we'll randomly show denied status
-            if (Math.random() < 0.1) { // 10% chance to show denied status
-                setStatus('denied');
-                setShowRetry(true);
-            }
         }
-    }, [selectedOrder]);
+    }, [participant, order, isPaymentConfirmed]);
 
     const handleRetry = () => {
         // Simulate retry logic - in real app, you would call an API here
@@ -55,13 +70,16 @@ export function TicketsStatus({ selectedOrder }: TicketsStatusProps) {
 
         // Simulate validation after retry
         setTimeout(() => {
-            if (selectedOrder) {
-                setStatus(selectedOrder.verifyEntry ? 'validated' : 'pending');
+            if (order && !isPaymentConfirmed) {
+                setStatus('denied');
+                setShowRetry(true);
+            } else if (participant) {
+                setStatus(participant.validation ? 'validated' : 'pending');
             }
         }, 2000);
     };
 
-    if (!selectedOrder) {
+    if (!order) {
         return (
             <Card sx={{ p: 2, marginTop: 2, borderRadius: "12px", flex: 1, boxShadow: 3 }}>
                 <HeadingCommon variant="body1" title="Ticket Status" weight={600} />
@@ -71,6 +89,12 @@ export function TicketsStatus({ selectedOrder }: TicketsStatusProps) {
     }
 
     const statusConfig = {
+        'select-participant': {
+            color: "#1976d2",
+            icon: <PendingIcon fontSize="large" color="info" />,
+            title: "Select Participant",
+            message: "Please select a participant to validate ticket."
+        },
         pending: {
             color: "orange",
             icon: <PendingIcon fontSize="large" color="warning" />,
@@ -87,7 +111,9 @@ export function TicketsStatus({ selectedOrder }: TicketsStatusProps) {
             color: "red",
             icon: <BlockIcon fontSize="large" color="error" />,
             title: "Denied",
-            message: "Ticket already used or invalid."
+            message: !isPaymentConfirmed 
+                ? "Payment not confirmed. Ticket validation denied." 
+                : "Ticket already used or invalid."
         }
     };
 

@@ -74,6 +74,7 @@ export const verifyTicketCode = (verifyData) => async (dispatch) => {
       message: err?.response?.data?.message || "Error verifying ticket",
       status: err?.status,
       ticket: {},
+      eventDetails: err?.response?.data?.eventDetails||{},
       flag: err?.response?.data?.flag
     };
   }

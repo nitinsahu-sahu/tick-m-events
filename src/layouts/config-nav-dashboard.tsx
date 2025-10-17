@@ -57,7 +57,7 @@ export const navData: NavItem[] = [
     title: 'Events',
     path: '#',
     icon: icon('ic_events'),
-    info: <EventsInfo />,
+    // info: <EventsInfo />,
     roles: ['organizer'],
     children: [ // Submenu items
       {
@@ -76,7 +76,7 @@ export const navData: NavItem[] = [
     title: 'Projects',
     path: '#',
     icon: icon('ic_projects'),
-    info: <EventsInfo />,
+    // info: <EventsInfo />,
     roles: ['provider'],
     children: [ // Submenu items
       {
@@ -95,7 +95,7 @@ export const navData: NavItem[] = [
     title: 'Place A Bid',
     path: '#',
     icon: icon('ic_projects'),
-    info: <EventsInfo />,
+    // info: <EventsInfo />,
     roles: ['organizer'],
     children: [ // Submenu items
       {

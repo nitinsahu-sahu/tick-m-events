@@ -11,6 +11,7 @@ const ProviderStats = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { completedRequests } = useSelector((state: RootState) => state?.serviceRequest);
   const { averageRating } = useSelector((state: RootState) => state?.auth?.user);
+console.log(completedRequests);
 
  
   useEffect(() => {

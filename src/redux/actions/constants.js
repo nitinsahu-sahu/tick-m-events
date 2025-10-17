@@ -602,6 +602,18 @@ export const userPersonalServiceReqConstants = {
     CREATE_SUCCESS: 'CREATE_SUCCESS',
 }
 
+export const entryValidationReqConstants = {
+    GET_REQUEST: 'GET_REQUEST',
+    GET_FAILURE: 'GET_FAILURE',
+    GET_SUCCESS: 'GET_SUCCESS',
+}
+
+export const statisticsPerformanceConstants = {
+    GET_REQUEST: 'GET_REQUEST',
+    GET_FAILURE: 'GET_FAILURE',
+    GET_SUCCESS: 'GET_SUCCESS',
+}
+
 export const reminderConstants = {
     SAVE_REQUEST: 'REMINDER_SETTINGS_SAVE_REQUEST',
     SAVE_SUCCESS: 'REMINDER_SETTINGS_SAVE_SUCCESS',

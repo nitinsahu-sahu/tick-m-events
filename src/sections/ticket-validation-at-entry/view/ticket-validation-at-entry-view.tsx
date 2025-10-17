@@ -6,6 +6,7 @@ import axios from "src/redux/helper/axios";
 import { eventFetch, todayEventFetch } from "src/redux/actions/event.action";
 import { PageTitleSection } from "src/components/page-title-section";
 import { AppDispatch, RootState } from "src/redux/store";
+import { orderBasedUserEventFetch } from "src/redux/actions/participant/tickt-validation";
 
 import { Order, SelectTickets } from "../select-event";
 import { TicketsStatus } from "../ticket-status";
@@ -33,21 +34,32 @@ export function TicketValidationAtEntryView() {
     const [tickets, setTickets] = useState<Event[]>([]);
     const [upcomingQrTicket, setUpcomingQrTicket] = useState<Ticket | null>(null);
     const _id = useSelector((state: RootState) => state.auth.user?._id);
-console.log('selectedEventOrder>>',selectedEventOrder);
+    const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
+    const [isPaymentConfirmed, setIsPaymentConfirmed] = useState<boolean>(true);
 
     const handleEventSelectOrder = (order: Order | null) => {
         setSelectedEventOrder(order);
+        // Reset participant when order changes
+        setSelectedParticipant(null);
     };
+
+    const handlePaymentStatusCheck = (isConfirmed: boolean) => {
+        setIsPaymentConfirmed(isConfirmed);
+        // If payment is not confirmed, clear participant selection
+        if (!isConfirmed) {
+            setSelectedParticipant(null);
+        }
+    };
+
     useEffect(() => {
         dispatch(todayEventFetch());
+        dispatch(orderBasedUserEventFetch())
     }, [dispatch]);
 
     useEffect(() => {
         async function fetchTickets() {
             try {
                 const response = await axios.get(`/event-order/user/${_id}`);
-console.log('response>>',response);
-
                 const orders: any[] = response.data;
                 const groupedEvents: Event[] = orders.reduce((acc: Event[], order) => {
                     const eventId = order.eventDetails?._id;
@@ -59,6 +71,7 @@ console.log('response>>',response);
                         eventId: order.eventId,
                         userId: order.userId,
                         tickets: order.tickets,
+                        participantDetails: order.participantDetails,
                         totalAmount: order.totalAmount,
                         paymentStatus: order.paymentStatus,
                         paymentMethod: order.paymentMethod,
@@ -66,7 +79,7 @@ console.log('response>>',response);
                         verifyEntry: order.verifyEntry,
                         ticketCode: order.ticketCode,
                         createdAt: order.createdAt,
-                         qrCode: order.qrCode || null
+                        qrCode: order.qrCode || null
                     };
 
                     if (existingEvent) {
@@ -81,7 +94,7 @@ console.log('response>>',response);
 
                     return acc;
                 }, []);
-                setTickets(groupedEvents); // <-- pass this to <SelectTickets />
+                setTickets(groupedEvents);
             } catch (error) {
                 console.error("Error fetching tickets:", error);
             }
@@ -105,10 +118,17 @@ console.log('response>>',response);
                             events={tickets}
                             onEventSelectOrder={handleEventSelectOrder}
                             selectedEventOrder={selectedEventOrder}
+                            onParticipantSelect={setSelectedParticipant}
+                            selectedParticipant={selectedParticipant}
+                            onPaymentStatusCheck={handlePaymentStatusCheck}
                         />
 
                         {/* Ticket Status */}
-                        <TicketsStatus selectedOrder={selectedEventOrder} />
+                        <TicketsStatus 
+                            participant={selectedParticipant} 
+                            order={selectedEventOrder}
+                            isPaymentConfirmed={isPaymentConfirmed}
+                        />
                     </Box>
                 </Grid>
 

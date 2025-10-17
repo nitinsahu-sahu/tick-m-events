@@ -59,11 +59,16 @@ interface Props {
 export function TicketManagementView() {
   const now = useMemo(() => new Date(), []);
   const [activeTab, setActiveTab] = useState('Active Tickets');
+  const [visibleActiveCount, setVisibleActiveCount] = useState(2);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const { _id } = useSelector((state: RootState) => state?.auth?.user);
   const [upcomingQrTicket, setUpcomingQrTicket] = useState<Ticket | null>(null);
   const [refundRequests, setRefundRequests] = useState<RefundRequest[]>([]);
   const refundedOrderIds = refundRequests.map(req => req.orderId);
+  const handleLoadMoreActive = () => {
+    setVisibleActiveCount(prev => prev + 2);
+  };
+
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
   };
@@ -323,20 +328,36 @@ export function TicketManagementView() {
           </Typography>
 
           {tickets?.length > 0 ? (
-            <Grid container spacing={3} mt={3}>
-              {tickets
-                .filter(ticket => {
+            <>
+              <Grid container spacing={3} mt={3}>
+                {tickets
+                  .filter(ticket => {
+                    const dateStr = ticket.eventDetails?.date;
+                    const eventDate = dateStr ? new Date(dateStr) : null;
+                    return eventDate && eventDate > new Date();
+                  })
+                  .slice(0, visibleActiveCount)
+                  .map((ticketc, index) => (
+                    <Grid item xs={12} sm={6} md={6} key={index} mb={6}>
+                      <TicketCard ticket={ticketc} />
+                    </Grid>
+                  ))}
+              </Grid>
+
+              {/* Load More button */}
+              {visibleActiveCount <
+                tickets.filter(ticket => {
                   const dateStr = ticket.eventDetails?.date;
                   const eventDate = dateStr ? new Date(dateStr) : null;
                   return eventDate && eventDate > new Date();
-                })
-                .slice(0, 2)
-                .map((ticketc, index) => (
-                  <Grid item xs={12} sm={6} md={6} key={index} mb={6}>
-                    <TicketCard ticket={ticketc} />
-                  </Grid>
-                ))}
-            </Grid>
+                }).length && (
+                  <Box mt={3} display="flex" justifyContent="center">
+                    <Button variant="outlined" onClick={handleLoadMoreActive}>
+                      Load More
+                    </Button>
+                  </Box>
+                )}
+            </>
           ) : (
             <Typography variant="body1" color="textSecondary" mt={2}>
               You don&#39;t have any active tickets

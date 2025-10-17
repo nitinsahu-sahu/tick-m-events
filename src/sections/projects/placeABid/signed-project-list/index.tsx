@@ -1,14 +1,19 @@
 import {
     Typography, Box, Card, CardContent, Grid,
-    Chip, Avatar, Fade, Collapse,Tooltip, CircularProgress,
+    Chip, Avatar, Fade, Collapse, Tooltip, CircularProgress,
     Modal, IconButton, Table, TableBody,
-    TableCell, TableContainer, TableHead, TableRow
-    
+    TableCell, TableContainer, TableHead, TableRow,
+    Button, Dialog, DialogTitle, DialogContent,
+    DialogActions, Stack, Paper
 } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    ExpandMore, ExpandLess, Chat, Assignment, People, MonetizationOn, CheckCircle, ArrowForward
+    ExpandMore, ExpandLess, Chat, Assignment, People, MonetizationOn, CheckCircle, ArrowForward,
+    Print as PrintIcon, Close as CloseIcon,
+    Event as EventIcon, LocationOn as LocationIcon,
+    AttachMoney as MoneyIcon, Schedule as ScheduleIcon,
+    Description as DescriptionIcon, Person as PersonIcon
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
@@ -107,7 +112,18 @@ interface ProjectStatistics {
     cancelledProjects: number;
 }
 
-// Project Details Modal Component
+// Helper function for status colors
+function getStatusColor(status: string) {
+    switch (status) {
+        case 'pending': return 'warning';
+        case 'ongoing': return 'info';
+        case 'completed': return 'success';
+        case 'rejected': return 'error';
+        default: return 'default';
+    }
+}
+
+// Enhanced Project Details Modal Component
 function ProjectDetailsModal({
     open,
     onClose,
@@ -117,116 +133,502 @@ function ProjectDetailsModal({
     onClose: () => void;
     project: SignedProject | null;
 }) {
+    const printRef = useRef<HTMLDivElement>(null);
+
     if (!project) return null;
 
-    return (
-        <Modal open={open} onClose={onClose}>
-            <Fade in={open}>
-                <Box sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '90%',
-                    maxWidth: 800,
-                    maxHeight: '90vh',
-                    overflow: 'auto',
-                    bgcolor: 'background.paper',
-                    borderRadius: 2,
-                    boxShadow: 24,
-                    p: 4,
-                }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                        <Typography variant="h5" fontWeight="bold">
-                            Project Details
+    const handlePrint = () => {
+        const printContent = printRef.current;
+        if (!printContent) return;
+
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+
+        const allStyles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+            .map(style => style.outerHTML)
+            .join('\n');
+
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Project Contract - ${project.projectDetails._id}</title>
+                    <meta charset="utf-8">
+                    <style>
+                        @media print {
+                            body { margin: 0; padding: 20px; background: white !important; color: black !important; }
+                            .no-print { display: none !important; }
+                            .print-section { break-inside: avoid; margin-bottom: 20px; }
+                            * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
+                        }
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; }
+                        .watermark { 
+                            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg);
+                            opacity: 0.03; z-index: 0; pointer-events: none; 
+                        }
+                        .stamp { 
+                            background: linear-gradient(45deg, #FF6B6B 0%, #FF8E53 100%) !important;
+                            color: white !important; border: 3px solid white !important; 
+                        }
+                        .section-paper { 
+                            border: 1px solid #E8EAF6; border-radius: 12px; padding: 20px; 
+                            margin-bottom: 20px; background: white !important; position: relative;
+                            box-shadow: 0 2px 12px rgba(0,0,0,0.08); 
+                        }
+                    </style>
+                    ${allStyles}
+                </head>
+                <body>
+                    <div class="print-content">${printContent.innerHTML}</div>
+                    <script>window.onload = function() { window.print(); setTimeout(() => window.close(), 100); };</script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+    };
+
+    const ContractDetailsContent = () => (
+        <div ref={printRef}>
+            {/* Enhanced Header with Logo */}
+            <Box className="contract-header">
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box>
+                        <Typography variant="h4" fontWeight="bold">
+                            📄 Project Contract & Agreement
                         </Typography>
-                        <IconButton onClick={onClose} size="small">
-                            <ArrowForward />
-                        </IconButton>
+                        <Typography variant="subtitle1" sx={{ mt: 1 }}>
+                            Contract ID: <strong>{project.projectDetails._id}</strong>
+                        </Typography>
                     </Box>
+                    <Box sx={{ opacity: 0.9, transform: 'rotate(5deg)' }}>
+                        <Box className="stamp" sx={{ 
+                            width: 45, 
+                            height: 45, 
+                            borderRadius: '50%', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            fontWeight: 'bold', 
+                            fontSize: '11px', 
+                            textAlign: 'center', 
+                            lineHeight: 1.1 
+                        }}>
+                            TICK-M<br />EVENTS
+                        </Box>
+                    </Box>
+                </Box>
+            </Box>
 
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} md={6}>
-                            <Card variant="outlined" sx={{ mb: 2 }}>
-                                <CardContent>
-                                    <Typography variant="h6" gutterBottom>
-                                        Project Information
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        <strong>Category:</strong> {project.projectDetails.categoryId.name}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        <strong>Location:</strong> {project.projectDetails.eventLocation}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        <strong>Budget:</strong> {project.projectDetails.orgBudget} XAF
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        <strong>Service Time:</strong> {new Date(project.projectDetails.serviceTime).toLocaleDateString()}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
+            {/* Enhanced Content */}
+            <Box sx={{ py: 3, position: 'relative', minHeight: '100vh' }}>
+                {/* Watermark */}
+                <Box className="watermark">
+                    <Typography variant="h1" fontWeight="bold" sx={{ fontSize: '120px', color: '#667eea', whiteSpace: 'nowrap' }}>
+                      TICK-M EVENTS
+                    </Typography>
+                </Box>
 
-                            <Card variant="outlined">
-                                <CardContent>
-                                    <Typography variant="h6" gutterBottom>
-                                        Requirements
-                                    </Typography>
-                                    <div
-                                        dangerouslySetInnerHTML={{
-                                            __html: project.projectDetails.orgRequirement
-                                        }}
-                                    />
-                                </CardContent>
-                            </Card>
-                        </Grid>
+                {/* Status Bar */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, position: 'relative', zIndex: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                        <Chip 
+                            label={`Status: ${project.projectStatus}`} 
+                            color={getStatusColor(project.projectStatus)} 
+                            variant="filled" 
+                            sx={{ fontWeight: 'bold' }} 
+                        />
+                        <Chip 
+                            label={`Signed: ${project.projectDetails.isSigned ? '✅ Yes' : '❌ No'}`} 
+                            color={project.projectDetails.isSigned ? "success" : "error"} 
+                            variant="filled" 
+                        />
+                        <Chip 
+                            label={`Budget: ${project.projectDetails.orgBudget} XAF`} 
+                            color="primary" 
+                            variant="outlined" 
+                        />
+                    </Box>
+                </Box>
 
-                        <Grid item xs={12} md={6}>
-                            <Card variant="outlined" sx={{ mb: 2 }}>
-                                <CardContent>
-                                    <Typography variant="h6" gutterBottom>
-                                        Winning Bid Details
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        <strong>Bid Amount:</strong> {project.winningBid.bidAmount} XAF
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        <strong>Delivery:</strong> {project.winningBid.deliveryTime} {project.winningBid.deliveryUnit}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        <strong>Accepted Amount:</strong> {project.winningBid.winningBid} XAF
-                                    </Typography>
-                                </CardContent>
-                            </Card>
+                <Grid container spacing={3} position="relative" zIndex={1}>
+                    {/* Left Column */}
+                    <Grid item xs={12} md={6}>
+                        {/* Project Information Card */}
+                        <Paper className="section-paper" sx={{ 
 
-                            <Card variant="outlined">
-                                <CardContent>
-                                    <Typography variant="h6" gutterBottom>
-                                        Milestones
+                        }}>
+                            <Box className="stamp" sx={{ 
+                                position: 'absolute', 
+                                top: -12, 
+                                right: -12, 
+                                width: 28, 
+                                height: 28, 
+                                borderRadius: '50%', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center', 
+                                fontWeight: 'bold', 
+                                fontSize: '11px', 
+                                boxShadow: '0 3px 10px rgba(0,0,0,0.2)' 
+                            }}>
+                                TM
+                            </Box>
+                            <Typography variant="h6" gutterBottom sx={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                fontWeight: 'bold', 
+                                  borderBottom: '2px solid #667eea',
+                                pb: 1
+                            }}>
+                                 <EventIcon sx={{ mr: 1, color: '#667eea' }} /> Project Information
+                            </Typography>
+                            <Stack spacing={2} sx={{ mt: 2 }}>
+                                <Box sx={{ 
+                                    p: 2, 
+                                   
+                                }}>
+                                    <Typography variant="subtitle2" color="#667eea" fontWeight="bold">
+                                        <EventIcon sx={{ fontSize: 16, mr: 1 }} />
+                                        Category
                                     </Typography>
-                                    {project.winningBid.milestones.map((milestone, index) => (
-                                        <Box key={milestone._id} mb={1}>
-                                            <Typography variant="body2">
-                                                {index + 1}. {milestone.milestorneName} -
-                                                {milestone.amount} {milestone.currency}
+                                    <Typography variant="body1" fontWeight="500" sx={{ mt: 0.5 }}>
+                                        {project.projectDetails.categoryId.name}
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ 
+                                    p: 2, 
+                                   
+                                }}>
+                                    <Typography variant="subtitle2" color="#667eea" fontWeight="bold">
+                                        <LocationIcon sx={{ fontSize: 16, mr: 1 }} />
+                                        Location
+                                    </Typography>
+                                    <Typography variant="body1" fontWeight="500" sx={{ mt: 0.5 }}>
+                                        {project.projectDetails.eventLocation}
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ 
+                                    p: 2, 
+                                   
+                                }}>
+                                    <Typography variant="subtitle2" color="#667eea" fontWeight="bold">
+                                        <MoneyIcon sx={{ fontSize: 16, mr: 1 }} />
+                                        Budget
+                                    </Typography>
+                                    <Typography variant="body1" fontWeight="500" sx={{ mt: 0.5 }}>
+                                        {project.projectDetails.orgBudget} XAF
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ 
+                                    p: 2, 
+                                   
+                                }}>
+                                    <Typography variant="subtitle2" color="#667eea" fontWeight="bold">
+                                        <ScheduleIcon sx={{ fontSize: 16, mr: 1 }} />
+                                        Service Time
+                                    </Typography>
+                                    <Typography variant="body1" fontWeight="500" sx={{ mt: 0.5 }}>
+                                        {formatDateTimeCustom(project.projectDetails.serviceTime)}
+                                    </Typography>
+                                </Box>
+                            </Stack>
+                        </Paper>
+
+                        {/* Requirements Card */}
+                        <Paper className="section-paper" sx={{ 
+                           mt:2
+                        }}>
+                            <Typography variant="h6" gutterBottom sx={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                fontWeight: 'bold', 
+                                color: '#37474f',
+                                borderBottom: '2px solid #ff6b6b',
+                                pb: 1
+                            }}>
+                                <DescriptionIcon sx={{ mr: 1, color: '#ff6b6b' }} /> Project Requirements
+                            </Typography>
+                            <Box sx={{ 
+                                mt: 2, 
+                                p: 2, 
+
+                            }}>
+                                <div dangerouslySetInnerHTML={{ __html: project.projectDetails.orgRequirement }} />
+                            </Box>
+                        </Paper>
+                    </Grid>
+
+                    {/* Right Column */}
+                    <Grid item xs={12} md={6}>
+                        {/* Winning Bid Details Card */}
+                        <Paper className="section-paper" sx={{ 
+                           
+                        }}>
+                            <Box className="stamp" sx={{ 
+                                position: 'absolute', 
+                                top: -12, 
+                                right: -12, 
+                                width: 28, 
+                                height: 28, 
+                                borderRadius: '50%', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center', 
+                                fontWeight: 'bold', 
+                                fontSize: '11px', 
+                                boxShadow: '0 3px 10px rgba(0,0,0,0.2)' 
+                            }}>
+                                TM
+                            </Box>
+                            <Typography variant="h6" gutterBottom sx={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                fontWeight: 'bold', 
+                                color: '#37474f',
+                                borderBottom: '2px solid #4caf50',
+                                pb: 1
+                            }}>
+                                <MoneyIcon sx={{ mr: 1, color: '#4caf50' }} /> Winning Bid Details
+                            </Typography>
+                            <Stack spacing={2} sx={{ mt: 2 }}>
+                                <Box sx={{ 
+                                    p: 2, 
+                                    textAlign: 'center'
+                                }}>
+                                    <Typography variant="subtitle2" color="#4caf50" fontWeight="bold">
+                                        Bid Amount
+                                    </Typography>
+                                    <Typography variant="h5" color="#4caf50" fontWeight="bold">
+                                        {project.winningBid.bidAmount.toLocaleString()} XAF
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ 
+                                    p: 2, 
+                                    
+                                    borderRadius: 2,
+                                   
+                                    textAlign: 'center'
+                                }}>
+                                    <Typography variant="subtitle2" color="#2e7d32" fontWeight="bold">
+                                        Accepted Amount
+                                    </Typography>
+                                    <Typography variant="h5" color="#2e7d32" fontWeight="bold">
+                                        {project.winningBid.winningBid.toLocaleString()} XAF
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ 
+                                    p: 2,  
+                                    borderRadius: 2,
+                                   
+                                }}>
+                                    <Typography variant="subtitle2" color="#4caf50" fontWeight="bold">
+                                        Delivery Time
+                                    </Typography>
+                                    <Typography variant="body1" fontWeight="500" sx={{ mt: 0.5 }}>
+                                        {project.winningBid.deliveryTime} {project.winningBid.deliveryUnit}
+                                    </Typography>
+                                </Box>
+                            </Stack>
+                        </Paper>
+
+                        {/* Milestones Card */}
+                        <Paper className="section-paper" sx={{ 
+                            mt:2
+                        }}>
+                            <Typography variant="h6" gutterBottom sx={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                fontWeight: 'bold', 
+                                color: '#37474f',
+                                borderBottom: '2px solid #9c27b0',
+                                pb: 1
+                            }}>
+                                <DescriptionIcon sx={{ mr: 1, color: '#9c27b0' }} /> Payment Milestones
+                            </Typography>
+                            <Stack spacing={2} sx={{ mt: 2 }}>
+                                {project.winningBid.milestones.map((milestone, index) => (
+                                    <Box key={milestone._id} sx={{ 
+                                        p: 2, 
+                                         
+                                        borderRadius: 2,
+                                       
+                                        position: 'relative'
+                                    }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Box sx={{ 
+                                                    width: 24, 
+                                                    height: 24, 
+                                                    borderRadius: '50%', 
+                                                    backgroundColor: milestone.isReleased ? '#4caf50' : '#ff9800',
+                                                    display: 'flex', 
+                                                    alignItems: 'center', 
+                                                    justifyContent: 'center',
+                                                    color: 'white',
+                                                    fontSize: '12px',
+                                                    fontWeight: 'bold'
+                                                }}>
+                                                    {index + 1}
+                                                </Box>
+                                                <Typography variant="subtitle1" fontWeight="500">
+                                                    {milestone.milestorneName}
+                                                </Typography>
+                                            </Box>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Typography variant="h6" color="#9c27b0" fontWeight="bold">
+                                                    {milestone.amount.toLocaleString()} {milestone.currency}
+                                                </Typography>
                                                 {milestone.isReleased && (
                                                     <Chip
                                                         label="Released"
                                                         size="small"
                                                         color="success"
-                                                        sx={{ ml: 1 }}
+                                                        variant="filled"
+                                                        sx={{ fontWeight: 'bold' }}
                                                     />
                                                 )}
-                                            </Typography>
+                                            </Box>
                                         </Box>
-                                    ))}
-                                </CardContent>
-                            </Card>
-                        </Grid>
+                                    </Box>
+                                ))}
+                            </Stack>
+                        </Paper>
                     </Grid>
+                </Grid>
+
+                {/* Footer */}
+                <Box sx={{ 
+                    textAlign: 'center', 
+                    mt: 4, 
+                    pt: 3, 
+                    borderTop: '2px dashed #e0e0e0', 
+                    opacity: 0.8, 
+                    fontSize: '12px', 
+                    color: 'text.secondary', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                }}>
+                    <Box className="stamp" sx={{ 
+                        width: 22, 
+                        height: 22, 
+                        borderRadius: '50%', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        fontWeight: 'bold', 
+                        fontSize: '10px', 
+                        marginRight: '10px' 
+                    }}>
+                        TM
+                    </Box>
+                    Tick-M Events Official Contract Document • Generated on {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </Box>
-            </Fade>
-        </Modal>
+            </Box>
+        </div>
+    );
+
+    return (
+        <Dialog 
+            open={open} 
+            onClose={onClose} 
+            maxWidth="lg" 
+            fullWidth 
+            PaperProps={{ 
+                sx: { 
+                    borderRadius: 3,
+                    
+                } 
+            }}
+        >
+            <DialogTitle sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center', 
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
+                color: 'white', 
+                py: 3, 
+                position: 'relative', 
+                borderRadius: '12px 12px 0 0' 
+            }}>
+                <Box>
+                    <Typography variant="h4" fontWeight="bold">
+                        📄 Project Contract
+                    </Typography>
+                    <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+                        Contract ID: {project.projectDetails._id}
+                    </Typography>
+                </Box>
+                <IconButton 
+                    onClick={onClose} 
+                    sx={{ 
+                        color: 'white', 
+                        backgroundColor: 'rgba(255,255,255,0.2)', 
+                        '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' } 
+                    }}
+                >
+                    <CloseIcon />
+                </IconButton>
+                <Box sx={{ 
+                    position: 'absolute', 
+                    top: 20, 
+                    right: 70, 
+                    opacity: 0.9, 
+                    transform: 'rotate(5deg)' 
+                }}>
+                    <Box sx={{ 
+                        width: 45, 
+                        height: 45, 
+                        borderRadius: '50%', 
+                        background: 'linear-gradient(45deg, #FF6B6B 0%, #FF8E53 100%)', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        color: 'white', 
+                        fontWeight: 'bold', 
+                        fontSize: '12px', 
+                        border: '3px solid white', 
+                        textAlign: 'center', 
+                        lineHeight: 1.1 
+                    }}>
+                        TICK-M<br />EVENTS
+                    </Box>
+                </Box>
+            </DialogTitle>
+
+            <DialogContent dividers sx={{ py: 3, position: 'relative' }}>
+                <ContractDetailsContent />
+            </DialogContent>
+
+            <DialogActions sx={{ 
+                px: 3, 
+                py: 2, 
+                position: 'relative', 
+                zIndex: 1, 
+                background: 'white', 
+                borderRadius: '0 0 12px 12px' 
+            }}>
+                <Button 
+                    onClick={onClose} 
+                    variant="outlined" 
+                    sx={{ borderRadius: 2, px: 3 }}
+                >
+                    Close
+                </Button>
+                <Button 
+                    onClick={handlePrint} 
+                    variant="contained" 
+                    startIcon={<PrintIcon />} 
+                    sx={{ 
+                        borderRadius: 2, 
+                        px: 3, 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+                    }}
+                >
+                    Download
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 }
 
@@ -311,15 +713,6 @@ function ProjectRow({
     const [expanded, setExpanded] = useState(false);
     const [selectedContractForStatus, setSelectedContractForStatus] = useState<any>(null);
     const [statusModalOpen, setStatusModalOpen] = useState(false);
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'pending': return 'success';
-            case 'ongoing': return 'warning';
-            case 'completed': return 'info';
-            case 'rejected': return 'error';
-            default: return 'default';
-        }
-    };
 
     const handleStatusChangeClick = (contract: any) => {
         setSelectedContractForStatus(contract);
@@ -481,9 +874,11 @@ export function SignedProjectList() {
     const [modalOpen, setModalOpen] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>()
+    
     useEffect(() => {
         dispatch(fatchOrgEvents())
     }, [dispatch,__events])
+    
     const handleEventSelect = (event: any | null) => {
         setSelectedEvent(event);
         setIsLoading(true);
@@ -597,7 +992,7 @@ export function SignedProjectList() {
                     </Fade>
                 )}
 
-                {/* Project Details Modal */}
+                {/* Enhanced Project Details Modal */}
                 <ProjectDetailsModal
                     open={modalOpen}
                     onClose={handleCloseModal}

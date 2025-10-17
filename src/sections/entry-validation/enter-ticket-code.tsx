@@ -1,14 +1,16 @@
 import { Box, Button, Card, Grid, TextField, IconButton, Typography, Tooltip, Table, TableHead, TableCell, TableBody, TableRow } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from 'react-toastify';
 
 import { confirmTicketEntry, verifyTicketCode } from "src/redux/actions/eventOrder";
 import { AppDispatch } from 'src/redux/store';
-import { Iconify } from "src/components/iconify";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
-import { formatTimeToAMPM } from "src/hooks/formate-time";
-
+import { EarlyEntryCountdown } from "./validation-cards/too-early";
+import { InvalidAndExpiry } from "./validation-cards/invalid-and-expiry";
+import { PaymentPending } from "./validation-cards/payment-pending";
+import { Already } from "./validation-cards/already";
+import { Granted } from "./validation-cards/granted"; // Import the new component
 
 interface Ticket {
     _id: string;
@@ -16,7 +18,6 @@ interface Ticket {
     ticketCode: string;
     tickets: Array<{
         ticketType: string;
-
     }>;
     verifyEntry: boolean;
     entryTime?: string;
@@ -33,46 +34,54 @@ interface Ticket {
         gender: string;
         validation?: boolean;
     }>;
-
 }
-type Participant = {
-    _id: string;
-    name: string;
-    age: string;
-    gender: string;
-    validation?: boolean;
-};
-
 
 interface FlagState {
     counter: string;
     message: string;
-    ticket: Partial<Ticket>; // Partial makes all properties optional
+    eventDetails: any;
+    ticket: Partial<Ticket>;
 }
 
 interface ApiResult {
     status: number;
+    eventDetails: any;
     type: string;
     message: any;
     flag: any;
     ticket: Ticket;
 }
 
-export function EnterTicketCode({ _selectEve,eventSelected }: any) {
+export function EnterTicketCode({ _selectEve, eventSelected }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const [verifyData, setVerifyData] = useState({
         ticketCode: "",
         participantId: "",
         name: "",
-        eventId:eventSelected?._id
     });
 
     const [flag, setFlag] = useState<FlagState>({
         counter: "",
         message: "",
         ticket: {},
+        eventDetails: {}
     });
-    // Fixed the event handler to properly update state
+
+    // Reset flag and form data when eventSelected changes
+    useEffect(() => {
+        setFlag({
+            counter: "",
+            message: "",
+            ticket: {},
+            eventDetails: {}
+        });
+        setVerifyData({
+            ticketCode: "",
+            participantId: "",
+            name: "",
+        });
+    }, [eventSelected]);
+
     const handleEventChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
         setVerifyData(prev => ({
@@ -81,48 +90,10 @@ export function EnterTicketCode({ _selectEve,eventSelected }: any) {
         }));
     };
 
-    // Improved the verify callback with proper dependencies
-    // const handleVerifyTicketCode = useCallback(async (event: React.FormEvent) => {
-    //     event.preventDefault();
-
-    //     try {
-    //         const result = await dispatch(verifyTicketCode(verifyData)) as ApiResult;
-
-    //         if (result?.status === 200) {
-    //             // 🚨 Check payment status before granting entry
-    //             if (result.ticket?.paymentStatus !== "confirmed") {
-    //                 setFlag({
-    //                     counter: "paymentPending",
-    //                     message: "Payment not done",
-    //                     ticket: result.ticket,
-    //                 });
-    //                 return; // stop here
-    //             }
-
-    //             setFlag({
-    //                 counter: result.flag,
-    //                 message: result.message,
-    //                 ticket: result.ticket,
-    //             });
-
-    //         } else {
-    //             setFlag({
-    //                 counter: result?.flag,
-    //                 message: result?.message,
-    //                 ticket: result?.ticket,
-    //             });
-    //         }
-    //     } catch (error: any) {
-    //         toast.error(error.message || "Verification failed");
-    //     }
-    // }, [verifyData, dispatch]);
-
     const handleVerifyTicketCode = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
-console.log(verifyData);
-
         try {
-            const result = await dispatch(verifyTicketCode(verifyData)) as ApiResult;
+            const result = await dispatch(verifyTicketCode({ ...verifyData, eventId: eventSelected._id })) as ApiResult;
 
             if (result?.status === 200) {
                 // 🚨 Always check paymentStatus (works for ticketCode, userId, or both)
@@ -131,6 +102,7 @@ console.log(verifyData);
                         counter: "paymentPending",
                         message: "Payment not done",
                         ticket: result.ticket,
+                        eventDetails: {}
                     });
                     return;
                 }
@@ -139,6 +111,7 @@ console.log(verifyData);
                     counter: result.flag,
                     message: result.message,
                     ticket: result.ticket,
+                    eventDetails: {}
                 });
 
             } else {
@@ -146,62 +119,28 @@ console.log(verifyData);
                     counter: result?.flag,
                     message: result?.message,
                     ticket: result?.ticket,
+                    eventDetails: result?.eventDetails
                 });
             }
         } catch (error: any) {
             toast.error(error.message || "Verification failed");
         }
-    }, [verifyData, dispatch]);
+    }, [verifyData, dispatch, eventSelected._id]);
 
     const handleCancelState = () => {
         setFlag({
             counter: "",
             message: "",
-            ticket: {}
-        })
+            ticket: {},
+            eventDetails: {}
+        });
         setVerifyData({
             ticketCode: "",
             participantId: "",
             name: "",
-            eventId:null
-        })
+        });
     };
 
-
-    // const handleConfirmEntry = useCallback(async (event: React.FormEvent | null, customVerifyData?: typeof verifyData) => {
-    //     if (event) event.preventDefault();
-    //     const now = new Date();
-    //     const entryTime = now.toISOString(); // Or format as needed
-    //     const data = {
-    //         // verifyData,
-    //         verifyData: customVerifyData || verifyData,
-    //         verifyEntry: true,
-    //         entryTime // Send current time to backend
-    //     }
-    //     try {
-    //         const result = await dispatch(confirmTicketEntry(data));
-    //         if ((result as ApiResult)?.status === 200) {
-    //             toast.success('Entry Successfully');
-
-    //             setTimeout(() => {
-    //                 setFlag({
-    //                     counter: "",
-    //                     message: "",
-    //                     ticket: {}
-    //                 })
-    //                 setVerifyData({
-    //                     ticketCode: "",
-    //                     participantId: "",
-    //                     name: ""
-    //                 })
-    //             }, 4000);
-
-    //         }
-    //     } catch (error) {
-    //         toast.error('Ticket verification failed');
-    //         console.error('Verification error:', error);
-    //     }
-    // }, [verifyData, dispatch]);
     const handleConfirmEntry = useCallback(
         async (
             event: React.FormEvent | null,
@@ -230,12 +169,12 @@ console.log(verifyData);
                                 counter: "",
                                 message: "",
                                 ticket: {},
+                                eventDetails: {}
                             });
                             setVerifyData({
                                 ticketCode: "",
                                 participantId: "",
                                 name: "",
-                                eventId:null
                             });
                         }, 4000);
                     } else {
@@ -358,238 +297,30 @@ console.log(verifyData);
                 </Grid>
             </form>
 
-            {flag.counter === 'invalid' || flag.counter === 'expired' ? <Grid container spacing={2} mt={2}>
-                <Grid item xs={12} >
-                    <Card
-                        sx={{
-                            backgroundColor: '#FFCCCC',
-                            borderRadius: "12px",
-                            padding: "12px",
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            border: "2px solid #ddd",
-                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)"
-                        }}
-                    >
-                        <HeadingCommon title={flag.message} baseSize="23px" width={{ md: "34%" }} />
-                        <Tooltip title={
-                            <HeadingCommon color="white" title="No data found in this ticket Code" baseSize="12px" />
+            {/* Conditional rendering of validation components */}
+            {flag.counter === 'too_early' && (
+                <EarlyEntryCountdown flagData={flag} />
+            )}
 
-                        } arrow>
-                            <IconButton sx={{ ml: 1 }}>
-                                <Iconify icon="mdi:information-outline" />
-                            </IconButton>
-                        </Tooltip>
-                    </Card>
-                </Grid>
-            </Grid> : null}
+            {flag.counter === 'invalid' || flag.counter === 'expired' ? (
+                <InvalidAndExpiry flagData={flag} />
+            ) : null}
+
             {flag.counter === 'paymentPending' && (
-                <Grid container spacing={2} mt={2}>
-                    <Grid item xs={12}>
-                        <Card
-                            sx={{
-                                backgroundColor: '#FFF3CD',
-                                borderRadius: "12px",
-                                padding: "12px",
-                                border: "2px solid #ddd",
-                                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)"
-                            }}
-                        >
-                            <HeadingCommon
-                                title={flag.message}
-                                baseSize="23px"
-                                color="orange"
-                            />
-                            <Tooltip title={
-                                <HeadingCommon
-                                    color="white"
-                                    title="Payment must be completed before entry"
-                                    baseSize="12px"
-                                />
-                            } arrow>
-                                <IconButton sx={{ ml: 1 }}>
-                                    <Iconify icon="mdi:information-outline" />
-                                </IconButton>
-                            </Tooltip>
-                        </Card>
-                    </Grid>
-                </Grid>
+                <PaymentPending flagData={flag} />
             )}
 
-            {flag.counter === 'already' ? <Grid container spacing={2} mt={2}>
-                <Grid item xs={12} >
-                    <Card
-                        sx={{
-                            backgroundColor: '#FFD9A3',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            borderRadius: "12px",
-                            padding: "12px",
-                            border: "2px solid #ddd",
-                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)"
-                        }}
-                    >
-                        <HeadingCommon title={flag.message} baseSize="23px" width={{ md: "34%" }} />
-                        <Tooltip title={
-                            <HeadingCommon color="white" title='Book another tickets' baseSize="12px" />
+            {flag.counter === 'already' && (
+                <Already flagData={flag} />
+            )}
 
-                        } arrow>
-                            <IconButton sx={{ ml: 1 }}>
-                                <Iconify icon="mdi:information-outline" />
-                            </IconButton>
-                        </Tooltip>
-                    </Card>
-                </Grid>
-            </Grid> : null}
             {flag.counter === 'granted' && (
-                <Grid container spacing={2} mt={2}>
-                    <Grid item xs={12}>
-                        <Card
-                            sx={{
-                                backgroundColor: '#DFFFE0',
-                                borderRadius: "12px",
-                                padding: "12px",
-                                border: "2px solid #ddd",
-                                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)"
-                            }}
-                        >
-                            <HeadingCommon title={flag.message} baseSize="23px" width={{ md: "34%" }} />
-                            <HeadingCommon
-                                title={`Entry Time: ${formatTimeToAMPM(new Date().toISOString())}`}
-                                baseSize="23px"
-                                width={{ md: "34%" }}
-                            />
-                            {Array.isArray(flag.ticket.participantDetails) && (
-                                <Box mt={3}>
-                                    <Typography variant="h6" fontWeight="bold" gutterBottom>
-                                        Participant Details
-                                    </Typography>
-
-                                    {flag.ticket.participantDetails.length > 0 ? (
-                                        <Table size="small">
-                                            <TableHead>
-                                                <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
-                                                    <TableCell><b>Name</b></TableCell>
-                                                    <TableCell><b>Age</b></TableCell>
-                                                    <TableCell><b>Gender</b></TableCell>
-                                                    <TableCell><b>Action</b></TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {flag.ticket.participantDetails.map((p: any, i: number) => (
-                                                    <TableRow key={i}>
-                                                        <TableCell>{p.name}</TableCell>
-                                                        <TableCell>{p.age}</TableCell>
-                                                        <TableCell>{p.gender}</TableCell>
-                                                        <TableCell>
-                                                            <Button
-                                                                variant="contained"
-                                                                size="small"
-                                                                sx={{
-                                                                    backgroundColor: p.validation ? "gray" : "green",
-                                                                    color: "white",
-                                                                    borderRadius: "6px",
-                                                                    "&:hover": {
-                                                                        backgroundColor: p.validation ? "gray" : "darkgreen"
-                                                                    },
-                                                                }}
-                                                                disabled={p.validation}
-                                                                onClick={() => handleConfirmEntry(null, {
-                                                                    ticketCode: flag.ticket.ticketCode || "",
-                                                                    participantId: p._id,
-                                                                    name: "",
-                                                                    eventId:eventSelected._id
-                                                                })}
-                                                            >
-                                                                {p.validation ? "✔ Entered" : "Confirm"}
-                                                            </Button>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
-                                    ) : (
-                                        <Typography color="textSecondary" mt={2}>
-                                            No participant details available for this ticket.
-                                        </Typography>
-                                    )}
-                                </Box>
-                            )}
-                            <Box
-                                display="flex"
-                                justifyContent="space-between"
-                                my={1}
-                                flexDirection={{ xs: 'column', sm: 'row', md: 'row' }}
-                                gap={{ xs: 2, sm: 0, md: 0 }}
-                            >
-                                <Button
-                                    variant="contained"
-                                    sx={{
-                                        backgroundColor: "green",
-                                        color: "white",
-                                        borderRadius: "8px",
-                                        "&:hover": { backgroundColor: "darkgreen" },
-                                        width: { xs: '100%', sm: 'auto', md: 'auto' }
-                                    }}
-                                    disabled={
-                                        flag.ticket.verifyEntry ||
-                                        (flag.ticket.participantDetails?.some((p) => !p.validation) ?? false)
-                                    }
-                                    onClick={handleConfirmEntry}
-                                >
-                                    Confirm Entry
-                                </Button>
-
-                                <Box
-                                    display="flex"
-                                    alignItems="center"
-                                    width={{ xs: '100%', sm: 'auto', md: 'auto' }}
-                                    gap={1}
-                                >
-                                    <Button
-                                        variant="contained"
-                                        sx={{
-                                            backgroundColor: "red",
-                                            color: "white",
-                                            borderRadius: "8px",
-                                            "&:hover": { backgroundColor: "darkred" },
-                                            width: { xs: '100%', sm: 'auto', md: 'auto' }
-                                        }}
-                                        onClick={handleCancelState}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Tooltip
-                                        title={
-                                            <>
-                                                <HeadingCommon color="white" title={`Name: ${flag?.ticket?.userId?.name}`} baseSize="12px" />
-                                                <HeadingCommon color="white" title={`Email: ${flag?.ticket?.userId?.email}`} baseSize="12px" />
-                                                <HeadingCommon
-                                                    color="white"
-                                                    title={`Ticket Type: ${flag?.ticket?.tickets?.[0]?.ticketType || 'N/A'}`}
-                                                    baseSize="12px"
-                                                />
-                                                <HeadingCommon
-                                                    title={flag?.ticket?.verifyEntry ? "Ticket Status: Verified" : "Ticket Status: Unverified"}
-                                                    baseSize="12px"
-                                                    color="white"
-                                                />
-                                            </>
-                                        }
-                                        arrow
-                                    >
-                                        <IconButton sx={{ ml: 1 }}>
-                                            <Iconify icon="mdi:information-outline" />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Box>
-                            </Box>
-                        </Card>
-                    </Grid>
-                </Grid>
+                <Granted 
+                    flagData={flag} 
+                    onConfirmEntry={handleConfirmEntry}
+                    onCancel={handleCancelState}
+                />
             )}
-
-
         </Box>
     );
 }

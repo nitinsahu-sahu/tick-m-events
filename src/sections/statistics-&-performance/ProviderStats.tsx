@@ -1,40 +1,24 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Box, Grid, Typography, Paper } from '@mui/material';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import StarRateIcon from '@mui/icons-material/StarRate';
-import { AppDispatch, RootState } from 'src/redux/store';
-import { getRequestsByProvider } from '../../redux/actions/service-request';
 
-const ProviderStats = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { completedRequests } = useSelector((state: RootState) => state?.serviceRequest);
-  const { averageRating } = useSelector((state: RootState) => state?.auth?.user);
-console.log(completedRequests);
-
- 
-  useEffect(() => {
-    dispatch(getRequestsByProvider());
-  }, [dispatch]);
-
-  const contractCount = completedRequests?.length || 0;
-console.log();
+const ProviderStats = ({ contractObtained, revenueGenerated, customerRatings }: any) => {
 
   const stats = [
     {
       title: 'Contracts Obtained',
-      value: contractCount,
+      value: contractObtained || 0,
       icon: <AssignmentIcon sx={{ fontSize: 40, color: '#0099E5' }} />,
     },
     {
       title: 'Revenue Generated',
-      value: '5,000,000 XAF', // You can make this dynamic
+      value: `${revenueGenerated || 0} XAF`, // You can make this dynamic
       icon: <MonetizationOnIcon sx={{ fontSize: 40, color: '#0099E5' }} />,
     },
     {
       title: 'Customer Ratings',
-      value: `${averageRating||0}/5`, // You can make this dynamic
+      value: `${customerRatings || 0}/5`, // You can make this dynamic
       icon: <StarRateIcon sx={{ fontSize: 40, color: '#0099E5' }} />,
     },
   ];
@@ -42,7 +26,7 @@ console.log();
   return (
     <Box sx={{ my: 4 }}>
       <Grid container spacing={3}>
-        {stats.map((stat, index) => (
+        {stats?.map((stat, index) => (
           <Grid item xs={12} sm={4} key={index}>
             <Paper
               elevation={3}

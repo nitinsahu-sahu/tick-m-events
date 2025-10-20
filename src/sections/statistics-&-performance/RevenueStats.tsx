@@ -21,57 +21,100 @@ import {
   Bar,
 } from 'recharts';
 
-const monthlyData = [
-  { name: 'April', revenue: 150000 },
-  { name: 'May', revenue: 350000 },
-  { name: 'June', revenue: 400000 },
-  { name: 'July', revenue: 800000 },
-  { name: 'August', revenue: 600000 },
-  { name: 'September', revenue: 250000 },
-  { name: 'October', revenue: 450000 },
-  { name: 'November', revenue: 700000 },
-];
+// Custom tooltip component
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <Paper
+        elevation={3}
+        sx={{
+          p: 1.5,
+          bgcolor: 'background.paper',
+          border: '1px solid #e0e0e0',
+        }}
+      >
+        <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+          {label}
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#0099E5' }}>
+          Total Revenue: {(payload[0]?.value || 0).toLocaleString()} XAF
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#ff6b6b' }}>
+          Bid Revenue: {(payload[1]?.value || 0).toLocaleString()} XAF
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#4ecdc4' }}>
+          Event Revenue: {(payload[2]?.value || 0).toLocaleString()} XAF
+        </Typography>
+      </Paper>
+    );
+  }
 
-const dailyData = [
-  { day: '06', a: 50, b: 80 },
-  { day: '07', a: 90, b: 60 },
-  { day: '08', a: 75, b: 50 },
-  { day: '09', a: 100, b: 85 },
-  { day: '10', a: 60, b: 70 },
-  { day: '11', a: 85, b: 65 },
-  { day: '12', a: 55, b: 80 },
-  { day: '13', a: 90, b: 60 },
-  { day: '14', a: 70, b: 20 },
-  { day: '15', a: 40, b: 95 },
-];
+  return null;
+};
 
-const RevenueStats = () => {
+const RevenueStats = ({ monthlyRevenueGrowth, dailyPercentageChange, revenueBreakdown }: any) => {
   const [tab, setTab] = React.useState(0);
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const cardHeight = isMobile ? 'auto' : 400;
+  // Transform monthlyRevenueGrowth data for the chart
+  const transformChartData = () => monthlyRevenueGrowth?.map((month:any) => ({
+    name: month.period,
+    shortName: new Date(month.year, month.month - 1).toLocaleString('default', { month: 'short' }),
+    totalRevenue: month.totalRevenue,
+    bidRevenue: month.bidRevenue,
+    eventReqRevenue: month.eventReqRevenue,
+    totalProjects: month.totalProjects,
+    bidProjects: month.bidProjects,
+    eventReqProjects: month.eventReqProjects,
+  }));
+
+  const chartData = transformChartData();
+  
+  // Calculate dynamic Y-axis domain based on data
+  const calculateYAxisDomain = () => {
+    const maxRevenue = Math.max(...chartData.map((item:any) => item.totalRevenue));
+    const paddedMax = maxRevenue * 1.2;
+    return [0, Math.ceil(paddedMax / 1000) * 1000];
+  };
+
+  const [yMin, yMax] = calculateYAxisDomain();
+
+  // Format Y-axis ticks
+  const formatYAxisTick = (value:any) => {
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(0)}M`;
+    }
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(0)}k`;
+    }
+    return value === 0 ? '' : value.toString();
+  };
 
   return (
     <Grid container spacing={3}>
-      {/* Line Chart */}
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={12}>
         <Paper
           elevation={3}
           sx={{
             borderRadius: '16px',
             p: 2,
-            height: cardHeight,
+            height: { xs: 300, sm: 350, md: 400 },
             display: 'flex',
             flexDirection: 'column',
             border: '1px solid #E0E0E0',
             boxShadow: '0 0 10px rgba(0,0,0,0.15)',
           }}
         >
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            flexWrap: 'wrap', 
+            gap: 1 
+          }}>
             <Typography variant="h6" fontWeight="bold">
-              Monthly Revenue Growth <span style={{ color: '#777' }}>2025</span>
+              Monthly Revenue Growth <span style={{ color: '#777' }}>2024-2025</span>
             </Typography>
             <Tabs
               value={tab}
@@ -80,96 +123,158 @@ const RevenueStats = () => {
               indicatorColor="primary"
               sx={{
                 minHeight: 'unset',
-                '& .MuiTab-root': { minHeight: 'unset', fontSize: 13 },
+                '& .MuiTab-root': { 
+                  minHeight: 'unset', 
+                  fontSize: { xs: 12, sm: 13 },
+                  px: { xs: 1, sm: 2 }
+                },
               }}
             >
-              <Tab label="Monthly" />
-              <Tab label="Weekly" />
-              <Tab label="Daily" />
+              <Tab label="Revenue" />
+              <Tab label="Projects" />
+              <Tab label="Breakdown" />
             </Tabs>
           </Box>
 
-          {/* Chart container */}
           <Box sx={{ flexGrow: 1, mt: 3 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tickMargin={8}
-                  padding={{ left: 30, right: 20 }}
-                />
-                <YAxis
-                  domain={[0, 800000]}
-                  tickFormatter={(value) => (value === 0 ? '' : `${value / 1000}k`)}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#0099E5"
-                  strokeWidth={3}
-                  dot={{ r: 5 }}
-                />
-              </LineChart>
+              {tab === 0 ? (
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="shortName"
+                    axisLine={false}
+                    tickLine={false}
+                    tickMargin={8}
+                    padding={{ left: 10, right: 10 }}
+                  />
+                  <YAxis
+                    domain={[yMin, yMax]}
+                    tickFormatter={formatYAxisTick}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Line
+                    type="monotone"
+                    dataKey="totalRevenue"
+                    stroke="#0099E5"
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: '#0099E5' }}
+                    activeDot={{ r: 6, fill: '#0099E5' }}
+                    name="Total Revenue"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="bidRevenue"
+                    stroke="#ff6b6b"
+                    strokeWidth={2}
+                    strokeDasharray="3 3"
+                    dot={{ r: 3, fill: '#ff6b6b' }}
+                    name="Bid Revenue"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="eventReqRevenue"
+                    stroke="#4ecdc4"
+                    strokeWidth={2}
+                    strokeDasharray="3 3"
+                    dot={{ r: 3, fill: '#4ecdc4' }}
+                    name="Event Revenue"
+                  />
+                </LineChart>
+              ) : tab === 1 ? (
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="shortName"
+                    axisLine={false}
+                    tickLine={false}
+                    tickMargin={8}
+                    padding={{ left: 10, right: 10 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip />
+                  <Bar
+                    dataKey="totalProjects"
+                    fill="#8884d8"
+                    name="Total Projects"
+                    radius={[2, 2, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="bidProjects"
+                    fill="#82ca9d"
+                    name="Bid Projects"
+                    radius={[2, 2, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="eventReqProjects"
+                    fill="#ffc658"
+                    name="Event Projects"
+                    radius={[2, 2, 0, 0]}
+                  />
+                </BarChart>
+              ) : (
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="shortName"
+                    axisLine={false}
+                    tickLine={false}
+                    tickMargin={8}
+                    padding={{ left: 10, right: 10 }}
+                  />
+                  <YAxis
+                    tickFormatter={formatYAxisTick}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip />
+                  <Bar
+                    dataKey="bidRevenue"
+                    stackId="a"
+                    fill="#ff6b6b"
+                    name="Bid Revenue"
+                    radius={[2, 2, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="eventReqRevenue"
+                    stackId="a"
+                    fill="#4ecdc4"
+                    name="Event Revenue"
+                    radius={[2, 2, 0, 0]}
+                  />
+                </BarChart>
+              )}
             </ResponsiveContainer>
           </Box>
-        </Paper>
-      </Grid>
 
-      {/* Bar Chart */}
-      <Grid item xs={12} md={6}>
-        <Paper
-          elevation={3}
-          sx={{
-            borderRadius: '14px',
-            p: 2,
-            bgcolor: '#0099E5',
-            color: '#fff',
-            position: 'relative',
-            height: cardHeight,
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <Typography variant="h6" fontWeight="bold">
-            Revenue Breakdown
-          </Typography>
-
-          <Typography variant="body2" mb={1}>
-            Than last day
-          </Typography>
-
-          {/* 94% and triangle icon */}
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="flex-end"
-            position="absolute"
-            top={16}
-            right={16}
-          >
-            <Typography variant="h3" fontWeight="bold" mr={1}>
-              94%
-            </Typography>
-            <Box component="img" src="./assets/icons/dashboard/ic_arrow_up_white.svg" width={16} height={16} />
-
-          </Box>
-
-          {/* Bar chart */}
-          <Box sx={{ flexGrow: 1, mt: 3 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={dailyData}>
-                <XAxis dataKey="day" stroke="#fff" axisLine={false} tickLine={false} />
-                <Tooltip />
-                <Bar dataKey="a" fill="#fff" barSize={10} radius={[10, 10, 0, 0]} />
-                <Bar dataKey="b" fill="#002f5f" barSize={10} radius={[10, 10, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: 3, 
+            mt: 2, 
+            flexWrap: 'wrap' 
+          }}>
+            {tab === 0 && (
+              <>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ width: 12, height: 3, bgcolor: '#0099E5' }} />
+                  <Typography variant="body2">Total Revenue</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ width: 12, height: 2, bgcolor: '#ff6b6b', border: '1px dashed #ff6b6b' }} />
+                  <Typography variant="body2">Bid Revenue</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ width: 12, height: 2, bgcolor: '#4ecdc4', border: '1px dashed #4ecdc4' }} />
+                  <Typography variant="body2">Event Revenue</Typography>
+                </Box>
+              </>
+            )}
           </Box>
         </Paper>
       </Grid>

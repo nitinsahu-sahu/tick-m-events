@@ -14,6 +14,7 @@ import { recommTrandingPopularEventFetch } from './redux/actions/home-recommenda
 import NotificationsHandler from './utils/notification-handle';
 import { getPromotionLogo } from './redux/actions/customization/promotion-logo';
 import { LanguageProvider } from './redux/contexts/LanguageContext';
+import { statisticsPerformanceFetch } from './redux/actions/provider/statisticsAndPerformance';
 
 
 // ----------------------------------------------------------------------
@@ -30,6 +31,8 @@ export default function App() {
     dispatch(todayEventFetch());
     dispatch(getPromotionLogo())
     dispatch(recommTrandingPopularEventFetch());
+    dispatch(statisticsPerformanceFetch());
+
   }, [dispatch]);
 
   useEffect(() => {

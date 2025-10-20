@@ -1,7 +1,8 @@
-import { placeABidConstants, providerProposalConstants } from "src/redux/actions/constants";
+import { placeABidConstants, providerProposalConstants, statisticsPerformanceConstants } from "src/redux/actions/constants";
 
 const initialState = {
     loading: false,
+    statistics:{},
     _projects: [],
     _mybids: [],
     _project: {},
@@ -15,6 +16,25 @@ const placeABidReducer = (state, action) => {
     }
 
     switch (action.type) {
+        case statisticsPerformanceConstants.GET_REQUEST:
+            return {
+                ...state,
+                loading: true
+            };
+        case statisticsPerformanceConstants.GET_SUCCESS:
+            return {
+                ...state,
+                message: action.payload.message,
+                statistics: action.payload.statistics,
+                loading: false
+            };
+        case statisticsPerformanceConstants.GET_FAILURE:
+            return {
+                ...state,
+                error: action.payload.error,
+                loading: true
+            };
+
         case providerProposalConstants.UPDATE_MYBID_REQUEST:
             return { ...state, loading: true };
 

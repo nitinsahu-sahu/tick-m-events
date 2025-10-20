@@ -6,14 +6,12 @@ export const statisticsPerformanceFetch = () => async (dispatch) => {
 
   try {
     const response = await axios.get(`/p/statistics`);
-    console.log('ss',response.data);
     
     dispatch({
       type: statisticsPerformanceConstants.GET_SUCCESS,
       payload: {
         message: response?.data?.message,
-        allOrders: response?.data?.allOrders,
-        verifiedOrders: response?.data?.verifiedOrders,
+        statistics: response?.data.statistics,
       },
     });
   } catch (error) {

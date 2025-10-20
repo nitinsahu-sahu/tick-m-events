@@ -1,12 +1,8 @@
-import React from 'react';
 import {
   Box,
   Grid,
   Paper,
   Typography,
-  Button,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material';
 import {
   LineChart,
@@ -19,30 +15,33 @@ import {
 } from 'recharts';
 import { TrendingUp } from '@mui/icons-material';
 
-const statCards = [
-  {
-    icon: <TrendingUp sx={{ fontSize: 40, color: '#007BBA' }} />,
-    title: 'Offer Conversion Rate',
-    value: '45%',
-    subtitle: 'of sent proposals accepted',
-  },
-];
+export default function DashboardSummary({ performanceTrend, offerConversionRate }: any) {
+  // Safely process performanceTrend data for the chart
+  const getChartData = () => {
+    if (!performanceTrend || !Array.isArray(performanceTrend)) {
+      return [];
+    }
 
-const monthlyData = [
-  { name: 'April', revenue: 150000 },
-  { name: 'May', revenue: 350000 },
-  { name: 'June', revenue: 400000 },
-  { name: 'July', revenue: 800000 },
-  { name: 'August', revenue: 600000 },
-  { name: 'September', revenue: 250000 },
-  { name: 'October', revenue: 450000 },
-  { name: 'November', revenue: 700000 },
-];
+    return performanceTrend
+      .filter(item => item && typeof item === 'object')
+      .map(item => ({
+        name: item.monthName || `Month ${item.month}`,
+        revenue: item.totalRevenue || 0,
+        period: item.period || `${item.monthName} ${item.year}`
+      }))
+      .filter(item => item.revenue > 0); // Only show months with revenue data
+  };
 
-export default function DashboardSummary() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const cardHeight = isMobile ? 'auto' : 400;
+  const chartData = getChartData();
+
+  const statCards = [
+    {
+      icon: <TrendingUp sx={{ fontSize: 40, color: '#007BBA' }} />,
+      title: 'Offer Conversion Rate',
+      value: `${offerConversionRate || 0}%`,
+      subtitle: 'of sent proposals accepted',
+    },
+  ];
 
   return (
     <Box
@@ -90,7 +89,7 @@ export default function DashboardSummary() {
               </Typography>
               <Typography fontSize={13}>{statCards[0].subtitle}</Typography>
             </Box>
-            </Paper>
+          </Paper>
         </Grid>
 
         <Grid item xs={12} md={8}>
@@ -99,7 +98,7 @@ export default function DashboardSummary() {
             sx={{
               borderRadius: '14px',
               p: 2,
-              height: cardHeight,
+              height: { xs: 300, sm: 350, md: 400 },
               display: 'flex',
               flexDirection: 'column',
               border: '1px solid #E0E0E0',
@@ -113,57 +112,59 @@ export default function DashboardSummary() {
             </Box>
 
             <Box sx={{ flexGrow: 1, mt: 3 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis
-                    dataKey="name"
-                    axisLine={false}
-                    tickLine={false}
-                    tickMargin={8}
-                    padding={{ left: 30, right: 20 }}
-                  />
-                  <YAxis
-                    domain={[0, 800000]}
-                    tickFormatter={(value) => (value === 0 ? '' : `${value / 1000}k`)}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="#0099E5"
-                    strokeWidth={3}
-                    dot={{ r: 5 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {
+                chartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis
+                        dataKey="period"
+                        axisLine={false}
+                        tickLine={false}
+                        tickMargin={8}
+                        padding={{ left: 30, right: 20 }}
+                      />
+                      <YAxis
+                        domain={[0, 80000]}
+                        tickFormatter={(value) => (value === 0 ? '' : `${value / 1000} XAF`)}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <Tooltip />
+                      <Line
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="#0099E5"
+                        strokeWidth={3}
+                        dot={{ r: 5 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <Box
+                    sx={{
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexDirection: 'column',
+                      color: 'text.secondary'
+                    }}
+                  >
+                    <Typography variant="h6" gutterBottom>
+                      No Data Available
+                    </Typography>
+                    <Typography variant="body2">
+                      Revenue data will appear here once projects are completed.
+                    </Typography>
+                  </Box>
+                )
+              }
+
             </Box>
           </Paper>
         </Grid>
       </Grid>
     </Box>
-  );
-}
-
-function DarkRoundedButton({ children }: { children: React.ReactNode }) {
-  return (
-    <Button
-      fullWidth
-      sx={{
-        backgroundColor: '#0B2E4C',
-        color: 'white',
-        textTransform: 'none',
-        borderRadius: '20px',
-        height: 45,
-        fontWeight: 500,
-        '&:hover': {
-          backgroundColor: '#071E33',
-        },
-      }}
-    >
-      {children}
-    </Button>
   );
 }

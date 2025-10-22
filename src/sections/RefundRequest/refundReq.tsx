@@ -18,7 +18,7 @@ import {
   MenuItem,
   InputAdornment,
   Card,
-  CardContent,Modal,
+  CardContent, Modal,
   Grid,
   Divider,
   IconButton,
@@ -34,12 +34,17 @@ import PersonIcon from '@mui/icons-material/Person';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import PaymentIcon from '@mui/icons-material/Payment';
 import NotesIcon from '@mui/icons-material/Notes';
+import DescriptionIcon from '@mui/icons-material/Description';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import InfoIcon from '@mui/icons-material/Info';
 import { getAdminRefundReq } from "src/redux/actions/admin/refund-requests";
 import { AppDispatch, RootState } from "src/redux/store";
 import { formatEventDate } from "src/hooks/formate-time";
 
 import { DashboardContent } from "src/layouts/dashboard";
 import { RefundRequestTyp } from "./utils";
+import axios from '../../redux/helper/axios';
 
 // Modal Style
 const modalStyle = {
@@ -48,27 +53,49 @@ const modalStyle = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: {
-    xs: '95%', // Full width on mobile with small margins
-    sm: '90%', // Slightly larger on small screens
-    md: '85%', // Medium on tablets
-    lg: '80%', // Large on desktop
-    xl: '75%'  // Extra large screens
+    xs: '95%',
+    sm: '90%',
+    md: '85%',
+    lg: '80%',
+    xl: '75%'
   },
   maxWidth: '1200px',
   maxHeight: {
-    xs: '85vh', // Smaller height on mobile
-    sm: '90vh', // Larger on bigger screens
+    xs: '85vh',
+    sm: '90vh',
   },
   bgcolor: 'background.paper',
   borderRadius: 2,
   boxShadow: 24,
   p: {
-    xs: 2, // Less padding on mobile
-    sm: 3, // More padding on larger screens
+    xs: 2,
+    sm: 3,
     md: 4
   },
   overflow: 'auto'
 };
+
+// Types for API Response
+interface ApiResponseData {
+  paymentStatusCheck?: {
+    url: string;
+    status: number;
+    data: any;
+    error?: string;
+  };
+  payoutRequest?: {
+    url: string;
+    status: number;
+    data: any;
+    requestBody: any;
+    error?: string;
+  };
+  error?: {
+    message: string;
+    stack?: string;
+    fullError?: any;
+  };
+}
 
 // Status Card Component
 const StatusCard = ({ status, amount, date }: { status: string; amount: number; date: string }) => {
@@ -88,7 +115,7 @@ const StatusCard = ({ status, amount, date }: { status: string; amount: number; 
   return (
     <Card sx={{ bgcolor: statusConfig.bgcolor, border: `1px solid ${statusConfig.color}20` }}>
       <CardContent>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" justifyContent="space-between">
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" justifyContent="between">
           <Box>
             <Typography variant="h6" fontWeight="bold" color={statusConfig.color}>
               {statusConfig.label}
@@ -111,20 +138,97 @@ const StatusCard = ({ status, amount, date }: { status: string; amount: number; 
   );
 };
 
-// Info Row Component
-const InfoRow = ({ icon, label, value, color = "primary" }: { icon: React.ReactNode; label: string; value: string; color?: string }) => (
-  <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mb: 2 }}>
-    <Box sx={{ color, mt: 0.5 }}>{icon}</Box>
-    <Box flex={1}>
-      <Typography variant="body2" color="text.secondary" fontWeight="medium">
-        {label}
-      </Typography>
-      <Typography variant="body1" fontWeight="medium">
-        {value}
-      </Typography>
-    </Box>
-  </Stack>
-);
+// API Response Display Component - Human Readable
+const ApiResponseDisplay = ({ responseData, title }: { responseData: any; title: string }) => {
+  if (!responseData) return null;
+
+  const getDisplayStatus = () => {
+    // If there's an explicit error message
+    if (responseData.error) {
+      return responseData.error;
+    }
+    // For payment status check
+    if (responseData.data?.status) {
+      return responseData.data.status;
+    }
+    // For payout response - show the actual message
+    if (responseData.data?.message) {
+      return responseData.data.message;
+    }
+    // Fallback to HTTP status with description
+    return `HTTP ${responseData.status} ${responseData.status >= 400 ? 'Error' : 'Success'}`;
+  };
+
+  const getStatusIcon = () => {
+    const status = getDisplayStatus().toLowerCase();
+    if (status.includes('successful') || status.includes('success') || responseData.status < 400) return <CheckCircleIcon color="success" />;
+    if (status.includes('error') || status.includes('failed') || status.includes('rejected') || status.includes('not found') || responseData.status >= 400) return <ErrorIcon color="error" />;
+    if (status.includes('pending')) return <InfoIcon color="info" />;
+    return <InfoIcon color="info" />;
+  };
+
+  const getStatusColor = () => {
+    const status = getDisplayStatus().toLowerCase();
+    if (status.includes('successful') || status.includes('success') || responseData.status < 400) return 'success.main';
+    if (status.includes('error') || status.includes('failed') || status.includes('rejected') || status.includes('not found') || responseData.status >= 400) return 'error.main';
+    if (status.includes('pending')) return 'warning.main';
+    return 'info.main';
+  };
+
+  const hasError = () => {
+    const status = getDisplayStatus().toLowerCase();
+    return status.includes('error') || status.includes('failed') || status.includes('rejected') || status.includes('not found') || responseData.status >= 400;
+  };
+
+  return (
+    <Card sx={{ mt: 2, border: hasError() ? '2px solid' : 'none', borderColor: hasError() ? 'error.main' : 'transparent' }}>
+      <CardContent>
+        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <DescriptionIcon color={hasError() ? "error" : "primary"} />
+          {title}
+        </Typography>
+        
+        {/* Error Alert Box */}
+        {hasError() && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            <Typography variant="body1" fontWeight="bold">
+              {getDisplayStatus()}
+            </Typography>
+          </Alert>
+        )}
+
+        {/* Request Info */}
+        <Box sx={{ mb: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+          <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+            Request Details:
+          </Typography>
+          <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+            <strong>Status:</strong> 
+            {getStatusIcon()}
+            <Box component="span" color={getStatusColor()}>
+              {getDisplayStatus()}
+            </Box>
+          </Typography>
+        </Box>
+
+        {/* Request Body for Payout */}
+        {responseData.requestBody && (
+          <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1, mt: 2 }}>
+            <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+              Request Sent:
+            </Typography>
+            {Object.entries(responseData.requestBody).map(([key, value]: [string, any]) => (
+              <Typography key={key} variant="body2" sx={{ mb: 1 }}>
+                <strong>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</strong>{' '}
+                {String(value)}
+              </Typography>
+            ))}
+          </Box>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
 
 export function RefundReq() {
   const dispatch = useDispatch<AppDispatch>();
@@ -133,6 +237,10 @@ export function RefundReq() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedRequest, setSelectedRequest] = useState<RefundRequestTyp | null>(null);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [apiResponse, setApiResponse] = useState<ApiResponseData | null>(null);
+  const [adminNotes, setAdminNotes] = useState<string>('');
+  const [loadingRefund, setLoadingRefund] = useState(false);
+  const [savingNotes, setSavingNotes] = useState(false);
 
   useEffect(() => {
     dispatch(getAdminRefundReq());
@@ -163,7 +271,7 @@ export function RefundReq() {
       currency: 'XAF'
     }).format(amount);
 
-  // Filter refund requests based on search and status
+  // Filter refund requests
   const filteredRefundReqs: RefundRequestTyp[] = refundReqs?.filter((request: RefundRequestTyp) => {
     const matchesSearch =
       request.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -177,23 +285,259 @@ export function RefundReq() {
 
   // Handler functions
   const handleViewDetails = (request: RefundRequestTyp): void => {
-   setSelectedRequest(request);
+    setSelectedRequest(request);
     setModalOpen(true);
-    // Implement view details logic
-  };
- const handleCloseModal = (): void => {
-    setModalOpen(false);
-    setSelectedRequest(null);
-  };
-  const handleApprove = (request: RefundRequestTyp): void => {
-    console.log('Approve request:', request);
-    // Implement approve logic
+    setApiResponse(null);
+    setAdminNotes(request.adminNotes || '');
   };
 
-  const handleReject = (request: RefundRequestTyp): void => {
-    console.log('Reject request:', request);
-    // Implement reject logic
+  const handleCloseModal = (): void => {
+    setModalOpen(false);
+    setSelectedRequest(null);
+    setApiResponse(null);
+    setAdminNotes('');
   };
+
+  const handleApprove = async (request: RefundRequestTyp) => {
+    try {
+      const res = await axios.put(`/refund-request/${request._id}`, {
+        refundStatus: 'approved',
+        adminNotes: adminNotes || 'Refund request approved by admin',
+      });
+      console.log("✅ Refund request approved:", res.data);
+      alert('Refund request approved successfully!');
+      dispatch(getAdminRefundReq()); // Refresh the list
+      handleCloseModal();
+    } catch (err: any) {
+      console.error("❌ Failed to approve refund:", err.response?.data || err.message);
+      alert(`Failed to approve refund: ${err.response?.data?.message || err.message}`);
+    }
+  };
+
+  const handleReject = async (request: RefundRequestTyp) => {
+    try {
+      const res = await axios.put(`/refund-request/${request._id}`, {
+        refundStatus: 'rejected',
+        adminNotes: adminNotes || 'Refund request rejected by admin',
+      });
+      console.log("✅ Refund request rejected:", res.data);
+      alert('Refund request rejected successfully!');
+      dispatch(getAdminRefundReq()); // Refresh the list
+      handleCloseModal();
+    } catch (err: any) {
+      console.error("❌ Failed to reject refund:", err.response?.data || err.message);
+      alert(`Failed to reject refund: ${err.response?.data?.message || err.message}`);
+    }
+  };
+
+const handleProceedRefund = async (request: RefundRequestTyp) => {
+  try {
+    console.log("🟢 Starting refund process for:", request);
+    setLoadingRefund(true);
+    setApiResponse(null);
+
+    // Step 1: Check payment status
+    const transId = request.transactionId;
+    console.log("🔍 Checking payment status for transId:", transId);
+
+    const statusRes = await fetch(`https://sandbox.fapshi.com/payment-status/${transId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "apiuser": "f046347f-8d27-40cd-af94-90bc44f3d2c7",
+        "apikey": "FAK_TEST_177a608c18c0db8c50be",
+      },
+    });
+
+    console.log("📡 Payment status response status:", statusRes.status);
+    const statusData = await statusRes.json();
+    
+    // Check if transaction not found or other error
+    let paymentError = '';
+    if (statusRes.status === 404) {
+      paymentError = 'Transaction not found';
+    } else if (statusRes.status >= 400) {
+      paymentError = statusData.message || `Payment status check failed with status ${statusRes.status}`;
+    } else if (statusData?.status !== "SUCCESSFUL") {
+      paymentError = `Transaction status: ${statusData.status}. Refund cannot proceed.`;
+    }
+
+    // Store payment status response with proper typing
+    setApiResponse((prev: ApiResponseData | null) => ({
+      ...prev,
+      paymentStatusCheck: {
+        url: `https://sandbox.fapshi.com/payment-status/${transId}`,
+        status: statusRes.status,
+        data: statusData,
+        error: paymentError
+      }
+    }));
+
+    if (paymentError) {
+      setAdminNotes(`Payment status check failed: ${paymentError}`);
+      return;
+    }
+
+    console.log("✅ Transaction successful. Proceeding with payout...");
+
+    let phoneNumber = request.user.phone || "";
+    // Ensure it includes country code (Cameroon = 237)
+    if (phoneNumber && !phoneNumber.startsWith("237")) {
+      phoneNumber = phoneNumber.replace(/^\+/, "");
+    }
+
+    // Step 2: Proceed with payout
+    const payoutBody = {
+      amount: request.refundAmount,         
+      phone: phoneNumber,             
+      medium: request.paymentMethod?.replace("_", " "),            
+      name: request.user.name,             
+      email: request.user.email,             
+      userId: request.user._id,             
+      externalId: request.transactionId,     
+    };
+
+    console.log("📤 Payout request body:", payoutBody);
+
+    const payoutRes = await fetch(`https://sandbox.fapshi.com/payout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apiuser": "f046347f-8d27-40cd-af94-90bc44f3d2c7",
+        "apikey": "FAK_TEST_177a608c18c0db8c50be",
+      },
+      body: JSON.stringify(payoutBody),
+    });
+
+    console.log("📡 Payout response status:", payoutRes.status);
+    const payoutData = await payoutRes.json();
+
+    // FIXED: Check for payout success/failure
+    let payoutError = '';
+    let isSuccess = false;
+
+    if (payoutRes.status >= 400) {
+      // HTTP error (400, 500, etc.)
+      payoutError = payoutData.message || `Payout failed with status ${payoutRes.status}`;
+    } else if (payoutData.message === "Accepted" && payoutData.transId) {
+      // SUCCESS: "Accepted" with transaction ID means successful
+      isSuccess = true;
+    } else if (payoutData.status && payoutData.status !== "SUCCESSFUL") {
+      // Other status checks
+      payoutError = payoutData.message || `Payout status: ${payoutData.status}`;
+    } else if (!payoutData.transId) {
+      // No transaction ID indicates failure
+      payoutError = payoutData.message || 'Payout failed: No transaction ID received';
+    } else {
+      // Default success case
+      isSuccess = true;
+    }
+
+    // Store payout response with proper typing - include error if any
+    setApiResponse((prev: ApiResponseData | null) => ({
+      ...prev,
+      payoutRequest: {
+        url: "https://sandbox.fapshi.com/payout",
+        status: payoutRes.status,
+        data: payoutData,
+        requestBody: payoutBody,
+        error: payoutError || undefined // Use undefined instead of empty string for no error
+      }
+    }));
+
+    if (isSuccess) {
+      // SUCCESS CASE
+      const transactionId = payoutData.transId || payoutData.transactionId || 'N/A';
+      const notes = `Refund processed successfully via Fapshi. Transaction ID: ${transactionId}`;
+      setAdminNotes(notes);
+
+      // Update backend to 'refunded' status
+      try {
+        const res = await axios.put(`/refund-request/${request._id}`, {
+          refundStatus: 'refunded',
+          adminNotes: notes,
+        });
+        console.log("✅ Refund request updated in backend:", res.data);
+        alert('✅ Refund processed successfully!');
+        dispatch(getAdminRefundReq()); // Refresh the list
+      } catch (err: any) {
+        console.error("❌ Failed to update refund request in backend:", err.response?.data || err.message);
+        setAdminNotes(`${notes} (Failed to update backend)`);
+      }
+    } else {
+      // FAILURE CASE
+      const notes = adminNotes || `Refund failed: ${payoutError}`;
+      setAdminNotes(notes);
+      
+      // Update backend to 'rejected' status
+      try {
+        const res = await axios.put(`/refund-request/${request._id}`, {
+          refundStatus: 'rejected',
+          adminNotes: notes,
+        });
+        console.log("ℹ️ Backend notes updated for failed refund:", res.data);
+        alert(`❌ Refund failed: ${payoutError}`);
+        dispatch(getAdminRefundReq()); // Refresh the list
+      } catch (err: any) {
+        console.error("❌ Failed to update backend notes for failed refund:", err.response?.data || err.message);
+      }
+    }
+
+  } catch (err: any) {
+    console.group("❌ Error during refund process");
+    console.error("Full error object:", err);
+    console.error("Error message:", err.message);
+    console.error("Error stack:", err.stack);
+    console.groupEnd();
+
+    const errorMsg = err.message || "Unknown error occurred";
+    alert("❌ Something went wrong while processing the refund.");
+    
+    // Store error in API response with proper typing
+    setApiResponse((prev: ApiResponseData | null) => ({
+      ...prev,
+      error: {
+        message: err.message,
+        stack: err.stack,
+        fullError: err
+      }
+    }));
+    
+    // Auto-fill admin notes with error
+    setAdminNotes(`System error: ${errorMsg}. Please check API response for technical details.`);
+  } finally {
+    setLoadingRefund(false);
+    console.log("🟡 Refund process ended for:", request.transactionId);
+  }
+};
+  const handleSaveAdminNotes = async () => {
+    if (selectedRequest && adminNotes.trim()) {
+      try {
+        setSavingNotes(true);
+        const res = await axios.put(`/refund-request/${selectedRequest._id}`, {
+          adminNotes: adminNotes.trim(),
+        });
+        console.log("✅ Admin notes saved:", res.data);
+        alert('Admin notes saved successfully!');
+        dispatch(getAdminRefundReq()); // Refresh the list
+      } catch (err: any) {
+        console.error("❌ Failed to save admin notes:", err.response?.data || err.message);
+        alert(`Failed to save admin notes: ${err.response?.data?.message || err.message}`);
+      } finally {
+        setSavingNotes(false);
+      }
+    }
+  };
+
+  // Check if process refund button should be disabled
+  const isProcessRefundDisabled = (request: RefundRequestTyp) => 
+    request.refundStatus === 'rejected' || 
+    request.refundStatus === 'refunded' || 
+    request.refundStatus === 'cancelled';
+
+  // Check if admin notes section should be shown
+  const shouldShowAdminNotes = (request: RefundRequestTyp) => 
+    request.refundStatus !== 'rejected';
 
   // Table headers
   const headers: string[] = [
@@ -291,7 +635,7 @@ export function RefundReq() {
                       fontWeight: 'bold',
                       fontSize: '0.9rem',
                       py: 2,
-                       bgcolor: '#1F8FCD'
+                      bgcolor: '#1F8FCD'
                     }}
                     align="center"
                   >
@@ -335,7 +679,6 @@ export function RefundReq() {
                       {formatEventDate(request.eventDate)}
                     </Typography>
                   </TableCell>
-
 
                   {/* Refund Amount */}
                   <TableCell align="center">
@@ -419,7 +762,6 @@ export function RefundReq() {
           </Table>
         </TableContainer>
       ) : (
-        // No Data Available UI
         <Paper
           elevation={3}
           sx={{
@@ -480,7 +822,7 @@ export function RefundReq() {
         </Box>
       )}
 
-        {/* Refund Details Modal */}
+      {/* Refund Details Modal */}
       <Modal
         open={modalOpen}
         onClose={handleCloseModal}
@@ -536,6 +878,9 @@ export function RefundReq() {
                             <Typography variant="body2" color="text.secondary">
                               {selectedRequest.user?.email}
                             </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Phone: {selectedRequest.user?.phone || 'N/A'}
+                            </Typography>
                           </Box>
                         </Box>
                       </Stack>
@@ -575,6 +920,96 @@ export function RefundReq() {
                       </Stack>
                     </CardContent>
                   </Card>
+
+                  {/* API Response Data - Human Readable */}
+                  {apiResponse && (
+                    <>
+                      {apiResponse.paymentStatusCheck && (
+                        <ApiResponseDisplay 
+                          responseData={apiResponse.paymentStatusCheck} 
+                          title="Payment Status Check" 
+                        />
+                      )}
+                      {apiResponse.payoutRequest && (
+                        <ApiResponseDisplay 
+                          responseData={apiResponse.payoutRequest} 
+                          title="Payout Request" 
+                        />
+                      )}
+                      {apiResponse.error && (
+                        <Alert severity="error" sx={{ mt: 2 }}>
+                          <Typography variant="body1" fontWeight="bold">
+                            System Error: {apiResponse.error.message}
+                          </Typography>
+                        </Alert>
+                      )}
+                    </>
+                  )}
+
+                  {/* Rejection Reason Section - Show when status is rejected */}
+                  {selectedRequest.refundStatus === 'rejected' && selectedRequest.adminNotes && (
+                    <Card sx={{ mt: 3, border: '2px solid', borderColor: 'error.main' }}>
+                      <CardContent>
+                        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'error.main' }}>
+                          <ErrorIcon color="error" />
+                          Rejection Reason
+                        </Typography>
+                        <Alert severity="error" sx={{ mt: 1 }}>
+                          <Typography variant="body1" fontWeight="medium">
+                            {selectedRequest.adminNotes}
+                          </Typography>
+                        </Alert>
+                        {apiResponse && (
+                          <Box sx={{ mt: 2 }}>
+                            <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                              Technical Details:
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {apiResponse.payoutRequest?.error || apiResponse.paymentStatusCheck?.error || 'No technical details available'}
+                            </Typography>
+                          </Box>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Admin Notes Section - Hide when status is rejected */}
+                  {shouldShowAdminNotes(selectedRequest) && (
+                    <Card sx={{ mt: 3 }}>
+                      <CardContent>
+                        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <NotesIcon color="primary" />
+                          Admin Notes & Feedback
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          multiline
+                          rows={4}
+                          value={adminNotes}
+                          onChange={(e) => setAdminNotes(e.target.value)}
+                          placeholder="Add notes about this refund request... (This field auto-fills with API response messages)"
+                          variant="outlined"
+                          sx={{ mt: 1 }}
+                        />
+                        <Box sx={{ mt: 2, display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                          <Button 
+                            variant="outlined" 
+                            onClick={() => setAdminNotes('')}
+                            disabled={!adminNotes}
+                          >
+                            Clear
+                          </Button>
+                          <Button 
+                            variant="contained" 
+                            onClick={handleSaveAdminNotes}
+                            disabled={!adminNotes || savingNotes}
+                          >
+                            {savingNotes ? <CircularProgress size={20} /> : 'Save Notes'}
+                          </Button>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  )}
                 </Grid>
 
                 {/* Right Column - Event and Payment Info */}
@@ -625,6 +1060,14 @@ export function RefundReq() {
                         </Box>
                         <Box>
                           <Typography variant="body2" color="text.secondary">
+                            Transaction ID
+                          </Typography>
+                          <Typography variant="body1" fontWeight="medium" fontFamily="monospace" fontSize="0.8rem">
+                            {selectedRequest.transactionId}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="body2" color="text.secondary">
                             Order Total
                           </Typography>
                           <Typography variant="body1" fontWeight="bold" color="primary.main">
@@ -654,11 +1097,11 @@ export function RefundReq() {
                         {selectedRequest.reason}
                       </Typography>
 
-                      {selectedRequest.adminNotes && (
+                      {selectedRequest.adminNotes && selectedRequest.refundStatus !== 'rejected' && (
                         <>
                           <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                             <NotesIcon color="secondary" />
-                            Admin Notes
+                            Existing Admin Notes
                           </Typography>
                           <Typography variant="body1" sx={{ mt: 1, p: 2, bgcolor: 'warning.light', borderRadius: 1 }}>
                             {selectedRequest.adminNotes}
@@ -686,6 +1129,14 @@ export function RefundReq() {
                       </Button>
                     </>
                   )}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    disabled={loadingRefund || isProcessRefundDisabled(selectedRequest)}
+                    onClick={() => handleProceedRefund(selectedRequest)}
+                  >
+                    {loadingRefund ? "Processing..." : "Proceed Refund"}
+                  </Button>
                 </Stack>
               </Box>
             </>

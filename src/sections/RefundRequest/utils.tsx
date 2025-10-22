@@ -5,6 +5,7 @@ export interface Avatar {
 }
 
 export interface User {
+   phone?: string;
   _id: string;
   name: string;
   email: string;
@@ -40,6 +41,7 @@ export interface RefundPolicy {
 }
 
 export interface RefundRequestTyp {
+    transactionId?: string;
   _id: string;
   user: User;
   event: Event;

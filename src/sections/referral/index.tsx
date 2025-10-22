@@ -308,7 +308,7 @@ export function Referral() {
                                 Earn Rewards
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                You both receive 100 points when they complete their first action
+                                You both receive 100 points when they complete their first event ticket purchase.
                             </Typography>
                         </Box>
                     </Grid>

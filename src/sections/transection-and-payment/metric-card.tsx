@@ -1,10 +1,8 @@
 import {
-  Box,
   Card,
   CardContent,
   Grid,
   Typography,
-  useTheme,
 } from "@mui/material";
 
 type MetricCardProps = {
@@ -28,9 +26,26 @@ export function MetricCard({ selectedEvent }: MetricCardProps) {
     .reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0);
 
   // 2. Refunded Amount (if you ever track actual refunds)
-  const refundedAmount = orders
-    .filter((order: any) => order.refundStatus === "refunded")
-    .reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0);
+  const refundedAmount = orders.reduce((sum: any, order: any) => {
+    // Check if there are refund requests
+    if (
+      order.refundStatus === "requestedRefund" &&
+      Array.isArray(order.refundRequests) &&
+      order.refundRequests.length > 0
+    ) {
+      // Find any refund request marked as "refunded"
+      const refundedReq = order.refundRequests.find(
+        (r: any) => r.refundStatus === "refunded"
+      );
+ 
+      if (refundedReq) {
+        // Add its refundAmount (or 0 if missing)
+        return sum + (refundedReq.refundAmount || 0);
+      }
+    }
+ 
+    return sum;
+  }, 0);
 
   // 3. Pending Funds (paymentStatus === "pending")
   const pendingFunds = orders

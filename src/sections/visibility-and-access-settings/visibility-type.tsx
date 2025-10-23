@@ -22,11 +22,6 @@ interface VisibilityData {
   status: 'draft' | 'publish' | 'archived';
 }
 
-interface VisibilityTypeProps {
-  eventId: string;
-  visibility: VisibilityData;
-}
-
 // Generate URL based on visibility type
 const generateDefaultUrl = (visibilityType: string, eventId: string) => {
   
@@ -37,7 +32,6 @@ const generateDefaultUrl = (visibilityType: string, eventId: string) => {
 export function VisibilityType({ eventId, visibility }: any) {
   const dispatch = useDispatch<AppDispatch>();
   const [copied, setCopied] = useState(false);
-  const [error, setError] = useState('');
   const [visibilityState, setVisibilityState] = useState<VisibilityData>({
     ...visibility,
     customUrl: visibility?.customUrl || generateDefaultUrl(visibility?.visibilityType, eventId)
@@ -67,17 +61,17 @@ export function VisibilityType({ eventId, visibility }: any) {
     }
   }, [visibility]);
 
-  const handlePromotionChange = (field: keyof typeof promotionSettings) => {
-    const newSettings = {
-      ...promotionSettings,
-      [field]: !promotionSettings[field]
-    };
-    setPromotionSettings(newSettings);
-    setVisibilityState({
-      ...visibilityState,
-      promotionAndHighlight: newSettings
-    });
-  };
+  // const handlePromotionChange = (field: keyof typeof promotionSettings) => {
+  //   const newSettings = {
+  //     ...promotionSettings,
+  //     [field]: !promotionSettings[field]
+  //   };
+  //   setPromotionSettings(newSettings);
+  //   setVisibilityState({
+  //     ...visibilityState,
+  //     promotionAndHighlight: newSettings
+  //   });
+  // };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(visibilityState.customUrl);
@@ -130,12 +124,6 @@ export function VisibilityType({ eventId, visibility }: any) {
       <Box display="flex" justifyContent="space-between">
         <HeadingCommon title="Visibility Type" />
       </Box>
-
-      {error && (
-        <Typography color="error" sx={{ mt: 2 }}>
-          {error}
-        </Typography>
-      )}
 
       <RadioGroup
         value={visibilityState?.visibilityType}

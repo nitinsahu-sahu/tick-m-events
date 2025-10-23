@@ -1,16 +1,9 @@
-import { useMemo, useEffect } from 'react'
 import { toast } from 'react-toastify';
+import { useMemo, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserNotifications, markNotificationRead } from '../redux/actions/notification.actions';
-import { AppDispatch, RootState } from '../redux/store';
 
-interface Notification {
-  _id: string;
-  subject: string;
-  message: string;
-  status?: string;
-  [key: string]: any;
-}
+import { AppDispatch, RootState } from '../redux/store';
+import { fetchUserNotifications, markNotificationRead } from '../redux/actions/notification.actions';
 
 interface NotificationsHandlerProps {
   user: any; 
@@ -33,7 +26,6 @@ const notifications = useMemo(
   // ✅ Display and mark notifications
   useEffect(() => {
     if (!Array.isArray(notifications)) {
-      console.error('❌ Invalid notifications data:', notifications);
       return;
     }
 

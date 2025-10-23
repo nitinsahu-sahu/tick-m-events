@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
+
 import Footer from "src/components/Footer";
 import Header from "src/components/Header";
 import { PromotionLogoBar } from "src/components/brands-logo";

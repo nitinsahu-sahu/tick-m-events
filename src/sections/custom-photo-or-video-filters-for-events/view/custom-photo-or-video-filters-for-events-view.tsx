@@ -1,9 +1,10 @@
 import { Box } from '@mui/material';
+import { useState } from 'react';
+
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
-import { useState } from 'react';
+
 import { FilterGrid } from '../FilterGrid';
-import ShareSection from '../ShareSection';
 import { PhotoFilterSection } from '../PhotoFilterSection';
 import { FrameProvider } from './FrameContext';
 

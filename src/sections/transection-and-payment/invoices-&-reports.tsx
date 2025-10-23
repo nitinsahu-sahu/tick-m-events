@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
-import { Box, Paper } from "@mui/material";
+import { Box, Paper, Tab, Tabs } from "@mui/material";
 import { TransactionAndPaymentTable } from "src/components/tables/transaction-&-payment-table";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import axios from "src/redux/helper/axios";
 import { InvoiceTableHeaders, EventData } from "./utils";
 
-
 type InvoiceHistoryProps = {
     selectedEvent: EventData | null;
 };
 
-type WithdrawalData = {
+type TransactionData = {
     _id: string;
     transId: string;
     eventId: string;
@@ -24,46 +23,66 @@ type WithdrawalData = {
 };
 
 export function InvoiceHistory({ selectedEvent }: InvoiceHistoryProps) {
-    const [withdrawals, setWithdrawals] = useState<WithdrawalData[]>([]);
+    const [withdrawals, setWithdrawals] = useState<TransactionData[]>([]);
+    const [refunds, setRefunds] = useState<TransactionData[]>([]);
+    const [tabIndex, setTabIndex] = useState(0);
 
-    // Fetch withdrawals when selectedEvent changes
     useEffect(() => {
-        const fetchWithdrawals = async () => {
-            try {
-                if (!selectedEvent) return;
+        const fetchData = async () => {
+            if (!selectedEvent) return;
 
-                const { data } = await axios.get("transaction-payment/get-refund-and-withdrawals");
-                if (data.success) {
-                    // Optionally filter by event
-                    const eventWithdrawals = data.data.filter(
-                        (w: WithdrawalData) => w.eventId === selectedEvent._id
-                    );
-                    setWithdrawals(eventWithdrawals);
+            try {
+                // 1️⃣ Fetch Withdrawals
+                const withdrawalResp = await axios.get("transaction-payment/get-refund-and-withdrawals", {
+                    params: { eventId: selectedEvent._id },
+                });
+
+                if (withdrawalResp.data.success) {
+                    setWithdrawals(withdrawalResp.data.data);
+                }
+
+                // 2️⃣ Fetch Refunds
+                const refundResp = await axios.get("transaction-payment/get-refund-refunded-data", {
+                    params: { eventId: selectedEvent._id },
+                });
+
+                if (refundResp.data.success) {
+                    setRefunds(refundResp.data.data);
                 }
             } catch (error) {
-                console.error("Error fetching withdrawals:", error);
+                console.error("Error fetching transactions:", error);
             }
         };
 
-        fetchWithdrawals();
+        fetchData();
     }, [selectedEvent]);
 
-    const handleDownloadInvoice = async (transId: string, status: string) => {
-        if (status.toLowerCase() !== "approved") {
+    const handleDownloadInvoice = async (transId: string, status: string, type: "withdrawal" | "refund") => {
+        if (status.toLowerCase() !== "approved" && type === "withdrawal") {
             alert("Invoice can only be downloaded for approved withdrawals");
+            return;
+        }
+        if (type === "refund" && status.toLowerCase() !== "refunded") {
+            alert("Invoice can only be downloaded for refunded transactions");
             return;
         }
 
         try {
-            const response = await axios.get(`/transaction-payment/withdrawals/invoice/${transId}`, {
+            // Decide URL based on type
+            const url =
+                type === "withdrawal"
+                    ? `/transaction-payment/withdrawals/invoice/${transId}`
+                    : `/transaction-payment/refunds/invoice/${transId}`;
+
+            const response = await axios.get(url, {
                 responseType: "blob",
             });
 
             const blob = new Blob([response.data], { type: "application/pdf" });
-            const url = window.URL.createObjectURL(blob);
+            const urlBlob = window.URL.createObjectURL(blob);
             const link = document.createElement("a");
-            link.href = url;
-            link.download = `Invoice-${transId}.pdf`;
+            link.href = urlBlob;
+            link.download = `${type === "withdrawal" ? "Withdrawal" : "Refund"}-Invoice-${transId}.pdf`;
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -73,30 +92,51 @@ export function InvoiceHistory({ selectedEvent }: InvoiceHistoryProps) {
         }
     };
 
-    const invoiceData = withdrawals.map((w) => ({
-        invoiceId: w.transId,
-        date: new Date(w.createdAt).toLocaleDateString(),
-        amount: `${w.amount.toLocaleString()} XAF`,
-        method: w.payment.paymentMethod.toUpperCase(),
-        status: w.status.charAt(0).toUpperCase() + w.status.slice(1).toLowerCase(),
-        action: [
-            {
-                label: "Download PDF",
-                onClick: () => handleDownloadInvoice(w.transId, w.status),
-            },
-        ],
-    }));
+
+    const mapToInvoiceData = (data: TransactionData[], type: "withdrawal" | "refund") =>
+        data.map((t) => ({
+            invoiceId: t.transId,
+            date: new Date(t.createdAt).toLocaleDateString(),
+            amount: `${t.amount.toLocaleString()} XAF`,
+            method: t.payment.paymentMethod.toUpperCase(),
+            status: t.status.charAt(0).toUpperCase() + t.status.slice(1).toLowerCase(),
+            action: [
+                {
+                    label: "Download PDF",
+                    onClick: () => handleDownloadInvoice(t.transId, t.status, type),
+                },
+            ],
+        }));
+
 
     return (
         <Box mt={3} boxShadow={3} bgcolor="white" borderRadius={3} sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
             <HeadingCommon title="Invoices" variant="h5" weight={600} />
-            <Paper sx={{ borderRadius: 3 }}>
-                <TransactionAndPaymentTable
-                    headers={InvoiceTableHeaders}
-                    data={invoiceData}
-                    type="3"
-                    onDownloadInvoice={handleDownloadInvoice}
-                />
+
+            {/* Tabs */}
+            <Tabs value={tabIndex} onChange={(_, newIndex) => setTabIndex(newIndex)} sx={{ mb: 2 }}>
+                <Tab label={`Withdrawals (${withdrawals.length})`} />
+                <Tab label={`Refunds (${refunds.length})`} />
+            </Tabs>
+
+            <Paper sx={{ borderRadius: 3, p: 2 }}>
+                {tabIndex === 0 && (
+                    <TransactionAndPaymentTable
+                        headers={InvoiceTableHeaders}
+                        data={mapToInvoiceData(withdrawals, "withdrawal")}
+                        type="3"
+                        onDownloadInvoice={handleDownloadInvoice}
+                    />
+                )}
+                {tabIndex === 1 && (
+                    <TransactionAndPaymentTable
+                        headers={InvoiceTableHeaders}
+                        data={mapToInvoiceData(refunds, "refund")}
+                        type="3"
+                        onDownloadInvoice={handleDownloadInvoice}
+                    />
+                )}
+
             </Paper>
         </Box>
     );

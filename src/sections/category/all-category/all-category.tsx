@@ -12,13 +12,12 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import React, { useEffect } from 'react';
 import Marquee from 'react-fast-marquee';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
-import { PageTitleSection } from 'src/components/page-title-section';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { fetchAllCategories } from 'src/redux/actions/event.action';
-import { Link } from 'react-router-dom';
 
 export function AllCategoriesView() {
   const dispatch = useDispatch<AppDispatch>();

@@ -1,12 +1,10 @@
 import { Box, Grid, Typography, Card, CardMedia, Button } from '@mui/material';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Marquee from 'react-fast-marquee';
 import React, { useEffect } from 'react';
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { TicketCard } from 'src/components/event-card/event-card';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { categoryByIdFetch } from 'src/redux/actions/event.action';
 import { PopularEvent } from 'src/sections/home-and-recommendations/PopularEvent';

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import {
     Box,
     Accordion,
@@ -77,39 +77,6 @@ const faqs = [
 • For service providers: Registration is free, but TICK-M EVENTS charges a small commission on contracts made via the marketplace.
 
 👉 With TICK-M EVENTS, you get everything in one place: ticketing, event organization, service providers, photo/video tools, secure management, and much more.`,
-    },
-];
-
-const blogPosts = [
-    {
-        image: "/assets/images/about/our-mission/our-mission.png",
-        date: "18 Sep 2023",
-        time: "6 mins",
-        comments: "38 comments",
-        tag: "News",
-        title: "2025 Cadillac Escalade costs more money for a lot more tech",
-        author: "Jimmy Dave",
-        avatar: "/assets/users/jimmy.png",
-    },
-    {
-        image: "/assets/images/about/our-mission/our-mission-1.png",
-        date: "18 Sep 2023",
-        time: "6 mins",
-        comments: "38 comments",
-        tag: "Trend",
-        title: "2025 BMW 5 Series Review: A balanced luxury sedan",
-        author: "Jimmy Dave",
-        avatar: "/assets/users/jimmy.png",
-    },
-    {
-        image: "/assets/images/about/our-mission/our-mission-2.png",
-        date: "18 Sep 2023",
-        time: "6 mins",
-        comments: "38 comments",
-        tag: "Discovery",
-        title: "2025 Ruf Rodeo is ready to wrangle some rough roads",
-        author: "Jimmy Dave",
-        avatar: "/assets/users/jimmy2.png",
     },
 ];
 

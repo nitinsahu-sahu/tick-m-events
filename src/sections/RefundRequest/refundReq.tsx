@@ -13,14 +13,12 @@ import {
   Button,
   CircularProgress,
   Alert,
-  Tooltip,
   TextField,
   MenuItem,
   InputAdornment,
   Card,
   CardContent, Modal,
   Grid,
-  Divider,
   IconButton,
   Stack
 } from "@mui/material";
@@ -38,10 +36,11 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import InfoIcon from '@mui/icons-material/Info';
+import { toast } from "react-toastify";
+
 import { getAdminRefundReq } from "src/redux/actions/admin/refund-requests";
 import { AppDispatch, RootState } from "src/redux/store";
 import { formatEventDate } from "src/hooks/formate-time";
-
 import { DashboardContent } from "src/layouts/dashboard";
 import { RefundRequestTyp } from "./utils";
 import axios from '../../redux/helper/axios';
@@ -187,7 +186,7 @@ const ApiResponseDisplay = ({ responseData, title }: { responseData: any; title:
           <DescriptionIcon color={hasError() ? "error" : "primary"} />
           {title}
         </Typography>
-        
+
         {/* Error Alert Box */}
         {hasError() && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -203,7 +202,7 @@ const ApiResponseDisplay = ({ responseData, title }: { responseData: any; title:
             Request Details:
           </Typography>
           <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-            <strong>Status:</strong> 
+            <strong>Status:</strong>
             {getStatusIcon()}
             <Box component="span" color={getStatusColor()}>
               {getDisplayStatus()}
@@ -305,12 +304,13 @@ export function RefundReq() {
         adminNotes: adminNotes || 'Refund request approved by admin',
       });
       console.log("✅ Refund request approved:", res.data);
-      alert('Refund request approved successfully!');
+      toast.success("Refund request approved successfully!");
+      setTimeout(() => handleCloseModal(), 1500); // close after 1.5 sec
       dispatch(getAdminRefundReq()); // Refresh the list
       handleCloseModal();
     } catch (err: any) {
       console.error("❌ Failed to approve refund:", err.response?.data || err.message);
-      alert(`Failed to approve refund: ${err.response?.data?.message || err.message}`);
+      toast.error(`Failed to approve refund: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -321,195 +321,200 @@ export function RefundReq() {
         adminNotes: adminNotes || 'Refund request rejected by admin',
       });
       console.log("✅ Refund request rejected:", res.data);
-      alert('Refund request rejected successfully!');
+      toast.success("Refund request rejected successfully!");
+      setTimeout(() => handleCloseModal(), 1500);
       dispatch(getAdminRefundReq()); // Refresh the list
       handleCloseModal();
     } catch (err: any) {
       console.error("❌ Failed to reject refund:", err.response?.data || err.message);
-      alert(`Failed to reject refund: ${err.response?.data?.message || err.message}`);
+      toast.error(`Failed to reject refund: ${err.response?.data?.message || err.message}`);
     }
   };
 
-const handleProceedRefund = async (request: RefundRequestTyp) => {
-  try {
-    console.log("🟢 Starting refund process for:", request);
-    setLoadingRefund(true);
-    setApiResponse(null);
+  const handleProceedRefund = async (request: RefundRequestTyp) => {
+    try {
+      console.log("🟢 Starting refund process for:", request);
+      setLoadingRefund(true);
+      setApiResponse(null);
 
-    // Step 1: Check payment status
-    const transId = request.transactionId;
-    console.log("🔍 Checking payment status for transId:", transId);
+      // Step 1: Check payment status
+      const transId = request.transactionId;
+      console.log("🔍 Checking payment status for transId:", transId);
 
-    const statusRes = await fetch(`https://sandbox.fapshi.com/payment-status/${transId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "apiuser": "f046347f-8d27-40cd-af94-90bc44f3d2c7",
-        "apikey": "FAK_TEST_177a608c18c0db8c50be",
-      },
-    });
+      const statusRes = await fetch(`https://sandbox.fapshi.com/payment-status/${transId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "apiuser": "f046347f-8d27-40cd-af94-90bc44f3d2c7",
+          "apikey": "FAK_TEST_177a608c18c0db8c50be",
+        },
+      });
 
-    console.log("📡 Payment status response status:", statusRes.status);
-    const statusData = await statusRes.json();
-    
-    // Check if transaction not found or other error
-    let paymentError = '';
-    if (statusRes.status === 404) {
-      paymentError = 'Transaction not found';
-    } else if (statusRes.status >= 400) {
-      paymentError = statusData.message || `Payment status check failed with status ${statusRes.status}`;
-    } else if (statusData?.status !== "SUCCESSFUL") {
-      paymentError = `Transaction status: ${statusData.status}. Refund cannot proceed.`;
-    }
+      console.log("📡 Payment status response status:", statusRes.status);
+      const statusData = await statusRes.json();
 
-    // Store payment status response with proper typing
-    setApiResponse((prev: ApiResponseData | null) => ({
-      ...prev,
-      paymentStatusCheck: {
-        url: `https://sandbox.fapshi.com/payment-status/${transId}`,
-        status: statusRes.status,
-        data: statusData,
-        error: paymentError
+      // Check if transaction not found or other error
+      let paymentError = '';
+      if (statusRes.status === 404) {
+        paymentError = 'Transaction not found';
+      } else if (statusRes.status >= 400) {
+        paymentError = statusData.message || `Payment status check failed with status ${statusRes.status}`;
+      } else if (statusData?.status !== "SUCCESSFUL") {
+        paymentError = `Transaction status: ${statusData.status}. Refund cannot proceed.`;
       }
-    }));
 
-    if (paymentError) {
-      setAdminNotes(`Payment status check failed: ${paymentError}`);
-      return;
-    }
+      // Store payment status response with proper typing
+      setApiResponse((prev: ApiResponseData | null) => ({
+        ...prev,
+        paymentStatusCheck: {
+          url: `https://sandbox.fapshi.com/payment-status/${transId}`,
+          status: statusRes.status,
+          data: statusData,
+          error: paymentError
+        }
+      }));
 
-    console.log("✅ Transaction successful. Proceeding with payout...");
-
-    let phoneNumber = request.user.phone || "";
-    // Ensure it includes country code (Cameroon = 237)
-    if (phoneNumber && !phoneNumber.startsWith("237")) {
-      phoneNumber = phoneNumber.replace(/^\+/, "");
-    }
-
-    // Step 2: Proceed with payout
-    const payoutBody = {
-      amount: request.refundAmount,         
-      phone: phoneNumber,             
-      medium: request.paymentMethod?.replace("_", " "),            
-      name: request.user.name,             
-      email: request.user.email,             
-      userId: request.user._id,             
-      externalId: request.transactionId,     
-    };
-
-    console.log("📤 Payout request body:", payoutBody);
-
-    const payoutRes = await fetch(`https://sandbox.fapshi.com/payout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apiuser": "f046347f-8d27-40cd-af94-90bc44f3d2c7",
-        "apikey": "FAK_TEST_177a608c18c0db8c50be",
-      },
-      body: JSON.stringify(payoutBody),
-    });
-
-    console.log("📡 Payout response status:", payoutRes.status);
-    const payoutData = await payoutRes.json();
-
-    // FIXED: Check for payout success/failure
-    let payoutError = '';
-    let isSuccess = false;
-
-    if (payoutRes.status >= 400) {
-      // HTTP error (400, 500, etc.)
-      payoutError = payoutData.message || `Payout failed with status ${payoutRes.status}`;
-    } else if (payoutData.message === "Accepted" && payoutData.transId) {
-      // SUCCESS: "Accepted" with transaction ID means successful
-      isSuccess = true;
-    } else if (payoutData.status && payoutData.status !== "SUCCESSFUL") {
-      // Other status checks
-      payoutError = payoutData.message || `Payout status: ${payoutData.status}`;
-    } else if (!payoutData.transId) {
-      // No transaction ID indicates failure
-      payoutError = payoutData.message || 'Payout failed: No transaction ID received';
-    } else {
-      // Default success case
-      isSuccess = true;
-    }
-
-    // Store payout response with proper typing - include error if any
-    setApiResponse((prev: ApiResponseData | null) => ({
-      ...prev,
-      payoutRequest: {
-        url: "https://sandbox.fapshi.com/payout",
-        status: payoutRes.status,
-        data: payoutData,
-        requestBody: payoutBody,
-        error: payoutError || undefined // Use undefined instead of empty string for no error
+      if (paymentError) {
+        setAdminNotes(`Payment status check failed: ${paymentError}`);
+        return;
       }
-    }));
 
-    if (isSuccess) {
-      // SUCCESS CASE
-      const transactionId = payoutData.transId || payoutData.transactionId || 'N/A';
-      const notes = `Refund processed successfully via Fapshi. Transaction ID: ${transactionId}`;
-      setAdminNotes(notes);
+      console.log("✅ Transaction successful. Proceeding with payout...");
 
-      // Update backend to 'refunded' status
-      try {
-        const res = await axios.put(`/refund-request/${request._id}`, {
-          refundStatus: 'refunded',
-          adminNotes: notes,
-        });
-        console.log("✅ Refund request updated in backend:", res.data);
-        alert('✅ Refund processed successfully!');
-        dispatch(getAdminRefundReq()); // Refresh the list
-      } catch (err: any) {
-        console.error("❌ Failed to update refund request in backend:", err.response?.data || err.message);
-        setAdminNotes(`${notes} (Failed to update backend)`);
+      let phoneNumber = request.user.phone || "";
+      // Ensure it includes country code (Cameroon = 237)
+      if (phoneNumber && !phoneNumber.startsWith("237")) {
+        phoneNumber = phoneNumber.replace(/^\+/, "");
       }
-    } else {
-      // FAILURE CASE
-      const notes = adminNotes || `Refund failed: ${payoutError}`;
-      setAdminNotes(notes);
-      
-      // Update backend to 'rejected' status
-      try {
-        const res = await axios.put(`/refund-request/${request._id}`, {
-          refundStatus: 'rejected',
-          adminNotes: notes,
-        });
-        console.log("ℹ️ Backend notes updated for failed refund:", res.data);
-        alert(`❌ Refund failed: ${payoutError}`);
-        dispatch(getAdminRefundReq()); // Refresh the list
-      } catch (err: any) {
-        console.error("❌ Failed to update backend notes for failed refund:", err.response?.data || err.message);
+
+      // Step 2: Proceed with payout
+      const payoutBody = {
+        amount: request.refundAmount,
+        phone: phoneNumber,
+        medium: request.paymentMethod?.replace("_", " "),
+        name: request.user.name,
+        email: request.user.email,
+        userId: request.user._id,
+        externalId: request.transactionId,
+      };
+
+      console.log("📤 Payout request body:", payoutBody);
+
+      const payoutRes = await fetch(`https://sandbox.fapshi.com/payout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apiuser": "f046347f-8d27-40cd-af94-90bc44f3d2c7",
+          "apikey": "FAK_TEST_177a608c18c0db8c50be",
+        },
+        body: JSON.stringify(payoutBody),
+      });
+
+      console.log("📡 Payout response status:", payoutRes.status);
+      const payoutData = await payoutRes.json();
+
+      // FIXED: Check for payout success/failure
+      let payoutError = '';
+      let isSuccess = false;
+
+      if (payoutRes.status >= 400) {
+        // HTTP error (400, 500, etc.)
+        payoutError = payoutData.message || `Payout failed with status ${payoutRes.status}`;
+      } else if (payoutData.message === "Accepted" && payoutData.transId) {
+        // SUCCESS: "Accepted" with transaction ID means successful
+        isSuccess = true;
+      } else if (payoutData.status && payoutData.status !== "SUCCESSFUL") {
+        // Other status checks
+        payoutError = payoutData.message || `Payout status: ${payoutData.status}`;
+      } else if (!payoutData.transId) {
+        // No transaction ID indicates failure
+        payoutError = payoutData.message || 'Payout failed: No transaction ID received';
+      } else {
+        // Default success case
+        isSuccess = true;
       }
+
+      // Store payout response with proper typing - include error if any
+      setApiResponse((prev: ApiResponseData | null) => ({
+        ...prev,
+        payoutRequest: {
+          url: "https://sandbox.fapshi.com/payout",
+          status: payoutRes.status,
+          data: payoutData,
+          requestBody: payoutBody,
+          error: payoutError || undefined // Use undefined instead of empty string for no error
+        }
+      }));
+
+      if (isSuccess) {
+        // SUCCESS CASE
+        const transactionId = payoutData.transId || payoutData.transactionId || 'N/A';
+        const notes = `Refund processed successfully via Fapshi. Transaction ID: ${transactionId}`;
+        setAdminNotes(notes);
+
+        // Update backend to 'refunded' status
+        try {
+          const res = await axios.put(`/refund-request/${request._id}`, {
+            refundStatus: 'refunded',
+            adminNotes: notes,
+            refundTransactionId: transactionId,
+          });
+          console.log("✅ Refund request updated in backend:", res.data);
+          toast.success("✅ Refund processed successfully!");
+          setTimeout(() => handleCloseModal(), 1500);
+          dispatch(getAdminRefundReq()); // Refresh the list
+        } catch (err: any) {
+          console.error("❌ Failed to update refund request in backend:", err.response?.data || err.message);
+          toast.error("Failed to update refund status in backend!");
+          setAdminNotes(`${notes} (Failed to update backend)`);
+        }
+      } else {
+        // FAILURE CASE
+        const notes = adminNotes || `Refund failed: ${payoutError}`;
+        setAdminNotes(notes);
+
+        // Update backend to 'rejected' status
+        try {
+          const res = await axios.put(`/refund-request/${request._id}`, {
+            refundStatus: 'rejected',
+            adminNotes: notes,
+          });
+          console.log("ℹ️ Backend notes updated for failed refund:", res.data);
+          toast.error(`❌ Refund failed: ${payoutError}`);
+          dispatch(getAdminRefundReq()); // Refresh the list
+        } catch (err: any) {
+          console.error("❌ Failed to update backend notes for failed refund:", err.response?.data || err.message);
+          toast.error("Failed to update backend after refund failure!");
+        }
+      }
+
+    } catch (err: any) {
+      console.group("❌ Error during refund process");
+      console.error("Full error object:", err);
+      console.error("Error message:", err.message);
+      console.error("Error stack:", err.stack);
+      console.groupEnd();
+
+      const errorMsg = err.message || "Unknown error occurred";
+      alert("❌ Something went wrong while processing the refund.");
+
+      // Store error in API response with proper typing
+      setApiResponse((prev: ApiResponseData | null) => ({
+        ...prev,
+        error: {
+          message: err.message,
+          stack: err.stack,
+          fullError: err
+        }
+      }));
+
+      // Auto-fill admin notes with error
+      setAdminNotes(`System error: ${errorMsg}. Please check API response for technical details.`);
+    } finally {
+      setLoadingRefund(false);
+      console.log("🟡 Refund process ended for:", request.transactionId);
     }
-
-  } catch (err: any) {
-    console.group("❌ Error during refund process");
-    console.error("Full error object:", err);
-    console.error("Error message:", err.message);
-    console.error("Error stack:", err.stack);
-    console.groupEnd();
-
-    const errorMsg = err.message || "Unknown error occurred";
-    alert("❌ Something went wrong while processing the refund.");
-    
-    // Store error in API response with proper typing
-    setApiResponse((prev: ApiResponseData | null) => ({
-      ...prev,
-      error: {
-        message: err.message,
-        stack: err.stack,
-        fullError: err
-      }
-    }));
-    
-    // Auto-fill admin notes with error
-    setAdminNotes(`System error: ${errorMsg}. Please check API response for technical details.`);
-  } finally {
-    setLoadingRefund(false);
-    console.log("🟡 Refund process ended for:", request.transactionId);
-  }
-};
+  };
   const handleSaveAdminNotes = async () => {
     if (selectedRequest && adminNotes.trim()) {
       try {
@@ -518,11 +523,11 @@ const handleProceedRefund = async (request: RefundRequestTyp) => {
           adminNotes: adminNotes.trim(),
         });
         console.log("✅ Admin notes saved:", res.data);
-        alert('Admin notes saved successfully!');
+        toast.success("Admin notes saved successfully!");
         dispatch(getAdminRefundReq()); // Refresh the list
       } catch (err: any) {
         console.error("❌ Failed to save admin notes:", err.response?.data || err.message);
-        alert(`Failed to save admin notes: ${err.response?.data?.message || err.message}`);
+        toast.error(`Failed to save admin notes: ${err.response?.data?.message || err.message}`);
       } finally {
         setSavingNotes(false);
       }
@@ -530,13 +535,13 @@ const handleProceedRefund = async (request: RefundRequestTyp) => {
   };
 
   // Check if process refund button should be disabled
-  const isProcessRefundDisabled = (request: RefundRequestTyp) => 
-    request.refundStatus === 'rejected' || 
-    request.refundStatus === 'refunded' || 
+  const isProcessRefundDisabled = (request: RefundRequestTyp) =>
+    request.refundStatus === 'rejected' ||
+    request.refundStatus === 'refunded' ||
     request.refundStatus === 'cancelled';
 
   // Check if admin notes section should be shown
-  const shouldShowAdminNotes = (request: RefundRequestTyp) => 
+  const shouldShowAdminNotes = (request: RefundRequestTyp) =>
     request.refundStatus !== 'rejected';
 
   // Table headers
@@ -925,15 +930,15 @@ const handleProceedRefund = async (request: RefundRequestTyp) => {
                   {apiResponse && (
                     <>
                       {apiResponse.paymentStatusCheck && (
-                        <ApiResponseDisplay 
-                          responseData={apiResponse.paymentStatusCheck} 
-                          title="Payment Status Check" 
+                        <ApiResponseDisplay
+                          responseData={apiResponse.paymentStatusCheck}
+                          title="Payment Status Check"
                         />
                       )}
                       {apiResponse.payoutRequest && (
-                        <ApiResponseDisplay 
-                          responseData={apiResponse.payoutRequest} 
-                          title="Payout Request" 
+                        <ApiResponseDisplay
+                          responseData={apiResponse.payoutRequest}
+                          title="Payout Request"
                         />
                       )}
                       {apiResponse.error && (
@@ -992,15 +997,15 @@ const handleProceedRefund = async (request: RefundRequestTyp) => {
                           sx={{ mt: 1 }}
                         />
                         <Box sx={{ mt: 2, display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                          <Button 
-                            variant="outlined" 
+                          <Button
+                            variant="outlined"
                             onClick={() => setAdminNotes('')}
                             disabled={!adminNotes}
                           >
                             Clear
                           </Button>
-                          <Button 
-                            variant="contained" 
+                          <Button
+                            variant="contained"
                             onClick={handleSaveAdminNotes}
                             disabled={!adminNotes || savingNotes}
                           >

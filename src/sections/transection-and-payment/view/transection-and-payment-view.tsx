@@ -29,21 +29,45 @@ export function TransectionAndPaymentView() {
     dispatch(promotionEvents())
   }, [dispatch])
 
-  const handleEventSelect = (event: EventData | null) => {
-    if (!event) {
+ const handleEventSelect = (event: EventData | null) => {
+     if (!event) {
       setSelectedEvent(null);
       return;
     }
-
-    // Calculate availableBalance by summing confirmed orders
-    const totalConfirmedSales = event.orders
-      ?.filter(order => order.paymentStatus === "confirmed")
-      .reduce((sum, order) => sum + order.totalAmount, 0) || 0;
-
+    // Total confirmed sales
+    const totalConfirmedSales =
+      event.orders
+        ?.filter((order) => order.paymentStatus === "confirmed")
+        .reduce((sum, order) => sum + (order.totalAmount || 0), 0) || 0;
+ 
+    // Calculate total refunded amount
+    const refundedAmount =
+      event.orders?.reduce((sum: number, order: any) => {
+        if (
+          order.refundStatus === "requestedRefund" &&
+          Array.isArray(order.refundRequests) &&
+          order.refundRequests.length > 0
+        ) {
+          const refundedReq = order.refundRequests.find(
+            (r: any) => r.refundStatus === "refunded"
+          );
+          if (refundedReq) {
+            return sum + (refundedReq.refundAmount || 0);
+          }
+        }
+        return sum;
+      }, 0) || 0;
+ 
+    // Base balance after platform fee (90%)
     const baseBalance = totalConfirmedSales * 0.9;
+ 
+    // Withdrawals
     const withdrawals = event.totalApprovedWithdrawals || 0;
-
-    const availableBalance = baseBalance - withdrawals;
+ 
+    // Available balance after refunds + withdrawals
+    const availableBalance = baseBalance - withdrawals - refundedAmount;
+ 
+    // Update selected event
     setSelectedEvent({
       ...event,
       availableBalance,

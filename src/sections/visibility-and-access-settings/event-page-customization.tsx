@@ -25,7 +25,6 @@ export const EventCustomization = ({ eventId }: any) => {
       if (!eventId) return; // Don't run if no eventId is selected
 
       const result = await dispatch(eventCustomizationPageFetch(eventId));
-      console.log("event", result);
       if ('customization' in result && result.status === 200) {
         const customization = result.customization;
 

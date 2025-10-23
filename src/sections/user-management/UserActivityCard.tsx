@@ -2,14 +2,15 @@ import {
   Box, Paper, Typography, Button, Grid, CircularProgress, InputAdornment, IconButton, TextField, Stack,ButtonProps
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { AppDispatch, RootState } from "src/redux/store";
 import { useEffect, useMemo, useState } from 'react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { fetchAdminActivities } from 'src/redux/actions/activityActions';
 import { DataGrid, GridColDef, GridToolbar } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
+
+import { fetchAdminActivities } from 'src/redux/actions/activityActions';
+import { AppDispatch, RootState } from "src/redux/store";
 
 export default function UserActivityCard() {
   const [localLoading, setLocalLoading] = useState(true);

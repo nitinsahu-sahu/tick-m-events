@@ -1,27 +1,4 @@
-// import React, { createContext, useContext, useState } from 'react';
-
-// interface FrameContextType {
-//   selectedFrame: string | null;
-//   setSelectedFrame: (url: string | null) => void;
-// }
-
-// const FrameContext = createContext<FrameContextType>({
-//   selectedFrame: null,
-//   setSelectedFrame: () => {},
-// });
-
-// export const useFrame = () => useContext(FrameContext);
-
-// export const FrameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-//   const [selectedFrame, setSelectedFrame] = useState<string | null>(null);
-
-//   return (
-//     <FrameContext.Provider value={{ selectedFrame, setSelectedFrame }}>
-//       {children}
-//     </FrameContext.Provider>
-//   );
-// };
-import React, { createContext, useContext, useState, useMemo, ReactNode } from 'react';
+import { createContext, useContext, useState, useMemo, ReactNode } from 'react';
 
 interface FrameContextType {
   selectedFrame: string | null;

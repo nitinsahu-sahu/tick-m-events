@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     Grid,
     Box,
@@ -8,10 +8,6 @@ import {
     IconButton, Tooltip
 } from '@mui/material';
 
-import FacebookIcon from '@mui/icons-material/Facebook';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import GoogleIcon from '@mui/icons-material/Google';
 import { useTranslation } from 'react-i18next';
 
 import Header from 'src/components/Header';

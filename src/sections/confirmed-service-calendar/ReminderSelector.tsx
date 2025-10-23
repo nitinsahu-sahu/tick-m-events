@@ -1,4 +1,3 @@
-import React from "react";
 import { FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 
 interface ReminderSelectorProps {

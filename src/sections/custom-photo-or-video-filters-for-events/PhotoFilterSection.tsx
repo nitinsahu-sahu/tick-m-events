@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Box, MenuItem, Select, Typography, Button, Stack, Slider, FormControl, InputLabel } from '@mui/material';
-import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import axios from 'src/redux/helper/axios';
+import { Box, MenuItem, Select, Typography, Button, FormControl, InputLabel } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { RootState } from 'src/redux/store';
 import { toast } from 'react-toastify';
+
+import axios from 'src/redux/helper/axios';
+import { RootState } from 'src/redux/store';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+
 import { useFrame } from './view/FrameContext';
 
 export function PhotoFilterSection() {

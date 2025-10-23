@@ -1,4 +1,4 @@
-import { Box, Button, Typography, useMediaQuery } from '@mui/material';
+import { Box, Button,  useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import PropTypes from 'prop-types';
@@ -26,7 +26,7 @@ const ShareSection: React.FC<ShareSectionProps> = ({ image }) => {
 
       <Box
         sx={{
-          width: isMobile ? '100%' : '400px',
+          width: {sm:'100%',md:'400px'},
           height: 300,
           backgroundColor: '#d9d9d9',
           borderRadius: 2.5,

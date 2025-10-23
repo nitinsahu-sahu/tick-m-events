@@ -109,6 +109,7 @@ const PromotionAndOfferTable = ({
                                 </TableCell>
                                 <TableCell align="center" sx={{
                                     fontWeight: "bold",
+                                    textTransform:"capitalize",
                                     color:
                                         row.status === "active" ? "#00BE10" : "#BE0003"
                                 }}>

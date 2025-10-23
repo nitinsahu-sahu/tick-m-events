@@ -29,12 +29,22 @@ export function TicketCard({ ticket }: any) {
     // Check partial refund eligibility
     const isPartialRefundEligible = isPolicyEnabled && isPartialRefundAllowed && !isFullRefundEligible && daysBefore > 0;
 
+    const noRefundAfterDate = policy?.noRefundAfterDate;
+    const noRefundDate = policy?.noRefundDate ? new Date(policy.noRefundDate) : null;
+
+    let isNoRefundDateEligible = false;
+    if (noRefundAfterDate && noRefundDate) {
+        isNoRefundDateEligible = today <= noRefundDate;
+    }
+
     // Use this instead of `isRefundable`
     const refundType = isFullRefundEligible
         ? 'full'
         : isPartialRefundEligible
             ? 'partial'
-            : null;
+            : isNoRefundDateEligible
+                ? 'dateBased'
+                : null;
 
     const [openRefundModal, setOpenRefundModal] = useState(false);
     const [isRefunding, setIsRefunding] = useState(false);
@@ -73,7 +83,7 @@ export function TicketCard({ ticket }: any) {
         const totalAmount = ticket.totalAmount || 0;
         let refundAmount = 0;
 
-        if (refundType === 'full') {
+        if (refundType === 'full' ||  refundType === 'dateBased') {
             refundAmount = totalAmount;  // full refund amount
         } else if (refundType === 'partial') {
             refundAmount = Math.round(totalAmount * (partialRefundPercent / 100));
@@ -124,7 +134,7 @@ export function TicketCard({ ticket }: any) {
             const payload = {
                 orderId: ticket._id,
                 beneficiaryId,
-                participantDetails: beneficiaryNames.map((name:string, idx:number) => ({
+                participantDetails: beneficiaryNames.map((name: string, idx: number) => ({
                     ...ticket.participantDetails[idx],
                     name,
                 })),
@@ -378,7 +388,7 @@ export function TicketCard({ ticket }: any) {
                                 border: "1px solid #ccc",
                             }}
                         />
-                        {beneficiaryNames.map((name:string, idx:number) => (
+                        {beneficiaryNames.map((name: string, idx: number) => (
                             <input
                                 key={idx}
                                 type="text"
@@ -505,19 +515,36 @@ export function TicketCard({ ticket }: any) {
                                         {isRefunding ? 'Processing...' : 'Confirm Partial Refund'}
                                     </Button>
                                 </>
-                            ) : (
-                                <Box textAlign="center" mb={2}>
-                                    <Typography color="error" fontWeight={600}>
-                                        ❌ Refund not applicable as per event&apos;s policy.
+                            ) : refundType === 'dateBased' ? (
+                                <>
+                                    <Typography variant="h6" color="success.main" mb={1}>
+                                        ✨ Refund Eligible (Before Cutoff Date)!
                                     </Typography>
-                                    <Typography variant="body2" mt={1}>
-                                        Full refunds require at least <strong>{fullRefundDays}</strong> day(s) notice.
+                                    <Typography variant="body2" mb={2}>
+                                        Refund requests are allowed until <strong>{new Date(policy.noRefundDate).toLocaleDateString()}</strong>.
                                     </Typography>
-                                    <Typography variant="body2">
-                                        You&apos;re currently only <strong>{daysBefore}</strong> day(s) away.
-                                    </Typography>
-                                </Box>
-                            )}
+                                    <Button
+                                        variant="contained"
+                                        sx={{ backgroundColor: "#0B2E4C", color: "#fff", mb: 1, width: "100%" }}
+                                        disabled={isRefunding}
+                                        onClick={handleRefundRequest}
+                                    >
+                                        {isRefunding ? 'Processing...' : 'Confirm Refund'}
+                                    </Button>
+                                </>) :
+                                (
+                                    <Box textAlign="center" mb={2}>
+                                        <Typography color="error" fontWeight={600}>
+                                            ❌ Refund not applicable as per event&apos;s policy.
+                                        </Typography>
+                                        <Typography variant="body2" mt={1}>
+                                            Full refunds require at least <strong>{fullRefundDays}</strong> day(s) notice.
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            You&apos;re currently only <strong>{daysBefore}</strong> day(s) away.
+                                        </Typography>
+                                    </Box>
+                                )}
 
 
                         <Button

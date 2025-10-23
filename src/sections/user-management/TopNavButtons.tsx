@@ -1,4 +1,4 @@
-import { Button, Grid, useTheme, useMediaQuery } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 
 interface TopNavButtonsProps {
   active: string;
@@ -13,8 +13,6 @@ const options = [
 ];
 
 export function TopNavButtons({ active, onChange }: TopNavButtonsProps) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // <600px
 
   return (
     <Grid

@@ -126,42 +126,52 @@ export function NotificationAndReminder({ selEvent }: any) {
       },
 
       "Interested participants (Waitlist but no purchase yet)": async () => {
-        const wishlistEntries = selEvent?.wishlistUsers || selEvent?.wishlistData || [];
-        const wishlistArray = Array.isArray(wishlistEntries) ? wishlistEntries : [wishlistEntries];
-
-        const validWishlist = wishlistArray.filter(
-          (entry: any) =>
-            typeof entry?.userId?.email === "string" && entry.userId.email.trim() !== ""
-        );
-
-        if (!validWishlist.length) return { emails: [], error: "No Interested Wishlist Users" };
-
-        const emails = validWishlist.map((entry) => {
-          const { email, name, phone } = entry.userId;
-          return {
-            email,
-            name: name || "Guest",
-            phone: phone || "",
-          };
+        // Access wishlist users from selEvent
+        const wishlistEntries = selEvent?.wishlist?.users || [];
+ 
+        // If wishlist is empty, return a clear error message
+        if (!Array.isArray(wishlistEntries) || wishlistEntries.length === 0) {
+          const errMsg = "No wishlist users found for this event"; // <-- custom message
+          console.warn("⚠️", errMsg);
+          return { emails: [], error: errMsg };
+        }
+ 
+        // Filter out entries with invalid or missing emails
+        const validWishlist = wishlistEntries.filter((entry: any) => {
+          const email = entry?.email ?? "";
+          return typeof email === "string" && email.trim() !== "";
         });
-
+ 
+        if (!validWishlist.length) {
+          const errMsg = "Wishlist users found but no valid emails";
+          console.warn("⚠️", errMsg);
+          return { emails: [], error: errMsg };
+        }
+ 
+        // Map valid wishlist entries to email objects
+        const emails = validWishlist.map((entry) => ({
+          email: entry?.email,
+          name: entry?.name || "Guest",
+          phone: entry?.phone || "",
+        }));
+ 
         return { emails };
       },
-
+ 
       "Pending payment participants (Unfinished reservations)": async () => {
         const pendingOrders = (selEvent?.orders || []).filter(
           (order: any) => order.paymentStatus === "pending"
         );
-
+ 
         if (!pendingOrders.length) return { emails: [], error: "No Pending Payment Users" };
-
+ 
         const validOrders = pendingOrders.filter(
           (order: Order) =>
             typeof order?.userId?.email === "string" && order.userId.email.trim() !== ""
         );
-
+ 
         if (!validOrders.length) return { emails: [], error: "No valid emails in Pending Orders" };
-
+ 
         const emails = validOrders.map((order: Order) => {
           const { email, name } = order.userId;
           return {
@@ -170,7 +180,7 @@ export function NotificationAndReminder({ selEvent }: any) {
             phone: order?.orderAddress?.number || "",
           };
         });
-
+ 
         return { emails };
       },
     };

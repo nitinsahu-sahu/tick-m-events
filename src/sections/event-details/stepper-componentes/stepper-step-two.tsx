@@ -195,53 +195,6 @@ export function StepperStepTwo() {
         }
     };
 
-    // const handleTicketConfig = useCallback(async (event: any) => {
-    //     event.preventDefault();
-    //     setLoading(true);
-    //     const formEventData = new FormData();
-    //     formEventData.append("tickets", JSON.stringify(ticketRows));
-    //     formEventData.append("purchaseDeadlineDate", ticketConfigData.purchaseDeadlineDate);
-    //     formEventData.append("isPurchaseDeadlineEnabled", ticketConfigData.isPurchaseDeadlineEnabled);
-    //     formEventData.append("paymentMethods", ticketConfigData.paymentMethods);
-    //     formEventData.append("isRefundPolicyEnabled", refundEnabled.toString());
-    //     formEventData.append("payStatus", payStatus);
-
-    //     if (selectedRefundPolicy === "fullRefund") {
-    //         formEventData.append("fullRefundCheck", "true");
-    //         formEventData.append("fullRefundDaysBefore", ticketConfigData.fullRefundDaysBefore);
-    //     } else if (selectedRefundPolicy === "partialRefund") {
-    //         formEventData.append("partialRefundCheck", "true");
-    //         formEventData.append("partialRefundPercent", ticketConfigData.partialRefundPercent);
-    //     } else if (selectedRefundPolicy === "noRefundDate") {
-    //         formEventData.append("noRefundAfterDateCheck", "true");
-    //         formEventData.append("noRefundDate", ticketConfigData.noRefundDate);
-    //     }
-
-    //     try {
-    //         const searchParams = new URLSearchParams(window.location.search);
-    //         const eventId = searchParams.get('eventId');
-
-    //         const res = await dispatch(ticketConfigCreate({ formEventData, eventId }));
-
-    //         const ticketConfigId = res?.ticketConfigId;
-
-    //         navigate(`?eventId=${eventId}&ticketConfigId=${ticketConfigId}`, { replace: true });
-    //     } catch (error) {
-    //         toast.error("Server Error");
-    //     } finally {
-    //         setLoading(false);
-    //     }
-
-    // }, [
-    //     navigate,
-    //     payStatus,
-    //     dispatch,
-    //     ticketRows,
-    //     ticketConfigData,
-    //     refundEnabled,
-    //     selectedRefundPolicy
-    // ]);
-
     const handleTicketConfig = useCallback(async (event: any) => {
         event.preventDefault();
         setLoading(true);
@@ -377,21 +330,22 @@ export function StepperStepTwo() {
                         </Select>
                     </FormControl>
                 ) : (
-                    <Box sx={{ ml: 2, display: 'flex', alignItems: 'center' }}>
-                        <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
-                            No {payStatus === 'free' ? 'free' : 'paid'} tickets available.
-                        </Typography>
-                        <Link
-                            to="/ticket-and-reservation-management"
-                            style={{
-                                color: "primary",
-                                textDecoration: 'underline',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Create ticket
-                        </Link>
-                    </Box>
+                    // <Box sx={{ ml: 2, display: 'flex', alignItems: 'center' }}>
+                    //     <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
+                    //         No {payStatus === 'free' ? 'free' : 'paid'} tickets available.
+                    //     </Typography>
+                    //     <Link
+                    //         to="/ticket-and-reservation-management"
+                    //         style={{
+                    //             color: "primary",
+                    //             textDecoration: 'underline',
+                    //             cursor: 'pointer'
+                    //         }}
+                    //     >
+                    //         Create ticket
+                    //     </Link>
+                    // </Box>
+                    null
                 )}
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>

@@ -53,7 +53,7 @@ export function OverviewAnalyticsView() {
     series: [{ name: 'Sales', data: [] }],
     options: getChartOptions([])
   });
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const currentDate = new Date()
   const [selectedTicket, setSelectedTicket] = useState("VIP");
   const theme = useTheme();
   const isMobileTablet = useMediaQuery(theme.breakpoints.down("sm")); // Show mobile/tablet view
@@ -145,11 +145,8 @@ export function OverviewAnalyticsView() {
           isMobileTablet={isMobileTablet}
           selectedTicket={selectedTicket}
           setSelectedTicket={setSelectedTicket}
-          ticketType={ticketType}
           timePeriod={timePeriod}
-          handleTicketTypeChange={handleTicketTypeChange}
           handleTimePeriodChange={handleTimePeriodChange}
-          chartData={chartData}
           upcomingEvents={upcomingEvents}
           latestSales={latestSales}
           latestEvents={latestEvents}
@@ -157,7 +154,6 @@ export function OverviewAnalyticsView() {
           eventDates={eventDates}
           getDayNumber={getDayNumber}
           getDayName={getDayName}
-          ticketSalesData={ticketSalesData}
           selectedEvent={selectedEvent}
         />
 

@@ -13,6 +13,7 @@ interface Props {
   type: string;
   onDownloadInvoice?: () => void;
   onCancel?: () => void;
+  onResubmit?: () => void;
 }
 
 export function TicketHistoryCancelRefundCard({
@@ -20,8 +21,11 @@ export function TicketHistoryCancelRefundCard({
   index,
   type,
   onDownloadInvoice,
-  onCancel,
+  onCancel, onResubmit,
 }: Props) {
+  const isRejected =
+    items?.status?.toLowerCase() === 'rejected' ||
+    items?.status?.toLowerCase() === 'denied';
   return (
     <Grid item xs={12} key={index}>
       <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
@@ -52,6 +56,22 @@ export function TicketHistoryCancelRefundCard({
           >
             {items?.status}
           </Typography>
+          
+           {/* ✅ Show admin note if refund was rejected */}
+          {isRejected && items?.adminNotes && (
+            <Box mt={1}>
+              <Typography
+                variant="body2"
+                color="textDanger"
+                sx={{
+                  fontStyle: 'italic',
+                  fontSize: { xs: '12px', sm: '14px' },
+                }}
+              >
+                Reason: {items.adminNotes}
+              </Typography>
+            </Box>
+          )}
 
           <Box mt={2} display="flex" gap={2} flexWrap="wrap">
             {items?.button?.map((btnText: string) => {
@@ -71,15 +91,30 @@ export function TicketHistoryCancelRefundCard({
                     isCancel
                       ? onCancel
                       : isInvoice
-                      ? onDownloadInvoice
-                      : undefined
+                        ? onDownloadInvoice
+                        : undefined
                   }
                 >
                   {btnText}
                 </Button>
               );
             })}
+             {/* ✅ Add "Resubmit Request" button when rejected */}
+            {isRejected && (
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{
+                  backgroundColor: '#1976d2',
+                  fontSize: { xs: '12px', sm: '14px', md: '16px' },
+                }}
+                onClick={onResubmit}
+              >
+                Resubmit Request
+              </Button>
+            )}
           </Box>
+          
         </CardContent>
       </Card>
     </Grid>

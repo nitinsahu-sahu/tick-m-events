@@ -37,26 +37,42 @@ export function MetricCard({ selectedEvent }: MetricCardProps) {
       const refundedReq = order.refundRequests.find(
         (r: any) => r.refundStatus === "refunded"
       );
- 
+
       if (refundedReq) {
         // Add its refundAmount (or 0 if missing)
         return sum + (refundedReq.refundAmount || 0);
       }
     }
- 
+
     return sum;
   }, 0);
 
   // 3. Pending Funds (paymentStatus === "pending")
-  const pendingFunds = orders
-    .filter((order: any) => order.paymentStatus === "pending")
-    .reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0);
+  const pendingRefunds = orders.reduce((sum: number, order: any) => {
+    if (Array.isArray(order.refundRequests)) {
+      const pendingReqs = order.refundRequests.filter(
+        (r: any) =>
+          r.refundStatus === "processed" || r.refundStatus === "requestedRefund"
+      );
+      return (
+        sum +
+        pendingReqs.reduce(
+          (innerSum: number, r: any) => innerSum + (r.refundAmount || 0),
+          0
+        )
+      );
+    }
+    return sum;
+  }, 0);
+
+  const pendingWithdrawals = selectedEvent?.withdrawalDetails?.totals?.pendingAmount || 0;
+  const pendingFunds = pendingRefunds + pendingWithdrawals;
 
   // 4. Available Balance = Total Sales - Refunded Amount
   const commission = totalSales * 0.10;
   const netSales = totalSales - refundedAmount;
-  const withdrawals = selectedEvent?.totalApprovedWithdrawals || 0
-  const availableBalance = netSales - commission - withdrawals;
+  const approvedWithdrawals = selectedEvent?.withdrawalDetails?.totals?.approvedAmount || 0;
+  const availableBalance = netSales - commission - pendingWithdrawals - approvedWithdrawals;
 
   // Final metrics array
   const metrics = [

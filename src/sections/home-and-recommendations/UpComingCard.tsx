@@ -1,9 +1,9 @@
-import { Card, CardContent, Button,keyframes, Box, Grid, Typography, ButtonProps } from '@mui/material';
+import { Card, CardContent, Button, keyframes, Box, Grid, Typography, ButtonProps } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 
-import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { formatTimeTo12Hour } from 'src/hooks/formate-time';
+import { truncateTextletter } from 'src/hooks/description-cutting';
 
 // Define interface for custom button props
 interface CustomButtonProps extends ButtonProps {
@@ -95,13 +95,14 @@ export function UpComingCard({ ticket, onShareClick }: { ticket: any; onShareCli
         <Typography
           variant="h5"
           sx={{
-            fontWeight: 700,
-            mb: 2,
+            fontWeight: 600,
             textShadow: '1px 1px 2px rgba(0,0,0,0.3)',
-            fontSize: { xs: '1.3rem', sm: '1.5rem' }
+            fontSize: { xs: 18, sm: 20, md: 22 }
           }}
         >
-          {ticket.eventDetails?.eventName}
+          {
+            truncateTextletter(ticket.eventDetails?.eventName, 21)
+          }
         </Typography>
 
         {/* Event details */}
@@ -110,7 +111,7 @@ export function UpComingCard({ ticket, onShareClick }: { ticket: any; onShareCli
           sx={{
             mb: 3,
             opacity: 0.9,
-            fontSize: { xs: '0.8rem', sm: '0.9rem' }
+            fontSize: { xs: 10, sm: 11, md: 12 }
           }}
         >
           {ticket.eventDetails?.location} | {ticket.eventDetails?.date} | {formatTimeTo12Hour(ticket.eventDetails?.time)}

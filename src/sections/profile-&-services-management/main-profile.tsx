@@ -30,6 +30,8 @@ interface PhoneNumberDisplayProps {
 
 export function MainProfile({ handleAvalibility, setShowService, onModify }: any) {
     const { profile } = useSelector((state: RootState) => state?.profile);
+    console.log('profile',profile);
+    
     const { user } = useSelector((state: RootState) => state?.auth);
     const dispatch = useDispatch<AppDispatch>();
     const [covererror, setCoverError] = useState(null)
@@ -280,14 +282,14 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                             }
                         }}
                     >
-                    {picloading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : <EditIcon fontSize="small" />}
+                        {picloading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : <EditIcon fontSize="small" />}
                         {/* <EditIcon fontSize="small" /> */}
                     </IconButton>
                 </Box>
 
                 <Box sx={{ marginTop: "-43px" }}>
                     <HeadingCommon variant="body1" title={profile?.name} weight={600} mb={0} />
-                    <HeadingCommon variant="body" title={profile?.username} weight={400} baseSize="16px" />
+                    <Typography fontWeight={600} fontSize={{ xs: 11, sm: 12, md: 13 }}>{profile?.username}</Typography>
                 </Box>
             </Box>
 
@@ -406,7 +408,7 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                             Completed Gigs
                         </Typography>
                         <Typography fontWeight="bold" fontSize="16px" mt={0.5}>
-                            {profile?.gigsCounts?.completed|| 0}
+                            {profile?.gigsCounts?.completed || 0}
                         </Typography>
                     </Grid>
                     {profile?.role === 'provider' && (
@@ -415,10 +417,11 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                                 Profile Views
                             </Typography>
                             <Typography fontWeight="bold" fontSize="16px" mt={0.5}>
-                                250{" "}
-                                <Typography component="span" fontSize="13px" color="#1E1E1E">
+                                {profile?.profileViews?.currentMonth?.count || 0}
+                                {/* 250{" "} */}
+                                {/* <Typography component="span" fontSize="13px" color="#1E1E1E">
                                     this week
-                                </Typography>
+                                </Typography> */}
                             </Typography>
                         </Grid>
                     )}

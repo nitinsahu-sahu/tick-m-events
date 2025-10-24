@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Box } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
+
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { TabButton } from 'src/components/button/multiple-button';
 import { AppDispatch, RootState } from 'src/redux/store';
-import { providersListFetch } from 'src/redux/actions/searchSelect';
+import { providersListFetch, updateProfileViews } from 'src/redux/actions/searchSelect';
 import { fatchOrgEvents, fatchOrgPlaceABids } from 'src/redux/actions/organizer/pageEvents';
 import { EventBreadCrum } from 'src/sections/entry-validation/event-status';
 import { eventFetch } from 'src/redux/actions/event.action';
@@ -34,9 +35,10 @@ export function SearchAndSelectServiceProvidersView() {
   const [offerList, setOfferList] = useState({})
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
 
-  const handleSelct = (row: any) => {
+  const handleSelct = async (row: any) => {
     setSelected(row)
     setOfferList(row)
+    await dispatch(updateProfileViews(row?._id))
   }
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {

@@ -81,8 +81,8 @@ export function HomeAndRecommendationsView() {
           return ticket.refundRequest.refundStatus !== 'refunded';
         });
 
-        // setTickets(nonRefundedTickets);
-        setTickets([]);
+        setTickets(nonRefundedTickets);
+
         const upcomingTicket = allTickets
           .filter(ticket => {
             const dateStr = ticket.eventDetails?.date;

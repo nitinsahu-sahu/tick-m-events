@@ -19,11 +19,8 @@ type Props = {
     isMobileTablet: boolean;
     selectedTicket: string;
     setSelectedTicket: (val: string) => void;
-    ticketType: string;
     timePeriod: string;
-    handleTicketTypeChange: (e: any) => void;
     handleTimePeriodChange: (e: any) => void;
-    chartData: any;
     upcomingEvents: any[];
     latestSales: any[];
     latestEvents: any[];
@@ -31,7 +28,6 @@ type Props = {
     eventDates: string[];
     getDayNumber: (d: string) => string;
     getDayName: (d: string) => string;
-    ticketSalesData: Record<string, any>;
     selectedEvent: any;
 };
 
@@ -45,11 +41,8 @@ export const RecentEventList: React.FC<Props> = ({
     isMobileTablet,
     selectedTicket,
     setSelectedTicket,
-    ticketType,
     timePeriod,
-    handleTicketTypeChange,
     handleTimePeriodChange,
-    chartData,
     upcomingEvents,
     latestSales,
     latestEvents,
@@ -57,90 +50,78 @@ export const RecentEventList: React.FC<Props> = ({
     eventDates,
     getDayNumber,
     getDayName,
-    ticketSalesData,
     selectedEvent,
 }) => {
     const theme = useTheme();
     const ticketTypes: Ticket[] = selectedEvent?.tickets?.[0]?.tickets || [];
-    
+
     useEffect(() => {
         const tickets = selectedEvent?.tickets?.[0]?.tickets || [];
         if (!tickets.length) return;
-        const types = tickets.map((t: { ticketType: string }) => t.ticketType); 
+        const types = tickets.map((t: { ticketType: string }) => t.ticketType);
         if (!selectedTicket || !types.includes(selectedTicket)) {
             setSelectedTicket(tickets[0].ticketType);
         }
     }, [selectedEvent, selectedTicket, setSelectedTicket]);
 
-    const monthLabels = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-];
+    const weeklyData = getWeeklyRevenue(selectedEvent, selectedTicket);
+    const monthlyData = getMonthlyRevenue(selectedEvent, selectedTicket);
+    const dailyData = getDailyRevenue(selectedEvent, selectedTicket);
 
-const weeklyData = getWeeklyRevenue(selectedEvent, selectedTicket);
-const monthlyData = getMonthlyRevenue(selectedEvent, selectedTicket);
-const dailyData = getDailyRevenue(selectedEvent, selectedTicket);
+    const revenueData =
+        timePeriod === "monthly"
+            ? monthlyData
+            : timePeriod === "weekly"
+                ? weeklyData
+                : dailyData;
 
-const revenueData =
-  timePeriod === "monthly"
-    ? monthlyData
-    : timePeriod === "weekly"
-    ? weeklyData
-    : dailyData;
+    const xAxisLabels =
+        timePeriod === "monthly"
+            ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            : timePeriod === "weekly"
+                ? ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"]
+                : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-const xAxisLabels =
-  timePeriod === "monthly"
-    ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    : timePeriod === "weekly"
-    ? ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"]
-    : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-// const yAxisConfig = {
-//   monthly: { min: 800000, max: 2400000 },
-//   weekly: { min: 350000, max: 650000 },
-//   daily: { min: 50000, max: 900000 }
-// };
-
-const yAxisConfig = {
-  monthly: { min: 0, max: 12000 },
-  weekly: { min: 0, max: 1200 },
-  daily: { min: 0, max: 1200 }
-} as const;
+    const yAxisConfig = {
+        monthly: { min: 0, max: 12000 },
+        weekly: { min: 0, max: 1200 },
+        daily: { min: 0, max: 1200 }
+    } as const;
 
 
-const { min, max } = yAxisConfig[timePeriod as keyof typeof yAxisConfig];
+    const { min, max } = yAxisConfig[timePeriod as keyof typeof yAxisConfig];
 
-const revenueChartData = {
-  options: {
-    chart: { id: "revenue-chart" },
-    xaxis: {
-      categories: xAxisLabels
-    },
-    stroke: {
-      curve: "smooth" as const
-    },
-    tooltip: {
-      y: {
-        formatter: (val: number) => `${val.toLocaleString()} XAF`
-      }
-    },
-    yaxis: {
-      min,
-      max,
-      tickAmount: 4,
-      labels: {
-        formatter: (val: number) => `${(val / 1000).toLocaleString()}k XAF`
-      }
-    }
-  },
-  series: [
-    {
-      name: "Revenue",
-      data: revenueData
-    }
-  ]
-};
-  
+    const revenueChartData = {
+        options: {
+            chart: { id: "revenue-chart" },
+            xaxis: {
+                categories: xAxisLabels
+            },
+            stroke: {
+                curve: "smooth" as const
+            },
+            tooltip: {
+                y: {
+                    formatter: (val: number) => `${val.toLocaleString()} XAF`
+                }
+            },
+            yaxis: {
+                min,
+                max,
+                tickAmount: 4,
+                labels: {
+                    formatter: (val: number) => `${(val / 1000).toLocaleString()}k XAF`
+                }
+            }
+        },
+        series: [
+            {
+                name: "Revenue",
+                data: revenueData
+            }
+        ]
+    };
+
     return (
         <Box sx={{ py: 3, minHeight: "100vh" }}>
             <Grid container spacing={3}>
@@ -393,8 +374,8 @@ const revenueChartData = {
                             {/* Chart */}
                             <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
                                 <Chart
-                                      options={revenueChartData.options}
-                                      series={revenueChartData.series}
+                                    options={revenueChartData.options}
+                                    series={revenueChartData.series}
                                     type="line"
                                     height={250}
                                     width="100%"
@@ -516,89 +497,89 @@ const revenueChartData = {
 };
 
 function getMonthlyRevenue(event: any, selectedTicket: string) {
-  const monthlyRevenue = new Array(12).fill(0); // Jan to Dec
+    const monthlyRevenue = new Array(12).fill(0); // Jan to Dec
 
-  if (!event || !event.order) return monthlyRevenue;
+    if (!event || !event.order) return monthlyRevenue;
 
-  event.order.forEach((order: any) => {
-    const isConfirmed = order.paymentStatus === "confirmed";
-    const hasSelectedTicket = order.tickets?.some(
-      (ticket: any) => ticket.ticketType === selectedTicket
-    );
-    const isRefunded = order.refundAmount > 0;
-
-    if (isConfirmed && hasSelectedTicket && !isRefunded) {
-      const orderMonth = dayjs(order.createdAt).month(); // 0 = Jan
-
-      const totalAmountForSelectedTicket = order.tickets
-        ?.filter((ticket: any) => ticket.ticketType === selectedTicket)
-        ?.reduce(
-          (sum: number, ticket: any) =>
-            sum + ticket.unitPrice * ticket.quantity,
-          0
+    event.order.forEach((order: any) => {
+        const isConfirmed = order.paymentStatus === "confirmed";
+        const hasSelectedTicket = order.tickets?.some(
+            (ticket: any) => ticket.ticketType === selectedTicket
         );
+        const isRefunded = order.refundAmount > 0;
 
-      monthlyRevenue[orderMonth] += totalAmountForSelectedTicket || 0;
-    }
-  });
+        if (isConfirmed && hasSelectedTicket && !isRefunded) {
+            const orderMonth = dayjs(order.createdAt).month(); // 0 = Jan
 
-  return monthlyRevenue;
+            const totalAmountForSelectedTicket = order.tickets
+                ?.filter((ticket: any) => ticket.ticketType === selectedTicket)
+                ?.reduce(
+                    (sum: number, ticket: any) =>
+                        sum + ticket.unitPrice * ticket.quantity,
+                    0
+                );
+
+            monthlyRevenue[orderMonth] += totalAmountForSelectedTicket || 0;
+        }
+    });
+
+    return monthlyRevenue;
 }
 
 function getWeeklyRevenue(event: any, selectedTicket: string) {
-  const weeklyRevenue = new Array(5).fill(0); // Week 1 to Week 5
+    const weeklyRevenue = new Array(5).fill(0); // Week 1 to Week 5
 
-  if (!event || !event.order) return weeklyRevenue;
+    if (!event || !event.order) return weeklyRevenue;
 
-  event.order.forEach((order: any) => {
-    const isConfirmed = order.paymentStatus === "confirmed";
-    const isRefunded = order.refundAmount > 0;
-    const hasSelectedTicket = order.tickets?.some(
-      (ticket: any) => ticket.ticketType === selectedTicket
-    );
-
-    if (isConfirmed && hasSelectedTicket && !isRefunded) {
-      const createdAt = dayjs(order.createdAt);
-      const weekOfMonth = Math.min(Math.floor((createdAt.date() - 1) / 7), 4); // 0 = Week 1, max = Week 5
-
-      const totalAmount = order.tickets
-        ?.filter((ticket: any) => ticket.ticketType === selectedTicket)
-        ?.reduce(
-          (sum: number, ticket: any) =>
-            sum + ticket.unitPrice * ticket.quantity,
-          0
+    event.order.forEach((order: any) => {
+        const isConfirmed = order.paymentStatus === "confirmed";
+        const isRefunded = order.refundAmount > 0;
+        const hasSelectedTicket = order.tickets?.some(
+            (ticket: any) => ticket.ticketType === selectedTicket
         );
 
-      weeklyRevenue[weekOfMonth] += totalAmount || 0;
-    }
-  });
+        if (isConfirmed && hasSelectedTicket && !isRefunded) {
+            const createdAt = dayjs(order.createdAt);
+            const weekOfMonth = Math.min(Math.floor((createdAt.date() - 1) / 7), 4); // 0 = Week 1, max = Week 5
 
-  return weeklyRevenue;
+            const totalAmount = order.tickets
+                ?.filter((ticket: any) => ticket.ticketType === selectedTicket)
+                ?.reduce(
+                    (sum: number, ticket: any) =>
+                        sum + ticket.unitPrice * ticket.quantity,
+                    0
+                );
+
+            weeklyRevenue[weekOfMonth] += totalAmount || 0;
+        }
+    });
+
+    return weeklyRevenue;
 }
 
 function getDailyRevenue(event: any, selectedTicket: string) {
-  const dailyRevenue = new Array(7).fill(0); // Mon to Sun
+    const dailyRevenue = new Array(7).fill(0); // Mon to Sun
 
-  if (!event || !event.order) return dailyRevenue;
+    if (!event || !event.order) return dailyRevenue;
 
-  event.order.forEach((order: any) => {
-    const isConfirmed = order.paymentStatus === "confirmed";
-    const hasSelectedTicket = order.tickets?.some(
-      (ticket: any) => ticket.ticketType === selectedTicket
-    );
-    const isRefunded = order.refundAmount > 0;
+    event.order.forEach((order: any) => {
+        const isConfirmed = order.paymentStatus === "confirmed";
+        const hasSelectedTicket = order.tickets?.some(
+            (ticket: any) => ticket.ticketType === selectedTicket
+        );
+        const isRefunded = order.refundAmount > 0;
 
-    if (isConfirmed && hasSelectedTicket && !isRefunded) {
-      const dayOfWeek = dayjs(order.createdAt).day(); // 0=Sunday, 1=Monday...
-      const index = (dayOfWeek + 6) % 7; // Make Monday = 0, Sunday = 6
+        if (isConfirmed && hasSelectedTicket && !isRefunded) {
+            const dayOfWeek = dayjs(order.createdAt).day(); // 0=Sunday, 1=Monday...
+            const index = (dayOfWeek + 6) % 7; // Make Monday = 0, Sunday = 6
 
-      const total = order.tickets
-        ?.filter((ticket: any) => ticket.ticketType === selectedTicket)
-        ?.reduce((sum: number, ticket: any) => sum + ticket.unitPrice * ticket.quantity, 0);
+            const total = order.tickets
+                ?.filter((ticket: any) => ticket.ticketType === selectedTicket)
+                ?.reduce((sum: number, ticket: any) => sum + ticket.unitPrice * ticket.quantity, 0);
 
-      dailyRevenue[index] += total || 0;
-    }
-  });
+            dailyRevenue[index] += total || 0;
+        }
+    });
 
-  return dailyRevenue;
+    return dailyRevenue;
 }

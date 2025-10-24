@@ -43,3 +43,29 @@ export const providersCateFetch = () => async (dispatch) => {
     });
   }
 };
+
+
+export const updateProfileViews = (userId) => async (dispatch) => {
+  dispatch({ type: searchSelectProviderConstants.PROFILE_VIEW_REQUEST });
+
+  try {
+    const response = await axios.patch(`/auth/profile-views/${userId}`);
+    console.log('====================================');
+    console.log('profile',response);
+    console.log('====================================');
+    dispatch({
+      type: searchSelectProviderConstants.PROFILE_VIEW_SUCCESS,
+      payload: {
+        serviceCate: response?.data?.categories
+      },
+    });
+  } catch (error) {
+    dispatch({
+      type: searchSelectProviderConstants.PROFILE_VIEW_FAILURE,
+      payload: {
+        message: error?.response?.data?.message || "Server error",
+        error: error.status
+      }
+    });
+  }
+};

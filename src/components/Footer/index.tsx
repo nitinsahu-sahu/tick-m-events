@@ -15,8 +15,6 @@ import axios from '../../redux/helper/axios'
 
 export default function Footer() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const currentRole = useSelector((state: RootState) => state.auth?.user?.role || 'participant');
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);

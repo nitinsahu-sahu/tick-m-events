@@ -40,6 +40,7 @@ interface Ticket {
   qrCode: string;
   verifyEntry: string;
   eventDate?: string;
+  refundRequest?: any;
   participantDetails?: ParticipantDetail[];
 }
 
@@ -65,25 +66,23 @@ export function HomeAndRecommendationsView() {
     }
   };
 
-  const latestChangeNotif = notifications
-    ?.slice()
-    ?.reverse()
-    ?.find((n: any) => {
-      const msg = n?.message?.toLowerCase();
-      return (
-        (msg.includes("location of") && msg.includes("has changed")) || // venue/location change
-        (msg.includes("date for") && msg.includes("has changed")) ||   // date change
-        (msg.includes("time for") && msg.includes("has changed"))      // time change
-      );
-    });
-
   useEffect(() => {
     async function fetchTickets() {
       try {
         const response = await axios.get(`/event-order/user/${_id}`);
 
         const allTickets: Ticket[] = response.data;
-        setTickets(allTickets);
+        // Filter out refunded tickets
+        const nonRefundedTickets = allTickets.filter(ticket => {
+          // If there's no refund request, keep the ticket
+          if (!ticket.refundRequest) return true;
+
+          // If there's a refund request, only keep if status is not 'refunded'
+          return ticket.refundRequest.refundStatus !== 'refunded';
+        });
+
+        // setTickets(nonRefundedTickets);
+        setTickets([]);
         const upcomingTicket = allTickets
           .filter(ticket => {
             const dateStr = ticket.eventDetails?.date;
@@ -246,13 +245,61 @@ export function HomeAndRecommendationsView() {
             ))}
           </Grid>
         ) : (
-          <Typography variant="body1" sx={{
-            textAlign: 'center',
-            padding: 3,
-            color: 'text.secondary'
-          }}>
-            No active tickets available
-          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              py: 8,
+              px: 2,
+              textAlign: 'center',
+              border: '2px dashed',
+              borderColor: 'grey.300',
+              borderRadius: 2,
+              backgroundColor: 'grey.50'
+            }}
+          >
+            {/* Text */}
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                color: 'text.secondary',
+                mb: 1
+              }}
+            >
+              No Active Tickets
+            </Typography>
+
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                maxWidth: 400,
+                lineHeight: 1.5
+              }}
+            >
+              You don&apos;t have any upcoming events. Explore events to book your next experience!
+            </Typography>
+
+            {/* Optional: Add a button to browse events */}
+            <Button
+              variant="contained"
+              sx={{
+                mt: 3,
+                backgroundColor: 'primary.main',
+                '&:hover': {
+                  backgroundColor: 'primary.dark'
+                }
+              }}
+              onClick={() => {
+                navigate('/our-event');
+              }}
+            >
+              Browse Events
+            </Button>
+          </Box>
         )}
       </Box>
 

@@ -39,6 +39,7 @@ interface Ticket {
   verifyEntry?: boolean;
   refundPolicy?: RefundPolicy;
   isRefundPolicyEnabled?: boolean;
+  refundRequest?: any
 }
 interface RefundRequest {
   orderId: string;
@@ -61,6 +62,7 @@ export function TicketManagementView() {
   const [activeTab, setActiveTab] = useState('Active Tickets');
   const [visibleActiveCount, setVisibleActiveCount] = useState(2);
   const [tickets, setTickets] = useState<Ticket[]>([]);
+
   const { _id } = useSelector((state: RootState) => state?.auth?.user);
   const [upcomingQrTicket, setUpcomingQrTicket] = useState<Ticket | null>(null);
   const [refundRequests, setRefundRequests] = useState<RefundRequest[]>([]);
@@ -81,8 +83,16 @@ export function TicketManagementView() {
       try {
         const response = await axios.get(`/event-order/user/${_id}`);
         const allTickets: Ticket[] = response.data;
-        setTickets(allTickets);
-        console.log("All", allTickets);
+        // Filter out refunded tickets
+        const nonRefundedTickets = allTickets.filter(ticket => {
+          // If there's no refund request, keep the ticket
+          if (!ticket.refundRequest) return true;
+
+          // If there's a refund request, only keep if status is not 'refunded'
+          return ticket.refundRequest.refundStatus !== 'refunded';
+        });
+
+        setTickets(nonRefundedTickets);
         const upcomingTicket = allTickets
           .filter(ticket => {
             const dateStr = ticket.eventDetails?.date;

@@ -1,7 +1,26 @@
 import {
-  Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody,
-  Paper, Box, Chip, Avatar, Button, CircularProgress, Alert, TextField, MenuItem, InputAdornment,
-  Card, CardContent, Modal, Grid, IconButton, Stack
+  Typography,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
+  Box,
+  Chip,
+  Avatar,
+  Button,
+  CircularProgress,
+  Alert,
+  TextField,
+  MenuItem,
+  InputAdornment,
+  Card,
+  CardContent, Modal,
+  Grid,
+  IconButton,
+  Stack
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -441,11 +460,11 @@ export function RefundReq() {
             refundTransactionId: transactionId,
           });
           console.log("✅ Refund request updated in backend:", res.data);
-          toast.success("✅ Refund processed successfully!");
+          toast.success("Refund processed successfully!");
           setTimeout(() => handleCloseModal(), 1500);
           dispatch(getAdminRefundReq()); // Refresh the list
         } catch (err: any) {
-          console.error("❌ Failed to update refund request in backend:", err.response?.data || err.message);
+          console.error("❌Failed to update refund request in backend:", err.response?.data || err.message);
           toast.error("Failed to update refund status in backend!");
           setAdminNotes(`${notes} (Failed to update backend)`);
         }
@@ -461,7 +480,7 @@ export function RefundReq() {
             adminNotes: notes,
           });
           console.log("ℹ️ Backend notes updated for failed refund:", res.data);
-          toast.error(`❌ Refund failed: ${payoutError}`);
+          toast.error(`Refund failed: ${payoutError}`);
           dispatch(getAdminRefundReq()); // Refresh the list
         } catch (err: any) {
           console.error("❌ Failed to update backend notes for failed refund:", err.response?.data || err.message);
@@ -720,26 +739,7 @@ export function RefundReq() {
                       >
                         View
                       </Button>
-                      {request.refundStatus === 'pending' && (
-                        <>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            color="success"
-                            onClick={() => handleApprove(request)}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            color="error"
-                            onClick={() => handleReject(request)}
-                          >
-                            Reject
-                          </Button>
-                        </>
-                      )}
+
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -1105,24 +1105,23 @@ export function RefundReq() {
                   <Button variant="outlined" onClick={handleCloseModal}>
                     Close
                   </Button>
-                  {selectedRequest.refundStatus === 'pending' && (
+                  {selectedRequest.refundStatus === 'processed' && (
                     <>
-                      <Button variant="contained" color="success" onClick={() => handleApprove(selectedRequest)}>
-                        Approve Refund
-                      </Button>
                       <Button variant="contained" color="error" onClick={() => handleReject(selectedRequest)}>
                         Reject Request
                       </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        disabled={loadingRefund || isProcessRefundDisabled(selectedRequest)}
+                        onClick={() => handleProceedRefund(selectedRequest)}
+                      >
+                        {loadingRefund ? "Processing..." : "Proceed Refund"}
+                      </Button>
                     </>
                   )}
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={loadingRefund || isProcessRefundDisabled(selectedRequest)}
-                    onClick={() => handleProceedRefund(selectedRequest)}
-                  >
-                    {loadingRefund ? "Processing..." : "Proceed Refund"}
-                  </Button>
+
+
                 </Stack>
               </Box>
             </>

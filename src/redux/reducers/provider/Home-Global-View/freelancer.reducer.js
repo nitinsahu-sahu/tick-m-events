@@ -2,7 +2,7 @@ import { placeABidConstants, providerProposalConstants, statisticsPerformanceCon
 
 const initialState = {
     loading: false,
-    statistics:{},
+    statistics: {},
     _projects: [],
     _mybids: [],
     _project: {},

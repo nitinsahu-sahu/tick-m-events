@@ -403,7 +403,7 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
   };
 
   return (
-    <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3 } }}>
+    <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3,md:0 } }}>
       <Box
         sx={{
           backgroundColor: '#fff',

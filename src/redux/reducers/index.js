@@ -33,7 +33,7 @@ const rootReducer = combineReducers({
     admin: reqAndRefundsReducer,
     customization: customizationReducer,
     provider: placeABidReducer,
-    providerRC: reservationContractsReducer,
+    resContracts: reservationContractsReducer,
     organizer: pageEventReducer,
     gogs: globalOverviewGeneralStatisticsReducer,
     notification: notificationReducer,

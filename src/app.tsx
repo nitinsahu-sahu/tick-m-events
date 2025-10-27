@@ -15,6 +15,7 @@ import NotificationsHandler from './utils/notification-handle';
 import { getPromotionLogo } from './redux/actions/customization/promotion-logo';
 import { LanguageProvider } from './redux/contexts/LanguageContext';
 import { statisticsPerformanceFetch } from './redux/actions/provider/statisticsAndPerformance';
+import { getReservationContracts } from './redux/actions/provider/reservation-contract';
 
 
 // ----------------------------------------------------------------------
@@ -25,6 +26,8 @@ export default function App() {
 
   useScrollToTop();
   useEffect(() => {
+    dispatch(getReservationContracts());
+
     dispatch(wishlistEventFetch())
     dispatch(eventFetch());
     dispatch(eventOrderFetch())

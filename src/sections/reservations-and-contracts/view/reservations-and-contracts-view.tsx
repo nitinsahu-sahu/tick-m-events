@@ -1,16 +1,19 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, CircularProgress } from "@mui/material";
 import { DashboardContent } from "src/layouts/dashboard";
 import { MatrixThreeCard } from "src/components/matrix-three-cards/matrix-three-cards";
 import { AppDispatch, RootState } from "src/redux/store";
 import { getReservationContracts } from "src/redux/actions/provider/reservation-contract";
 import { ReservationsTable } from "../reservationTable";
 
-
 export function ReservationsAndContractsView() {
     const dispatch = useDispatch<AppDispatch>();
-    const { resarvationContracts } = useSelector((state: RootState) => state?.providerRC);
+    const { 
+        resarvationContracts: contracts, 
+        loading, 
+        error 
+    } = useSelector((state: RootState) => state?.resContracts || {});
     const [viewType, setViewType] = useState<null | "active" | "completed">('active');
 
     useEffect(() => {
@@ -20,6 +23,33 @@ export function ReservationsAndContractsView() {
     const handleCardButtonClick = (type: "active" | "completed") => {
         setViewType(type);
     };
+
+    // Show loading state
+    if (loading) {
+        return (
+            <DashboardContent>
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                    <CircularProgress />
+                </Box>
+            </DashboardContent>
+        );
+    }
+
+    // Show error state
+    if (error) {
+        return (
+            <DashboardContent>
+                <Box sx={{ mb: 4 }}>
+                    <Typography variant="h4" fontWeight="bold" gutterBottom>
+                        Reservations & Contracts
+                    </Typography>
+                </Box>
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                    <Typography color="error">Error loading data: {error}</Typography>
+                </Box>
+            </DashboardContent>
+        );
+    }
 
     return (
         <DashboardContent>
@@ -33,29 +63,29 @@ export function ReservationsAndContractsView() {
                 </Typography>
             </Box>
 
-            {/* Metrics Cards */}
+            {/* Metrics Cards - Always show even if data is empty */}
             <MatrixThreeCard
                 metrics={[
                     {
                         title: "Active Contracts",
-                        value: resarvationContracts?.summary?.totalActiveProjects || 0,
+                        value: contracts?.summary?.totalActiveProjects || 0,
                         buttonType: "active"
                     },
                     {
                         title: "Completed Projects",
-                        value: resarvationContracts?.summary?.totalCompletedProjects || 0,
+                        value: contracts?.summary?.totalCompletedProjects || 0,
                         buttonType: "completed"
                     },
                     {
                         title: "Total Expected Payments",
-                        value: `${resarvationContracts?.summary?.overallExpectedPayments || 0} XAF`
+                        value: `${contracts?.summary?.overallExpectedPayments || 0} XAF`
                     }
                 ]}
                 onCardButtonClick={handleCardButtonClick}
             />
 
-            {/* Active Projects Table */}
-            {viewType === "active" && resarvationContracts?.activeProjects?.projects && (
+            {/* Active Projects Table - Show even if empty with proper fallbacks */}
+            {viewType === "active" && (
                 <Box mt={4}>
                     <Typography variant="h5" fontWeight="600" gutterBottom sx={{
                         color: "#2295D4",
@@ -78,21 +108,30 @@ export function ReservationsAndContractsView() {
                                 fontSize: "0.75rem"
                             }}
                         >
-                            {resarvationContracts.activeProjects.count}
+                            {contracts?.summary?.totalActiveProjects || 0}
                         </Typography>
                     </Typography>
                     <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                        Total Expected Payments: {resarvationContracts.activeProjects.totalExpectedPayments} XAF
+                        Total Expected Payments: {contracts?.activeProjects?.totalExpectedPayments || 0} XAF
                     </Typography>
+                    
+                    {/* Show table even if projects array is empty */}
                     <ReservationsTable
-                        projects={resarvationContracts.activeProjects.projects}
+                        projects={contracts?.activeProjects?.projects || []}
                         type="active"
                     />
+                    
+                    {/* Show message when no active projects */}
+                    {(!contracts?.activeProjects?.projects || contracts.activeProjects.projects.length === 0) && (
+                        <Typography variant="body1" color="textSecondary" textAlign="center" py={4}>
+                            No active contracts found
+                        </Typography>
+                    )}
                 </Box>
             )}
 
-            {/* Completed Projects Table */}
-            {viewType === "completed" && resarvationContracts?.completedProjects?.projects && (
+            {/* Completed Projects Table - Show even if empty with proper fallbacks */}
+            {viewType === "completed" && (
                 <Box mt={4}>
                     <Typography variant="h5" fontWeight="600" gutterBottom sx={{
                         color: "#4CAF50",
@@ -115,16 +154,19 @@ export function ReservationsAndContractsView() {
                                 fontSize: "0.75rem"
                             }}
                         >
-                            {resarvationContracts.completedProjects.count}
+                            {contracts?.summary?.totalCompletedProjects || 0}
                         </Typography>
                     </Typography>
                     <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                        Total Payments: {resarvationContracts.completedProjects.totalExpectedPayments} XAF
+                        Total Payments: {contracts?.completedProjects?.totalExpectedPayments || 0} XAF
                     </Typography>
+                    
                     <ReservationsTable
-                        projects={resarvationContracts.completedProjects.projects}
+                        projects={contracts?.completedProjects?.projects || []}
                         type="completed"
                     />
+                    
+                    
                 </Box>
             )}
         </DashboardContent>

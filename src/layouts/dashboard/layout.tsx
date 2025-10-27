@@ -106,13 +106,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   open={navOpen}
                   onClose={() => setNavOpen(false)}
                 />
-                {
-                  (
-                    hiddenReserContracts.some(path => pathname.includes(path))) &&
-                  !isMobileOrTablet && (
-                    <HeadingCommon weight={600} baseSize="30px" title="Reservations & Contracts" />
-                  )
-                }
+                
                 {
                   (
                     hiddenServiceCal.some(path => pathname.includes(path))) &&

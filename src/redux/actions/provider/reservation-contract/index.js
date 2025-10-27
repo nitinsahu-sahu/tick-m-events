@@ -1,7 +1,6 @@
 import axios from "../../../helper/axios";
 import { reservationContractsConstants } from "../../constants";
 
-// Organizer see project bids only
 export const getReservationContracts = () => async (dispatch) => {
   dispatch({ type: reservationContractsConstants.GET_REQUEST });
   try {
@@ -10,13 +9,20 @@ export const getReservationContracts = () => async (dispatch) => {
       type: reservationContractsConstants.GET_SUCCESS,
       payload: {
         message: response?.data?.message,
-        project: response?.data?.contracts,
+        resarvationContracts: response?.data?.contracts || {
+          summary: { totalActiveProjects: 0, totalCompletedProjects: 0, overallExpectedPayments: 0 },
+          activeProjects: { projects: [], totalExpectedPayments: 0 },
+          completedProjects: { projects: [], totalExpectedPayments: 0 }
+        },
       },
     });
   } catch (error) {
     dispatch({
       type: reservationContractsConstants.GET_FAILURE,
-      payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+      payload: { 
+        message: error?.response?.data?.message || "Server error", 
+        error: error.status 
+      },
     });
   }
 };

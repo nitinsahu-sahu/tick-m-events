@@ -15,7 +15,7 @@ const Protected = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("expiresAt");
 
     // Redirect to sign-in page
-    return <Navigate to="/sign-in" />;
+    return <Navigate to="/home" />;
 };
 
 export default Protected;

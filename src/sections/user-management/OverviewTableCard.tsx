@@ -522,7 +522,7 @@ export function OverviewTableCard() {
         </Box>
       )}
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mt={4}>
-        <ResponsiveActionButton>View Account Details</ResponsiveActionButton>
+        {/* <ResponsiveActionButton>View Account Details</ResponsiveActionButton> */}
         <ResponsiveActionButton onClick={() => exportToCSV(filteredUsers, 'users.csv')}>
           Export Data
         </ResponsiveActionButton>

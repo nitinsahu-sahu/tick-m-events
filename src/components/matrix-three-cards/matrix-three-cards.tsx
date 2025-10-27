@@ -1,4 +1,4 @@
-import { Card, CardContent, Grid, Typography, Button, Stack } from "@mui/material";
+import { Card, CardContent, Grid, Button } from "@mui/material";
 import { HeadingCommon } from "../multiple-responsive-heading/heading";
 
 export function MatrixThreeCard({ metrics, md = 4, sm = 4, onCardButtonClick }: any) {
@@ -18,16 +18,17 @@ export function MatrixThreeCard({ metrics, md = 4, sm = 4, onCardButtonClick }: 
                             <HeadingCommon title={metric.title} variant="h4" baseSize="26px" />
                             <HeadingCommon title={metric.value} color="#2295D4" baseSize="26px" />
 
-                            {metric.buttonType && (
+                            {metric.buttonType && metric.value > 0 && (
                                 <Button
                                     variant="contained"
                                     sx={{ mt: 2 }}
-                                    color="primary" 
+                                    color="primary"
                                     onClick={() => onCardButtonClick(metric.buttonType)}
                                 >
                                     View {metric.buttonType === 'active' ? 'Active Contracts' : 'Completed Projects'}
                                 </Button>
                             )}
+
 
                         </CardContent>
                     </Card>

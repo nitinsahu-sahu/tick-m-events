@@ -126,7 +126,7 @@ const PlatformStatistics = memo(({ statistics }: PlatformStatisticsProps) => {
         justifyContent="center"
         gap={2}
       >
-        <Button
+        {/* <Button
           variant="contained"
           startIcon={<Visibility />}
           onClick={handleViewFullReport}
@@ -170,7 +170,7 @@ const PlatformStatistics = memo(({ statistics }: PlatformStatisticsProps) => {
           }}
         >
           {isExporting ? 'Exporting...' : 'Export Data'}
-        </Button>
+        </Button> */}
 
         <Menu
           anchorEl={anchorEl}

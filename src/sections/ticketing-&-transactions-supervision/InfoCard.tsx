@@ -23,7 +23,7 @@ export function InfoCard({ activeTab, setActiveTab }: InfoCardProps) {
             <Paper sx={{ p: 3, bgcolor: '#cce7f9', borderRadius: 2, textAlign: 'center' }}>
               <Typography variant="subtitle1">Total Sales</Typography>
               <Typography variant="h5" fontWeight="bold">
-                $45,000
+                45,000 XAF
               </Typography>
             </Paper>
           </Grid>
@@ -31,7 +31,7 @@ export function InfoCard({ activeTab, setActiveTab }: InfoCardProps) {
             <Paper sx={{ p: 3, bgcolor: '#cce7f9', borderRadius: 2, textAlign: 'center' }}>
               <Typography variant="subtitle1">Pending Payments</Typography>
               <Typography variant="h5" fontWeight="bold">
-                $12,000
+                12,000 XAF
               </Typography>
             </Paper>
           </Grid>

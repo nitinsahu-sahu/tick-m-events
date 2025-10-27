@@ -53,7 +53,7 @@ export interface RefundRequestTyp {
   reason: string;
   refundPolicy?: RefundPolicy;
   eventDate: string;
-  refundStatus: 'pending' | 'approved' | 'rejected' | 'refunded' | 'cancelled';
+  refundStatus: 'pending' | 'approved' | 'rejected' | 'refunded' | 'cancelled'|'processed';
   isAdminForwrd: boolean;
   adminNotes?: string;
   createdAt: string;

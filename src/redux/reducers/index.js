@@ -26,12 +26,14 @@ import { rewardReducer } from './rewardReducer'
 import customizationReducer from './customization/promotion-logos'
 import reqAndRefundsReducer from './admin/refund-request/refundreuest.reducer'
 import entryValidationReducer from './participant/entry-validation/index'
+import reservationContractsReducer from './provider/reservation-contract/index'
 
 const rootReducer = combineReducers({
     participant:entryValidationReducer,
     admin: reqAndRefundsReducer,
     customization: customizationReducer,
     provider: placeABidReducer,
+    providerRC: reservationContractsReducer,
     organizer: pageEventReducer,
     gogs: globalOverviewGeneralStatisticsReducer,
     notification: notificationReducer,

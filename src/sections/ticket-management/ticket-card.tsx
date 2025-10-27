@@ -86,7 +86,7 @@ export function TicketCard({ ticket }: any) {
         if (refundType === 'full' || refundType === 'dateBased') {
             refundAmount = totalAmount;  // full refund amount
         } else if (refundType === 'partial') {
-            refundAmount = Math.round(totalAmount * (partialRefundPercent / 100));
+            refundAmount = Math.round(totalAmount * ((100 - partialRefundPercent) / 100));
         }
         try {
             const payload = {

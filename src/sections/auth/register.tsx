@@ -14,7 +14,7 @@ export function Register() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    
+
     // Get referral code from URL parameter
     const referralCodeFromUrl = searchParams.get('referrelCode') || '';
 
@@ -254,7 +254,7 @@ export function Register() {
                 InputLabelProps={{ shrink: true }}
                 sx={{ mt: 2 }}
             />
-            
+
             {/* Gender Radio Buttons */}
             <Box sx={{ width: '100%' }} mt={2}>
                 <Box display="flex" gap={2} alignItems="center">
@@ -325,10 +325,23 @@ export function Register() {
                         },
                     },
                     '& .PhoneInputCountry': {
+                        border:"1px solid rgba(0, 0, 0, 0.23)",
+                        px:2,
+                        borderRadius:'10px',
                         marginRight: '8px',
+                        // Style for the country container to show it's fixed
+                        opacity: 0.7,
+                        cursor: 'not-allowed',
                     },
                     '& .PhoneInputCountrySelect': {
-                        marginRight: '8px',
+                        display: 'none !important', // Completely hide the select dropdown
+                    },
+                    '& .PhoneInputCountryIcon': {
+                        // Style the flag to indicate it's not changeable
+                        opacity: 0.7,
+                    },
+                    '& .PhoneInputCountrySelectArrow': {
+                        display: 'none !important', // Hide the dropdown arrow
                     },
                 },
                 '& .PhoneInput--focus': {
@@ -340,13 +353,16 @@ export function Register() {
             }}>
                 <PhoneInput
                     international
-                    defaultCountry="US"
+                    defaultCountry="CM"
+                    country="CM"
+                    countries={["CM"]}
                     value={phoneNumber}
                     onChange={handlePhoneChange}
                     placeholder="Enter phone number"
+                    disabled={false} // Keep the phone number input enabled
                 />
             </Box>
-            
+
             {/* Role Select */}
             <TextField
                 fullWidth
@@ -422,7 +438,7 @@ export function Register() {
                     )
                 }}
             />
-            
+
             {/* Register Button */}
             <LoadingButton
                 fullWidth

@@ -1,14 +1,14 @@
 import { Box, Button, Card, CardContent, Grid, Typography, Avatar, } from "@mui/material";
-import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
-import { formatTimeTo12Hour } from "src/hooks/formate-time";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
+
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+import { formatTimeTo12Hour } from "src/hooks/formate-time";
+
 import axios from "../../redux/helper/axios";
 
-
 export function TicketCard({ ticket }: any) {
-
     const navigate = useNavigate();
     const [showQr, setShowQr] = useState(false);
     const today = new Date();
@@ -83,7 +83,7 @@ export function TicketCard({ ticket }: any) {
         const totalAmount = ticket.totalAmount || 0;
         let refundAmount = 0;
 
-        if (refundType === 'full' ||  refundType === 'dateBased') {
+        if (refundType === 'full' || refundType === 'dateBased') {
             refundAmount = totalAmount;  // full refund amount
         } else if (refundType === 'partial') {
             refundAmount = Math.round(totalAmount * (partialRefundPercent / 100));
@@ -156,6 +156,10 @@ export function TicketCard({ ticket }: any) {
             toast.error(error.response?.data?.message || "❌ Transfer failed");
         }
     };
+
+    const [refundRejected, setRefundRejected] = useState(ticket?.refundRequest?.refundStatus === "rejected");
+    const [adminNotes, setAdminNotes] = useState(ticket?.refundRequest?.adminNotes || "");
+    const [openRefundRejectedModal, setOpenRefundRejectedModal] = useState(false);
 
 
     return (
@@ -260,27 +264,29 @@ export function TicketCard({ ticket }: any) {
                             Download Ticket
                         </Button>
 
-                        {["Share", "Request Refund"].map((label) => (
+                        {["Share", refundRejected ? "Refund Rejected" : "Request Refund"].map((label) => (
                             <Button
                                 onClick={(e) => {
                                     e.stopPropagation();
+
                                     if (label === "Share") {
                                         setOpenShareModal(true);
-                                    }
-                                    else if (label === "Request Refund" && !ticket.verifyEntry) {
+                                    } else if (label === "Request Refund" && !ticket.verifyEntry) {
                                         setOpenRefundModal(true);
+                                    } else if (label === "Refund Rejected") {
+                                        setOpenRefundRejectedModal(true);
                                     }
                                 }}
                                 key={label}
                                 variant="contained"
                                 sx={{
-                                    backgroundColor: "#1F8FCD",
+                                    backgroundColor: label === "Refund Rejected" ? "error.main" : "#1F8FCD",
                                     fontSize: { xs: "12px", sm: "14px", md: "16px" },
                                     fontWeight: 500,
                                     whiteSpace: "nowrap",
                                     flexShrink: 0,
                                     "&:hover": {
-                                        backgroundColor: "#1F8FCD",
+                                        backgroundColor: label === "Refund Rejected" ? "error.dark" : "#1F8FCD",
                                     },
                                 }}
                             >
@@ -557,6 +563,82 @@ export function TicketCard({ ticket }: any) {
                     </Box>
                 </Box>
             )}
+            {openRefundRejectedModal && (
+                <Box
+                    onClick={(e) => e.stopPropagation()}
+                    sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(255,255,255,0.95)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        zIndex: 25,
+                        p: 2,
+                    }}
+                >
+                    <Box
+                        sx={{
+                            backgroundColor: "#fff",
+                            borderRadius: 4,
+                            boxShadow: 6,
+                            p: 4,
+                            width: "100%",
+                            maxWidth: 420,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Typography variant="h6" mb={2} fontWeight={700} color="error.main">
+                            ❌ Refund Request Rejected
+                        </Typography>
+
+                        {adminNotes ? (
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    mb: 3,
+                                    color: "text.primary",
+                                    textAlign: "center",
+                                    fontWeight: 500,
+                                }}
+                            >
+                                <strong>Notes:</strong><br />
+                                {adminNotes}
+                            </Typography>
+                        ) : (
+                            <Typography variant="body2" color="text.secondary" mb={3}>
+                                No notes provided by the admin.
+                            </Typography>
+                        )}
+
+                        <Button
+                            variant="contained"
+                            sx={{ backgroundColor: "#0B2E4C", color: "#fff", mb: 1, width: "100%" }}
+                            disabled={isRefunding}
+                            onClick={async () => {
+                                setOpenRefundRejectedModal(false);
+                                setRefundRejected(false);
+                                await handleRefundRequest(); // reuse existing refund logic
+                            }}
+                        >
+                            {isRefunding ? "Processing..." : "Request Refund Again"}
+                        </Button>
+                        <Button
+                            onClick={() => setOpenRefundRejectedModal(false)}
+                            variant="outlined"
+                            sx={{ mt: 1, width: "100%" }}
+                        >
+                            Close
+                        </Button>
+                    </Box>
+                </Box>
+            )}
+
         </Card>
     )
 }

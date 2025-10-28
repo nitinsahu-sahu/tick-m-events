@@ -43,15 +43,3 @@ export const RoleProtectedRoute = ({
 
   return <>{children}</>;
 };
-// export const RoleProtectedRoute = ({
-
-//   children,
-//   allowedRoles,
-//   currentRole
-// }: ProtectedRouteProps) => {
-
-//   if (!currentRole || !allowedRoles?.includes(currentRole)) {
-//     return <Navigate to="/404" replace />;
-//   }
-//   return <>{children}</>;
-// };

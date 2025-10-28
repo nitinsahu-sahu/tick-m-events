@@ -42,6 +42,7 @@ interface ApiResult {
 export function AddPlaceABid() {
     const { __events } = useSelector((state: RootState) => state.organizer);
     const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+
     const dispatch = useDispatch<AppDispatch>();
     const { categories } = useSelector((state: RootState) => state?.serviceReqCategories);
     const [charCount, setCharCount] = useState(0);
@@ -284,6 +285,22 @@ export function AddPlaceABid() {
                             />
 
                             {/* Service Time */}
+                            {/* <TextField
+                                required
+                                fullWidth
+                                label="Date and Time of the Service"
+                                type="datetime-local"
+                                margin="normal"
+                                name="serviceTime"
+                                value={formData.serviceTime}
+                                onChange={handleChange}
+                                error={!!errors.serviceTime}
+                                helperText={errors.serviceTime}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                            /> */}
+                            {/* Service Time */}
                             <TextField
                                 required
                                 fullWidth
@@ -297,6 +314,9 @@ export function AddPlaceABid() {
                                 helperText={errors.serviceTime}
                                 InputLabelProps={{
                                     shrink: true,
+                                }}
+                                inputProps={{
+                                    max: selectedEvent?.date ? `${selectedEvent.date}T23:59` : undefined,
                                 }}
                             />
 

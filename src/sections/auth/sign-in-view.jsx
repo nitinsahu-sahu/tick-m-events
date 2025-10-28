@@ -2,28 +2,17 @@ import { useState, useCallback, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { CircularProgress, Paper, Alert, Modal, InputAdornment, Typography, IconButton, TextField, Button, Grid, Box, Link } from '@mui/material';
-
 import { toast } from 'react-toastify';
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import { Iconify } from 'src/components/iconify';
 import { login, resetPassword, sendResetCode, verifyResetCode } from 'src/redux/actions';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { modalStyle } from './utils';
 
 import 'react-phone-number-input/style.css'
 
 // ----------------------------------------------------------------------
-const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
-  borderRadius: 2
-};
 
 export function SignInView() {
   const dispatch = useDispatch();
@@ -32,7 +21,7 @@ export function SignInView() {
   const { authenticate } = useSelector(state => state.auth);
   const [formData, setFormData] = useState(
     {
-    
+
       email: 'organizer.rabada12@gmail.com',
       password: 'Nitin@123'
 
@@ -183,7 +172,7 @@ export function SignInView() {
       if (redirectAfterLogin) {
         const redirectData = JSON.parse(redirectAfterLogin);
         sessionStorage.removeItem('redirectAfterLogin');
-        navigate(redirectData.redirectTo || '/');
+        navigate(redirectData.redirectTo);
         return;
       }
       navigate('/')
@@ -195,6 +184,8 @@ export function SignInView() {
   useEffect(() => {
     if (authenticate) {
       navigate("/", { replace: true });
+    }else{
+      navigate("/sign-in", { replace: true });
     }
   }, [authenticate, navigate]);
 

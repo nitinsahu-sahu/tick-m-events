@@ -1,7 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  Box, Typography, Avatar, Grid, Button, Paper, Divider, Tooltip,
-  Dialog, DialogTitle, DialogContent, DialogActions, Chip, IconButton
+  Box, Typography, Avatar, Grid, Button, Paper, Divider, Tooltip, Stack,
+  Dialog, DialogTitle, DialogContent, DialogActions, Chip, IconButton, TextField,
+  InputAdornment
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info'; // or your preferred info icon
 
@@ -29,6 +30,9 @@ interface StatusUpdateResponse {
 
 export function ProposalsCard({ proposals }: any) {
   const location = useLocation();
+  const [bidData, setBidData] = useState<any>({
+    bidAmount: proposals?.providerProposal?.amount || '',
+  });
 
   const dispatch = useDispatch<AppDispatch>();
   const [selectedProposal, setSelectedProposal] = useState<any>(null);
@@ -36,6 +40,9 @@ export function ProposalsCard({ proposals }: any) {
 
   const handleAwardClick = (proposal: any) => {
     setSelectedProposal(proposal);
+    setBidData({
+      bidAmount: proposal?.providerProposal?.amount || '',
+    });
     setDialogOpen(true);
   };
 
@@ -43,11 +50,15 @@ export function ProposalsCard({ proposals }: any) {
     setDialogOpen(false);
     setSelectedProposal(null);
   };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setBidData((prev: any) => ({ ...prev, [name]: value }));
+  };
 
   const handleAwardedProject = useCallback(async (id: any, status: any, proposal: any) => {
     if (status === 'accepted') {
       // Calculate 10% admin fee
-      const bidAmount = proposal?.providerProposal?.amount || 0;
+      const bidAmount = bidData?.bidAmount || 0;
       const adminFee = bidAmount * 0.1;
       const fapshiPayload = {
         placeABidId: proposal?._id,
@@ -94,7 +105,7 @@ export function ProposalsCard({ proposals }: any) {
       }
     }
 
-  }, [dispatch, location.pathname])
+  }, [dispatch, location.pathname, bidData?.bidAmount])
 
   const manualBids = proposals || [];
 
@@ -122,9 +133,12 @@ export function ProposalsCard({ proposals }: any) {
         </DialogTitle>
 
         <DialogContent dividers>
+
+
           {selectedProposal && (
-            <ProposalDetails proposal={selectedProposal} />
+            <ProposalDetails proposal={selectedProposal} bidData={bidData} handleInputChange={handleInputChange} />
           )}
+
         </DialogContent>
 
         <DialogActions sx={{ p: 2, gap: 1 }}>
@@ -147,7 +161,7 @@ export function ProposalsCard({ proposals }: any) {
             Award Request
             {selectedProposal?.providerProposal?.amount && (
               <Tooltip
-                title={`10% admin fee: ${(parseFloat(selectedProposal?.providerProposal?.amount) * 0.1).toFixed(2)} XAF will be deducted`}
+                title={`10% admin fee: ${(parseFloat(bidData?.bidAmount) * 0.1).toFixed(2)} XAF will be deducted`}
                 placement="top"
               >
                 <InfoIcon fontSize="small" sx={{ ml: 1 }} />
@@ -307,7 +321,7 @@ function ProposalItem({ proposal, onAwardClick }: any) {
 }
 
 // Component to display proposal details in the dialog
-function ProposalDetails({ proposal }: any) {
+function ProposalDetails({ proposal, bidData, handleInputChange }: any) {
   return (
     <Box>
       <Box display="flex" alignItems="center" gap={2} mb={2}>
@@ -356,6 +370,29 @@ function ProposalDetails({ proposal }: any) {
                 proposal?.providerStatus === 'rejected' ? 'error' : 'default'
             }
             size="small"
+          />
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={2} mb={3}>
+        <Grid item xs={12} md={12}>
+          <Typography variant="subtitle2" mb={1}>
+            Bid Amount (XAF)
+          </Typography>
+          <TextField
+            fullWidth
+            name="bidAmount"
+            variant="outlined"
+            size="small"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="start">
+                  XAF
+                </InputAdornment>
+              ),
+            }}
+            value={bidData?.bidAmount || proposal?.providerProposal?.amount || ''}
+            onChange={handleInputChange}
           />
         </Grid>
       </Grid>

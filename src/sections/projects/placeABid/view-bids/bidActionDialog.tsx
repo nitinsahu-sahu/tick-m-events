@@ -26,7 +26,7 @@ interface Milestone {
 }
 
 interface BidData {
-    bidAmount: string;
+    bidAmount: any;
     deliveryTime: string;
     deliveryUnit: string;
     proposal: string;
@@ -171,7 +171,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
     const handleActionClick = async (type: any) => {
         if (type === 'isOrgnizerAccepted') {
             // Calculate 10% admin fee
-            const bidAmount = selectedBid?.bidAmount || 0;
+            const bidAmount = bidData?.bidAmount || 0;
             const adminFee = bidAmount * 0.1;
             const fapshiPayload = {
                 placeABidId: project._id,

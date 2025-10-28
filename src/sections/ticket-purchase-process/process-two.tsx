@@ -1,6 +1,6 @@
-import { Box, Button, Grid, Paper, TextField, MenuItem, CircularProgress, Alert } from "@mui/material";
+import { Box, Button, Grid, Paper, TextField, MenuItem,InputAdornment, CircularProgress, Alert } from "@mui/material";
 import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import PhoneInput from 'react-phone-number-input'
 import type { E164Number } from 'libphonenumber-js';
 import { RootState } from "src/redux/store";
@@ -38,7 +38,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
       name: '',
       email: '',
       number: '',
-      country: '',
+      country: 'Cameroon', // Set Cameroon as default
       state: '',
       city: '',
       address: '',
@@ -53,7 +53,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
   const fetchCountries = async () => {
     setLoading(true);
     setApiError('');
-    
+
     const apiEndpoints = [
       {
         name: 'restcountries',
@@ -75,7 +75,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
         name: 'static',
         url: null,
         handler: async () => [
-          "South Africa", "United States", "United Kingdom", "Canada", "Australia",
+          "Cameroon", "South Africa", "United States", "United Kingdom", "Canada", "Australia",
           "India", "Germany", "France", "Brazil", "Japan", "China", "Nigeria",
           "Kenya", "Egypt", "Ghana", "Uganda", "Tanzania", "Zimbabwe", "Botswana",
           "Namibia", "Mozambique", "Zambia", "Malawi", "Angola", "Ethiopia"
@@ -95,9 +95,9 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
         })
       );
 
-      const successfulResult = results.find(result => 
-        result.status === 'fulfilled' && 
-        result.value.success && 
+      const successfulResult = results.find(result =>
+        result.status === 'fulfilled' &&
+        result.value.success &&
         result.value.data.length > 0
       );
 
@@ -110,7 +110,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
       setApiError('Failed to load countries. Please refresh the page.');
       // Use static data as final fallback
       setCountries([
-        "South Africa", "United States", "United Kingdom", "Canada", "Australia",
+        "Cameroon", "South Africa", "United States", "United Kingdom", "Canada", "Australia",
         "India", "Germany", "France", "Brazil", "Japan", "China"
       ].sort());
     } finally {
@@ -119,11 +119,11 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
   };
 
   // 📌 Fetch states with Promise-based approach
-  const fetchStates = async (country: string) => {
+  const fetchStates = useCallback(async (country: string) => {
     if (!country) return;
-    
+
     setLoading(true);
-    
+
     const apiHandlers = [
       {
         name: 'countriesnow',
@@ -150,9 +150,9 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
         })
       );
 
-      const successfulResult = results.find(result => 
-        result.status === 'fulfilled' && 
-        result.value.success && 
+      const successfulResult = results.find(result =>
+        result.status === 'fulfilled' &&
+        result.value.success &&
         result.value.data.length > 0
       );
 
@@ -166,14 +166,14 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // 📌 Fetch cities with Promise-based approach
   const fetchCities = async (country: string, state: string) => {
     if (!country || !state) return;
-    
+
     setLoading(true);
-    
+
     const apiHandlers = [
       {
         name: 'countriesnow',
@@ -200,9 +200,9 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
         })
       );
 
-      const successfulResult = results.find(result => 
-        result.status === 'fulfilled' && 
-        result.value.success && 
+      const successfulResult = results.find(result =>
+        result.status === 'fulfilled' &&
+        result.value.success &&
         result.value.data.length > 0
       );
 
@@ -221,8 +221,12 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
   // Static states data for fallback
   const getStaticStates = (country: string): string[] => {
     const stateData: { [key: string]: string[] } = {
+      "Cameroon": [
+        "Adamawa", "Centre", "East", "Far North", "Littoral",
+        "North", "Northwest", "South", "Southwest", "West"
+      ],
       "South Africa": [
-        "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal", 
+        "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal",
         "Limpopo", "Mpumalanga", "Northern Cape", "North West", "Western Cape"
       ],
       "United States": [
@@ -238,6 +242,13 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
   // Static cities data for fallback
   const getStaticCities = (country: string, state: string): string[] => {
     const cityData: { [key: string]: { [key: string]: string[] } } = {
+      "Cameroon": {
+        "Centre": ["Yaoundé", "Mfou", "Ngoumou", "Obala"],
+        "Littoral": ["Douala", "Edéa", "Loum", "Manjo"],
+        "West": ["Bafoussam", "Bangangté", "Dschang", "Mbouda"],
+        "Southwest": ["Buea", "Limbe", "Kumba", "Muyuka"],
+        "Northwest": ["Bamenda", "Kumbo", "Wum", "Ndop"]
+      },
       "South Africa": {
         "Gauteng": ["Johannesburg", "Pretoria", "Soweto", "Randburg"],
         "Western Cape": ["Cape Town", "Stellenbosch", "Paarl", "Worcester"],
@@ -263,7 +274,11 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
 
   useEffect(() => {
     fetchCountries();
-  }, []);
+    // Fetch states for Cameroon when component mounts
+    if (formData[0]?.country === 'Cameroon') {
+      fetchStates('Cameroon');
+    }
+  }, [fetchStates, formData]);
 
   useEffect(() => {
     setFormData(prev => {
@@ -274,6 +289,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
         email: email || '',
         number: number || '',
         gender: gender || '',
+        country: 'Cameroon' // Ensure Cameroon remains selected
       };
       return updated;
     });
@@ -299,7 +315,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setFormTouched(true); 
+    setFormTouched(true);
 
     if (!isFormValid()) return;
 
@@ -352,7 +368,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
       <form onSubmit={handleSubmit}>
         <Paper sx={{ width: "100%", p: 4, boxShadow: 3, borderRadius: 2, position: "relative" }}>
           <HeadProcess title="Participant Details" step="2" />
-          
+
           {apiError && (
             <Alert severity="warning" sx={{ mb: 2 }}>
               {apiError}
@@ -429,18 +445,35 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
               </Grid>
 
               <Grid item xs={12} sx={phoneInputStyles}>
-                <PhoneInput
-                  international
-                  defaultCountry="ZA"
-                  value={phoneNumber}
-                  onChange={handlePhoneChange}
-                  placeholder="Enter phone number"
+                <TextField
+                  fullWidth
+                  required
+                  name="number"
+                  type="text"
+                  label="Mobile Number"
+                  placeholder="Enter 8 digits (after 6)"
+                  value={phoneNumber.startsWith("6") ? phoneNumber.slice(1) : phoneNumber}
+                  onChange={(e) => {
+                    const input = e.target.value.replace(/^6/, ""); // remove extra 6 if user types it
+                    if (/^\d{0,8}$/.test(input)) {
+                      const fullNumber = `6${input}`;
+                      setPhoneNumber(fullNumber);
+                    }
+                  }}
+                  inputProps={{
+                    maxLength: 8,
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        6
+                      </InputAdornment>
+                    ),
+                  }}
+                  helperText="Number will automatically start with 6 (e.g., 671234567)"
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ mt: 2 }}
                 />
-                {formTouched && (!phoneNumber && !formData[0]?.number) && (
-                  <Box sx={{ color: 'red', fontSize: '0.8rem', mt: 0.5 }}>
-                    Phone number is required
-                  </Box>
-                )}
               </Grid>
 
               <Grid item xs={12} sm={4}>
@@ -448,7 +481,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                   select
                   fullWidth
                   label={loading ? "Loading countries..." : "Country"}
-                  value={formData[0]?.country || ''}
+                  value={formData[0]?.country || 'Cameroon'}
                   onChange={(e) => handleChange(0, "country", e.target.value)}
                   error={formTouched && !formData[0]?.country}
                   helperText={formTouched && !formData[0]?.country ? 'Country is required' : ''}
@@ -457,10 +490,13 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                     endAdornment: loading ? <CircularProgress size={20} /> : null,
                   }}
                 >
-                  <MenuItem value="">Select Country</MenuItem>
-                  {countries.map((country, index) => (
-                    <MenuItem key={index} value={country}>{country}</MenuItem>
-                  ))}
+                  <MenuItem value="Cameroon">Cameroon</MenuItem>
+                  {countries
+                    .filter(country => country !== "Cameroon")
+                    .map((country, index) => (
+                      <MenuItem key={index} value={country}>{country}</MenuItem>
+                    ))
+                  }
                 </TextField>
               </Grid>
 

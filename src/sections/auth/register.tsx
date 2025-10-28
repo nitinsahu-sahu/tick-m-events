@@ -325,9 +325,9 @@ export function Register() {
                         },
                     },
                     '& .PhoneInputCountry': {
-                        border:"1px solid rgba(0, 0, 0, 0.23)",
-                        px:2,
-                        borderRadius:'10px',
+                        border: "1px solid rgba(0, 0, 0, 0.23)",
+                        px: 2,
+                        borderRadius: '10px',
                         marginRight: '8px',
                         // Style for the country container to show it's fixed
                         opacity: 0.7,
@@ -351,15 +351,35 @@ export function Register() {
                     },
                 },
             }}>
-                <PhoneInput
-                    international
-                    defaultCountry="CM"
-                    country="CM"
-                    countries={["CM"]}
-                    value={phoneNumber}
-                    onChange={handlePhoneChange}
-                    placeholder="Enter phone number"
-                    disabled={false} // Keep the phone number input enabled
+                <TextField
+                    fullWidth
+                    required
+                    name="number"
+                    type="text"
+                    label="Mobile Number"
+                    placeholder="Enter 8 digits (after 6)"
+                    value={phoneNumber.startsWith("6") ? phoneNumber.slice(1) : phoneNumber}
+                    onChange={(e) => {
+                        const input = e.target.value.replace(/^6/, ""); // remove extra 6 if user types it
+                        if (/^\d{0,8}$/.test(input)) {
+                            const fullNumber = `6${input}`;
+                            setPhoneNumber(fullNumber);
+                            setRegisterData((prevData) => ({ ...prevData, number: fullNumber }));
+                        }
+                    }}
+                    inputProps={{
+                        maxLength: 8,
+                    }}
+                    helperText="Number will automatically start with 6 (e.g., 671234567)"
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                6
+                            </InputAdornment>
+                        ),
+                    }}
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ mt: 2 }}
                 />
             </Box>
 

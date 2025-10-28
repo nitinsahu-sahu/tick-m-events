@@ -41,6 +41,8 @@ interface ApiResult {
 
 // ServiceCard.tsx (new component)
 export function ServiceCard({ event, service, providerId, eventId, disabled = false }: any) {
+  console.log('evnt', event);
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const dispatch = useDispatch<AppDispatch>();
@@ -50,7 +52,7 @@ export function ServiceCard({ event, service, providerId, eventId, disabled = fa
     orgBudget: 0,
     orgRequirement: '',
     serviceTime: "",
-    eventLocation: '',
+    eventLocation: event?.location || '',
     orgAdditionalRequirement: "",
     providerId
   });
@@ -111,7 +113,7 @@ export function ServiceCard({ event, service, providerId, eventId, disabled = fa
           serviceTime: "",
           eventLocation: '',
           orgAdditionalRequirement: "",
-          providerId:null
+          providerId: null
         })
         setTermsAccepted(false)
       } else {
@@ -441,7 +443,7 @@ export function ServiceCard({ event, service, providerId, eventId, disabled = fa
 
       <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
         <form onSubmit={handleSaveRequest}>
-          <DialogTitle>Request Service</DialogTitle>
+          <DialogTitle>Request Services Form</DialogTitle>
           <DialogContent>
             <Box sx={{ mt: 2 }}>
               <TextField

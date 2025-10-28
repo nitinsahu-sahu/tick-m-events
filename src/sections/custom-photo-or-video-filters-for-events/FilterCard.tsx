@@ -1,8 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Button, Grid, useMediaQuery, Container } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { Box, IconButton } from '@mui/material';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import FlipCameraIosIcon from '@mui/icons-material/FlipCameraIos';
+import ReplayIcon from '@mui/icons-material/Replay';
+import SaveIcon from '@mui/icons-material/Save';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import StopIcon from '@mui/icons-material/Stop';
+
 import { useFrame } from './view/FrameContext';
+
 
 interface FilterCardProps {
   title: string;
@@ -12,9 +19,6 @@ interface FilterCardProps {
 }
 
 export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onShare, frameSize }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   const { selectedFrame } = useFrame();
   const [mode, setMode] = useState(isVideoMode ? 'video' : 'photo');
   const [selectedFilter, setSelectedFilter] = useState('none');
@@ -28,16 +32,23 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const videoCanvasRef = useRef<HTMLCanvasElement>(null); // New canvas for video processing
+  const videoCanvasRef = useRef<HTMLCanvasElement>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
   const [recordedVideoURL, setRecordedVideoURL] = useState<string | null>(null);
   const [cameraRestartTrigger, setCameraRestartTrigger] = useState(0);
   const [isProcessingVideo, setIsProcessingVideo] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
-  // Responsive dimensions
-  const previewWidth = isMobile ? 300 : isTablet ? 350 : 400;
-  const previewHeight = isMobile ? 225 : isTablet ? 262 : 300;
+  // Full screen dimensions
+  const fullScreenStyle = {
+    position: 'fixed' as const,
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    zIndex: 9999,
+  };
 
   // Get available cameras and switch between them
   const switchCamera = async () => {
@@ -49,8 +60,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
 
     const newCamera = currentCamera === 'user' ? 'environment' : 'user';
     setCurrentCamera(newCamera);
-
-    // Restart camera with new facing mode
     setCameraRestartTrigger(prev => prev + 1);
   };
 
@@ -61,8 +70,8 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
     const constraints = {
       video: { 
         facingMode: currentCamera,
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
       }, 
       audio: mode === 'video'
     };
@@ -75,14 +84,14 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
         }
 
         if (mode === 'video') {
-          const recorder = new MediaRecorder(stream);
+          const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
           recorder.ondataavailable = (event) => {
             if (event.data.size > 0) {
               setRecordedChunks((prev) => [...prev, event.data]);
             }
           };
           recorder.onstop = () => {
-            // Removed blob creation here
+            // Recording stopped handler
           };
           setMediaRecorder(recorder);
         }
@@ -105,8 +114,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
       if (localVideoRef && localVideoRef.srcObject) {
         (localVideoRef.srcObject as MediaStream).getTracks().forEach((track) => track.stop());
       }
-      setMediaRecorder(null);
-      setRecordedChunks([]);
     };
   }, [mode, cameraRestartTrigger, currentCamera]);
 
@@ -117,36 +124,13 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
       const context = canvas.getContext('2d');
       
       if (context && video.videoWidth > 0 && video.videoHeight > 0) {
-        // Set canvas to match the display size
-        canvas.width = previewWidth;
-        canvas.height = previewHeight;
+        // Set canvas to match video resolution for high quality
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
         
-        // Calculate the aspect ratios
-        const videoAspect = video.videoWidth / video.videoHeight;
-        const canvasAspect = canvas.width / canvas.height;
-        
-        let renderWidth: number;
-        let renderHeight: number;
-        let offsetX: number;
-        let offsetY: number;
-        
-        if (videoAspect > canvasAspect) {
-          // Video is wider than canvas - fit to width
-          renderWidth = canvas.width;
-          renderHeight = renderWidth / videoAspect;
-          offsetX = 0;
-          offsetY = (canvas.height - renderHeight) / 2;
-        } else {
-          // Video is taller than canvas - fit to height
-          renderHeight = canvas.height;
-          renderWidth = renderHeight * videoAspect;
-          offsetX = (canvas.width - renderWidth) / 2;
-          offsetY = 0;
-        }
-        
-        // Clear canvas and draw video frame maintaining aspect ratio
+        // Draw video frame
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(video, offsetX, offsetY, renderWidth, renderHeight);
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
         
         const imageData = canvas.toDataURL('image/png');
         setCapturedPhoto(imageData);
@@ -159,8 +143,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
     }
   };
 
-  const filters = ['none', 'sepia', 'grayscale', 'blur'];
-  
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
     setStartDrag({ x: e.clientX, y: e.clientY });
@@ -198,11 +180,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
         return;
       }
 
-      // Set canvas to high resolution for better quality
-      const scaleFactor = 2; // Increase for higher quality
-      canvas.width = previewWidth * scaleFactor;
-      canvas.height = previewHeight * scaleFactor;
-
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.src = capturedPhoto;
@@ -212,10 +189,10 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // Apply the same transformations as in display
-        const scaledWidth = previewWidth * zoom * scaleFactor;
-        const scaledHeight = previewHeight * zoom * scaleFactor;
-        const dx = (offset.x * scaleFactor) - scaledWidth / 2;
-        const dy = (offset.y * scaleFactor) - scaledHeight / 2;
+        const scaledWidth = canvas.width * zoom;
+        const scaledHeight = canvas.height * zoom;
+        const dx = offset.x - scaledWidth / 2;
+        const dy = offset.y - scaledHeight / 2;
 
         // Apply filter
         ctx.filter = selectedFilter !== 'none' ? `${selectedFilter}(1)` : 'none';
@@ -230,14 +207,13 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
 
           frameImg.onload = () => {
             ctx.filter = 'none';
-            // Draw frame at high resolution
+            // Draw frame
             ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
             const finalImage = canvas.toDataURL('image/png');
             resolve(finalImage);
           };
           
           frameImg.onerror = () => {
-            // If frame fails to load, still return the image
             const finalImage = canvas.toDataURL('image/png');
             resolve(finalImage);
           };
@@ -266,7 +242,7 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
   const processVideoWithFrame = async (videoBlob: Blob): Promise<Blob> => 
     new Promise((resolve, reject) => {
       if (!selectedFrame || !videoCanvasRef.current) {
-        resolve(videoBlob); // Return original if no frame selected
+        resolve(videoBlob);
         return;
       }
 
@@ -291,12 +267,10 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
 
       frameImg.onload = () => {
         video.onloadedmetadata = () => {
-          // Set canvas size to match video
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
 
-          // Create a new MediaRecorder for the processed video
-          const stream = canvas.captureStream(30); // 30 FPS
+          const stream = canvas.captureStream(30);
           videoMediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
 
           videoMediaRecorder.ondataavailable = (event) => {
@@ -313,18 +287,14 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
 
           videoMediaRecorder.start();
 
-          // Process each frame
           const drawFrame = () => {
             if (video.paused || video.ended) {
               videoMediaRecorder.stop();
               return;
             }
 
-            // Draw video frame
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            // Draw frame overlay
             ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
 
             requestAnimationFrame(drawFrame);
@@ -336,7 +306,7 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
       };
 
       frameImg.onerror = () => {
-        resolve(videoBlob); // Return original if frame fails to load
+        resolve(videoBlob);
       };
 
       video.onerror = () => {
@@ -349,14 +319,11 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
 
     setIsProcessingVideo(true);
     try {
-      // Fetch the recorded video blob
       const response = await fetch(recordedVideoURL);
       const videoBlob = await response.blob();
 
-      // Process the video with frame
       const processedBlob = await processVideoWithFrame(videoBlob);
 
-      // Create download link for processed video
       const url = URL.createObjectURL(processedBlob);
       const a = document.createElement('a');
       a.href = url;
@@ -365,11 +332,9 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
       a.click();
       document.body.removeChild(a);
       
-      // Clean up
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error processing video:', error);
-      // Fallback to original video download
       const a = document.createElement('a');
       a.href = recordedVideoURL;
       a.download = `video-${new Date().getTime()}.webm`;
@@ -399,470 +364,335 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
     setZoom(1);
     setOffset({ x: 0, y: 0 });
     setSelectedFilter('none');
+    setRecordedVideoURL(null);
+    setRecordedChunks([]);
+    setIsRecording(false);
     setCameraRestartTrigger(prev => prev + 1);
   };
 
+  const startRecording = () => {
+    if (mediaRecorder && mediaRecorder.state !== 'recording') {
+      setRecordedChunks([]);
+      mediaRecorder.start();
+      setIsRecording(true);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder?.state === 'recording') {
+      mediaRecorder.stop();
+      setIsRecording(false);
+    }
+  };
+
   return (
-    <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3,md:0 } }}>
+    <Box sx={fullScreenStyle}>
+      {/* Header with minimal controls */}
       <Box
         sx={{
-          backgroundColor: '#fff',
-          borderRadius: 2.5,
-          boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-          p: { xs: 2, sm: 3 },
-          minHeight: 500,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10000,
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%)',
+          p: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}
       >
-        <HeadingCommon title={title} weight={600} baseSize="20px" />
+        <IconButton
+          onClick={() => setMode(mode === 'photo' ? 'video' : 'photo')}
+          sx={{
+            color: 'white',
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' }
+          }}
+        >
+          {mode === 'photo' ? <VideocamIcon /> : <CameraAltIcon />}
+        </IconButton>
 
-        {/* Mode Switch and Camera Controls */}
-        <Box sx={{ 
-          display: 'flex', 
-          gap: 2, 
-          mb: 2, 
-          justifyContent: 'center', 
-          flexWrap: 'wrap',
-          flexDirection: { xs: 'column', sm: 'row' }
-        }}>
-          <Button
-            variant={mode === 'photo' ? 'contained' : 'outlined'}
-            onClick={() => {
-              setMode('photo');
-              setCapturedPhoto(null);
-              setShowFilterEdit(false);
-            }}
-            sx={{
-              backgroundColor: mode === 'photo' ? '#0B2E4C' : 'transparent',
-              color: mode === 'photo' ? '#fff' : '#0B2E4C',
-              borderColor: '#0B2E4C',
-              borderRadius: 1,
-              textTransform: 'none',
-              minWidth: { xs: '100%', sm: 130 },
-            }}
-          >
-            Photo Mode
-          </Button>
-          <Button
-            variant={mode === 'video' ? 'contained' : 'outlined'}
-            onClick={() => setMode('video')}
-            sx={{
-              backgroundColor: mode === 'video' ? '#0B2E4C' : 'transparent',
-              color: mode === 'video' ? '#fff' : '#0B2E4C',
-              borderColor: '#0B2E4C',
-              borderRadius: 1,
-              textTransform: 'none',
-              minWidth: { xs: '100%', sm: 130 },
-            }}
-          >
-            Video Mode
-          </Button>
-          
-          {/* Camera Switch Button - Only show when not in captured photo mode */}
-          {!capturedPhoto && (
-            <Button
-              onClick={switchCamera}
-              variant="outlined"
-              sx={{
-                borderColor: '#0B2E4C',
-                color: '#0B2E4C',
-                borderRadius: 1,
-                textTransform: 'none',
-                minWidth: { xs: '100%', sm: 130 },
-              }}
-            >
-              Switch Camera ({currentCamera === 'user' ? 'Front' : 'Back'})
-            </Button>
-          )}
-        </Box>
+        <IconButton
+          onClick={switchCamera}
+          sx={{
+            color: 'white',
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' }
+          }}
+        >
+          <FlipCameraIosIcon />
+        </IconButton>
+      </Box>
 
-        {/* Camera Preview or Captured Image */}
-        <Box sx={{ textAlign: 'center', mb: 2 }}>
-          {capturedPhoto ? (
+      {/* Camera Preview or Captured Content */}
+      <Box sx={{ 
+        width: '100%', 
+        height: '100%', 
+        backgroundColor: '#000',
+        position: 'relative'
+      }}>
+        {capturedPhoto ? (
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              position: 'relative',
+              overflow: 'hidden',
+              cursor: showFilterEdit ? 'grab' : 'default',
+            }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onWheel={handleWheel}
+          >
+            {/* Photo as background */}
             <Box
               sx={{
-                position: 'relative',
-                width: '100%',
-                maxWidth: previewWidth,
-                height: previewHeight,
-                overflow: 'hidden',
-                borderRadius: 2,
-                cursor: capturedPhoto && showFilterEdit ? 'grab' : 'default',
-                margin: '0 auto',
+                position: 'absolute',
+                width: `${zoom * 100}%`,
+                height: `${zoom * 100}%`,
+                top: `${offset.y - (zoom * 100) / 2}%`,
+                left: `${offset.x - (zoom * 100) / 2}%`,
+                backgroundImage: `url(${capturedPhoto})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                filter: selectedFilter !== 'none' ? `${selectedFilter}(1)` : 'none',
+                pointerEvents: 'none',
               }}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onWheel={handleWheel}
-            >
-              {/* Photo as background */}
+            />
+            {/* Frame overlay */}
+            {selectedFrame && (
               <Box
+                component="img"
+                src={selectedFrame}
+                alt="Frame"
                 sx={{
                   position: 'absolute',
-                  width: `${zoom * 100}%`,
-                  height: `${zoom * 100}%`,
-                  top: `${offset.y - (zoom * previewHeight) / 2}px`,
-                  left: `${offset.x - (zoom * previewWidth) / 2}px`,
-                  backgroundImage: `url(${capturedPhoto})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  filter: selectedFilter !== 'none' ? `${selectedFilter}(1)` : 'none',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
                   pointerEvents: 'none',
                 }}
               />
-              {/* Frame overlay */}
-              {selectedFrame && (
-                <Box
-                  component="img"
-                  src={selectedFrame}
-                  alt="Frame"
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    pointerEvents: 'none',
-                    borderRadius: 2,
-                  }}
-                />
-              )}
-            </Box>
-          ) : mode === 'video' && recordedVideoURL ? (
-            <Box
-              sx={{
-                position: 'relative',
+            )}
+          </Box>
+        ) : mode === 'video' && recordedVideoURL ? (
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              position: 'relative',
+              backgroundColor: '#000',
+            }}
+          >
+            <video
+              src={recordedVideoURL}
+              controls
+              style={{
                 width: '100%',
-                maxWidth: previewWidth,
-                height: previewHeight,
-                borderRadius: '12px',
-                overflow: 'hidden',
-                backgroundColor: '#000',
-                margin: '0 auto',
+                height: '100%',
+                objectFit: 'contain',
               }}
             >
-              <video
-                src={recordedVideoURL}
-                controls
-                style={{
+              <track kind="captions" src="" srcLang="en" label="English" />
+            </video>
+            {selectedFrame && (
+              <Box
+                component="img"
+                src={selectedFrame}
+                alt="Frame"
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
                   width: '100%',
                   height: '100%',
                   objectFit: 'cover',
+                  pointerEvents: 'none',
                 }}
-              >
-                <track kind="captions" srcLang="en" label="English captions" />
-              </video>
-
-              {selectedFrame && (
-                <Box
-                  component="img"
-                  src={selectedFrame}
-                  alt="Frame"
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    pointerEvents: 'none',
-                    borderRadius: '12px',
-                  }}
-                />
-              )}
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                position: 'relative',
+              />
+            )}
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              position: 'relative',
+              backgroundColor: '#000',
+            }}
+          >
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              style={{
                 width: '100%',
-                maxWidth: previewWidth,
-                height: previewHeight,
-                borderRadius: '12px',
-                overflow: 'hidden',
-                backgroundColor: '#000',
-                margin: '0 auto',
+                height: '100%',
+                objectFit: 'cover',
               }}
             >
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                style={{
+              <track kind="captions" src="" srcLang="en" label="English" />
+            </video>
+            {selectedFrame && (
+              <Box
+                component="img"
+                src={selectedFrame}
+                alt="Frame"
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
                   width: '100%',
                   height: '100%',
                   objectFit: 'cover',
+                  pointerEvents: 'none',
                 }}
-              >
-                <track kind="captions" srcLang="en" label="English captions" />
-              </video>
-
-              {selectedFrame && (
-                <Box
-                  component="img"
-                  src={selectedFrame}
-                  alt="Frame"
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    pointerEvents: 'none',
-                    borderRadius: '12px',
-                  }}
-                />
-              )}
-            </Box>
-          )}
-
-          <canvas
-            ref={canvasRef}
-            width={previewWidth}
-            height={previewHeight}
-            style={{ display: 'none' }}
-          />
-          {/* Hidden canvas for video processing */}
-          <canvas
-            ref={videoCanvasRef}
-            style={{ display: 'none' }}
-          />
-        </Box>
-
-        {/* Filter Options */}
-        {capturedPhoto && showFilterEdit && (
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: 1, 
-            mb: 2,
-            flexWrap: 'wrap' 
-          }}>
-            {filters.map((filter) => (
-              <Button
-                key={filter}
-                onClick={() => setSelectedFilter(filter)}
-                variant={selectedFilter === filter ? 'contained' : 'outlined'}
-                sx={{
-                  textTransform: 'none',
-                  borderRadius: 1,
-                  px: 2,
-                  py: 0.5,
-                  backgroundColor: selectedFilter === filter ? '#0B2E4C' : '#fff',
-                  color: selectedFilter === filter ? '#fff' : '#000',
-                  borderColor: '#0B2E4C',
-                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                }}
-              >
-                {filter}
-              </Button>
-            ))}
-          </Box>
-        )}
-        
-        {capturedPhoto && showFilterEdit && (
-          <Box sx={{ 
-            textAlign: 'center', 
-            m: 1, 
-            color: '#666', 
-            fontSize: { xs: 12, sm: 14 } 
-          }}>
-            Use your mouse wheel to zoom in/out. Click and drag to reposition the photo.
+              />
+            )}
           </Box>
         )}
 
-        {/* Action Buttons */}
-        <Grid container spacing={2} justifyContent="center">
-          {mode === 'photo' && !capturedPhoto ? (
-            <Grid item xs={12} sm={6} md={4}>
-              <Button
-                onClick={handleCapture}
-                variant="contained"
-                fullWidth
-                sx={{
-                  backgroundColor: '#0B2E4C',
-                  borderRadius: 1,
-                  textTransform: 'none',
-                  py: 1.2,
-                }}
-              >
-                Capture
-              </Button>
-            </Grid>
-          ) : mode === 'video' ? (
-            <>
-              <Box sx={{ textAlign: 'center', mb: 2, width: '100%' }}>
-                {recordedVideoURL ? (
-                  <>
-                    <Box
-                      sx={{
-                        position: 'relative',
-                        width: '100%',
-                        maxWidth: previewWidth,
-                        height: previewHeight,
-                        borderRadius: '12px',
-                        overflow: 'hidden',
-                        backgroundColor: '#000',
-                        margin: '0 auto',
-                        mt: { xs: 2, sm: 2, md: 2 },
-                      }}
-                    >
-                      <video
-                        src={recordedVideoURL}
-                        controls
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                        }}
-                      >
-                        <track kind="captions" srcLang="en" label="English captions" />
-                      </video>
-
-                      {selectedFrame && (
-                        <Box
-                          component="img"
-                          src={selectedFrame}
-                          alt="Frame"
-                          sx={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            pointerEvents: 'none',
-                            borderRadius: '12px',
-                          }}
-                        />
-                      )}
-                    </Box>
-
-                    <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
-                      <Grid item xs={12} sm={6} md={4}>
-                        <Button
-                          fullWidth
-                          onClick={handleSaveVideo}
-                          variant="contained"
-                          disabled={isProcessingVideo}
-                          sx={{ 
-                            backgroundColor: '#0B2E4C', 
-                            borderRadius: 1, 
-                            textTransform: 'none',
-                            py: 1.2,
-                          }}
-                        >
-                          {isProcessingVideo ? 'Processing...' : 'Save Video'}
-                        </Button>
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
-                        <Button
-                          fullWidth
-                          onClick={() => {
-                            setRecordedChunks([]);
-                            setRecordedVideoURL(null);
-                          }}
-                          variant="outlined"
-                          sx={{ 
-                            borderColor: '#0B2E4C', 
-                            color: '#0B2E4C', 
-                            borderRadius: 1, 
-                            textTransform: 'none',
-                            py: 1.2,
-                          }}
-                        >
-                          Retake
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </>
-                ) : (
-                  <Grid container spacing={2} justifyContent="center">
-                    <Grid item xs={12} sm={6} md={4}>
-                      <Button
-                        onClick={() => {
-                          if (mediaRecorder && mediaRecorder.state !== 'recording') {
-                            setRecordedChunks([]);
-                            mediaRecorder.start();
-                          }
-                        }}
-                        disabled={!mediaRecorder || mediaRecorder.state === 'recording'}
-                        variant="contained"
-                        fullWidth
-                        sx={{ 
-                          backgroundColor: '#0B2E4C', 
-                          borderRadius: 1, 
-                          textTransform: 'none',
-                          py: 1.2,
-                          mt:1,
-                        }}
-                      >
-                        Start Recording
-                      </Button>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={4}>
-                      <Button
-                        onClick={() => mediaRecorder?.state === 'recording' && mediaRecorder.stop()}
-                        disabled={!mediaRecorder || mediaRecorder.state !== 'recording'}
-                        variant="outlined"
-                        fullWidth
-                        sx={{ 
-                          borderColor: '#0B2E4C', 
-                          color: '#0B2E4C', 
-                          borderRadius: 1, 
-                          textTransform: 'none',
-                          py: 1.2,
-                           mt:1,
-                        }}
-                      >
-                        Stop Recording
-                      </Button>
-                    </Grid>
-                  </Grid>
-                )}
-              </Box>
-            </>
-          ) : (
-            <>
-              <Grid item xs={12} sm={6} md={4}>
-                <Button
-                  fullWidth
-                  onClick={downloadImage}
-                  variant="contained"
-                  sx={{
-                    backgroundColor: '#0B2E4C',
-                    borderRadius: 1,
-                    textTransform: 'none',
-                    py: 1.2,
-                  }}
-                >
-                  Save Photo
-                </Button>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={4}>
-                <Button
-                  fullWidth
-                  onClick={handleRetake}
-                  variant="outlined"
-                  sx={{
-                    borderColor: '#0B2E4C',
-                    color: '#0B2E4C',
-                    borderRadius: 1,
-                    textTransform: 'none',
-                    py: 1.2,
-                  }}
-                >
-                  Retake
-                </Button>
-              </Grid>
-            </>
-          )}
-        </Grid>
+        <canvas
+          ref={canvasRef}
+          style={{ display: 'none' }}
+        />
+        <canvas
+          ref={videoCanvasRef}
+          style={{ display: 'none' }}
+        />
       </Box>
-    </Container>
+
+      {/* Bottom Controls */}
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10000,
+          background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%)',
+          p: 3,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 3
+        }}
+      >
+        {mode === 'photo' && !capturedPhoto ? (
+          <IconButton
+            onClick={handleCapture}
+            sx={{
+              width: 70,
+              height: 70,
+              backgroundColor: 'white',
+              '&:hover': { backgroundColor: '#f0f0f0' },
+              border: '2px solid white'
+            }}
+          >
+            <CameraAltIcon sx={{ fontSize: 30, color: 'black' }} />
+          </IconButton>
+        ) : mode === 'video' ? (
+          recordedVideoURL ? (
+            <>
+              <IconButton
+                onClick={handleSaveVideo}
+                disabled={isProcessingVideo}
+                sx={{
+                  color: 'white',
+                  backgroundColor: 'rgba(255,255,255,0.2)',
+                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' }
+                }}
+              >
+                <SaveIcon />
+              </IconButton>
+              <IconButton
+                onClick={handleRetake}
+                sx={{
+                  color: 'white',
+                  backgroundColor: 'rgba(255,255,255,0.2)',
+                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' }
+                }}
+              >
+                <ReplayIcon />
+              </IconButton>
+            </>
+          ) : (
+            <IconButton
+              onClick={isRecording ? stopRecording : startRecording}
+              sx={{
+                width: 70,
+                height: 70,
+                backgroundColor: isRecording ? '#ff4444' : 'white',
+                '&:hover': { 
+                  backgroundColor: isRecording ? '#ff6666' : '#f0f0f0' 
+                },
+                border: '2px solid white',
+                animation: isRecording ? 'pulse 1s infinite' : 'none',
+                '@keyframes pulse': {
+                  '0%': { transform: 'scale(1)' },
+                  '50%': { transform: 'scale(1.1)' },
+                  '100%': { transform: 'scale(1)' }
+                }
+              }}
+            >
+              {isRecording ? (
+                <StopIcon sx={{ fontSize: 30, color: 'white' }} />
+              ) : (
+                <FiberManualRecordIcon sx={{ fontSize: 30, color: 'red' }} />
+              )}
+            </IconButton>
+          )
+        ) : (
+          <>
+            <IconButton
+              onClick={downloadImage}
+              sx={{
+                color: 'white',
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' }
+              }}
+            >
+              <SaveIcon />
+            </IconButton>
+            <IconButton
+              onClick={handleRetake}
+              sx={{
+                color: 'white',
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' }
+              }}
+            >
+              <ReplayIcon />
+            </IconButton>
+          </>
+        )}
+      </Box>
+
+      {/* Instructions for photo editing */}
+      {capturedPhoto && showFilterEdit && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 100,
+            left: 0,
+            right: 0,
+            textAlign: 'center',
+            color: 'white',
+            fontSize: 14,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            py: 1,
+            zIndex: 10000
+          }}
+        >
+          Pinch to zoom • Drag to reposition
+        </Box>
+      )}
+    </Box>
   );
 };

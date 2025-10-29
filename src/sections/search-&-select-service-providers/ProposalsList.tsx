@@ -61,8 +61,7 @@ export function ProposalsCard({ proposals }: any) {
       const bidAmount = bidData?.bidAmount || 0;
       const adminFee = bidAmount * 0.1;
       const fapshiPayload = {
-        placeABidId: proposal?._id,
-        bidId: proposal?.serviceRequestId?._id,
+        eventReqId: proposal?.serviceRequestId?._id,
         eventId: proposal.eventId,
         amount: Math.round(adminFee), // Round to whole number
         email: proposal?.providerId?.email,
@@ -83,10 +82,11 @@ export function ProposalsCard({ proposals }: any) {
           try {
             const webhookPayload = {
               transId,
-              status: 'successful', // simulate success
+              status: 'success', // simulate success
+              winningBid: bidData?.bidAmount, // simulate success
             };
 
-            const webhookResponse = await axios.post('/payment/webhook', webhookPayload);
+            await axios.post('/payment/webhook', webhookPayload);
           } catch (webhookError) {
             console.error('Manual webhook trigger failed:', webhookError);
           }
@@ -377,7 +377,7 @@ function ProposalDetails({ proposal, bidData, handleInputChange }: any) {
       <Grid container spacing={2} mb={3}>
         <Grid item xs={12} md={12}>
           <Typography variant="subtitle2" mb={1}>
-            Bid Amount (XAF)
+            Final Bid Amount (XAF)
           </Typography>
           <TextField
             fullWidth

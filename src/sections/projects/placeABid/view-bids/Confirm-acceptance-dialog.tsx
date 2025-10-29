@@ -1,7 +1,6 @@
 import {
-    Typography, Box, TextField, Chip, Button, Avatar, FormControl, InputLabel,
-    Alert, Dialog, DialogTitle, Grid, MenuItem, SelectChangeEvent, Tooltip,
-    DialogContent, DialogActions, Stack, Divider, IconButton, Select
+    Typography, Box, TextField, Button, Alert, Dialog, DialogTitle,
+    DialogContent, DialogActions
 } from "@mui/material";
 
 export function ConfirmAcceptanceDialog({

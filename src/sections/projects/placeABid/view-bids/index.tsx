@@ -2,19 +2,19 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import ChatIcon from '@mui/icons-material/Chat';
-import InfoIcon from "@mui/icons-material/Info";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import StarIcon from '@mui/icons-material/Star';
-
 import {
     Typography, Box, Card, Grid, Chip, Button, Avatar, Divider,
-    Container, Paper, Tabs, Tab, Skeleton, Alert, IconButton, Tooltip
+    Container, Paper, Tabs, Tab, Skeleton, Alert, IconButton
 } from "@mui/material";
 import { ArrowBack, Schedule, Person, Work, LocationOn, Event } from "@mui/icons-material";
+
 import { fatchOrgProjectBids } from "src/redux/actions/organizer/pageEvents";
 import { AppDispatch, RootState } from "src/redux/store";
 import { formatDateTimeCustom } from "src/hooks/formate-time";
 import { TextWithShowMore } from "src/components/text-with-show-more";
+
 import { BidActionDialog } from "./bidActionDialog";
 
 // Define TypeScript interfaces for better type safety

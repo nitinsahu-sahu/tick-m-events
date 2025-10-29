@@ -188,7 +188,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
                 const paymentResponse = await axios.post('/payment/initiate', fapshiPayload);
 
                 if (paymentResponse.status === 200) {
-                    const paymentWindow = window.open(paymentResponse.data.paymentInfo.paymentLink, '_self');
+                    window.open(paymentResponse.data.paymentInfo.paymentLink, '_self');
                 }
             } catch (error) {
                 console.error('Payment initiation failed:', error);
@@ -216,6 +216,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
         const { name, value } = e.target;
         setBidData(prev => ({ ...prev, [name]: value }));
     };
+    
     const handleConfirmAction = useCallback(async () => {
         const newErrors = { acceptedAmount: "", rejectionReason: "", message: "" };
 
@@ -282,10 +283,6 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
             ...prev,
             [bidId]: newStatus
         }));
-
-        // Here you would typically save the status change to your backend
-        console.log(`Updating bid ${bidId} status to:`, newStatus);
-        // dispatch(updateBidStatus(bidId, newStatus));
     };
 
     return (

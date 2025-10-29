@@ -97,7 +97,6 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
                 setHasExistingBid(false);
             }
         } catch (error: any) {
-            console.error("Error checking existing bid:", error);
             setBidCheckError(error.response?.data?.message || "Failed to check bid status");
             setHasExistingBid(false);
         } finally {
@@ -309,14 +308,14 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
                     </CardContent>
                 </Card>
 
-                <Button
+                {/* <Button
                     variant="outlined"
                     color="primary"
                     fullWidth
                     sx={{ mr: 2 }}
                 >
                     Edit Bid
-                </Button>
+                </Button> */}
             </Paper>
         );
     }
@@ -447,7 +446,7 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
                                 value={bidData.proposal}
                                 onChange={handleDescriptionChange}
                                 className="custom-quill"
-                                placeholder="Full Description of Requirements (minimum 80 characters)"
+                                placeholder="Full Description of Requirements (minimum 100 characters)"
                                 modules={{
                                     toolbar: [
                                         [{ 'header': [1, 2, false] }],
@@ -460,9 +459,9 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
                             <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between' }}>
                                 <Typography
                                     variant="caption"
-                                    color={charCount < 80 ? "error" : "textSecondary"}
+                                    color={charCount < 100 ? "error" : "textSecondary"}
                                 >
-                                    {charCount} characters (Minimum 80 required)
+                                    {charCount} characters (Minimum 100 required)
                                 </Typography>
                                 {errors.orgRequirement && (
                                     <Typography variant="caption" color="error">

@@ -79,17 +79,17 @@ export function ProposalsCard({ proposals }: any) {
           const transId = paymentResponse.data?.paymentInfo?.transId || paymentResponse.data?.paymentInfo?.transactionId;
 
           // Step 2️⃣: Call webhook endpoint manually (simulate payment success)
-          try {
-            const webhookPayload = {
-              transId,
-              status: 'success', // simulate success
-              winningBid: bidData?.bidAmount, // simulate success
-            };
+          // try {
+          //   const webhookPayload = {
+          //     transId,
+          //     status: 'success', // simulate success
+          //     winningBid: bidData?.bidAmount, // simulate success
+          //   };
 
-            await axios.post('/payment/webhook', webhookPayload);
-          } catch (webhookError) {
-            console.error('Manual webhook trigger failed:', webhookError);
-          }
+          //   await axios.post('/payment/webhook', webhookPayload);
+          // } catch (webhookError) {
+          //   console.error('Manual webhook trigger failed:', webhookError);
+          // }
 
           // Step 3️⃣: Redirect user to payment page
           window.open(paymentResponse.data.paymentInfo.paymentLink, '_self');

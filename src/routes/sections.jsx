@@ -76,6 +76,7 @@ export const GobalHomePage = lazy(() => import('src/pages/global-home'));
 export const EventListPage = lazy(() => import('src/pages/event-list'));
 export const PromotionLogosPage = lazy(() => import('src/pages/customization/promotion-logo/index'));
 export const RefundReqPage = lazy(() => import('src/pages/refund-requests'));
+export const ProfilePage = lazy(() => import('src/pages/profile'));
 // ----------------------------------------------------------------------
 
 const renderFallback = (
@@ -154,7 +155,10 @@ export function Router() {
           path: '/custom-photo-or-video-filters-for-events',
           element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><CustomPhotoAndVideoFiltersforEventsPage /></RoleProtectedRoute>
         },
-
+        {
+          path: '/profile',
+          element: <RoleProtectedRoute allowedRoles={['participant']} currentRole={currentRole}><ProfilePage /></RoleProtectedRoute>
+        },
         // -----------------------**************-------------------------
 
         // Organizer Route

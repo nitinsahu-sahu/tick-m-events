@@ -267,6 +267,12 @@ export const navData: NavItem[] = [
     roles: ['provider'],
   },
   {
+    title: 'Profile',
+    path: '/profile',
+    icon: icon('ic_profile_service'),
+    roles: ['participant'],
+  },
+  {
     title: 'Statistics',
     path: '/statistics-&-performance',
     icon: icon('ic-analytics'),

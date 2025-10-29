@@ -98,14 +98,6 @@ export function OfferAndService() {
                     Add Services
                 </Button>
             </Box>
-            {/* Table */}
-            <ProfileAndServiceTable
-                setActiveSection={setActiveSection}
-                activeSection={activeSection}
-                headers={offterTableHeaders}
-                data={services}
-                onModify={handleModify}
-            />
 
             {/* Form Section - Only appears when activeSection is set */}
             {activeSection && (
@@ -133,6 +125,17 @@ export function OfferAndService() {
                     )}
                 </Box>
             )}
+            
+            {/* Table */}
+            <ProfileAndServiceTable
+                setActiveSection={setActiveSection}
+                activeSection={activeSection}
+                headers={offterTableHeaders}
+                data={services}
+                onModify={handleModify}
+            />
+
+            
         </Box>
     )
 }

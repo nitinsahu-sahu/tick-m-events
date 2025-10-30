@@ -50,6 +50,12 @@ export const eventServiceConstants = {
     CANCEL_SERVICE_FAILURE: "CANCEL_SERVICE_FAILURE",
 }
 
+export const secureInfoConstants = {
+    GET_REQUEST: "GET_REQUEST",
+    GET_SUCCESS: "GET_SUCCESS",
+    GET_FAILURE: "GET_FAILURE",
+}
+
 export const convConstants = {
     GET_CONV_REQUEST: "GET_CONV_REQUEST",
     GET_CONV_SUCCESS: "GET_CONV_SUCCESS",

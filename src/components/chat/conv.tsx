@@ -687,7 +687,15 @@ export function ChatPanel() {
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             maxWidth: { xs: 120, sm: 180 },
-                            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                            filter: 'blur(4px)', // Adjust blur intensity as needed
+                            userSelect:'none', // Prevent text selection when blurred
+                            WebkitUserSelect: 'none', // For Safari
+                            MozUserSelect: 'none', // For Firefox
+                            // '&:hover': {
+                            //   filter: 'blur(0px)', // Remove blur on hover to reveal
+                            //   transition: 'filter 0.3s ease'
+                            // }
                           }}
                         >
                           {item.user.email}

@@ -27,8 +27,10 @@ import customizationReducer from './customization/promotion-logos'
 import reqAndRefundsReducer from './admin/refund-request/refundreuest.reducer'
 import entryValidationReducer from './participant/entry-validation/index'
 import reservationContractsReducer from './provider/reservation-contract/index'
+import secureInfoReducer from './secure.reducer'
 
 const rootReducer = combineReducers({
+    security:secureInfoReducer,
     participant:entryValidationReducer,
     admin: reqAndRefundsReducer,
     customization: customizationReducer,

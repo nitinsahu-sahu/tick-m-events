@@ -18,7 +18,7 @@ import { AppDispatch, RootState } from 'src/redux/store';
 
 import axios from '../../redux/helper/axios'
 import { HeadingCommon } from '../multiple-responsive-heading/heading';
-import { SelectedUser, ConversationUser, UnreadCounts, MessagesState, ConversationData, formatFileSize, downloadFile } from './utills';
+import { SelectedUser, ConversationUser, UnreadCounts, MessagesState } from './utills';
 import { MessageBubble } from './message-bubble';
 import { FullScreenAvatar } from './full-screen-avatar';
 
@@ -105,7 +105,7 @@ export function ChatPanel() {
     };
   }, []);
 
- useEffect(() => {
+  useEffect(() => {
     if (socket) {
       socket.emit('addUser', user?._id);
 

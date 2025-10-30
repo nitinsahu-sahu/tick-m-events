@@ -57,95 +57,121 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
     frameImageRef.current = null;
   }, [selectedFrame]);
 
-  const switchCamera = async (e:any) => {
-    e.stopPropagation(); // Stop event propagation
+  const switchCamera = async () => {
+    console.log('📸 Flip button clicked! Current camera:', currentCamera);
+    console.log('🖥️ User agent:', navigator.userAgent);
+
     try {
-      // Stop current stream
+      const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      if (!isMobileDevice) {
+        console.log('🖥️ Desktop mode detected — showing test feedback and simulating camera switch');
+
+        // Show overlay text for testing
+        const overlay = document.createElement('div');
+        overlay.textContent = `Flip camera test (desktop) — switching to: ${currentCamera === 'user' ? 'environment' : 'user'}`;
+        overlay.style.position = 'fixed';
+        overlay.style.top = '20px';
+        overlay.style.left = '50%';
+        overlay.style.transform = 'translateX(-50%)';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
+        overlay.style.color = '#fff';
+        overlay.style.padding = '12px 20px';
+        overlay.style.borderRadius = '8px';
+        overlay.style.zIndex = '9999';
+        overlay.style.fontFamily = 'sans-serif';
+        overlay.style.fontSize = '14px';
+        overlay.style.fontWeight = 'bold';
+        document.body.appendChild(overlay);
+
+        // Remove overlay after 2 seconds
+        setTimeout(() => {
+          if (overlay.parentNode) {
+            overlay.parentNode.removeChild(overlay);
+          }
+        }, 2000);
+      }
+
+      // Stop current stream regardless of device type
       if (videoRef.current && videoRef.current.srcObject) {
         const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-        tracks.forEach((track) => track.stop());
+        tracks.forEach(track => {
+          console.log(`🛑 Stopping track: ${track.kind} - ${track.label}`);
+          track.stop();
+        });
+        videoRef.current.srcObject = null;
+        console.log('🛑 Stopped previous stream.');
       }
 
-      // Get all available cameras
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = devices.filter((device) => device.kind === 'videoinput');
+      // Determine new camera mode
+      const newCamera = currentCamera === 'user' ? 'environment' : 'user';
+      console.log(`🔄 Switching camera from ${currentCamera} to ${newCamera}`);
 
-      if (videoDevices.length < 2) {
-        console.warn("Only one camera found. Cannot flip.");
-        return;
-      }
+      // Update state first
+      setCurrentCamera(newCamera);
 
-      // Get current device ID to avoid reselecting the same camera
-      const currentStream = videoRef.current?.srcObject as MediaStream;
-      const currentVideoTrack = currentStream?.getVideoTracks()[0];
-      const currentDeviceId = currentVideoTrack?.getSettings().deviceId;
-
-      // Find the next camera (not the current one)
-      let nextDevice = videoDevices.find(device => device.deviceId !== currentDeviceId);
-
-      // If no alternate found (shouldn't happen with 2+ cameras), use the first one
-      if (!nextDevice) {
-        nextDevice = videoDevices[0];
-      }
-
-      // Create new stream with the alternate camera
-      const stream = await navigator.mediaDevices.getUserMedia({
+      // For desktop: just restart with the same camera but show the switch happened
+      const constraints: MediaStreamConstraints = {
         video: {
-          deviceId: { exact: nextDevice.deviceId },
+          facingMode: isMobileDevice ? newCamera : 'user', // On desktop, always use 'user'
           width: { ideal: 1280 },
-          height: { ideal: 720 },
+          height: { ideal: 720 }
         },
         audio: mode === 'video',
-      });
+      };
 
-      // Update camera state based on device label (if available)
-      const deviceLabel = nextDevice.label.toLowerCase();
-      if (deviceLabel.includes('front') || deviceLabel.includes('facetime')) {
-        setCurrentCamera('user');
-      } else if (deviceLabel.includes('back') || deviceLabel.includes('rear')) {
-        setCurrentCamera('environment');
-      } else {
-        // If we can't determine from label, toggle based on current state
-        setCurrentCamera(prev => prev === 'user' ? 'environment' : 'user');
-      }
+      console.log('🎯 Requesting media with constraints:', constraints);
 
-      // Apply new stream to video element
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+        console.log('✅ Camera stream restarted successfully');
 
-        // Wait for video to be ready and update canvas dimensions
-        videoRef.current.onloadedmetadata = () => {
-          if (videoCanvasRef.current && videoRef.current) {
-            videoCanvasRef.current.width = videoRef.current.videoWidth;
-            videoCanvasRef.current.height = videoRef.current.videoHeight;
-          }
-        };
-      }
-
-    } catch (error) {
-      console.error("Error switching camera:", error);
-
-      // Fallback: try with just facingMode
-      try {
-        const fallbackCamera = currentCamera === 'user' ? 'environment' : 'user';
-
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: fallbackCamera,
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-          },
-          audio: mode === 'video',
-        });
-
-        setCurrentCamera(fallbackCamera);
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+        // Show success message for mobile
+        if (isMobileDevice) {
+          const successOverlay = document.createElement('div');
+          successOverlay.textContent = `Switched to ${newCamera} camera`;
+          successOverlay.style.position = 'fixed';
+          successOverlay.style.top = '20px';
+          successOverlay.style.left = '50%';
+          successOverlay.style.transform = 'translateX(-50%)';
+          successOverlay.style.backgroundColor = 'rgba(76, 175, 80, 0.9)';
+          successOverlay.style.color = '#fff';
+          successOverlay.style.padding = '12px 20px';
+          successOverlay.style.borderRadius = '8px';
+          successOverlay.style.zIndex = '9999';
+          document.body.appendChild(successOverlay);
+          setTimeout(() => {
+            if (successOverlay.parentNode) {
+              successOverlay.parentNode.removeChild(successOverlay);
+            }
+          }, 1500);
         }
-      } catch (fallbackError) {
-        console.error("Fallback camera switch also failed:", fallbackError);
       }
+
+    } catch (err) {
+      console.error('❌ Error switching camera:', err);
+
+      // Show error overlay
+      const errorOverlay = document.createElement('div');
+      errorOverlay.textContent = `Camera error: ${err instanceof Error ? err.message : 'Unknown error'}`;
+      errorOverlay.style.position = 'fixed';
+      errorOverlay.style.top = '20px';
+      errorOverlay.style.left = '50%';
+      errorOverlay.style.transform = 'translateX(-50%)';
+      errorOverlay.style.backgroundColor = 'rgba(244, 67, 54, 0.9)';
+      errorOverlay.style.color = '#fff';
+      errorOverlay.style.padding = '12px 20px';
+      errorOverlay.style.borderRadius = '8px';
+      errorOverlay.style.zIndex = '9999';
+      document.body.appendChild(errorOverlay);
+      setTimeout(() => {
+        if (errorOverlay.parentNode) {
+          errorOverlay.parentNode.removeChild(errorOverlay);
+        }
+      }, 3000);
     }
   };
 

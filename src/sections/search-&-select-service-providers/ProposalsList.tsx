@@ -29,6 +29,7 @@ interface StatusUpdateResponse {
 }
 
 export function ProposalsCard({ proposals }: any) {
+ 
   const location = useLocation();
   const [bidData, setBidData] = useState<any>({
     bidAmount: proposals?.providerProposal?.amount || '',
@@ -61,12 +62,12 @@ export function ProposalsCard({ proposals }: any) {
       const bidAmount = bidData?.bidAmount || 0;
       const adminFee = bidAmount * 0.1;
       const fapshiPayload = {
-        eventReqId: proposal?.serviceRequestId?._id,
+        eventReqId: selectedProposal?._id,
         eventId: proposal.eventId,
         amount: Math.round(adminFee), // Round to whole number
         email: proposal?.providerId?.email,
         userId: proposal?.providerId?._id.toString(),
-        redirectUrl: `${window.location.origin}${location.pathname}?projectId=${proposal?.serviceRequestId?._id}&bidId=${proposal?._id}&adminFee=true`,
+        redirectUrl: `${window.location.origin}${location.pathname}?projectId=${selectedProposal?._id}&bidId=${proposal?._id}&adminFee=true`,
 
       };
       // Process admin fee payment first
@@ -105,7 +106,7 @@ export function ProposalsCard({ proposals }: any) {
       }
     }
 
-  }, [dispatch, location.pathname, bidData?.bidAmount])
+  }, [dispatch, location.pathname,selectedProposal?._id, bidData?.bidAmount])
 
   const manualBids = proposals || [];
 

@@ -100,7 +100,7 @@ export function TicketHistoryCancelRefundCard({
               );
             })}
              {/* ✅ Add "Resubmit Request" button when rejected */}
-            {isRejected && (
+            {/* {isRejected && (
               <Button
                 variant="contained"
                 color="primary"
@@ -112,7 +112,7 @@ export function TicketHistoryCancelRefundCard({
               >
                 Resubmit Request
               </Button>
-            )}
+            )} */}
           </Box>
           
         </CardContent>

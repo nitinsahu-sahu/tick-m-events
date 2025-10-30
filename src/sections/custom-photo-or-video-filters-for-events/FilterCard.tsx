@@ -57,121 +57,64 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
     frameImageRef.current = null;
   }, [selectedFrame]);
 
-  const switchCamera = async () => {
-    console.log('📸 Flip button clicked! Current camera:', currentCamera);
-    console.log('🖥️ User agent:', navigator.userAgent);
-
+   const switchCamera = async () => {
+    console.log('👀 Button clicked');
+    console.log('📸 Flip camera clicked. Current camera:', currentCamera);
+ 
     try {
+      // --- 1️⃣ Visual feedback overlay ---
+      const overlay = document.createElement('div');
+      overlay.textContent = `Switching to ${currentCamera === 'user' ? 'back (environment)' : 'front (user)'} camera...`;
+      overlay.style.position = 'fixed';
+      overlay.style.top = '20px';
+      overlay.style.left = '50%';
+      overlay.style.transform = 'translateX(-50%)';
+      overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
+      overlay.style.color = '#fff';
+      overlay.style.padding = '10px 16px';
+      overlay.style.borderRadius = '8px';
+      overlay.style.zIndex = '9999';
+      overlay.style.fontFamily = 'monospace';
+      overlay.style.fontSize = '14px';
+      document.body.appendChild(overlay);
+      setTimeout(() => overlay.remove(), 2000);
+ 
+      // --- 2️⃣ Simulated log (desktop feedback only) ---
       const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
       if (!isMobileDevice) {
-        console.log('🖥️ Desktop mode detected — showing test feedback and simulating camera switch');
-
-        // Show overlay text for testing
-        const overlay = document.createElement('div');
-        overlay.textContent = `Flip camera test (desktop) — switching to: ${currentCamera === 'user' ? 'environment' : 'user'}`;
-        overlay.style.position = 'fixed';
-        overlay.style.top = '20px';
-        overlay.style.left = '50%';
-        overlay.style.transform = 'translateX(-50%)';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
-        overlay.style.color = '#fff';
-        overlay.style.padding = '12px 20px';
-        overlay.style.borderRadius = '8px';
-        overlay.style.zIndex = '9999';
-        overlay.style.fontFamily = 'sans-serif';
-        overlay.style.fontSize = '14px';
-        overlay.style.fontWeight = 'bold';
-        document.body.appendChild(overlay);
-
-        // Remove overlay after 2 seconds
-        setTimeout(() => {
-          if (overlay.parentNode) {
-            overlay.parentNode.removeChild(overlay);
-          }
-        }, 2000);
+        console.log('🖥️ Simulated flip — desktop detected (no real camera switch).');
       }
-
-      // Stop current stream regardless of device type
-      if (videoRef.current && videoRef.current.srcObject) {
-        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-        tracks.forEach(track => {
-          console.log(`🛑 Stopping track: ${track.kind} - ${track.label}`);
-          track.stop();
-        });
+ 
+      // --- 3️⃣ Stop current stream ---
+      if (videoRef.current?.srcObject) {
+        (videoRef.current.srcObject as MediaStream)
+          .getTracks()
+          .forEach(track => track.stop());
         videoRef.current.srcObject = null;
-        console.log('🛑 Stopped previous stream.');
       }
-
-      // Determine new camera mode
+ 
+      // --- 4️⃣ Toggle camera state ---
       const newCamera = currentCamera === 'user' ? 'environment' : 'user';
-      console.log(`🔄 Switching camera from ${currentCamera} to ${newCamera}`);
-
-      // Update state first
       setCurrentCamera(newCamera);
-
-      // For desktop: just restart with the same camera but show the switch happened
-      const constraints: MediaStreamConstraints = {
-        video: {
-          facingMode: isMobileDevice ? newCamera : 'user', // On desktop, always use 'user'
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: mode === 'video',
-      };
-
-      console.log('🎯 Requesting media with constraints:', constraints);
-
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-        console.log('✅ Camera stream restarted successfully');
-
-        // Show success message for mobile
-        if (isMobileDevice) {
-          const successOverlay = document.createElement('div');
-          successOverlay.textContent = `Switched to ${newCamera} camera`;
-          successOverlay.style.position = 'fixed';
-          successOverlay.style.top = '20px';
-          successOverlay.style.left = '50%';
-          successOverlay.style.transform = 'translateX(-50%)';
-          successOverlay.style.backgroundColor = 'rgba(76, 175, 80, 0.9)';
-          successOverlay.style.color = '#fff';
-          successOverlay.style.padding = '12px 20px';
-          successOverlay.style.borderRadius = '8px';
-          successOverlay.style.zIndex = '9999';
-          document.body.appendChild(successOverlay);
-          setTimeout(() => {
-            if (successOverlay.parentNode) {
-              successOverlay.parentNode.removeChild(successOverlay);
-            }
-          }, 1500);
+      console.log(`🔄 Camera mode changed to: ${newCamera}`);
+ 
+      // --- 5️⃣ (Optional) Restart stream for real devices ---
+      if (isMobileDevice) {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: newCamera },
+          audio: mode === 'video',
+        });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play();
+          console.log(`✅ Switched to ${newCamera} camera successfully.`);
         }
+      } else {
+        console.log('⚙️ Skipped getUserMedia — desktop test mode.');
       }
-
+ 
     } catch (err) {
       console.error('❌ Error switching camera:', err);
-
-      // Show error overlay
-      const errorOverlay = document.createElement('div');
-      errorOverlay.textContent = `Camera error: ${err instanceof Error ? err.message : 'Unknown error'}`;
-      errorOverlay.style.position = 'fixed';
-      errorOverlay.style.top = '20px';
-      errorOverlay.style.left = '50%';
-      errorOverlay.style.transform = 'translateX(-50%)';
-      errorOverlay.style.backgroundColor = 'rgba(244, 67, 54, 0.9)';
-      errorOverlay.style.color = '#fff';
-      errorOverlay.style.padding = '12px 20px';
-      errorOverlay.style.borderRadius = '8px';
-      errorOverlay.style.zIndex = '9999';
-      document.body.appendChild(errorOverlay);
-      setTimeout(() => {
-        if (errorOverlay.parentNode) {
-          errorOverlay.parentNode.removeChild(errorOverlay);
-        }
-      }, 3000);
     }
   };
 
@@ -688,7 +631,7 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
             </Box>
 
             {/* Flip Camera */}
-            {!capturedPhoto && !recordedVideoURL && (
+            {/* {!capturedPhoto && !recordedVideoURL && (
               <IconButton
                 onClick={switchCamera}
                 sx={{
@@ -709,7 +652,30 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
               >
                 <FlipCameraIos />
               </IconButton>
-            )}
+            )} */}
+            <IconButton
+              onClick={() => {
+                console.log('🖱️ Flip icon clicked!');
+                switchCamera();
+              }}
+              sx={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                backgroundColor: 'rgba(0,0,0,0.4)',
+                color: '#fff',
+                borderRadius: '50%',
+                width: 40,
+                height: 40,
+                zIndex: 9999,
+                backdropFilter: 'blur(6px)',
+                transition: '0.3s',
+                cursor: 'pointer',
+                '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' },
+              }}
+            >
+              <FlipCameraIos />
+            </IconButton>
           </Box>
 
           {/* Hidden canvases */}

@@ -58,13 +58,10 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
   }, [selectedFrame]);
 
    const switchCamera = async () => {
-    console.log('👀 Button clicked');
-    console.log('📸 Flip camera clicked. Current camera:', currentCamera);
  
     try {
       // --- 1️⃣ Visual feedback overlay ---
       const overlay = document.createElement('div');
-      overlay.textContent = `Switching to ${currentCamera === 'user' ? 'back (environment)' : 'front (user)'} camera...`;
       overlay.style.position = 'fixed';
       overlay.style.top = '20px';
       overlay.style.left = '50%';
@@ -96,8 +93,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
       // --- 4️⃣ Toggle camera state ---
       const newCamera = currentCamera === 'user' ? 'environment' : 'user';
       setCurrentCamera(newCamera);
-      console.log(`🔄 Camera mode changed to: ${newCamera}`);
- 
       // --- 5️⃣ (Optional) Restart stream for real devices ---
       if (isMobileDevice) {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -631,28 +626,6 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
             </Box>
 
             {/* Flip Camera */}
-            {/* {!capturedPhoto && !recordedVideoURL && (
-              <IconButton
-                onClick={switchCamera}
-                sx={{
-                  position: 'absolute',
-                  top: 16,
-                  right: 16,
-                  backgroundColor: 'rgba(0,0,0,0.4)',
-                  color: '#fff',
-                  borderRadius: '50%',
-                  width: 40,
-                  height: 40,
-                  backdropFilter: 'blur(6px)',
-                  transition: '0.3s',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.2)',
-                  },
-                }}
-              >
-                <FlipCameraIos />
-              </IconButton>
-            )} */}
             <IconButton
               onClick={() => {
                 console.log('🖱️ Flip icon clicked!');

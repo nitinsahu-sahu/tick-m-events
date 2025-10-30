@@ -316,7 +316,7 @@ export function TicketReservationManagementTable({
                                     {
 
                                         type === "3" || type === "4" ?
-                                            <TableCell align="center" sx={{ textTransform: "capitalize" }} >{row.paymentStatus || row.orderId.paymentStatus}</TableCell>
+                                            <TableCell align="center" sx={{ textTransform: "capitalize" }} >{row?.paymentStatus || row?.orderId?.paymentStatus}</TableCell>
                                             :
                                             <TableCell align="center" >
                                                 {type === "3" ?

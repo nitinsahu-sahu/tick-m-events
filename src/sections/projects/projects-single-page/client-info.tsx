@@ -4,19 +4,29 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TikTokIcon from '@mui/icons-material/MusicNote';
 import {
     Box, Typography, Paper, Divider, Stack,
-    IconButton, Link, Avatar, Tooltip,Button
+    IconButton, Link, Avatar, Tooltip, Button
 } from "@mui/material";
 import { useNavigate } from 'react-router-dom';
 import ChatIcon from '@mui/icons-material/Chat';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { formatEventDate } from 'src/hooks/formate-time';
+import { secureInfoData } from 'src/redux/actions/secure.acation';
+import { useEffect } from 'react';
+import { AppDispatch, RootState } from 'src/redux/store';
+
 
 export function ClientInfo({ _project }: any) {
-      const navigate = useNavigate();
-    
+    const dispatch = useDispatch<AppDispatch>();
+    const { isAssigned } = useSelector((state: RootState) => state?.security);
+
+    const navigate = useNavigate();
+    useEffect(() => {
+        dispatch(secureInfoData(_project?._id));
+    }, [dispatch, _project?._id]);
     const verificationItems = [
         {
             key: 'emailVerified',
@@ -100,11 +110,24 @@ export function ClientInfo({ _project }: any) {
                             </Tooltip>
                         )}
                     </Box>
-                    <Typography variant="body2" textTransform="capitalize">📍 {_project?.createdBy?.address}</Typography>
+                    <Typography variant="body2" textTransform="capitalize" fontSize={11}>📍 {_project?.createdBy?.address}</Typography>
                     <Typography variant="body2" color="gray" fontSize={11}>
                         Member since {formatEventDate(_project?.createdBy?.createdAt)}
                     </Typography>
-                    <Typography variant="body2" color="gray" fontSize={11} mb={2}>
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            fontSize: 11,
+                            filter: !isAssigned ? 'blur(4px)' : null,
+                            userSelect: !isAssigned ? 'none' : 'auto', // Prevent text selection when blurred
+                            WebkitUserSelect: !isAssigned ? 'none' : 'auto', // For Safari
+                            MozUserSelect: !isAssigned ? 'none' : 'auto', // For Firefox
+                        }}
+                    >
                         {_project?.createdBy?.email}
                     </Typography>
                 </Box>

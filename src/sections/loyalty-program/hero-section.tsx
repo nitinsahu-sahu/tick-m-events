@@ -6,7 +6,7 @@ import {
 import { Visibility, VisibilityOff, ContentCopy } from "@mui/icons-material";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "src/redux/store";
-import { fetchAvailableRewards,fetchRewardHistory,redeemReward } from "src/redux/actions/rewardActions";
+import { fetchAvailableRewards, fetchRewardHistory, redeemReward } from "src/redux/actions/rewardActions";
 import { styled } from '@mui/material/styles';
 
 type Reward = {
@@ -58,9 +58,25 @@ export const HeroSection = () => {
     const rewardHistory = useSelector((state: RootState) => state.reward.history as RewardHistory[]);
     const loading = useSelector((state: RootState) => state.reward.loading);
 
+    const scrollToEarnMorePoints = () => {
+            const earnMoreSection = document.getElementById('earn-more-points-section');
+            if (earnMoreSection) {
+                earnMoreSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            } else {
+                // Fallback: scroll to bottom if section not found
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+        };
+
     useEffect(() => {
         dispatch(fetchAvailableRewards() as any);
-          dispatch(fetchRewardHistory() as any)
+        dispatch(fetchRewardHistory() as any)
     }, [dispatch]);
 
     const [open, setOpen] = useState(false);
@@ -70,25 +86,25 @@ export const HeroSection = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
 
-  const handleRedeemClick = async (reward: Reward) => {
-    setSelectedReward(reward);
-    setShowCode(false);
+    const handleRedeemClick = async (reward: Reward) => {
+        setSelectedReward(reward);
+        setShowCode(false);
 
-    const code = reward.redeemCode || `REWARD-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    setGeneratedCode(code);
+        const code = reward.redeemCode || `REWARD-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+        setGeneratedCode(code);
 
-    // Only call API if no code exists
-    if (!reward.redeemCode) {
-        const result = await dispatch(redeemReward(reward._id, code) as any);
+        // Only call API if no code exists
+        if (!reward.redeemCode) {
+            const result = await dispatch(redeemReward(reward._id, code) as any);
 
-        if (result.status !== 200) {
-            alert(`Failed to redeem reward: ${result.message}`);
-            return;
+            if (result.status !== 200) {
+                alert(`Failed to redeem reward: ${result.message}`);
+                return;
+            }
         }
-    }
 
-    setOpen(true);
-};
+        setOpen(true);
+    };
 
 
     const handleClose = () => {
@@ -148,7 +164,7 @@ export const HeroSection = () => {
                             {loading ? (
                                 <Typography color="text.secondary">Loading history...</Typography>
                             ) : rewardHistory.length === 0 ? (
-                                <Box display="flex" justifyContent="center" alignItems="center" minHeight="100px">
+                                <Box display="flex" justifyContent="center" alignItems="center" >
                                     <Typography color="text.secondary">No reward history found.</Typography>
                                 </Box>
                             ) : (
@@ -184,7 +200,15 @@ export const HeroSection = () => {
 
                                 <Button
                                     variant="outlined"
-                                    sx={{ borderRadius: 1, minWidth: "230px", flexGrow: 1, fontWeight: 500, color: "#0B2E4C", borderColor: "#0B2E4C" }}
+                                    sx={{
+                                        borderRadius: 1,
+                                        minWidth: "230px",
+                                        flexGrow: 1,
+                                        fontWeight: 500,
+                                        color: "#0B2E4C",
+                                        borderColor: "#0B2E4C"
+                                    }}
+                                    onClick={scrollToEarnMorePoints}
                                 >
                                     Discover How to Earn More Points
                                 </Button>

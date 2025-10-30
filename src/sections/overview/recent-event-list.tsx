@@ -54,7 +54,8 @@ export const RecentEventList: React.FC<Props> = ({
 }) => {
     const theme = useTheme();
     const ticketTypes: Ticket[] = selectedEvent?.tickets?.[0]?.tickets || [];
-
+  const [visibleCount, setVisibleCount] = React.useState(2);
+  
     useEffect(() => {
         const tickets = selectedEvent?.tickets?.[0]?.tickets || [];
         if (!tickets.length) return;
@@ -146,7 +147,7 @@ export const RecentEventList: React.FC<Props> = ({
                                 )}
                                 <Grid container spacing={3}>
                                     {
-                                        upcomingEvents?.slice(0, 1).map((event: any) => (
+                                        upcomingEvents?.slice(0,visibleCount).map((event: any) => (
                                             <Grid item xs={12} key={event._id}>
                                                 <Link to={`/our-event/${event._id}`} target='__blank' style={{ textDecoration: "none" }}>
 
@@ -202,11 +203,12 @@ export const RecentEventList: React.FC<Props> = ({
                                     }
                                 </Grid>
                                 {/* Conditionally show "Load More" only if 4+ events exist */}
-                                {upcomingEvents?.length > 2 && (
+                               {upcomingEvents?.length > visibleCount && (
                                     <Button
                                         fullWidth
                                         variant="contained"
                                         sx={{ mt: 2, backgroundColor: '#0B2E4E' }}
+                                        onClick={() => setVisibleCount(prev => prev + 2)} // load 2 more per click
                                     >
                                         Load More
                                     </Button>
@@ -222,7 +224,7 @@ export const RecentEventList: React.FC<Props> = ({
                                     Recent Event List
                                 </Typography>
                                 <Grid container spacing={3}>
-                                    {upcomingEvents?.slice(0, 3)?.map((event: any) => (
+                                    {upcomingEvents?.slice(0, visibleCount)?.map((event: any) => (
                                         <Grid item xs={12} key={event._id}>
                                             <Card sx={{ display: "flex", flexDirection: "column", padding: 2, boxShadow: 3, borderRadius: 2 }}>
 
@@ -277,11 +279,16 @@ export const RecentEventList: React.FC<Props> = ({
                                         </Grid>
                                     ))}
                                 </Grid>
-                                <Link to='/our-event' target='__blank'>
-                                    <Button fullWidth variant="contained" sx={{ mt: 2, backgroundColor: '#0B2E4E' }}>
+                                  {upcomingEvents?.length > visibleCount && (
+                                    <Button
+                                        fullWidth
+                                        variant="contained"
+                                        sx={{ mt: 2, backgroundColor: "#0B2E4E" }}
+                                        onClick={() => setVisibleCount(prev => prev + 2)} // load 2 more per click
+                                    >
                                         Load More
                                     </Button>
-                                </Link>
+                                )}
 
                             </CardContent>
                         </Card>

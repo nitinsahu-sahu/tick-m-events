@@ -59,13 +59,13 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
 
   const switchCamera = async () => {
     try {
+      // Stop current stream
       if (videoRef.current && videoRef.current.srcObject) {
         const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
         tracks.forEach((track) => track.stop());
-        videoRef.current.srcObject = null;
       }
 
-      // Get all video input devices
+      // Get all available cameras
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter((device) => device.kind === 'videoinput');
 
@@ -74,27 +74,77 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
         return;
       }
 
-      // Switch between front and back camera
-      const newCamera = currentCamera === 'user' ? 'environment' : 'user';
-      setCurrentCamera(newCamera);
+      // Get current device ID to avoid reselecting the same camera
+      const currentStream = videoRef.current?.srcObject as MediaStream;
+      const currentVideoTrack = currentStream?.getVideoTracks()[0];
+      const currentDeviceId = currentVideoTrack?.getSettings().deviceId;
 
-      const newDevice = videoDevices.find((d) =>
-        newCamera === 'user'
-          ? d.label.toLowerCase().includes('front')
-          : d.label.toLowerCase().includes('back') ||
-          d.label.toLowerCase().includes('rear')
-      ) || videoDevices[0];
+      // Find the next camera (not the current one)
+      let nextDevice = videoDevices.find(device => device.deviceId !== currentDeviceId);
 
+      // If no alternate found (shouldn't happen with 2+ cameras), use the first one
+      if (!nextDevice) {
+        nextDevice = videoDevices[0];
+      }
+
+      // Create new stream with the alternate camera
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { deviceId: newDevice.deviceId },
+        video: {
+          deviceId: { exact: nextDevice.deviceId },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
         audio: mode === 'video',
       });
 
+      // Update camera state based on device label (if available)
+      const deviceLabel = nextDevice.label.toLowerCase();
+      if (deviceLabel.includes('front') || deviceLabel.includes('facetime')) {
+        setCurrentCamera('user');
+      } else if (deviceLabel.includes('back') || deviceLabel.includes('rear')) {
+        setCurrentCamera('environment');
+      } else {
+        // If we can't determine from label, toggle based on current state
+        setCurrentCamera(prev => prev === 'user' ? 'environment' : 'user');
+      }
+
+      // Apply new stream to video element
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+
+        // Wait for video to be ready and update canvas dimensions
+        videoRef.current.onloadedmetadata = () => {
+          if (videoCanvasRef.current && videoRef.current) {
+            videoCanvasRef.current.width = videoRef.current.videoWidth;
+            videoCanvasRef.current.height = videoRef.current.videoHeight;
+          }
+        };
       }
+
     } catch (error) {
       console.error("Error switching camera:", error);
+
+      // Fallback: try with just facingMode
+      try {
+        const fallbackCamera = currentCamera === 'user' ? 'environment' : 'user';
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: fallbackCamera,
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: mode === 'video',
+        });
+
+        setCurrentCamera(fallbackCamera);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (fallbackError) {
+        console.error("Fallback camera switch also failed:", fallbackError);
+      }
     }
   };
 

@@ -49,24 +49,53 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
   const [isProcessingVideo, setIsProcessingVideo] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false); // New state for video playback
- const frameImageRef = useRef<HTMLImageElement | null>(null); 
+  const frameImageRef = useRef<HTMLImageElement | null>(null);
   const previewWidth = '100%';
   const previewHeight = isMobile ? 400 : isTablet ? 450 : 500;
 
-   useEffect(() => {
-      frameImageRef.current = null;
-    }, [selectedFrame]);
-   
-  const switchCamera = async () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-      tracks.forEach(track => track.stop());
-      videoRef.current.srcObject = null;
-    }
+  useEffect(() => {
+    frameImageRef.current = null;
+  }, [selectedFrame]);
 
-    const newCamera = currentCamera === 'user' ? 'environment' : 'user';
-    setCurrentCamera(newCamera);
-    setCameraRestartTrigger(prev => prev + 1);
+  const switchCamera = async () => {
+    try {
+      if (videoRef.current && videoRef.current.srcObject) {
+        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+        tracks.forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
+      }
+
+      // Get all video input devices
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter((device) => device.kind === 'videoinput');
+
+      if (videoDevices.length < 2) {
+        console.warn("Only one camera found. Cannot flip.");
+        return;
+      }
+
+      // Switch between front and back camera
+      const newCamera = currentCamera === 'user' ? 'environment' : 'user';
+      setCurrentCamera(newCamera);
+
+      const newDevice = videoDevices.find((d) =>
+        newCamera === 'user'
+          ? d.label.toLowerCase().includes('front')
+          : d.label.toLowerCase().includes('back') ||
+          d.label.toLowerCase().includes('rear')
+      ) || videoDevices[0];
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: newDevice.deviceId },
+        audio: mode === 'video',
+      });
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (error) {
+      console.error("Error switching camera:", error);
+    }
   };
 
   // Check for supported MIME types
@@ -86,10 +115,10 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
   };
 
   // Draw frame on canvas for video recording
-    const drawFrameOnCanvas = useCallback(() => {
+  const drawFrameOnCanvas = useCallback(() => {
     const video = videoRef.current;
     const canvas = videoCanvasRef.current;
-    
+
     if (!canvas || !video || video.readyState < 2) return;
 
     const ctx = canvas.getContext('2d');
@@ -97,10 +126,10 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     // Draw video
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
+
     // Draw frame overlay if selected - FIXED: Only create image once
     if (selectedFrame) {
       // Create frame image only once and reuse it
@@ -109,7 +138,7 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
         frameImageRef.current.crossOrigin = 'anonymous';
         frameImageRef.current.src = selectedFrame;
       }
-      
+
       // Only draw if the image is loaded
       if (frameImageRef.current.complete && frameImageRef.current.naturalHeight !== 0) {
         ctx.drawImage(frameImageRef.current, 0, 0, canvas.width, canvas.height);
@@ -133,10 +162,10 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
         };
 
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        
+
         if (localVideoRef) {
           localVideoRef.srcObject = stream;
-          
+
           // Wait for video to be ready
           localVideoRef.onloadedmetadata = () => {
             if (videoCanvasRef.current) {
@@ -158,12 +187,12 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
         // Setup media recorder for video mode
         if (mode === 'video' && videoCanvasRef.current) {
           const canvas = videoCanvasRef.current;
-          
+
           // Wait a bit for canvas to be ready
           setTimeout(() => {
             const canvasStream = canvas.captureStream(30);
             const audioTracks = stream.getAudioTracks();
-            
+
             // Add audio tracks to canvas stream
             if (audioTracks.length > 0) {
               audioTracks.forEach(track => {
@@ -185,8 +214,8 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
             };
 
             recorder.onstop = () => {
-              const blob = new Blob(chunks, { 
-                type: mimeType.includes('mp4') ? 'video/mp4' : 'video/webm' 
+              const blob = new Blob(chunks, {
+                type: mimeType.includes('mp4') ? 'video/mp4' : 'video/webm'
               });
               const url = URL.createObjectURL(blob);
               setRecordedVideoURL(url);
@@ -212,7 +241,7 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
-      
+
       if (localVideoRef && localVideoRef.srcObject) {
         const stream = localVideoRef.srcObject as MediaStream;
         stream.getTracks().forEach(track => track.stop());
@@ -245,43 +274,43 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
     setIsVideoPlaying(false);
   };
 
-const handleCapture = () => {
-  if (videoRef.current && canvasRef.current) {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
+  const handleCapture = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
 
-    if (context && video.videoWidth > 0 && video.videoHeight > 0) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      if (context && video.videoWidth > 0 && video.videoHeight > 0) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Draw frame overlay if selected - SIMPLER APPROACH
-      const captureWithFrame = () => {
-        if (selectedFrame) {
-          const frameImg = new Image();
-          frameImg.crossOrigin = 'anonymous';
-          frameImg.onload = () => {
-            context.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+        // Draw frame overlay if selected - SIMPLER APPROACH
+        const captureWithFrame = () => {
+          if (selectedFrame) {
+            const frameImg = new Image();
+            frameImg.crossOrigin = 'anonymous';
+            frameImg.onload = () => {
+              context.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+              const imageData = canvas.toDataURL('image/png');
+              setCapturedPhoto(imageData);
+              setShowFilterEdit(true);
+            };
+            frameImg.src = selectedFrame;
+          } else {
             const imageData = canvas.toDataURL('image/png');
             setCapturedPhoto(imageData);
             setShowFilterEdit(true);
-          };
-          frameImg.src = selectedFrame;
-        } else {
-          const imageData = canvas.toDataURL('image/png');
-          setCapturedPhoto(imageData);
-          setShowFilterEdit(true);
-        }
-      };
+          }
+        };
 
-      // Small delay to ensure the video frame is properly drawn
-      setTimeout(captureWithFrame, 100);
+        // Small delay to ensure the video frame is properly drawn
+        setTimeout(captureWithFrame, 100);
+      }
     }
-  }
-};
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
@@ -396,7 +425,7 @@ const handleCapture = () => {
                 >
                   <track kind="captions" srcLang="en" label="English captions" />
                 </video>
-                
+
                 {/* Video Playback Controls Overlay */}
                 <Box
                   sx={{
@@ -445,7 +474,7 @@ const handleCapture = () => {
                     sx={{
                       height: '100%',
                       backgroundColor: '#0B2E4C',
-                      width: previewVideoRef.current 
+                      width: previewVideoRef.current
                         ? `${(previewVideoRef.current.currentTime / previewVideoRef.current.duration) * 100}%`
                         : '0%',
                       transition: 'width 0.1s linear',

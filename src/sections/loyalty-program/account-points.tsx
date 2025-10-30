@@ -35,7 +35,7 @@ export const AccountPoints = () => {
   ];
 
   return (
-    <Card sx={{ borderRadius: 3, boxShadow: 3, p: 3, mt: 4, mb: 4 }}>
+    <Card sx={{ borderRadius: 3, boxShadow: 3, p: 3, mt: 4, mb: 4 }} id="earn-more-points-section">
       <Typography variant="h6" fontWeight={600} fontSize={{ xs: "18px", sm: "22px", md: "26px" }} gutterBottom>
         My Accumulated Points
       </Typography>

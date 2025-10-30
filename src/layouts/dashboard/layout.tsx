@@ -1,16 +1,17 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Box, Alert, useMediaQuery, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { _giftboxdata, _langs, _messages, _notifications } from 'src/_mock';
 import { Iconify } from 'src/components/iconify';
-import { RootState } from 'src/redux/store';
+import { AppDispatch, RootState } from 'src/redux/store';
 import { usePathname } from 'src/routes/hooks';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { getFilteredNavItems } from 'src/routes/hooks/getFilterNavItesm';
+import { fetchUserPoints } from "src/redux/actions/rewardActions";
 
 import { Main } from './main';
 import { layoutClasses } from '../classes';
@@ -39,8 +40,9 @@ export type DashboardLayoutProps = {
 
 export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) {
   const theme = useTheme();
+  const dispatch = useDispatch<AppDispatch>();
   const { _id, name, role } = useSelector((state: RootState) => state?.auth?.user);
-
+  const points = useSelector((state: RootState) => state.reward.points || 0);
 
   const filteredNavItems = getFilteredNavItems(navData, role);
   const pathname = usePathname()
@@ -70,6 +72,9 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
   const [navOpen, setNavOpen] = useState(false);
 
   const layoutQuery: Breakpoint = 'lg';
+  useEffect(() => {
+    dispatch(fetchUserPoints());
+  }, [dispatch]);
 
   return (
     <LayoutSection
@@ -106,7 +111,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                   open={navOpen}
                   onClose={() => setNavOpen(false)}
                 />
-                
+
                 {
                   (
                     hiddenServiceCal.some(path => pathname.includes(path))) &&
@@ -126,7 +131,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                 {
                   hiddenMessageClientRel.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Messaging & Client Relationship" />
                 }
-     
+
                 {
                   hiddenGlobalOverview.some(path => pathname.includes(path)) && !isMobileOrTablet && <HeadingCommon weight={600} baseSize="30px" title="Global Overview & General Statistics" />
                 }
@@ -200,7 +205,7 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
 
                           </>
                         }
-                       
+
                         {/* <LanguagePopover data={_langs}/> */}
                       </Box>
                     }
@@ -222,11 +227,15 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                     </>
                   )
                 }
-                
-                {
-                  hiddenLoyaltyProgram.some(path => pathname.includes(path)) &&
-                  <HeadingCommon title="500" weight={700} color="#0B2E4C" />
 
+                {
+                  hiddenLoyaltyProgram.some(path => pathname.includes(path)) && (
+                    <HeadingCommon
+                      title={points?.toString() || 0}
+                      weight={700}
+                      color="#0B2E4C"
+                    />
+                  )
                 }
                 {
                   (hiddenTransectionPayment.some(path => pathname.includes(path))) && (

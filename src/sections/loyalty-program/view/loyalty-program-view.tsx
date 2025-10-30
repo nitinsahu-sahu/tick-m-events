@@ -8,6 +8,7 @@ import { RewardsHistory } from "../reward-history";
 
 
 export function LoyaltyProgramView() {
+
     return (
         <DashboardContent>
             <PageTitleSection title="My Loyalty Points" />

@@ -165,22 +165,79 @@ export function Profile() {
                         backgroundPosition: 'center',
                         borderTopLeftRadius: 16,
                         borderTopRightRadius: 16,
-                        position: 'relative'
+                        position: 'relative',
+                        '&:hover .edit-cover-btn': {
+                            opacity: 1,
+                            transform: 'translateY(0)'
+                        }
                     }}>
-                        {/* Avatar */}
-                        <Avatar
-                            src={profileData.avatar.url}
+                        {/* Cover Edit Button */}
+                        <IconButton
+                            className="edit-cover-btn"
                             sx={{
-                                width: 100,
-                                height: 100,
-                                border: '4px solid rgba(255,255,255,0.3)',
                                 position: 'absolute',
-                                bottom: -50,
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+                                top: 8,
+                                right: 8,
+                                backgroundColor: 'rgba(0,0,0,0.6)',
+                                color: 'white',
+                                opacity: 0,
+                                transform: 'translateY(-10px)',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    backgroundColor: 'rgba(0,0,0,0.8)',
+                                }
                             }}
-                        />
+                            onClick={() => {/* Handle cover edit */ }}
+                        >
+                            <Edit fontSize="small" />
+                        </IconButton>
+
+                        {/* Avatar Container */}
+                        <Box sx={{
+                            position: 'absolute',
+                            bottom: -50,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            '&:hover .edit-avatar-btn': {
+                                opacity: 1,
+                            }
+                        }}>
+                            <Avatar
+                                src={profileData.avatar.url}
+                                sx={{
+                                    width: 100,
+                                    height: 100,
+                                    border: '4px solid rgba(255,255,255,0.3)',
+                                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                                    position: 'relative'
+                                }}
+                            />
+
+                            {/* Avatar Edit Button */}
+                            <IconButton
+                                className="edit-avatar-btn"
+                                sx={{
+                                    position: 'absolute',
+                                    bottom: 4,
+                                    right: 4,
+                                    backgroundColor: 'primary.main',
+                                    color: 'white',
+                                    width: 32,
+                                    height: 32,
+                                    opacity: 0,
+                                    transition: 'all 0.3s ease',
+                                    '&:hover': {
+                                        backgroundColor: 'primary.dark',
+                                    },
+                                    '& .MuiSvgIcon-root': {
+                                        fontSize: 16
+                                    }
+                                }}
+                                onClick={() => {/* Handle avatar edit */ }}
+                            >
+                                <Edit />
+                            </IconButton>
+                        </Box>
                     </Box>
 
                     {/* Profile Content */}
@@ -259,7 +316,7 @@ export function Profile() {
                                     {profileData.referralCode}
                                 </Typography>
                                 <Typography variant="caption" color="rgba(255,255,255,0.7)">
-                                    Code
+                                    Referral Code
                                 </Typography>
                             </Box>
                         </Box>
@@ -328,7 +385,7 @@ export function Profile() {
                     </DialogTitle>
                     <DialogContent sx={{ pt: 3 }}>
                         <Grid container spacing={2}>
-                            <Grid item xs={12}>
+                            <Grid item xs={12} mt={2}>
                                 <TextField
                                     label="Full Name"
                                     value={editedData.name || ''}

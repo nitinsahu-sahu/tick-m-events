@@ -204,7 +204,7 @@ export function TicketCard({ ticket }: any) {
                     }}
 
                 />
-                <Typography variant="h6" fontWeight={600} fontSize={{ xs: "15px", sm: "20px", md: "25px" }} mt={5} color="#0B2E4C">
+                <Typography variant="h6" fontWeight={600} fontSize={{ xs: "15px", sm: "19px", md: "23px" }} mt={5} color="#0B2E4C">
                     {ticket.eventDetails?.eventName || "Event Name"}
                 </Typography>
                 <HeadingCommon variant="body2" title={`${ticket.eventDetails?.location} | ${ticket.eventDetails?.date} | ${formatTimeTo12Hour(ticket.eventDetails?.time)}`} baseSize="16px" weight={400} />

@@ -57,7 +57,8 @@ export const FilterCard: React.FC<FilterCardProps> = ({ title, isVideoMode, onSh
     frameImageRef.current = null;
   }, [selectedFrame]);
 
-  const switchCamera = async () => {
+  const switchCamera = async (e:any) => {
+    e.stopPropagation(); // Stop event propagation
     try {
       // Stop current stream
       if (videoRef.current && videoRef.current.srcObject) {

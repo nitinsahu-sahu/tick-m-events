@@ -30,8 +30,6 @@ interface PhoneNumberDisplayProps {
 
 export function MainProfile({ handleAvalibility, setShowService, onModify }: any) {
     const { profile } = useSelector((state: RootState) => state?.profile);
-    console.log('profile',profile);
-    
     const { user } = useSelector((state: RootState) => state?.auth);
     const dispatch = useDispatch<AppDispatch>();
     const [covererror, setCoverError] = useState(null)
@@ -153,10 +151,10 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
         coverInputRef.current?.click();
     };
 
-
     useEffect(() => {
         dispatch(profileGet(user?._id));
     }, [dispatch, user?._id]);
+
     return (
         <Box boxShadow={3} borderRadius={3} bgcolor="#FFFFFF" >
             {/* Banner Image */}
@@ -283,7 +281,6 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                         }}
                     >
                         {picloading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : <EditIcon fontSize="small" />}
-                        {/* <EditIcon fontSize="small" /> */}
                     </IconButton>
                 </Box>
 

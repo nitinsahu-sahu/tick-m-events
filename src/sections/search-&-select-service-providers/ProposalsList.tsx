@@ -63,6 +63,7 @@ export function ProposalsCard({ proposals }: any) {
       const adminFee = bidAmount * 0.1;
       const fapshiPayload = {
         eventReqId: selectedProposal?._id,
+        bidAmount,
         eventId: proposal.eventId,
         amount: Math.round(adminFee), // Round to whole number
         email: proposal?.providerId?.email,

@@ -41,7 +41,7 @@ const transactions = [
   },
 ];
 
-export function PaymentMonitoringTable () {
+export function PaymentMonitoringTable({ data }: any) {
   return (
     <Paper
       elevation={4}
@@ -81,12 +81,12 @@ export function PaymentMonitoringTable () {
           </TableHead>
 
           <TableBody>
-            {transactions.map((tx, index) => {
+            {data?.map((tx: any, index: any) => {
               const isLastRow = index === transactions.length - 1;
 
               return (
                 <TableRow
-                  key={index}
+                  key={tx?._id}
                   sx={{
                     backgroundColor: '#EEEEEE',
                     position: 'relative',
@@ -109,25 +109,27 @@ export function PaymentMonitoringTable () {
                       borderBottomLeftRadius: isLastRow ? '20px' : 0,
                     }}
                   >
-                    {tx.date}
+                    {tx.createdAt}
                   </TableCell>
-                  <TableCell align="center">{tx.event}</TableCell>
-                  <TableCell align="center">{tx.buyer}</TableCell>
-                  <TableCell align="center">{tx.amount}</TableCell>
-                  <TableCell align="center">{tx.method}</TableCell>
+                  <TableCell align="center">{tx.eventId?.eventName}</TableCell>
+                  <TableCell align="center">{tx.organizerId?.name}</TableCell>
+                  <TableCell align="center">{tx?.feeAmount} XAF</TableCell>
+                  <TableCell align="center">{tx.method||"Mobile Money"}</TableCell>
                   <TableCell
                     align="center"
                     sx={{
                       fontWeight: 600,
+                      textTransform:"capitalize",
                       borderBottomRightRadius: isLastRow ? '20px' : 0,
                       color:
-                        tx.status === 'Successful'
+                        tx.status === 'successful'
                           ? 'green'
-                          : tx.status === 'Pending'
+                          : tx.status === 'pending'
                             ? 'orange'
-                            : tx.status === 'Cancelled'
+                            : tx.status === 'failed'
                               ? 'red'
-                              : 'inherit',
+                              : tx.status === 'initiated'
+                              ? 'black':'inherit',
                     }}
                   >
                     {tx.status}

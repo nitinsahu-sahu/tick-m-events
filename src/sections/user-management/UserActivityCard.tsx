@@ -90,9 +90,6 @@ export default function UserActivityCard() {
       selectedActions.length === 0 ||
       selectedActions.includes(row.rawAction);
 
-    // Debug log
-    console.log('Row.rawAction:', row.rawAction, '| Selected:', selectedActions, '| Match:', matchesActionFilter);
-
     return matchesSearch && matchesActionFilter;
   });
 
@@ -251,7 +248,7 @@ export default function UserActivityCard() {
       <Typography variant="h6" fontWeight="bold" mb={2}>User Activity History</Typography>
 
       {/* Data Grid Table */}
-      <Box sx={{ height: 600, width: '100%' }}>
+      <Box sx={{ width: '100%' }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
           <TextField
             placeholder="Search..."
@@ -400,10 +397,9 @@ export default function UserActivityCard() {
           </Box>
         )}
       </Box>
-      {/* Chart + Actions */}
 
-      <Grid container spacing={3}>
-        {/* Full Width Graph */}
+      {/* Chart + Actions */}
+      <Grid container spacing={3} mt={3}>
         <Grid item xs={12}>
           <Paper
             sx={{

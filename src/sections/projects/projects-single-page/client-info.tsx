@@ -122,10 +122,10 @@ export function ClientInfo({ _project }: any) {
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             fontSize: 11,
-                            filter: !isAssigned ? 'blur(4px)' : null,
-                            userSelect: !isAssigned ? 'none' : 'auto', // Prevent text selection when blurred
-                            WebkitUserSelect: !isAssigned ? 'none' : 'auto', // For Safari
-                            MozUserSelect: !isAssigned ? 'none' : 'auto', // For Firefox
+                            filter: 'blur(4px)',
+                            userSelect: 'none',
+                            WebkitUserSelect: 'none',
+                            MozUserSelect: 'none',
                         }}
                     >
                         {_project?.createdBy?.email}

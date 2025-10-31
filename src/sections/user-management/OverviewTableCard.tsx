@@ -49,7 +49,6 @@ interface User {
 
 export function OverviewTableCard() {
   const dispatch = useDispatch<AppDispatch>();
-  const theme = useTheme();
   const { loading, users, error } = useSelector((state: RootState) => state.user);
   const [searchText, setSearchText] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -112,7 +111,7 @@ export function OverviewTableCard() {
             handleConfirmAction(
               () => dispatch(blockUser(row.id)),
               "Block User",
-              "Are you sure you want to block this user?"
+              "Are you sure you want to temporary block this user?"
             )
           }
         >

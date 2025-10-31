@@ -1,10 +1,15 @@
 import { Box, Paper, Typography, Button, Grid, List, ListItem, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+
 import { ProviderListView } from './PopularEvent';
 
 export default function ProviderCardList({ handleSelct, providersList }: any) {
   const [view, setView] = useState<'card' | 'list'>('card');
+    const navigate = useNavigate();
+  
   return (
     <Paper
       sx={{
@@ -104,8 +109,9 @@ export default function ProviderCardList({ handleSelct, providersList }: any) {
                           backgroundColor: '#071E33',
                         },
                       }}
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={() => {
+                        navigate("/messaging-relationship");
+                        sessionStorage.setItem('currentChatProvider', JSON.stringify(provider));
                       }}
                     >
                       Chat Now
@@ -125,13 +131,13 @@ export default function ProviderCardList({ handleSelct, providersList }: any) {
                   primaryTypographyProps={{ fontWeight: 'bold', variant: 'h6' }}
                   secondary={
                     <Typography
-                  variant="body2"
-                  color="black"
-                  fontWeight={400}
-                  fontSize={{ xs: '8px', sm: '12px', md: '16px' }}
-                >
-                  {provider.averageRating} ★ &nbsp; | &nbsp; {provider.username} &nbsp; | {provider.address}
-                </Typography>
+                      variant="body2"
+                      color="black"
+                      fontWeight={400}
+                      fontSize={{ xs: '8px', sm: '12px', md: '16px' }}
+                    >
+                      {provider.averageRating} ★ &nbsp; | &nbsp; {provider.username} &nbsp; | {provider.address}
+                    </Typography>
                   }
                 />
               </ListItem>

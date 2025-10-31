@@ -19,7 +19,7 @@ export function UserManagementView() {
 
       {activeTab === 'User List' && (
         <>
-          <SearchCard />
+          {/* <SearchCard /> */}
           <OverviewTableCard />
         </>
       )}
@@ -28,9 +28,9 @@ export function UserManagementView() {
         <KycDocumentTableCard />
       )}
 
-      {activeTab === 'Actions & Sanctions' && (
+      {/* {activeTab === 'Actions & Sanctions' && (
         <ActionAndSectionTable />
-      )}
+      )} */}
 
       {activeTab === 'Activity History' && (
         <UserActivityCard />

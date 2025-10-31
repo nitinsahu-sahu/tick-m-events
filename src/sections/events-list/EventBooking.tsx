@@ -920,28 +920,28 @@ const EventBooking: React.FC<EventBookingProps> = ({
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <PhoneIphoneOutlinedIcon fontSize="small" />
                   <Typography variant="body2">
-                    <strong>Mobile:</strong> 673 994 445
+                    <strong>Mobile:</strong> +237 697 182 551
                   </Typography>
                 </Stack>
 
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <EmailOutlinedIcon fontSize="small" />
                   <Typography variant="body2">
-                    <strong>Email:</strong> support@tickm-events.com
+                    <strong>Email:</strong> tickmevents@gmail.com
                   </Typography>
                 </Stack>
 
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <WhatsAppIcon fontSize="small" />
                   <Typography variant="body2">
-                    <strong>WhatsApp:</strong> +237 655 178 302
+                    <strong>WhatsApp:</strong> +237 697 182 551
                   </Typography>
                 </Stack>
 
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <FaxOutlinedIcon fontSize="small" />
                   <Typography variant="body2">
-                    <strong>Fax:</strong> +237 655 178 302
+                    <strong>Fax:</strong> +237 652 590 797
                   </Typography>
                 </Stack>
               </Stack>

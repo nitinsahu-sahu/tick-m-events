@@ -1,10 +1,11 @@
-import { refundReqConstants } from "src/redux/actions/constants";
+import { refundReqConstants, ticketTransSuperConstants } from "src/redux/actions/constants";
 
 const initialState = {
   loading: false,
   refundReqs: [],
+  payments:[],
   error: null,
-  pagination: {}, 
+  pagination: {},
 };
 
 const reqAndRefundsReducer = (state, action) => {
@@ -13,6 +14,15 @@ const reqAndRefundsReducer = (state, action) => {
   }
 
   switch (action.type) {
+    case ticketTransSuperConstants.GET_VERIFY_TRNS_REQUEST:
+      return { ...state, loading: true };
+
+    case ticketTransSuperConstants.GET_VERIFY_TRNS_SUCCESS:
+      return { ...state, loading: false, payments: action.payload.payments };
+
+    case ticketTransSuperConstants.GET_VERIFY_TRNS_FAILURE:
+      return { ...state, loading: false, error: action.payload };
+
     case refundReqConstants.GET_RR_REQUEST:
       return { ...state, loading: true };
 
@@ -21,6 +31,7 @@ const reqAndRefundsReducer = (state, action) => {
 
     case refundReqConstants.GET_RR_FAILURE:
       return { ...state, loading: false, error: action.payload };
+
     default:
       return state; // Always return a valid state
   }

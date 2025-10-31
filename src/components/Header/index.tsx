@@ -38,9 +38,11 @@ export default function Header() {
     <Box sx={{ width: 250, p: 2 }}>
       <List>
         {[
+          { text: t('home'), path: "/home" },
+          { text: t('events'), path: "/event-list" },
+          { text: t('blog'), path: "/blog" },
+          { text: t('b2bMarketplace'), path: "/b2b-marketplace" },
           { text: t('aboutUs'), path: "/about-us" },
-          { text: t('sellYourEvent'), path: "/sell-event" },
-          { text: t('advertiseYourEvent'), path: "/advertise-event" },
           { text: t('contactUs'), path: "/contact-us" },
         ].map((item, index) => (
           <ListItem 

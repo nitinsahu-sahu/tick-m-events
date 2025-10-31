@@ -46,7 +46,7 @@ export function TabWithTableView() {
 
     return (
         <>
-            <Box
+            {/* <Box
                 sx={{
                     overflow: "hidden",
                     marginTop: 3,
@@ -55,7 +55,7 @@ export function TabWithTableView() {
                 }}
             >
                 <TabButton tabValue={tabValue} tabLabels={tabLabels} onChange={handleTabChange} />
-            </Box>
+            </Box> */}
             <Paper elevation={6}
                 sx={{
                     mt: 3,
@@ -65,7 +65,8 @@ export function TabWithTableView() {
                     overflow: "hidden",
                 }}
             >
-                {tabValue === 0 && (
+                <MarketTrendsTab />
+                {/* {tabValue === 0 && (
                     <MatrixFourCard metrics={stats} />
                 )}
 
@@ -80,9 +81,9 @@ export function TabWithTableView() {
                         selectedFilter={selectedFilter}
                         onFilterChange={handleFilterChange}
                     />
-                )}
-                {tabValue === 2 && <MarketTrendsTab />}
-                {tabValue === 3 && (
+                )} */}
+                {/* {tabValue === 0 && <MarketTrendsTab />} */}
+                {/* {tabValue === 3 && (
                     <RequestTabSection
                         title="Security & Suspicious Transaction Control"
                         description=""
@@ -93,7 +94,7 @@ export function TabWithTableView() {
                         selectedFilter={selectedFilter}
                         onFilterChange={handleFilterChange}
                     />
-                )}
+                )} */}
             </Paper>
 
         </>

@@ -13,9 +13,9 @@ export function PromotionLogoBar({ brands, mainHead, subHead }: any) {
                     <Typography variant="h5" fontWeight="bold" gutterBottom>
                         {mainHead}
                     </Typography>
-                    <Typography color="textSecondary" gutterBottom>
+                    {/* <Typography color="textSecondary" gutterBottom>
                         {subHead}
-                    </Typography>
+                    </Typography> */}
 
                     {/* Marquee Container */}
                     <Box

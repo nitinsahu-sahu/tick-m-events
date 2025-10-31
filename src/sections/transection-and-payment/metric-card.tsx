@@ -4,6 +4,8 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
+import { useEffect } from "react";
+import axios from "src/redux/helper/axios";
 
 type MetricCardProps = {
   selectedEvent: any;
@@ -72,7 +74,27 @@ export function MetricCard({ selectedEvent }: MetricCardProps) {
   const commission = totalSales * 0.10;
   const netSales = totalSales - refundedAmount;
   const approvedWithdrawals = selectedEvent?.withdrawalDetails?.totals?.approvedAmount || 0;
-  const availableBalance = netSales - commission - pendingWithdrawals - approvedWithdrawals;
+  const availableBalance = Math.max(0, netSales - commission - pendingWithdrawals - approvedWithdrawals);
+
+  useEffect(() => {
+    if (!selectedEvent?._id || Number.isNaN(availableBalance)) return undefined;
+
+    const eventId = selectedEvent._id;
+
+    const saveAvailableBalance = async () => {
+      try {
+        await axios.put(`/o/${eventId}/balance`, { availableBalance });
+        console.log("✅ Event balance updated:", availableBalance);
+      } catch (error: any) {
+        console.error("❌ Failed to update event balance:", error?.response?.data || error);
+      }
+    };
+
+    saveAvailableBalance();
+    const interval = setInterval(saveAvailableBalance, 60000);
+    return () => clearInterval(interval);
+
+  }, [selectedEvent?._id, availableBalance]);
 
   // Final metrics array
   const metrics = [

@@ -11,7 +11,7 @@ const options = [
   'Global Statistics',
   'Ticketing Activity',
   'Marketplace Activity',
-  'Alerts & Quick Actions',
+  // 'Alerts & Quick Actions',
 ];
 
 export function TopNavButtons({ active, onChange }: TopNavButtonsProps) {

@@ -291,7 +291,6 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
             </Box>
 
             <Box p={3}>
-                {/* Basic Info */}
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant="h6" fontWeight={600}>Basic Information</Typography>
                     <Button
@@ -303,7 +302,6 @@ export function MainProfile({ handleAvalibility, setShowService, onModify }: any
                     </Button>
                 </Box>
 
-                {/* Expandable Details with Smooth Transition */}
                 <Collapse in={showDetails} timeout="auto" unmountOnExit>
                     <Box mt={2} sx={{
                         borderTop: '1px solid #e0e0e0',

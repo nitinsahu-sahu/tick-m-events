@@ -65,7 +65,7 @@ const GlobalStatistics = ({ statistics }: any) => (
     </Grid>
     {/* Action Buttons */}
 
-    <Grid container spacing={2} justifyContent="center">
+    {/* <Grid container spacing={2} justifyContent="center">
       {['Moderate an Event', 'Validate a Provider', 'Verify a Suspicious Transaction'].map(
         (label, idx) => (
           <Grid item xs={12} sm={6} md={4} key={idx}>
@@ -93,7 +93,7 @@ const GlobalStatistics = ({ statistics }: any) => (
           </Grid>
         )
       )}
-    </Grid>
+    </Grid> */}
   </Box>
 );
 

@@ -8,7 +8,7 @@ interface TopNavButtonsProps {
 const options = [
   'User List',
   'KYC Verification',
-  'Actions & Sanctions',
+  // 'Actions & Sanctions',
   'Activity History',
 ];
 

@@ -47,12 +47,12 @@ export function GlobalOverviewAndGeneralStatisticsView() {
         </>
       )}
 
-      {activeTab === 'Alerts & Quick Actions' && (
+      {/* {activeTab === 'Alerts & Quick Actions' && (
         <>
-          {/* <GlobalStatistics /> */}
+          <GlobalStatistics />
           <AlertsSection />
         </>
-      )}
+      )} */}
     </DashboardContent>
   );
 }

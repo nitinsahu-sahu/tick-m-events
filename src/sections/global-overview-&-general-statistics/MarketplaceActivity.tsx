@@ -79,11 +79,10 @@ export function MarketplaceActivity() {
 
         </Table>
       </TableContainer>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mt={4}>
-        {/* <ResponsiveActionButton>Validate a Provider</ResponsiveActionButton> */}
+      {/* <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mt={4}>
         <ResponsiveActionButton>Analyze an Organizer</ResponsiveActionButton>
         <ResponsiveActionButton>View Provider Transactions</ResponsiveActionButton>
-      </Stack>
+      </Stack> */}
     </Paper>
   );
 }

@@ -297,7 +297,6 @@ export const ContractDetailsModal: React.FC<ContractDetailsModalProps> = ({
                 />
                 <Box>
                   <Typography variant="subtitle1" fontWeight="bold">{contract.organizerId?.name}</Typography>
-                  <Typography variant="body2">{contract.organizerId?.email}</Typography>
                 </Box>
               </Box>
             </Paper>

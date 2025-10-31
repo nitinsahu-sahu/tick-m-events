@@ -15,8 +15,9 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
 import { useTranslation } from 'react-i18next';
-
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
 import { RootState } from 'src/redux/store';
 import { PromotionLogoBar } from 'src/components/brands-logo';
 import { carouselItems, eventTypes, pricingOptions } from './utills';
@@ -29,7 +30,7 @@ interface HeroSectionProps {
 export default function HeroSection({ events, onEventsFiltered }: HeroSectionProps) {
     const { promotionLogos } = useSelector((state: RootState) => state.customization);
     const { t } = useTranslation();
-
+    const navigate = useNavigate();
     const [tab, setTab] = useState(0);
     const [filters, setFilters] = useState({
         eventType: '',
@@ -123,9 +124,9 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
     };
 
     // Function to handle button clicks (redirect to registration/login)
-    const handleButtonClick = (buttonType: string) => {
+    const handleButtonClick = (path: string) => {
         // Replace with your actual routing logic
-        console.log(`Redirecting to ${buttonType} page`);
+        navigate(path);
         // Example: router.push('/auth/register') or window.location.href = '/auth/login'
     };
 
@@ -301,9 +302,9 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                             }}
                         >
                             {[
-                                { text: "Create my event", path: "/auth/register" },
-                                { text: "I'm looking for an event", path: "/auth/register" },
-                                { text: "I find a service provider", path: "/auth/register" },
+                                { text: "Create my event", path: "/register" },
+                                { text: "I'm looking for an event", path: "/sign-in" },
+                                { text: "I find a service provider", path: "/sign-in" },
                             ].map((item, index) => (
                                 <Grid item
                                     key={index}
@@ -314,7 +315,7 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                                     <Button
                                         variant="contained"
                                         startIcon={<CheckCircleIcon sx={{ color: "white" }} />}
-                                        onClick={() => handleButtonClick(item.text)}
+                                        onClick={() => handleButtonClick(item.path)}
                                         sx={{
                                             bgcolor: '#00AEEF',
                                             color: 'white',

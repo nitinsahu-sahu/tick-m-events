@@ -223,8 +223,7 @@ export function ProviderOrganizerInfoModal({ isModalOpen, selectedEvent, handleC
                     </Box>
 
                     {/* Basic Information  */}
-                    <Box p={3}>
-                        {/* Basic Info */}
+                    {/* <Box p={3}>
                         <Box display="flex" justifyContent="space-between" alignItems="center">
                             <Typography variant="h6" fontWeight={600}>Basic Information</Typography>
                             <Button
@@ -236,27 +235,24 @@ export function ProviderOrganizerInfoModal({ isModalOpen, selectedEvent, handleC
                             </Button>
                         </Box>
 
-                        {/* Expandable Details with Smooth Transition */}
                         <Collapse in={showDetails} timeout="auto" unmountOnExit>
                             <Box mt={2} sx={{
                                 borderTop: '1px solid #e0e0e0',
                                 pt: 2,
                             }}>
                                 <Grid container spacing={2}>
-                                    {/* Contact Info */}
                                     <Grid item xs={12} md={6}>
                                         <Typography variant="subtitle2" color="textSecondary">Contact</Typography>
                                         <Typography>{select?.email}</Typography>
                                         {select?.number && (
                                             <PhoneNumberDisplay
                                                 phoneNumber={select.number}
-                                                defaultCountry="US" // You can detect this dynamically
+                                                defaultCountry="US" 
                                             />
                                         )}
                                         <Typography textTransform="capitalize">{select?.address}</Typography>
                                     </Grid>
 
-                                    {/* Social Links */}
                                     <Grid item xs={12} md={6}>
                                         <Typography variant="subtitle2" color="textSecondary">Social Media</Typography>
                                         <Box display="flex" gap={1} mt={1}>
@@ -299,7 +295,6 @@ export function ProviderOrganizerInfoModal({ isModalOpen, selectedEvent, handleC
                                         </Box>
                                     </Grid>
 
-                                    {/* Experience */}
                                     <Grid item xs={12}>
                                         <Typography variant="subtitle2" color="textSecondary">Experience</Typography>
                                         <Typography>{select?.experience || 'Not specified'}</Typography>
@@ -307,13 +302,14 @@ export function ProviderOrganizerInfoModal({ isModalOpen, selectedEvent, handleC
                                 </Grid>
                             </Box>
                         </Collapse>
-                    </Box>
+                    </Box> */}
 
                     {/* Stats Section */}
                     <Grid
                         container
                         spacing={0}
                         sx={{
+                            mt:3,
                             p: 2,
                             display: 'flex',
                             justifyContent: 'space-around',

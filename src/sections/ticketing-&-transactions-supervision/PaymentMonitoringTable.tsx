@@ -138,45 +138,6 @@ export function PaymentMonitoringTable () {
           </TableBody>
         </Table>
       </Box>
-
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
-        mt={3}
-        justifyContent="space-between"
-      >
-        <Button
-          fullWidth
-          variant="contained"
-          sx={{
-            bgcolor: '#0e2a47',
-            '&:hover': { bgcolor: '#0c223b' },
-            borderRadius: '20px',
-            textTransform: 'none',
-            fontWeight: 600,
-          }}
-        >
-          Analyze a Transaction
-        </Button>
-        <Button
-          fullWidth
-          variant="outlined"
-          sx={{
-            borderRadius: '20px',
-            textTransform: 'none',
-            fontWeight: 600,
-            color: '#0B2E4C', // Set your preferred color
-            borderColor: '#0B2E4C', // Match border color to text
-            '&:hover': {
-              backgroundColor: '#0B2E4C', // subtle hover background
-              borderColor: '#0B2E4C',
-              color: 'white',
-            },
-          }}
-        >
-          Approve Event
-        </Button>
-      </Stack>
     </Paper>
   );
 };

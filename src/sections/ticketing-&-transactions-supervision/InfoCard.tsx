@@ -19,7 +19,7 @@ export function InfoCard({ activeTab, setActiveTab }: InfoCardProps) {
     <>
       <Paper elevation={3} sx={{ boxShadow: 3 }}>
         <Grid container spacing={3} p={3}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3, bgcolor: '#cce7f9', borderRadius: 2, textAlign: 'center' }}>
               <Typography variant="subtitle1">Total Sales</Typography>
               <Typography variant="h5" fontWeight="bold">
@@ -27,7 +27,7 @@ export function InfoCard({ activeTab, setActiveTab }: InfoCardProps) {
               </Typography>
             </Paper>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
             <Paper sx={{ p: 3, bgcolor: '#cce7f9', borderRadius: 2, textAlign: 'center' }}>
               <Typography variant="subtitle1">Pending Payments</Typography>
               <Typography variant="h5" fontWeight="bold">
@@ -35,14 +35,7 @@ export function InfoCard({ activeTab, setActiveTab }: InfoCardProps) {
               </Typography>
             </Paper>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 3, bgcolor: '#cce7f9', borderRadius: 2, textAlign: 'center' }}>
-              <Typography variant="subtitle1">Disputed Transactions</Typography>
-              <Typography variant="h5" fontWeight="bold">
-                5 Cases
-              </Typography>
-            </Paper>
-          </Grid>
+         
         </Grid>
       </Paper>
 

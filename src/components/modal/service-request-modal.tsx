@@ -1,22 +1,22 @@
-import { 
-    Modal, Box, Typography, Button, Avatar, Divider, Chip,
-    IconButton, Dialog, DialogTitle, DialogContent, DialogActions,
-    Paper, Stack, Grid
+import {
+  Modal, Box, Typography, Button, Avatar, Divider, Chip,
+  IconButton, Dialog, DialogTitle, DialogContent, DialogActions,
+  Paper, Stack, Grid
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { 
-    Close as CloseIcon,
-    Print as PrintIcon,
-    Event as EventIcon,
-    LocationOn as LocationIcon,
-    Person as PersonIcon,
-    Email as EmailIcon,
-    Schedule as ScheduleIcon,
-    AttachMoney as MoneyIcon,
-    Description as DescriptionIcon,
-    CheckCircle as CheckIcon,
-    Cancel as CancelIcon,
-    AccessTime as TimeIcon
+import {
+  Close as CloseIcon,
+  Print as PrintIcon,
+  Event as EventIcon,
+  LocationOn as LocationIcon,
+  Person as PersonIcon,
+  Email as EmailIcon,
+  Schedule as ScheduleIcon,
+  AttachMoney as MoneyIcon,
+  Description as DescriptionIcon,
+  CheckCircle as CheckIcon,
+  Cancel as CancelIcon,
+  AccessTime as TimeIcon
 } from "@mui/icons-material";
 import { useRef } from "react";
 import { HeadingCommon } from "../multiple-responsive-heading/heading";
@@ -108,18 +108,18 @@ const StatusChip = styled(Chip)(({ theme }) => ({
 
 const PrintContainer = styled(Box)(({ theme }) => ({
   '@media print': {
-    body: { 
-      margin: 0, 
-      padding: '20px', 
-      background: 'white !important', 
-      color: 'black !important' 
+    body: {
+      margin: 0,
+      padding: '20px',
+      background: 'white !important',
+      color: 'black !important'
     },
     '.no-print': { display: 'none !important' },
-    '.print-section': { 
+    '.print-section': {
       breakInside: 'avoid',
       marginBottom: '20px'
     },
-    '*': { 
+    '*': {
       '-webkit-print-color-adjust': 'exact !important',
       'color-adjust': 'exact !important'
     }
@@ -219,33 +219,33 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
 
   const PrintContent = () => (
     <div ref={printRef}>
-      
-        <LogoSection sx={{ justifyContent: 'space-between' }}>
-          <Box flex={1}>
-            <Typography variant="h4" fontWeight="bold" sx={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-              📋 Service Request Details
-            </Typography>
-            <Typography variant="subtitle1" sx={{ opacity: 0.9, mt: 1 }}>
-              Event: <strong>{data.eventId?.eventName || 'N/A'}</strong>
-            </Typography>
-          </Box>
-          <LogoStamp>
-            TICK-M<br />EVENTS
-          </LogoStamp>
-        </LogoSection>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="body2" sx={{ opacity: 0.9 }}>
-            Organized by: <strong>{data.organizerId?.name}</strong>
+
+      <LogoSection sx={{ justifyContent: 'space-between' }}>
+        <Box flex={1}>
+          <Typography variant="h4" fontWeight="bold" sx={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+            📋 Service Request Details
           </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.9 }}>
-            Generated on: {new Date().toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
+          <Typography variant="subtitle1" sx={{ opacity: 0.9, mt: 1 }}>
+            Event: <strong>{data.eventId?.eventName || 'N/A'}</strong>
           </Typography>
         </Box>
-     
+        <LogoStamp>
+          TICK-M<br />EVENTS
+        </LogoStamp>
+      </LogoSection>
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Typography variant="body2" sx={{ opacity: 0.9 }}>
+          Organized by: <strong>{data.organizerId?.name}</strong>
+        </Typography>
+        <Typography variant="body2" sx={{ opacity: 0.9 }}>
+          Generated on: {new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}
+        </Typography>
+      </Box>
+
       <Box sx={{ py: 3 }}>
         <Grid container spacing={3}>
           {/* Left Column */}
@@ -310,8 +310,8 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                       label={data.orgStatus}
                       color={
                         data.orgStatus === 'accepted' ? 'success' :
-                        data.orgStatus === 'rejected' ? 'error' : 
-                        data.orgStatus === 'request' ? 'info' : 'info'
+                          data.orgStatus === 'rejected' ? 'error' :
+                            data.orgStatus === 'request' ? 'info' : 'info'
                       }
                     />
                   </DetailValue>
@@ -361,8 +361,8 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                         label={data.providerStatus}
                         color={
                           data.providerStatus === 'accepted' ? 'success' :
-                          data.providerStatus === 'rejected' ? 'error' : 
-                          data.providerStatus === 'request' ? 'info' : 'info'
+                            data.providerStatus === 'rejected' ? 'error' :
+                              data.providerStatus === 'request' ? 'info' : 'info'
                         }
                       />
                     </DetailValue>
@@ -392,7 +392,27 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                     Email:
                   </DetailLabel>
                   <DetailValue variant="body2">
-                    {data.organizerId?.email}
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: { xs: 120, sm: 180 },
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                        filter: 'blur(4px)',
+                        userSelect: 'none',
+                        WebkitUserSelect: 'none',
+                        MozUserSelect: 'none',
+                        // '&:hover': {
+                        //   filter: 'blur(0px)', // Remove blur on hover to reveal
+                        //   transition: 'filter 0.3s ease'
+                        // }
+                      }}
+                    >
+                      {data.organizerId?.email}
+                    </Typography>
                   </DetailValue>
                 </DetailItem>
               </Stack>
@@ -424,17 +444,17 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
         </Grid>
 
         {/* Footer */}
-        <Box sx={{ 
-          textAlign: 'center', 
-          mt: 4, 
-          pt: 3, 
-          borderTop: '2px dashed #e0e0e0', 
-          opacity: 0.8, 
-          fontSize: '12px', 
-          color: 'text.secondary', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center' 
+        <Box sx={{
+          textAlign: 'center',
+          mt: 4,
+          pt: 3,
+          borderTop: '2px dashed #e0e0e0',
+          opacity: 0.8,
+          fontSize: '12px',
+          color: 'text.secondary',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
         }}>
           <LogoStamp sx={{ width: 24, height: 24, fontSize: '8px', marginRight: '8px' }}>
             TM
@@ -446,10 +466,10 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
   );
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="lg" 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="lg"
       fullWidth
       PaperProps={{
         sx: {
@@ -458,9 +478,9 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
         }
       }}
     >
-      <DialogTitle sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
+      <DialogTitle sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
         alignItems: 'center',
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         color: 'white',
@@ -475,15 +495,15 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
             {data.eventId?.eventName}
           </Typography>
         </Box>
-        
+
         <LogoSection sx={{ mb: 0, justifyContent: 'flex-end' }}>
           <LogoStamp sx={{ width: 45, height: 45, fontSize: '11px' }}>
             TICK-M<br />EVENTS
           </LogoStamp>
         </LogoSection>
-        
-        <IconButton 
-          onClick={onClose} 
+
+        <IconButton
+          onClick={onClose}
           sx={{ color: 'white', ml: 2 }}
         >
           <CloseIcon />
@@ -495,22 +515,22 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 2, gap: 2 }}>
-        <Button 
-          onClick={onClose} 
-          variant="outlined" 
+        <Button
+          onClick={onClose}
+          variant="outlined"
           startIcon={<CloseIcon />}
           sx={{ borderRadius: 2, px: 3 }}
         >
           Close
         </Button>
-        <Button 
-          onClick={handlePrint} 
-          variant="contained" 
+        <Button
+          onClick={handlePrint}
+          variant="contained"
           startIcon={<PrintIcon />}
-          sx={{ 
-            borderRadius: 2, 
-            px: 3, 
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+          sx={{
+            borderRadius: 2,
+            px: 3,
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
           }}
         >
           Download

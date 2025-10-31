@@ -1,6 +1,7 @@
 import { authConstants } from "./constants";
 import axios from "../helper/axios";
 import { saveUserFcmToken } from './notification.actions';
+
 // Checking SINGUP login or not
 export const updateProAvatar = (data) => async (dispatch) => {
     dispatch({ type: authConstants.UPDATE_AVATAR_REQUEST });
@@ -42,6 +43,8 @@ export const updateProCover = (data) => async (dispatch) => {
                 'Content-Type': 'multipart/form-data'
             }
         });
+        console.log(response,'cover');
+        
         dispatch({
             type: authConstants.UPDATE_COVER_SUCCESS,
             payload: { message: response?.data?.message },

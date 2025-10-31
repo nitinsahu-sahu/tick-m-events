@@ -1,70 +1,21 @@
 import {
-    Typography,
-    Card,
-    Box,
-    Grid,
-    TextField,
-    Button,
-    IconButton,
-    Avatar,
-    Chip,
-    Fab,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle
+    Typography, Card, Box, Grid, TextField, Button, IconButton,
+    Avatar, Chip, Fab, Dialog, DialogActions, DialogContent, DialogTitle, CircularProgress
 } from "@mui/material";
 import {
-    Edit,
-    Save,
-    Cancel,
-    Verified,
-    LocationOn,
-    Email,
-    Phone,
-    Person,
-    Star,
-    Share,
-    QrCode2,
-    Cake
+    Edit, Verified, LocationOn, Email, Phone, Person,
+    Star, Share
 } from "@mui/icons-material";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "src/redux/store";
-import axios from '../../../redux/helper/axios';
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import EditIcon from '@mui/icons-material/Edit';
 
-interface ProfileData {
-    _id: string;
-    username: string;
-    name: string;
-    email: string;
-    gender: string;
-    number: string;
-    address: string;
-    avatar: {
-        public_id: string;
-        url: string;
-    };
-    cover: {
-        public_id: string;
-        url: string;
-    };
-    isVerified: boolean;
-    certified: boolean;
-    role: string;
-    status: string;
-    referredBy: {
-        _id: string;
-        username: string;
-        name: string;
-        __id: string;
-    };
-    rewardPoints: number;
-    referralCount: number;
-    __id: string;
-    createdAt: string;
-    referralCode: string;
-}
+import { AppDispatch, RootState } from "src/redux/store";
+import { profileGet, updateProAvatar, updateProCover } from "src/redux/actions";
+
+import axios from '../../../redux/helper/axios';
+import { ProfileData, ApiResult } from "../utils";
 
 export function Profile() {
     const { user } = useSelector((state: RootState) => state?.auth);
@@ -72,6 +23,13 @@ export function Profile() {
     const [isEditing, setIsEditing] = useState(false);
     const [editedData, setEditedData] = useState<Partial<ProfileData>>({});
     const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const avatarInputRef = useRef<HTMLInputElement>(null);
+    const coverInputRef = useRef<HTMLInputElement>(null);
+    const [covererror, setCoverError] = useState(null)
+    const [coverloading, setCoverLoading] = useState(false)
+    const [picloading, setPicLoading] = useState(false)
+    const dispatch = useDispatch<AppDispatch>();
+    console.log(profileData, 'profileData');
 
     useEffect(() => {
         const fetchProfileData = async () => {
@@ -86,6 +44,7 @@ export function Profile() {
 
         fetchProfileData();
     }, [user]);
+
 
     const handleSave = async () => {
         try {
@@ -123,6 +82,68 @@ export function Profile() {
         );
     }
 
+    const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const formData = new FormData();
+            formData.append('cover', file);
+
+            try {
+                setCoverLoading(true);
+                setCoverError(null);
+
+                const result = await dispatch(updateProCover(formData))
+                if ((result as ApiResult)?.status === 200) {
+                    setCoverError(null);
+                    const response = await axios.get(`/participant/profile`);
+                    setProfileData(response.data.userProfile);
+                    setEditedData(response.data.userProfile);
+                } else {
+                    setCoverError(result.message);
+
+                }
+            } catch (error) {
+                toast.error(error.message);
+            } finally {
+                setCoverLoading(false);
+            }
+        }
+    };
+
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            try {
+                setPicLoading(true);
+                const result = await dispatch(updateProAvatar(formData))
+                if ((result as ApiResult)?.status === 200) {
+                    const response = await axios.get(`/participant/profile`);
+                    setProfileData(response.data.userProfile);
+                    setEditedData(response.data.userProfile);
+                } else {
+                    toast.error(result.message);
+                }
+            } catch (error) {
+                toast.error(error.message);
+            } finally {
+                setPicLoading(false);
+            }
+        }
+    };
+
+    const triggerAvatarInput = () => {
+        avatarInputRef.current?.click();
+    };
+
+    const triggerCoverInput = () => {
+        coverInputRef.current?.click();
+    };
+
+
+
     return (
         <Box sx={{
             minHeight: '100vh',
@@ -146,7 +167,21 @@ export function Profile() {
         <Share />
       </Fab> */}
 
-            <Box sx={{ maxWidth: 900, margin: 'auto' }}>
+            <Box sx={{ maxWidth: 800, margin: 'auto' }}>
+                <input
+                    type="file"
+                    ref={avatarInputRef}
+                    onChange={handleAvatarChange}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                />
+                <input
+                    type="file"
+                    ref={coverInputRef}
+                    onChange={handleCoverChange}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                />
                 {/* Main Profile Card */}
                 <Card sx={{
                     borderRadius: 4,
@@ -159,7 +194,7 @@ export function Profile() {
                 }}>
                     {/* Profile Header */}
                     <Box sx={{
-                        height: 120,
+                        height: 160,
                         background: `linear-gradient(45deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1)), url(${profileData.cover.url})`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
@@ -180,18 +215,29 @@ export function Profile() {
                                 right: 8,
                                 backgroundColor: 'rgba(0,0,0,0.6)',
                                 color: 'white',
-                                opacity: 0,
+                                // opacity: 0,
                                 transform: 'translateY(-10px)',
                                 transition: 'all 0.3s ease',
                                 '&:hover': {
                                     backgroundColor: 'rgba(0,0,0,0.8)',
-                                }
-                            }}
-                            onClick={() => {/* Handle cover edit */ }}
-                        >
-                            <Edit fontSize="small" />
-                        </IconButton>
+                                },
+                                opacity: coverloading ? 0.5 : 1
 
+                            }}
+                            disabled={coverloading}
+
+                            onClick={triggerCoverInput}
+                        >
+                            {coverloading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : <EditIcon fontSize="small" />}
+                        </IconButton>
+                        <Typography sx={{
+                            position: 'absolute',
+                            top: 10,
+                            right: 16,
+                            zIndex: 2
+                        }} color="red" fontSize={12} fontWeight={600}>
+                            {covererror}
+                        </Typography>
                         {/* Avatar Container */}
                         <Box sx={{
                             position: 'absolute',
@@ -233,9 +279,10 @@ export function Profile() {
                                         fontSize: 16
                                     }
                                 }}
-                                onClick={() => {/* Handle avatar edit */ }}
+                                onClick={triggerAvatarInput}
+
                             >
-                                <Edit />
+                                {picloading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : <EditIcon fontSize="small" />}
                             </IconButton>
                         </Box>
                     </Box>

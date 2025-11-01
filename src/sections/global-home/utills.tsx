@@ -1,4 +1,3 @@
-import SmartphoneIcon from "@mui/icons-material/Smartphone";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
 import ChatIcon from "@mui/icons-material/Chat";
@@ -43,27 +42,6 @@ export const flagship = [
     title: "Real-time statistics",
     description: "Sales, attendance, rates.",
   },
-];
-
-export const carouselItems = [
-    {
-        type: 'image',
-        src: '/assets/home-banner/03.png',
-        title: 'Professional Conferences',
-        description: 'Host and attend high-quality professional conferences'
-    },
-    {
-        type: 'image',
-        src: '/assets/home-banner/01.png',
-        title: 'Beautiful Wedding Events',
-        description: 'A smiling bride in a beautifully decorated room',
-    },
-    {
-        type: 'image',
-        src: '/assets/home-banner/02.jpg',
-        title: 'Digital E-Tickets',
-        description: 'Participants smiling with their phones displaying their e-ticket'
-    },
 ];
 
 export const eventTypes = ['All', 'Public', 'Private'];

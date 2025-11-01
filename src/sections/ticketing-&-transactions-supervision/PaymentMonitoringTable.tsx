@@ -114,7 +114,7 @@ export function PaymentMonitoringTable({ data }: any) {
                   <TableCell align="center">{tx.eventId?.eventName}</TableCell>
                   <TableCell align="center">{tx.organizerId?.name}</TableCell>
                   <TableCell align="center">{tx?.feeAmount} XAF</TableCell>
-                  <TableCell align="center">{tx.method||"Mobile Money"}</TableCell>
+                  <TableCell sx={{textTransform:"capitalize"}} align="center">{tx.paymentMethod||"Fapshi"}</TableCell>
                   <TableCell
                     align="center"
                     sx={{

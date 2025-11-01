@@ -4,23 +4,23 @@ import {
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
-import { RootState } from 'src/redux/store';
 import { Iconify } from "../iconify";
 import { SubscriptionModal } from "../modal/SubscriptionModal";
 import axios from '../../redux/helper/axios'
+import { TermsOfUseModal } from "../modal/TermsOfUseModal";
+import { PrivacyPolicyModal } from "../modal/PrivacyPolicyModal";
 
 export default function Footer() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStatus, setModalStatus] = useState(''); // 'success' or 'error'
   const [modalMessage, setModalMessage] = useState('');
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -94,6 +94,37 @@ export default function Footer() {
     }
   };
 
+  const handleCloseTermsModal = () => {
+    setTermsModalOpen(false);
+  };
+
+  const handleClosePrivacyModal = () => {
+    setPrivacyModalOpen(false);
+  };
+
+  const handleLinkClick = (linkName: string, e: React.MouseEvent) => {
+    switch (linkName) {
+      case "FAQ":
+        e.preventDefault();
+        navigate('/about-us', { state: { scrollTo: 'faq' } });
+        break;
+      case "Blog":
+        e.preventDefault();
+        navigate('/home', { state: { scrollTo: 'blog' } });
+        break;
+      case "Terms of Use":
+        e.preventDefault();
+        setTermsModalOpen(true);
+        break;
+      case "Privacy Policy":
+        e.preventDefault();
+        setPrivacyModalOpen(true);
+        break;
+      default:
+        // Allow normal navigation for other links
+        break;
+    }
+  };
   return (
     <Box sx={{ bgcolor: "#0d0d0d", color: "#fff", mt: 6, pt: 6, pb: 3, px: { xs: 3, md: 8 } }}>
       <Grid container spacing={4} justifyContent="space-around" alignItems="center">
@@ -145,6 +176,16 @@ export default function Footer() {
           onClose={handleCloseModal}
           status={modalStatus}
           message={modalMessage}
+        />
+
+        <TermsOfUseModal
+          open={termsModalOpen}
+          onClose={handleCloseTermsModal}
+        />
+
+        <PrivacyPolicyModal
+          open={privacyModalOpen}
+          onClose={handleClosePrivacyModal}
         />
 
         {/* Snackbar for quick messages */}
@@ -207,7 +248,7 @@ export default function Footer() {
           <Typography fontWeight={700} sx={{ mb: 2 }}>
             Tick-m events
           </Typography>
-          <Typography variant="body2">{t('address_1')}{t('address_2')}</Typography>
+          <Typography variant="body2">Douala - Nyalla Cobblestone Street, before the ZZ Hotel.</Typography>
           {/* <Typography variant="body2" sx={{ mt: 1 }}>Hours: 8:00 - 17:00, Mon - Sat</Typography> */}
           <Typography
             variant="body2"
@@ -271,16 +312,7 @@ export default function Footer() {
                 component={Link}
                 to={link.path}
                 variant="body2"
-                onClick={(e) => {
-                  if (link.name === "FAQ") {
-                    e.preventDefault();
-                    navigate('/about-us', { state: { scrollTo: 'faq' } });
-                  }
-                  if (link.name === "Blog") {
-                    e.preventDefault();
-                    navigate('/home', { state: { scrollTo: 'blog' } });
-                  }
-                }}
+                onClick={(e) => handleLinkClick(link.name, e)}
                 sx={{
                   mb: 1,
                   cursor: "pointer",

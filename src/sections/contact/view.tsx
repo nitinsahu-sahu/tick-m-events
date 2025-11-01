@@ -8,8 +8,6 @@ import {
     IconButton, Tooltip
 } from '@mui/material';
 
-import { useTranslation } from 'react-i18next';
-
 import Header from 'src/components/Header';
 import { Iconify } from 'src/components/iconify';
 
@@ -21,7 +19,6 @@ interface SubmitStatus {
 }
 
 export function Contact() {
-    const { t } = useTranslation();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -96,14 +93,14 @@ export function Contact() {
                                 mb: 2,
                             }}
                         >
-                            {t('cu')}
+                            Contact Us
                         </Typography>
                         <Typography fontSize={{ sm: 14, md: 16 }}>
-                            {t('oa')}: <span style={{ color: "#73BAFB" }}>{t('address_1')}</span>
+                            Office Address: <span style={{ color: "#73BAFB" }}>Douala - Nyalla Cobblestone Street,</span>
                         </Typography>
-                        <Typography fontSize={{ sm: 14, md: 16 }} color="text.secondary">{t('address_2')}</Typography>
+                        <Typography fontSize={{ sm: 14, md: 16 }} color="text.secondary">before the ZZ Hotel.</Typography>
                         <Typography sx={{ mb: 3 }} fontSize={{ sm: 14, md: 16 }}>
-                            {t('pn')}: <span style={{ color: "#73BAFB" }}>+237 697 182 551</span>
+                            Phone number: <span style={{ color: "#73BAFB" }}>+237 697 182 551</span>
                         </Typography>
                         <Box sx={{ display: "flex", gap: 2 }}>
                             {/* Email */}
@@ -160,7 +157,7 @@ export function Contact() {
                                 mb: 3,
                             }}
                         >
-                            {t("contact_txt")}
+                            Great vision without great people is irrelevant. Let’s work together.
                         </Typography>
 
                         <Box component="form" noValidate onSubmit={handleSubmit}>
@@ -222,7 +219,7 @@ export function Contact() {
                                     },
                                 }}
                             >
-                                {submitting ? `${t("submitting...")}` : `${t("submit")}`}
+                                {submitting ? 'Submitting' : 'Submit'}
                             </Button>
                         </Box>
                     </Grid>

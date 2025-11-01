@@ -13,9 +13,9 @@ import { eventOrderFetch } from './redux/actions/eventOrder';
 import { recommTrandingPopularEventFetch } from './redux/actions/home-recommendation.action';
 import NotificationsHandler from './utils/notification-handle';
 import { getPromotionLogo } from './redux/actions/customization/promotion-logo';
-import { LanguageProvider } from './redux/contexts/LanguageContext';
 import { statisticsPerformanceFetch } from './redux/actions/provider/statisticsAndPerformance';
 import { getReservationContracts } from './redux/actions/provider/reservation-contract';
+import { TranslateWidget } from '../TranslateWidget';
 
 
 // ----------------------------------------------------------------------
@@ -101,11 +101,10 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <LanguageProvider>
-        <Router />
-        <ToastContainer />
-        {user && <NotificationsHandler user={user} />}
-      </LanguageProvider>
+      <TranslateWidget />
+      <Router />
+      <ToastContainer />
+      {user && <NotificationsHandler user={user} />}
     </ThemeProvider>
   );
 }

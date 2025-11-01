@@ -14,36 +14,27 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import PersonIcon from "@mui/icons-material/Person";
-import LanguageIcon from "@mui/icons-material/Language";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useTranslation } from 'react-i18next';
-import { useLanguage } from "src/redux/contexts/LanguageContext";
 
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { t } = useTranslation();
-  const { currentLanguage, changeLanguage } = useLanguage();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
-  };
-
-  const handleLanguageChange = (event:any) => {
-    changeLanguage(event.target.value);
   };
 
   const drawer = (
     <Box sx={{ width: 250, p: 2 }}>
       <List>
         {[
-          { text: t('home'), path: "/home" },
-          { text: t('events'), path: "/event-list" },
-          { text: t('blog'), path: "/blog" },
-          { text: t('b2bMarketplace'), path: "/b2b-marketplace" },
-          { text: t('aboutUs'), path: "/about-us" },
-          { text: t('contactUs'), path: "/contact-us" },
+          { text: "Home", path: "/home" },
+          { text: "Events", path: "/event-list" },
+          { text: "Blog", path: "#" },
+          { text: "B2B Marketplace", path: "#" },
+          { text: "About", path: "/about-us" },
+          { text: "Contact", path: "/contact-us" },
         ].map((item, index) => (
           <ListItem 
             button 
@@ -113,7 +104,7 @@ export default function Header() {
                   }
                 }}
               >
-                {t('home')}
+                Home
               </Typography>
             </Link>
 
@@ -127,11 +118,11 @@ export default function Header() {
                   }
                 }}
               >
-                {t('events')}
+                Events
               </Typography>
             </Link>
             
-            <Link to="/blog" style={{ textDecoration: "none", color: "inherit" }}>
+            <Link to="#" style={{ textDecoration: "none", color: "inherit" }}>
               <Typography 
                 sx={{ 
                   cursor: "pointer", 
@@ -141,11 +132,11 @@ export default function Header() {
                   }
                 }}
               >
-                {t('blog')}
+                Blog
               </Typography>
             </Link>
             
-            <Link to="/b2b-marketplace" style={{ textDecoration: "none", color: "inherit" }}>
+            <Link to="#" style={{ textDecoration: "none", color: "inherit" }}>
               <Typography 
                 sx={{ 
                   cursor: "pointer", 
@@ -155,7 +146,7 @@ export default function Header() {
                   }
                 }}
               >
-                {t('b2bMarketplace')}
+                B2B Marketplace
               </Typography>
             </Link>
             
@@ -169,7 +160,7 @@ export default function Header() {
                   }
                 }}
               >
-                {t('about')}
+                About
               </Typography>
             </Link>
             
@@ -183,7 +174,7 @@ export default function Header() {
                   }
                 }}
               >
-                {t('contact')}
+                Contact
               </Typography>
             </Link>
           </Box>
@@ -206,12 +197,12 @@ export default function Header() {
                   }
                 }}
               >
-                <PersonIcon fontSize="small" /> {t('signIn')}
+                <PersonIcon fontSize="small" /> Sign In
               </Button>
             </Link>
 
             {/* Language Selector */}
-            <Box display="flex" alignItems="center" gap={0.5}>
+            {/* <Box display="flex" alignItems="center" gap={0.5}>
               <LanguageIcon sx={{ fontSize: 16, color: "#0d2a4d" }} />
               <Select
                 value={currentLanguage}
@@ -229,7 +220,7 @@ export default function Header() {
                 <MenuItem value="en">EN</MenuItem>
                 <MenuItem value="fr">FR</MenuItem>
               </Select>
-            </Box>
+            </Box> */}
 
             {/* Hamburger menu (mobile only) */}
             <IconButton

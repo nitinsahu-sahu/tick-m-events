@@ -14,13 +14,12 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
-import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { RootState } from 'src/redux/store';
 import { PromotionLogoBar } from 'src/components/brands-logo';
-import { carouselItems, eventTypes, pricingOptions } from './utills';
+import { eventTypes, pricingOptions } from './utills';
 
 interface HeroSectionProps {
     events: any[];
@@ -29,7 +28,6 @@ interface HeroSectionProps {
 
 export default function HeroSection({ events, onEventsFiltered }: HeroSectionProps) {
     const { promotionLogos } = useSelector((state: RootState) => state.customization);
-    const { t } = useTranslation();
     const navigate = useNavigate();
     const [tab, setTab] = useState(0);
     const [filters, setFilters] = useState({
@@ -221,7 +219,7 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                             }
                         }}
                     >
-                        {t('homeBanner_t1')}
+                        Organize. Book. Save time. TICK-M EVENTS is revolutionizing events in Africa
                     </Typography>
 
                     {/* Subtitle */}
@@ -255,7 +253,7 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                             }
                         }}
                     >
-                        {t('homeBanner_t2')}
+                        A single platform to manage your events, sell your tickets, find quality service providers and live unforgettable experiences.
                     </Typography>
 
                     {/* Three Action Buttons in Rounded Rectangle */}

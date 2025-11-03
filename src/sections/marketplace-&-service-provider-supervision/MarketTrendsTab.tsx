@@ -1,9 +1,13 @@
 // src/components/tabs/MarketTrendsTab.tsx
-import { Typography, Badge,Box, Button, Grid, Paper } from "@mui/material";
+import { Typography, Badge, Box, Button, Grid, Paper } from "@mui/material";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import { TabButton } from "src/components/button/multiple-button";
+import { fetchMonitoringMarketplace } from "src/redux/actions/admin/marketPlace-supervision";
+import { AppDispatch, RootState } from "src/redux/store";
+
 import { RequestTabSection } from "./request-tab-section";
 import {
   marketTrendsTableData,
@@ -12,7 +16,12 @@ import {
 import { PerformanceSummary } from "./performance-summary";
 
 
-export const MarketTrendsTab = () => {
+
+export const MarketTrendsTab = ({ selectedProviderId,selectedProviderName }: any) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { barGraphData,rawData,summary } = useSelector((state: RootState) => state?.admin?.performanceSumm);
+
+
   const [providerValue, setProviderValue] = useState(0);
   const providerLabels = [
     "Performance Summary",
@@ -28,6 +37,10 @@ export const MarketTrendsTab = () => {
     setProviderValue(newValue);
   };
 
+  useEffect(() => {
+    dispatch(fetchMonitoringMarketplace(selectedProviderId));
+  }, [dispatch, selectedProviderId]);
+
   return (
     <>
       <Box
@@ -40,10 +53,10 @@ export const MarketTrendsTab = () => {
         }}
       >
         <Typography variant="h3" sx={{ fontWeight: 600 }}>
-          Provider Name
+          {selectedProviderName || 'N/A'}
         </Typography>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        {/* <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Badge
             badgeContent={12}
             color="primary"
@@ -61,7 +74,7 @@ export const MarketTrendsTab = () => {
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
             Notification | Overall Performance Status
           </Typography>
-        </Box>
+        </Box> */}
       </Box>
 
       <Box
@@ -85,11 +98,11 @@ export const MarketTrendsTab = () => {
           borderRadius: 2,
           boxShadow: 3,
           overflow: "hidden",
-          mb:3
+          mb: 3
         }}
       >
         {providerValue === 0 && (
-          <PerformanceSummary />
+          <PerformanceSummary barGraphData={barGraphData} rawData={rawData} summary={summary}/>
         )}
 
         {providerValue === 1 && (
@@ -101,7 +114,7 @@ export const MarketTrendsTab = () => {
             data={[]}
           />
         )}
-         {providerValue === 2 && (
+        {providerValue === 2 && (
           <RequestTabSection
             title="Client feedback"
             description=""
@@ -110,7 +123,7 @@ export const MarketTrendsTab = () => {
             data={[]}
           />
         )}
-         {providerValue === 3 && (
+        {providerValue === 3 && (
           <RequestTabSection
             title="Recommendations"
             description=""
@@ -121,7 +134,7 @@ export const MarketTrendsTab = () => {
         )}
       </Paper>
 
-      <RequestTabSection
+      {/* <RequestTabSection
         title="Top Performing Service Providers"
         description=""
         headers={marketTrendsTableHeader}
@@ -160,7 +173,7 @@ export const MarketTrendsTab = () => {
             </Button>
           </Grid>
         </Grid>
-      </Box>
+      </Box> */}
     </>
   );
 };

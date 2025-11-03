@@ -26,12 +26,8 @@ const StatBox = memo(({ label, value }: StatBoxProps) => (
       },
     }}
   >
-    <Typography variant="h5" fontWeight={500} mb={1}>
-      {label}
-    </Typography>
-    <Typography variant="h4" fontWeight="bold" color="#0A2540">
-      {value}
-    </Typography>
+    <HeadingCommon title={label} baseSize="18px" mb={0}/>
+    <HeadingCommon title={value} baseSize="17px" mb={0}/>
   </Box>
 ));
 
@@ -41,6 +37,7 @@ interface PlatformStatisticsProps {
     totalEvents?: string;
     totalRevenue?: string;
     activeProviders?: string;
+    processedTransactions?:any
   };
 }
 
@@ -101,7 +98,7 @@ const PlatformStatistics = memo(({ statistics }: PlatformStatisticsProps) => {
         {[
           { label: 'Total Users', value: statistics?.totalUsers || '0' },
           { label: 'Total Events', value: statistics?.totalEvents || '0' },
-          { label: 'Total Revenue', value: statistics?.totalRevenue || '$0' },
+          { label: 'Total Revenue', value: statistics?.totalRevenue || '0 XAF' },
         ].map((stat, i) => (
           <Grid item xs={12} sm={6} md={4} key={i}>
             <StatBox label={stat.label} value={stat.value} />
@@ -112,7 +109,7 @@ const PlatformStatistics = memo(({ statistics }: PlatformStatisticsProps) => {
       <Grid container spacing={2} justifyContent="space-between" mb={3}>
         {[
           { label: 'Active Providers', value: statistics?.activeProviders || '0' },
-          { label: 'Processed Transactions', value: '12,345' }, // This should come from props in a real app
+          { label: 'Processed Transactions', value: statistics?.processedTransactions || 0 }, // This should come from props in a real app
         ].map((stat, i) => (
           <Grid item xs={12} sm={6} md={4} key={i + 3}>
             <StatBox label={stat.label} value={stat.value} />

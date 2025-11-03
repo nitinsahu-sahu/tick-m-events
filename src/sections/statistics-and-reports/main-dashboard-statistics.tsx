@@ -1,7 +1,11 @@
 import { Box, Grid, Typography, Card, CardContent, CircularProgress } from "@mui/material";
 import { ApexOptions } from "apexcharts";
+import { useEffect } from "react";
 import Chart from "react-apexcharts";
+import { useDispatch, useSelector } from "react-redux";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+import { fatchDashBoardStatisitcs } from "src/redux/actions/organizer/statistics-report";
+import { AppDispatch, RootState } from "src/redux/store";
 
 interface MainDashboardStatisticsProps {
     selectedEvent: any;
@@ -21,7 +25,47 @@ export function CommonBarHead({ totalCount, leftHead, head }: any) {
 }
 
 export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisticsProps) {
-    console.log(selectedEvent);
+    const dispatch = useDispatch<AppDispatch>();
+    const { overview, graph, peakSalesInfo } = useSelector((state: RootState) => state?.organizer);
+    console.log('graph', graph);
+
+    useEffect(() => {
+        dispatch(fatchDashBoardStatisitcs(selectedEvent?._id));
+    }, [dispatch, selectedEvent?._id]);
+
+    // Transform graph data for ApexCharts
+    const transformGraphData = (data: any[], valueKey: string) => {
+        if (!Array.isArray(data)) return [];
+        return data.map(item => item[valueKey] || 0);
+    };
+
+    const transformRemainingTicketsData = (data: any[]) => {
+        if (!Array.isArray(data)) return [{ data: [] }, { data: [] }];
+        return [
+            {
+                name: "Tickets Sold",
+                data: data.map(item => item.ticketsSold || 0)
+            },
+            {
+                name: "Remaining Tickets",
+                data: data.map(item => item.remainingTickets || 0)
+            }
+        ];
+    };
+
+    const transformSalesEvolutionData = (data: any[]) => {
+        if (!Array.isArray(data)) return [];
+        return data.map(item => item.tickets || 0);
+    };
+
+    // Get date labels for x-axis if needed
+    const getDateLabels = (data: any[]) => {
+        if (!Array.isArray(data)) return [];
+        return data.map(item => {
+            const date = new Date(item.date);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        });
+    };
 
     const isRefundApproved = (orderId: string): boolean =>
         Array.isArray(selectedEvent?.refundRequests) &&
@@ -44,7 +88,7 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
             if (!order.createdAt || isRefundApproved(order._id) || order.paymentStatus !== "confirmed") return;
 
             const date = new Date(order.createdAt);
-            const hourKey = `${date.toISOString().slice(0, 13)}:00`; // e.g. "2025-08-12T15:00"
+            const hourKey = `${date.toISOString().slice(0, 13)}:00`;
 
             const ticketCount = Array.isArray(order.tickets)
                 ? order.tickets.reduce((sum: number, ticket: any) => sum + (ticket.quantity || 0), 0)
@@ -63,231 +107,23 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
 
     if (peakHour) {
         const peakDate = new Date(peakHour);
-        const dateStr = peakDate.toLocaleDateString("en-GB"); // "dd/mm/yyyy"
+        const dateStr = peakDate.toLocaleDateString("en-GB");
         const hourStr = peakDate.toLocaleTimeString("en-US", {
             hour: "numeric",
             hour12: true,
-        }); // e.g. "3 PM"
+        });
 
         formattedPeakSales = `${dateStr} at ${hourStr} – ${peakTicketsSold} tickets sold in 1 hour`;
     }
 
-    // Calculate total tickets sold from selectedEvent
-    const totalTicketsSold = Array.isArray(selectedEvent?.order)
-        ? selectedEvent.order
-            .filter((order: any) => !isRefundApproved(order._id))
-            .reduce((sum: number, order: any) =>
-                sum + order.tickets.reduce((ticketSum: number, ticket: any) =>
-                    ticketSum + (ticket.quantity || 0), 0)
-                , 0) : 0;
-
-    // If you want total tickets available
+    // Total tickets available
     const totalTicketsAvailable = selectedEvent && selectedEvent.ticketQuantity
         ? Number(selectedEvent.ticketQuantity)
         : 0;
 
-    const conversionRate = totalTicketsAvailable
-        ? Number(((totalTicketsSold / totalTicketsAvailable) * 100).toFixed(2))
-        : 0;
-
-    const revenueGenerated = Array.isArray(selectedEvent?.order)
-        ? selectedEvent.order
-            .filter((order: any) => order.paymentStatus === "confirmed" && !isRefundApproved(order._id))
-            .reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0)
-        : 0;
-
-    const ticketsPendingPaymentCount = Array.isArray(selectedEvent?.order)
-        ? selectedEvent.order
-            .filter((order: any) => order.paymentStatus === "pending" && !isRefundApproved(order._id))
-            .reduce((sum: number, order: any) =>
-                sum + order.tickets.reduce((ticketSum: number, ticket: any) =>
-                    ticketSum + (ticket.quantity || 0), 0)
-                , 0)
-        : 0;
-
-
-    // Replace your chart data or counts with these variables
-    const totalTicketsSoldStr = totalTicketsSold.toString();
-    const revenueGeneratedStr = selectedEvent?.payStatus === "free"
-        ? "Free Tickets"
-        : `${revenueGenerated.toLocaleString("en-CM")} XAF`;
-
-
-    // 1. Create an array with days of the week labels
-    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-    // 2. Initialize an object to accumulate sales per day
-    const ticketsSoldByDay: Record<string, number> = {
-        Sun: 0,
-        Mon: 0,
-        Tue: 0,
-        Wed: 0,
-        Thu: 0,
-        Fri: 0,
-        Sat: 0,
-    };
-
-    if (Array.isArray(selectedEvent?.order)) {
-        selectedEvent.order.forEach((order: any) => {
-            if (!order.createdAt || isRefundApproved(order._id)) return;
-
-            const date = new Date(order.createdAt);
-            if (Number.isNaN(date.getTime())) return;
-
-            const day = daysOfWeek[date.getDay()];
-            const ticketCount = Array.isArray(order.tickets)
-                ? order.tickets.reduce((sum: number, ticket: any) => sum + (ticket.quantity || 0), 0)
-                : 0;
-
-            ticketsSoldByDay[day] += ticketCount;
-        });
-    }
-
-    // 4. Prepare the chart series data in order of daysOfWeek array
-    const totalTicketsSoldPerDay = daysOfWeek.map(day => ticketsSoldByDay[day]);
-    const revenueByDay: Record<string, number> = {
-        Sun: 0,
-        Mon: 0,
-        Tue: 0,
-        Wed: 0,
-        Thu: 0,
-        Fri: 0,
-        Sat: 0,
-    };
-
-    let cumulativeSold = 0;
-    const remainingTicketsPerDay = totalTicketsSoldPerDay.map(sold => {
-        cumulativeSold += sold;
-        return totalTicketsAvailable - cumulativeSold;
-    });
-
-    if (Array.isArray(selectedEvent?.order)) {
-        selectedEvent.order.forEach((order: any) => {
-            if (!order.createdAt || isRefundApproved(order._id) || order.paymentStatus !== "confirmed") return;
-
-            const date = new Date(order.createdAt);
-            const day = daysOfWeek[date.getDay()];
-            revenueByDay[day] += order.totalAmount || 0;
-        });
-    }
-
-    const totalRevenuePerDay = daysOfWeek.map(day => revenueByDay[day]);
-
-    // Line Chart Data (Total Tickets Sold, Revenue, Pending Payments)
-    const lineChartOptions: ApexOptions = {
-        chart: { type: "line", height: 50, sparkline: { enabled: true } },
-        stroke: { width: 4, curve: "smooth" },
-        colors: ["#2395D4"],
-    };
-    const lineChartSeries = [{ data: totalTicketsSoldPerDay }];
-
-    const weekDaysOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const weeklyTicketsSoldByDay: Record<string, number> = {
-        Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0,
-    };
-    if (Array.isArray(selectedEvent?.order)) {
-        // Get start (Sunday) and end (Saturday) of the current week
-        const now = new Date();
-        const startOfWeek = new Date(now);
-        startOfWeek.setHours(0, 0, 0, 0);
-        startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday
-        endOfWeek.setHours(23, 59, 59, 999);
-
-        // console.log(startOfWeek);
-        // console.log(endOfWeek);
-        selectedEvent.order.forEach((order: any) => {
-            // console.log("xd",new Date(order.createdAt).toISOString().split('T')[0]);
-            if (!order.createdAt) return;
-
-            const orderDate = new Date(order.createdAt);
-            console.log("orderData", orderDate)
-            // ✅ Only include orders between Sun and Sat of this week
-            if (orderDate < startOfWeek || orderDate > endOfWeek) return;
-
-            const dayName = daysOfWeek[orderDate.getDay()];
-            const ticketCount = Array.isArray(order.tickets)
-                ? order.tickets.reduce((sum: number, ticket: any) => sum + (ticket.quantity || 0), 0)
-                : 0;
-
-            weeklyTicketsSoldByDay[dayName] += ticketCount;
-        });
-
-    }
-
-    const totalTicketsSoldThisWeek = weekDaysOrder.map(day => weeklyTicketsSoldByDay[day]);
-
-    // Line Chart Data (Total Tickets Sold, Revenue, Pending Payments)
-    const SalesEvaluationChartOptions: ApexOptions = {
-        chart: { type: "line", height: 50, sparkline: { enabled: true } },
-        stroke: { width: 4, curve: "smooth" },
-        colors: ["#2395D4"],
-    };
-    const SalesEvaluationChartSeries = [{ data: totalTicketsSoldThisWeek }];
-
-    // console.log("Orders counted this week:", weeklyTicketsSoldByDay);
-
-    // console.log("SalesEvaluationChartSeries", SalesEvaluationChartSeries);
-    // Line Chart Data (Total Tickets Sold, Revenue, Pending Payments)
-    const RevenueGenerateChartOptions: ApexOptions = {
-        chart: { type: "line", height: 50, sparkline: { enabled: true } },
-        stroke: { width: 4, curve: "smooth" },
-        colors: ["#0B2E4E"],
-    };
-    const RevenueGenerateChartSeries = [{ data: totalRevenuePerDay }];
-
-    // Bar Chart Data (Remaining Tickets & Sales Trends)
-    const barChartOptions: ApexOptions = {
-        chart: { type: "bar", height: 50, sparkline: { enabled: true } },
-        plotOptions: { bar: { columnWidth: "50%" } },
-        colors: ["#FF5733"],
-    };
-    const barChartSeries = [
-        {
-            name: "Tickets Sold",
-            data: totalTicketsSoldPerDay,
-        },
-        {
-            name: "Remaining Tickets",
-            data: remainingTicketsPerDay,
-        },
-    ];
-
-    const pendingTicketsByDay: Record<string, number> = {
-        Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0,
-    };
-
-    if (Array.isArray(selectedEvent?.order)) {
-        selectedEvent.order
-            .filter((order: any) => order.paymentStatus === "pending")
-            .forEach((order: any) => {
-                if (!order.createdAt) return;
-
-                const date = new Date(order.createdAt);
-                const day = daysOfWeek[date.getDay()];
-                const ticketCount = Array.isArray(order.tickets)
-                    ? order.tickets.reduce((sum: number, ticket: any) => sum + (ticket.quantity || 0), 0)
-                    : 0;
-
-                pendingTicketsByDay[day] += ticketCount;
-            });
-    }
-
-    const totalPendingTicketsPerDay = daysOfWeek.map(day => pendingTicketsByDay[day]);
-
-    const TicketsPendingChartOptions: ApexOptions = {
-        chart: { type: "line", height: 50, sparkline: { enabled: true } },
-        stroke: { width: 4, curve: "smooth" },
-        colors: ["#FF5733"], // you can change color if needed
-    };
-
-    const TicketsPendingChartSeries = [{ data: totalPendingTicketsPerDay }];
-
     const validatedTicketsCount = Array.isArray(selectedEvent?.order)
         ? selectedEvent.order
-            .filter((order: any) => order.verifyEntry === true) // only validated entries
+            .filter((order: any) => order.verifyEntry === true)
             .reduce((sum: number, order: any) =>
                 sum + order.tickets.reduce((ticketSum: number, ticket: any) =>
                     ticketSum + (ticket.quantity || 0), 0)
@@ -297,6 +133,72 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
         ? Math.round((validatedTicketsCount / totalTicketsAvailable) * 100)
         : 0;
 
+    // Chart configurations
+    const lineChartOptions: ApexOptions = {
+        chart: { 
+            type: "line", 
+            height: 50, 
+            sparkline: { enabled: true },
+            zoom: { enabled: false }
+        },
+        stroke: { width: 3, curve: "smooth" },
+        colors: ["#2395D4"],
+        tooltip: { enabled: true },
+        grid: { show: false },
+        xaxis: {
+            labels: { show: false },
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+        },
+        yaxis: { show: false }
+    };
+
+    const RevenueGenerateChartOptions: ApexOptions = {
+        ...lineChartOptions,
+        colors: ["#0B2E4E"],
+    };
+
+    const SalesEvaluationChartOptions: ApexOptions = {
+        ...lineChartOptions,
+        colors: ["#2395D4"],
+    };
+
+    const TicketsPendingChartOptions: ApexOptions = {
+        ...lineChartOptions,
+        colors: ["#FF5733"],
+    };
+
+    const barChartOptions: ApexOptions = {
+        chart: { 
+            type: "bar", 
+            height: 50, 
+            sparkline: { enabled: true },
+            zoom: { enabled: false }
+        },
+        plotOptions: { 
+            bar: { 
+                columnWidth: "60%",
+                borderRadius: 2
+            } 
+        },
+        colors: ["#2395D4", "#FF5733"],
+        tooltip: { enabled: true },
+        grid: { show: false },
+        xaxis: {
+            labels: { show: false },
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+        },
+        yaxis: { show: false }
+    };
+
+    // Transform all graph data
+    const totalTicketsSoldData = transformGraphData(graph?.totalTicketsSold, 'ticketsSold');
+    const revenueGeneratedData = transformGraphData(graph?.revenueGenerated, 'revenue');
+    const ticketsPendingData = transformGraphData(graph?.ticketsPendingPayment, 'pendingTickets');
+    const remainingTicketsData = transformRemainingTicketsData(graph?.remainingTicketsSales);
+    const salesEvolutionData = transformSalesEvolutionData(graph?.salesEvolution);
+
     return (
         <Box mt={3}>
             <HeadingCommon title="Main Dashboard Statistics" mb={0} />
@@ -304,22 +206,22 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
             <Grid container spacing={2} mt={1}>
                 {[
                     {
-                        totalCount: totalTicketsSoldStr || "0",
+                        totalCount: overview?.totalTicketsSold || 0,
                         head: "Total Tickets Sold",
                         chartOptions: lineChartOptions,
-                        chartSeries: lineChartSeries,
+                        chartSeries: [{ data: totalTicketsSoldData }],
                     },
                     {
-                        totalCount: revenueGeneratedStr,
+                        totalCount: `$${overview?.totalRevenue?.toLocaleString() || 0}`,
                         head: "Revenue Generated",
                         chartOptions: RevenueGenerateChartOptions,
-                        chartSeries: RevenueGenerateChartSeries,
+                        chartSeries: [{ data: revenueGeneratedData }],
                     },
                     {
-                        totalCount: (totalTicketsAvailable - totalTicketsSold).toString(),
+                        totalCount: overview?.remainingTickets || 0,
                         head: "Remaining Tickets & Sales Trends",
                         chartOptions: barChartOptions,
-                        chartSeries: barChartSeries,
+                        chartSeries: remainingTicketsData,
                         type: "bar",
                     },
                     {
@@ -328,7 +230,7 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
                             <Box display="flex" justifyContent="space-between" alignItems="center">
                                 <Box>
                                     <Typography variant="h4" fontWeight="bold">
-                                        {validatedTicketsCount.toLocaleString()} {/* dynamically show count */}
+                                        {overview?.ticketsValidated || 0}
                                     </Typography>
                                     <Typography color="primary" sx={{ fontSize: "13px", fontWeight: 500 }}>
                                         Tickets <br /> Validated at Entrance
@@ -337,7 +239,7 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
                                 <Box position="relative" display="flex" alignItems="center">
                                     <CircularProgress
                                         variant="determinate"
-                                        value={validatedPercentage} // replace with dynamic % if available
+                                        value={validatedPercentage}
                                         size={55}
                                         thickness={5}
                                         sx={{ color: "#2395D4" }}
@@ -368,22 +270,22 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
                                     </Typography>
                                 </Box>
                                 <Box position="relative" display="flex" alignItems="center">
-                                    <CircularProgress variant="determinate" value={conversionRate} size={55} thickness={5} sx={{ color: "#2395D4" }} />
+                                    <CircularProgress variant="determinate" value={overview?.conversionRate || 0} size={55} thickness={5} sx={{ color: "#2395D4" }} />
                                     <Typography
                                         variant="caption"
                                         sx={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", fontWeight: "bold" }}
                                     >
-                                        {conversionRate}%
+                                        {overview?.conversionRate || 0}%
                                     </Typography>
                                 </Box>
                             </Box>
                         ),
                     },
                     {
-                        totalCount: ticketsPendingPaymentCount.toString(),
+                        totalCount: overview?.pendingPaymentOrders || 0,
                         head: "Tickets Pending Payment",
                         chartOptions: TicketsPendingChartOptions,
-                        chartSeries: TicketsPendingChartSeries,
+                        chartSeries: [{ data: ticketsPendingData }],
                     },
                     {
                         custom: true,
@@ -402,24 +304,25 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
                         totalCount: "Sales Evolution",
                         head: "This Week",
                         chartOptions: SalesEvaluationChartOptions,
-                        chartSeries: SalesEvaluationChartSeries,
+                        chartSeries: [{ data: salesEvolutionData }],
                     },
                 ].map((item, index) => (
                     <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                        <Card sx={{ boxShadow: 3, borderRadius: 3, height: "100%" }}>
-                            <CardContent sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                        <Card sx={{ boxShadow: 3, borderRadius: 3, height: "100%", minHeight: '140px' }}>
+                            <CardContent sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", p: 2 }}>
                                 {item.custom ? (
                                     item.content
                                 ) : (
                                     <>
                                         <CommonBarHead totalCount={item.totalCount} head={item.head} />
-                                        <Chart
-                                            options={item.chartOptions}
-                                            series={item.chartSeries}
-                                            type={(item.type || "line") as "line" | "area" | "bar" | "pie" | "donut" | "radialBar" | "scatter" | "bubble" | "heatmap" | "candlestick" | "boxPlot" | "radar" | "polarArea" | "rangeBar" | "rangeArea" | "treemap"}
-                                            height={50}
-                                        />
-
+                                        <Box sx={{ mt: 1 }}>
+                                            <Chart
+                                                options={item.chartOptions}
+                                                series={item.chartSeries}
+                                                type={(item.type || "line") as "line" | "bar"}
+                                                height={50}
+                                            />
+                                        </Box>
                                     </>
                                 )}
                             </CardContent>

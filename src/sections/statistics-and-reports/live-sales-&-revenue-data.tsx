@@ -323,7 +323,6 @@ const salesComparisonSeries = useMemo(() => {
 
 
 
-console.log("ss",salesComparisonSeries);
 const salesComparisonOptions = useMemo<ApexOptions>(() => ({
   ...commonChartOptions,
   chart: { type: "bar", stacked: false },

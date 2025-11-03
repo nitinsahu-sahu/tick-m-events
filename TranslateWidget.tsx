@@ -80,7 +80,6 @@ export function TranslateWidget() {
           multilanguagePage: true
         }, 'google_translate_element');
 
-        console.log('Translate widget ready');
       } catch (error) {
         console.error('Error initializing translate widget:', error);
       }

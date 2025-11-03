@@ -23,7 +23,6 @@ export function AnalyticsFourCards({
     selectedEvent,
 }: any) {
     const theme = useTheme();
-console.log(selectedEvent?.statistics?.tickets);
 
     const totalTickets = parseInt(selectedEvent?.ticketQuantity ?? "0", 10);
     // Calculate attendee engagement percentage

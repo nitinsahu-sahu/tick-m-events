@@ -10,26 +10,25 @@ import GlobalStatistics from '../GlobalStatistics';
 import PlatformStatistics from '../PlatformStatistics'
 import { TicketingActivityTable } from '../TicketingActivityTable';
 import { MarketplaceActivity } from '../MarketplaceActivity';
-import { AlertsSection } from '../AlertsSection';
 
 
 export function GlobalOverviewAndGeneralStatisticsView() {
   const [activeTab, setActiveTab] = useState('Global Statistics');
   const dispatch = useDispatch<AppDispatch>();
-  const {dashboardData } = useSelector((state: RootState) => state?.gogs);
+  const { dashboardData } = useSelector((state: RootState) => state?.gogs);
+  
   useEffect(() => {
     dispatch(fetchDashboardActivity())
   }, [dispatch]);
 
   return (
     <DashboardContent>
-      {/* <PageTitleSection title="Global Overview & General Statistics" /> */}
       <TopNavButtons active={activeTab} onChange={setActiveTab} />
 
       {activeTab === 'Global Statistics' && (
         <>
-          <GlobalStatistics statistics={dashboardData}/>
-          <PlatformStatistics statistics={dashboardData}/>
+          <GlobalStatistics statistics={dashboardData} />
+          <PlatformStatistics statistics={dashboardData} />
         </>
       )}
 

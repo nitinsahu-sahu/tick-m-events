@@ -5,7 +5,10 @@ const initialState = {
     __events: [],
     __projectWithBids: {},
     error: null,
-    loading: true
+    loading: true,
+    graph: {},
+    overview: {},
+    peakSalesInfo:{}
 };
 
 const pageEventReducer = (state, action) => {
@@ -13,6 +16,27 @@ const pageEventReducer = (state, action) => {
         state = initialState; // Assign initial state here
     }
     switch (action.type) {
+        case organizerEventConstants.GET_DASHBOARDSTATISTICS_REQUEST:
+            return { ...state, loading: true };
+
+        case organizerEventConstants.GET_DASHBOARDSTATISTICS_SUCCESS:
+            return {
+                ...state,
+                graph: action.payload.graph,
+                overview: action.payload.overview,
+                message: action.payload.message,
+                peakSalesInfo: action.payload.peakSalesInfo,
+                loading: false
+            };
+
+        case organizerEventConstants.GET_DASHBOARDSTATISTICS_FAILURE:
+            return {
+                ...state,
+                message: action.payload.message,
+                loading: true
+            };
+
+
         case organizerEventConstants.GET_BIDS_REQUEST:
             return { ...state, loading: true };
 

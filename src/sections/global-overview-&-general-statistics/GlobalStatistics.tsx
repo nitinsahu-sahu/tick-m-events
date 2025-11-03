@@ -24,12 +24,8 @@ const StatBox = memo(({ label, value }: StatBoxProps) => (
       },
     }}
   >
-    <Typography variant="h5" fontWeight={500} mb={1}>
-      {label}
-    </Typography>
-    <Typography variant="h4" fontWeight="bold" color="#0A2540">
-      {value}
-    </Typography>
+    <HeadingCommon title={label} baseSize="18px" mb={0} />
+    <HeadingCommon title={value} baseSize="17px" mb={0} />
   </Box>
 ));
 
@@ -49,7 +45,7 @@ const GlobalStatistics = ({ statistics }: any) => (
     }}
   >
     {/* Title */}
-      <HeadingCommon variant="h5" title=" Global Statistics" color="#0A2540" mb={3} />
+    <HeadingCommon variant="h5" title=" Global Statistics" color="#0A2540" mb={3} />
 
     {/* Stat Cards */}
     <Grid container spacing={2} mt={0.5} mb={2} justifyContent="center">

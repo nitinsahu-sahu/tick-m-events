@@ -1,11 +1,13 @@
-import { refundReqConstants, ticketTransSuperConstants } from "src/redux/actions/constants";
+import { marketPlaceSupervisionConstants, refundReqConstants, ticketTransSuperConstants } from "src/redux/actions/constants";
 
 const initialState = {
   loading: false,
   refundReqs: [],
-  payments:[],
+  payments: [],
+  providerList:[],
   error: null,
   pagination: {},
+  performanceSumm:{}
 };
 
 const reqAndRefundsReducer = (state, action) => {
@@ -14,6 +16,36 @@ const reqAndRefundsReducer = (state, action) => {
   }
 
   switch (action.type) {
+       case marketPlaceSupervisionConstants.GET_PERFORMANCE_REQUEST:
+      return { ...state, loading: true };
+
+    case marketPlaceSupervisionConstants.GET_PERFORMANCE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        performanceSumm: action.payload.performanceSumm,
+        message: action.payload.message
+      };
+
+    case marketPlaceSupervisionConstants.GET_PERFORMANCE_FAILURE:
+      return { ...state, loading: false, error: action.payload };
+
+    case marketPlaceSupervisionConstants.GET_PROVIDER_REQUEST:
+      return { ...state, loading: true };
+
+    case marketPlaceSupervisionConstants.GET_PROVIDER_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        providerList: action.payload.providerList,
+        count: action.payload.count,
+        message: action.payload.message
+      };
+
+    case marketPlaceSupervisionConstants.GET_PROVIDER_FAILURE:
+      return { ...state, loading: false, error: action.payload };
+
+
     case ticketTransSuperConstants.GET_VERIFY_TRNS_REQUEST:
       return { ...state, loading: true };
 

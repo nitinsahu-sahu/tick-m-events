@@ -13,8 +13,8 @@ export default function TrustedExpertise() {
   return (
     <Box
       sx={{
-        my:3,
-        mx:8,
+        my: 3,
+        mx: { xs: 2, sm: 4, md: 8 },
         borderRadius: 4,
         bgcolor: "#2196F3",
         p: { xs: 3, md: 6 },

@@ -1,4 +1,4 @@
-import { Box, Typography, Paper, Stack } from '@mui/material';
+import {Typography, Paper, Stack } from '@mui/material';
 import { RoundedButton } from './RoundedButton';
 
 export function SearchCard() {

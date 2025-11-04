@@ -4,10 +4,11 @@ const initialState = {
   loading: false,
   refundReqs: [],
   payments: [],
-  providerList:[],
+  providerList: [],
   error: null,
   pagination: {},
-  performanceSumm:{}
+  performanceSumm: {},
+  ticketTrnsSup: {}
 };
 
 const reqAndRefundsReducer = (state, action) => {
@@ -16,7 +17,21 @@ const reqAndRefundsReducer = (state, action) => {
   }
 
   switch (action.type) {
-       case marketPlaceSupervisionConstants.GET_PERFORMANCE_REQUEST:
+     case ticketTransSuperConstants.GET_TICKET_TRNS_REQUEST:
+      return { ...state, loading: true };
+
+    case ticketTransSuperConstants.GET_TICKET_TRNS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        ticketTrnsSup: action.payload.ticketTrnsSup,
+        message: action.payload.message
+      };
+
+    case ticketTransSuperConstants.GET_TICKET_TRNS_FAILURE:
+      return { ...state, loading: false, error: action.payload };
+
+    case marketPlaceSupervisionConstants.GET_PERFORMANCE_REQUEST:
       return { ...state, loading: true };
 
     case marketPlaceSupervisionConstants.GET_PERFORMANCE_SUCCESS:

@@ -385,56 +385,68 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
             >
                 <Box
                     display="flex"
+                    flexDirection={{ xs: "column", sm: "row" }}
                     justifyContent="space-between"
-                    alignItems="center"
+                    alignItems={{ xs: "flex-start", sm: "center" }}
+                    flexWrap="wrap"
                     mb={2}
+                    gap={2}
                 >
-                    <Tabs
-                        value={tab}
-                        onChange={(e, val) => setTab(val)}
-                        textColor="inherit"
-                        TabIndicatorProps={{ style: { display: 'none' } }}
-                    >
-                        <Tab
-                            label="All Events"
+                    <Box sx={{ width: "100%", overflowX: "auto" }}>
+                        <Tabs
+                            value={tab}
+                            onChange={(e, val) => setTab(val)}
+                            textColor="inherit"
+                            variant="scrollable"
+                            scrollButtons="auto"
+                            TabIndicatorProps={{ style: { display: "none" } }}
                             sx={{
-                                textTransform: 'none',
-                                fontWeight: 'bold',
-                                borderRadius: 2,
-                                px: 3,
-                                py: 1,
-                                mr: 1,
-                                backgroundColor: tab === 0 ? '#00AEEF' : 'transparent',
-                                color: tab === 0 ? '#fff' : '#000',
+                                minHeight: "40px",
+                                "& .MuiTabs-flexContainer": {
+                                    gap: 1,
+                                },
                             }}
-                        />
-                        <Tab
-                            label="Online Events"
-                            sx={{
-                                textTransform: 'none',
-                                fontWeight: 'bold',
-                                borderRadius: 3,
-                                px: 3,
-                                py: 1,
-                                mr: 1,
-                                backgroundColor: tab === 1 ? '#00AEEF' : 'transparent',
-                                color: tab === 1 ? '#fff' : '#000',
-                            }}
-                        />
-                        <Tab
-                            label="Live Events"
-                            sx={{
-                                textTransform: 'none',
-                                fontWeight: 'bold',
-                                borderRadius: 3,
-                                px: 3,
-                                py: 1,
-                                backgroundColor: tab === 2 ? '#00AEEF' : 'transparent',
-                                color: tab === 2 ? '#fff' : '#000',
-                            }}
-                        />
-                    </Tabs>
-
+                        >
+                            <Tab
+                                label="All Events"
+                                sx={{
+                                    textTransform: 'none',
+                                    fontWeight: 'bold',
+                                    borderRadius: 2,
+                                    px: { xs: 1, sm: 2, md: 3 },
+                                    py: 1,
+                                    mr: 1,
+                                    backgroundColor: tab === 0 ? '#00AEEF' : 'transparent',
+                                    color: tab === 0 ? '#fff' : '#000',
+                                }}
+                            />
+                            <Tab
+                                label="Online Events"
+                                sx={{
+                                    textTransform: 'none',
+                                    fontWeight: 'bold',
+                                    borderRadius: 2,
+                                    px: { xs: 1, sm: 2, md: 3 },
+                                    py: 1,
+                                    mr: 1,
+                                    backgroundColor: tab === 1 ? '#00AEEF' : 'transparent',
+                                    color: tab === 1 ? '#fff' : '#000',
+                                }}
+                            />
+                            <Tab
+                                label="Live Events"
+                                sx={{
+                                    textTransform: 'none',
+                                    fontWeight: 'bold',
+                                    borderRadius: 2,
+                                    px: { xs: 1, sm: 2, md: 3 },
+                                    py: 1,
+                                    backgroundColor: tab === 2 ? '#00AEEF' : 'transparent',
+                                    color: tab === 2 ? '#fff' : '#000',
+                                }}
+                            />
+                        </Tabs>
+                    </Box>
                     <Box display="flex" alignItems="center" gap={1}>
                         <PersonIcon fontSize="small" sx={{ color: '#000' }} />
                         <Typography variant="body2" color="text.primary">
@@ -442,6 +454,7 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                         </Typography>
                     </Box>
                 </Box>
+
 
                 {/* Search Form */}
                 <Box

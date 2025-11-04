@@ -112,20 +112,23 @@ export const fetchRewardHistory = () => async (dispatch) => {
   }
 };
 
-export const redeemReward = (rewardId, code) => async (dispatch) => {
+export const redeemReward = (rewardId, code,discountValue, discountType) => async (dispatch) => {
   dispatch({ type: rewardConstants.REDEEM_REWARD_REQUEST });
-
+ 
   try {
     const response = await axios.post("/loyalty/redeemCode", {
       rewardId,
       code,
+      discountValue,
+      discountType,
     });
-
-    dispatch({
+ 
+       console.log("🎯 Redeem API Response:", response.data);
+         dispatch({
       type: rewardConstants.REDEEM_REWARD_SUCCESS,
       payload: response.data,
     });
-
+ 
     return {
       type: rewardConstants.REDEEM_REWARD_SUCCESS,
       status: response.status,
@@ -139,7 +142,7 @@ export const redeemReward = (rewardId, code) => async (dispatch) => {
         error: error?.response?.status || 500,
       },
     });
-
+ 
     return {
       type: rewardConstants.REDEEM_REWARD_FAILURE,
       status: error?.response?.status || 500,

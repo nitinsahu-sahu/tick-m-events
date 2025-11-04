@@ -37,6 +37,8 @@ function mapStatus(status: string): TicketItem['status'] {
 
 
 function formatCurrency(amount: number | undefined | null): string {
+  console.log('amount', amount);
+
   if (typeof amount !== 'number' || Number.isNaN(amount)) return '0 XAF';
   return `${amount.toLocaleString('en-CM')} XAF`;
 }
@@ -80,15 +82,16 @@ export function TicketingActivityTable() {
     { field: 'organizerName', headerName: 'Organizer', flex: 1, align: 'center', headerAlign: 'center' },
     { field: 'ticketsSold', headerName: 'Tickets Sold', flex: 1, type: 'number', align: 'center', headerAlign: 'center' },
     {
-      field: 'revenue',
-      headerName: 'Revenue',
-      flex: 1,
-      align: 'center', headerAlign: 'center',
-      valueFormatter: ({ value }) => {
-        console.log('Formatting revenue value:', value);
-        return formatCurrency(value);
-      }
-    },
+  field: 'revenue',
+  headerName: 'Revenue',
+  flex: 1,
+  align: 'center', 
+  headerAlign: 'center',
+  renderCell: (params) => {
+    console.log('Revenue cell params:', params);
+    return formatCurrency(params.value);
+  }
+},
     {
       field: 'status',
       headerName: 'Status',

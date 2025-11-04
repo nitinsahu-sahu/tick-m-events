@@ -16,6 +16,8 @@ type Reward = {
     points: number;
     reason?: string;
     redeemCode?: string | null;
+    discountValue?: string | number | null;
+    discountType?: 'percent' | 'fixed' | null;
 };
 
 type RewardHistory = {
@@ -59,20 +61,20 @@ export const HeroSection = () => {
     const loading = useSelector((state: RootState) => state.reward.loading);
 
     const scrollToEarnMorePoints = () => {
-            const earnMoreSection = document.getElementById('earn-more-points-section');
-            if (earnMoreSection) {
-                earnMoreSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            } else {
-                // Fallback: scroll to bottom if section not found
-                window.scrollTo({
-                    top: document.body.scrollHeight,
-                    behavior: 'smooth'
-                });
-            }
-        };
+        const earnMoreSection = document.getElementById('earn-more-points-section');
+        if (earnMoreSection) {
+            earnMoreSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        } else {
+            // Fallback: scroll to bottom if section not found
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    };
 
     useEffect(() => {
         dispatch(fetchAvailableRewards() as any);
@@ -86,25 +88,64 @@ export const HeroSection = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
 
-    const handleRedeemClick = async (reward: Reward) => {
+    const handleRedeemClick = (reward: Reward) => {
         setSelectedReward(reward);
         setShowCode(false);
 
+        // Generate code for display
         const code = reward.redeemCode || `REWARD-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
         setGeneratedCode(code);
 
-        // Only call API if no code exists
-        if (!reward.redeemCode) {
-            const result = await dispatch(redeemReward(reward._id, code) as any);
-
-            if (result.status !== 200) {
-                alert(`Failed to redeem reward: ${result.message}`);
-                return;
-            }
-        }
-
-        setOpen(true);
+        setOpen(true); // just open dialog
     };
+
+    // Confirm Redeem button
+  const handleConfirmRedeem = async () => {
+    if (!selectedReward) return;
+
+    console.log("Selected Reward:", selectedReward);
+
+    const code = generatedCode;
+
+    // Extract discount from name
+    let discountValue: number = 0;
+    let discountType: 'percent' | 'fixed' = 'fixed';
+
+    const match = selectedReward.name.match(/(\d+)%/); // regex looks for number followed by %
+    if (match) {
+        discountValue = parseInt(match[1], 10); // e.g., 5
+        discountType = 'percent';
+    } else {
+        // fallback if no percentage in name, could parse description for fixed value
+        const fixedMatch = selectedReward.description.match(/(\d+)\s*XAF/);
+        if (fixedMatch) {
+            discountValue = parseInt(fixedMatch[1], 10);
+            discountType = 'fixed';
+        }
+    }
+      console.log("type",discountType);
+       console.log("value",discountValue);
+    const result = await dispatch(
+        redeemReward(selectedReward._id, code, discountValue, discountType) as any
+    );
+
+    if (!result || result.status !== 200) {
+        alert(`Failed to redeem reward: ${result?.message || 'Unknown error'}`);
+        return;
+    }
+
+    // Save locally for checkout
+    localStorage.setItem("redeemCode", code);
+    localStorage.setItem("discountValue", String(discountValue));
+    localStorage.setItem("discountType", discountType);
+
+    // Refresh list & close
+    await dispatch(fetchAvailableRewards() as any);
+    await dispatch(fetchRewardHistory() as any);
+
+    handleClose();
+    setSnackbarOpen(true);
+};
 
 
     const handleClose = () => {
@@ -229,7 +270,7 @@ export const HeroSection = () => {
                     }}
                 >
                     <DialogTitle sx={{ fontWeight: 700, fontSize: '1.5rem', color: 'white' }}>
-                        🎁 Redeem Your Reward
+                        🎁 Redeem Your Rewards
                     </DialogTitle>
 
                     <DialogContent dividers sx={{ borderColor: 'rgba(255,255,255,0.2)' }}>
@@ -293,9 +334,7 @@ export const HeroSection = () => {
                             Cancel
                         </CustomButton>
                         <CustomButton
-                            onClick={() => {
-                                handleClose();
-                            }}
+                            onClick={handleConfirmRedeem}
                             customcolor={{
                                 bg: "#00cec9",
                                 hover: "#00b7b1",
@@ -304,6 +343,8 @@ export const HeroSection = () => {
                         >
                             Confirm Redeem
                         </CustomButton>
+
+
                     </DialogActions>
                 </Box>
             </Dialog>

@@ -1,6 +1,7 @@
 import { Box, Typography, Grid, Button } from '@mui/material';
 import { memo } from 'react';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { formatRevenue } from 'src/hooks/format-revenu';
 
 interface StatBoxProps {
   label: string;
@@ -52,7 +53,7 @@ const GlobalStatistics = ({ statistics }: any) => (
       {[
         { label: 'Users', value: statistics?.totalUsers },
         { label: 'Events', value: statistics?.totalEvents },
-        { label: 'Revenue', value: statistics?.totalRevenue },
+        { label: 'Revenue', value: formatRevenue(statistics?.totalRevenue) },
       ].map((stat, i) => (
         <Grid item xs={12} sm={6} md={4} key={i}>
           <StatBox label={stat.label} value={stat.value} />

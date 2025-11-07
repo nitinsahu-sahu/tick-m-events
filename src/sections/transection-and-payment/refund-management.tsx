@@ -20,10 +20,6 @@ interface Order {
     refundRequests?: RefundRequest[];
 }
 
-interface SelectedEvent {
-    orders: Order[];
-}
-
 const formatDateWithDay = (dateString: string) => {
     const date = new Date(dateString);
     const options: Intl.DateTimeFormatOptions = {

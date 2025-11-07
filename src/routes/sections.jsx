@@ -77,6 +77,8 @@ export const EventListPage = lazy(() => import('src/pages/event-list'));
 export const PromotionLogosPage = lazy(() => import('src/pages/customization/promotion-logo/index'));
 export const RefundReqPage = lazy(() => import('src/pages/refund-requests'));
 export const ProfilePage = lazy(() => import('src/pages/profile'));
+export const ContactPayPage = lazy(() => import('src/pages/contact-pay-status'));
+
 // ----------------------------------------------------------------------
 
 const renderFallback = (
@@ -304,6 +306,13 @@ export function Router() {
         { path: 'password-recovery', element: <PasswordRecoveryPage /> },
       ],
     },
+    {
+      path: 'payment-success',
+      element: (
+        <ContactPayPage />
+      ),
+    },
+
     {
       path: 'event-list',
       element: (

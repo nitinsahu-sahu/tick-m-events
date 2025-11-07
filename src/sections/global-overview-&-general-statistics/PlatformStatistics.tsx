@@ -3,6 +3,7 @@ import { Box, Grid, Typography, Button, Menu, MenuItem, CircularProgress } from 
 import { Download, PictureAsPdf, InsertDriveFile, Visibility } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { formatRevenue } from 'src/hooks/format-revenu';
 
 interface StatBoxProps {
   label: string;
@@ -35,21 +36,19 @@ interface PlatformStatisticsProps {
   statistics: {
     totalUsers?: string;
     totalEvents?: string;
-    totalRevenue?: string;
+    totalRevenue?: any;
     activeProviders?: string;
     processedTransactions?:any
   };
 }
 
 const PlatformStatistics = memo(({ statistics }: PlatformStatisticsProps) => {
+  console.log(statistics);
+  
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const open = Boolean(anchorEl);
-
-  const handleExportClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
 
   const handleExportClose = () => {
     setAnchorEl(null);
@@ -98,7 +97,7 @@ const PlatformStatistics = memo(({ statistics }: PlatformStatisticsProps) => {
         {[
           { label: 'Total Users', value: statistics?.totalUsers || '0' },
           { label: 'Total Events', value: statistics?.totalEvents || '0' },
-          { label: 'Total Revenue', value: statistics?.totalRevenue || '0 XAF' },
+          { label: 'Total Revenue', value: formatRevenue(statistics?.totalRevenue) || '0 XAF' },
         ].map((stat, i) => (
           <Grid item xs={12} sm={6} md={4} key={i}>
             <StatBox label={stat.label} value={stat.value} />

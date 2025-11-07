@@ -1,10 +1,10 @@
 import axios from "../../helper/axios";
 import { contactPayConstants } from "../constants";
 
-export const iniConPay = (userId = '684bbdbb72b4e65f72d2527d', amount = 1000) => async (dispatch) => {
+export const iniConPay = (userId, amount, flag) => async (dispatch) => {
     dispatch({ type: contactPayConstants.INITIATE_CON_PAYMET_REQUEST });
     try {
-        const response = await axios.post("/contact-pay/initiate-payment", {userId, amount});
+        const response = await axios.post("/contact-pay/initiate-payment", { userId, amount, flag });
 
         dispatch({
             type: contactPayConstants.INITIATE_CON_PAYMET_SUCCESS,
@@ -36,7 +36,7 @@ export const checkPayConStat = (transactionId) => async (dispatch) => {
 
     try {
         const response = await axios.get(`/contact-pay/payment-status/${transactionId}`);
-                    console.log(response);
+        console.log(response);
 
         dispatch({
             type: contactPayConstants.CEHCKSTATUS_CON_PAYMET_SUCCESS,

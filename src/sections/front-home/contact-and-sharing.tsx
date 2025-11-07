@@ -87,10 +87,12 @@ export function ContactAndSharing({ organizer }: ContactAndSharingProps) {
     const handleContactClick = async () => {
         setLoading(true);
         setError('');
-
+        const flag = "contact"
+        const userId = '684bbdbb72b4e65f72d2527d'
+        const amount = 1000
         try {
             // Dispatch the action and await the result
-            const result = await dispatch(iniConPay()) as unknown as PaymentResponse;
+            const result = await dispatch(iniConPay(userId, amount, flag)) as unknown as PaymentResponse;
 
             // Type-safe check for success and paymentUrl
             if (result.data.success && result.data.paymentUrl) {
@@ -98,6 +100,7 @@ export function ContactAndSharing({ organizer }: ContactAndSharingProps) {
                 localStorage.setItem('currentTransactionId', result.data.transactionId);
                 // Redirect to Fapshi payment page
                 window.location.href = result.data.paymentUrl;
+
             } else {
                 setError(result.message || 'Failed to create payment link');
             }

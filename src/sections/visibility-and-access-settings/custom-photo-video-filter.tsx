@@ -103,8 +103,9 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
 
     const results = await Promise.all(
       fileArray.map(async (file) => {
+        // Only check for PNG type, ignore size limits
         if (file.type !== "image/png") {
-          toast.warning(`${file.name} is not a PNG file and not transparent.`);
+          toast.warning(`${file.name} is not a PNG file.`);
           return null;
         }
 
@@ -114,7 +115,7 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
           return null;
         }
 
-        return file; // valid PNG with transparency
+        return file;
       })
     );
 
@@ -122,7 +123,6 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
 
     if (validTransparentPngs.length === 0) return;
 
-    // Update state
     setFilesToUpload((prev) => [...prev, ...validTransparentPngs]);
 
     const newPreviewUrls = validTransparentPngs.map((file) =>
@@ -130,80 +130,100 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
     );
     setFilterImages((prev) => [...prev, ...newPreviewUrls]);
 
-    // Optional reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-
   const eventCoverImage = __events?.customization?.eventLogo?.url || '/assets/images/cover/1.png';
 
- const handleApplyFilter = async () => {
-  if (!__events?._id) {
-    toast.warning("Please select an event before applying.");
-    return;
-  }
-
-  if (filesToUpload.length === 0) {
-    toast.warning("Please select filter images to apply.");
-    return;
-  }
-
-  setIsUploading(true);
-
-  try {
-    const uploadedUrls: string[] = [];
-
-    await Promise.all(filesToUpload.map(async (file) => {
-      const formData = new FormData();
-      formData.append("eventId", __events?._id);
-      formData.append("frame", file);
-
-      try {
-        const response = await axios.post("/custom-frame/save-frame", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-
-        if (response.status === 200 || response.status === 201) {
-          toast.success("Frame saved successfully!");
-          const frameData = response.data?.data;
-          const latestUrl = frameData?.frameUrls?.slice(-1)[0];
-          if (latestUrl) uploadedUrls.push(latestUrl);
-        } else {
-          toast.error("Failed to upload frame.");
-        }
-
-      } catch (err: any) {
-        const backendMessage = err?.response?.data?.message || "Upload failed.";
-        toast.error(backendMessage);
-      }
-    }));
-
-    // 🆕 IMPORTANT: Replace temporary blob URLs with server URLs
-    if (uploadedUrls.length > 0) {
-      // Remove temporary previews and add server URLs
-      const tempUrls = filterImages.filter(url => url.startsWith('blob:'));
-      const permanentUrls = filterImages.filter(url => !url.startsWith('blob:'));
-      
-      // Clean up blob URLs
-      tempUrls.forEach(url => URL.revokeObjectURL(url));
-      
-      // Set new filter images with server URLs
-      setFilterImages([...permanentUrls, ...uploadedUrls]);
+  const handleApplyFilter = async () => {
+    if (!__events?._id) {
+      toast.warning("Please select an event before applying.");
+      return;
     }
 
-    // Clear uploaded files
-    setFilesToUpload([]);
+    if (filesToUpload.length === 0) {
+      toast.warning("Please select filter images to apply.");
+      return;
+    }
 
-  } catch (error) {
-    toast.error("Upload failed. Try again.");
-    console.error(error);
-  } finally {
-    setIsUploading(false);
-  }
-};
+    setIsUploading(true);
 
+    try {
+      const uploadedUrls: string[] = [];
+
+      const uploadResults = await Promise.all(
+        filesToUpload.map(async (file) => {
+          const formData = new FormData();
+          formData.append("eventId", __events?._id);
+          formData.append("frame", file);
+
+          try {
+            const response = await axios.post("/custom-frame/save-frame", formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+              timeout: 30000,
+            });
+
+            if (response.status === 200 || response.status === 201) {
+              const frameData = response.data?.data;
+              const latestUrl = frameData?.frameUrls?.slice(-1)[0];
+              return { success: true, url: latestUrl, fileName: file.name };
+            }
+
+            console.error("Upload failed with status:", response.status);
+            toast.error(`Failed to upload ${file.name}`);
+            return { success: false, url: null, fileName: file.name, error: `Status: ${response.status}` };
+
+          } catch (err: any) {
+            console.error("Upload error for file:", file.name, err);
+
+            let errorMessage = "Upload failed";
+            if (err.code === 'ECONNABORTED') {
+              errorMessage = "Upload timeout - check your connection";
+            } else if (err.response?.status === 413) {
+              errorMessage = "File too large";
+            } else if (err.response?.status === 400) {
+              errorMessage = "Invalid file format";
+            } else {
+              errorMessage = err?.response?.data?.message || "Upload failed";
+            }
+
+            toast.error(`${file.name}: ${errorMessage}`);
+            return { success: false, url: null, fileName: file.name, error: errorMessage };
+          }
+        })
+      );
+
+      // Process successful uploads
+      const successfulUploads = uploadResults.filter(result => result.success && result.url);
+      successfulUploads.forEach(result => {
+        if (result.url) uploadedUrls.push(result.url);
+      });
+
+      if (uploadedUrls.length > 0) {
+        const tempUrls = filterImages.filter(url => url.startsWith('blob:'));
+        const permanentUrls = filterImages.filter(url => !url.startsWith('blob:'));
+
+        tempUrls.forEach(url => URL.revokeObjectURL(url));
+        setFilterImages([...permanentUrls, ...uploadedUrls]);
+
+        toast.success(`Successfully uploaded ${uploadedUrls.length} file(s)`);
+      } else {
+        toast.warning("No files were successfully uploaded.");
+      }
+
+      setFilesToUpload([]);
+
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("Upload failed. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
   const applySelectedFilter = async () => {
     if (!__events?._id) {
       toast.warning("Please select an event before applying.");
@@ -231,49 +251,49 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
     }
   };
 
-  
- // 🆕 Always call delete API for all images
-const handleDeleteFilter = async (filename: string, index: number) => {
-  if (!__events?._id) {
-    toast.warning("No event selected.");
-    return;
-  }
 
-  try {
-    const res = await axios.delete("/custom-frame/delete-frame", {
-      params: {
-        eventId: __events?._id,
-        frameUrl: filename,
-      },
-    });
-    
-    if (res.status === 200) {
-      toast.success("Filter deleted successfully!");
-      // Remove from local state
-      setFilterImages((prev) => prev.filter((_, i) => i !== index));
-      setFilesToUpload((prev) => prev.filter((_, i) => i !== index));
-      
-      // Clean up blob URLs to free memory
-      if (filename.startsWith('blob:')) {
-        URL.revokeObjectURL(filename);
-      }
-    } else {
-      toast.error("Failed to delete filter.");
+  // 🆕 Always call delete API for all images
+  const handleDeleteFilter = async (filename: string, index: number) => {
+    if (!__events?._id) {
+      toast.warning("No event selected.");
+      return;
     }
-  } catch (error) {
-    toast.error("Error deleting filter.");
-    console.error(error);
-  }
 
-  // Clear selection if deleted filter was selected
-  if (selectedFilter === filename) {
-    setSelectedFilter(null);
-  }
+    try {
+      const res = await axios.delete("/custom-frame/delete-frame", {
+        params: {
+          eventId: __events?._id,
+          frameUrl: filename,
+        },
+      });
 
-  if (fileInputRef.current) {
-    fileInputRef.current.value = "";
-  }
-};
+      if (res.status === 200) {
+        toast.success("Filter deleted successfully!");
+        // Remove from local state
+        setFilterImages((prev) => prev.filter((_, i) => i !== index));
+        setFilesToUpload((prev) => prev.filter((_, i) => i !== index));
+
+        // Clean up blob URLs to free memory
+        if (filename.startsWith('blob:')) {
+          URL.revokeObjectURL(filename);
+        }
+      } else {
+        toast.error("Failed to delete filter.");
+      }
+    } catch (error) {
+      toast.error("Error deleting filter.");
+      console.error(error);
+    }
+
+    // Clear selection if deleted filter was selected
+    if (selectedFilter === filename) {
+      setSelectedFilter(null);
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   return (
     <Box boxShadow={3} borderRadius={3} p={{ xs: 2, sm: 3, md: 4 }} bgcolor="white" mt={3}>
@@ -379,19 +399,20 @@ const handleDeleteFilter = async (filename: string, index: number) => {
             <Input
               inputRef={fileInputRef}
               type="file"
-              inputProps={{ multiple: true }}
+              inputProps={{ multiple: true, accept: "image/png", }}
               onChange={handleFileUpload}
               disableUnderline
               sx={{ border: "1px solid black", padding: "8px", borderRadius: 2 }}
             />
             <Button
               variant="contained"
-              disabled={filesToUpload.length === 0 || isUploading} // 🆕 Disable when no files or uploading
+              disabled={filesToUpload.length === 0 || isUploading}
               sx={{
-                backgroundColor: filesToUpload.length === 0 || isUploading ? "#ccc" : "#0B2E4C", // 🆕 Change color when disabled
+                backgroundColor: filesToUpload.length === 0 || isUploading ? "#ccc" : "#0B2E4C",
                 color: "#fff",
-                padding: "11px",
-                width: "70%",
+                padding: { xs: "8px", sm: "11px" }, // 🆕 Responsive padding
+                width: { xs: "100%", sm: "70%" },   // 🆕 Full width on mobile
+                fontSize: { xs: "14px", sm: "16px" },
                 '&:disabled': {
                   backgroundColor: '#ccc',
                   color: '#666',
@@ -399,7 +420,7 @@ const handleDeleteFilter = async (filename: string, index: number) => {
               }}
               onClick={handleApplyFilter}
             >
-              {isUploading ? 'Uploading...' : 'Apply Upload Filter'} {/* 🆕 Show loading text */}
+              {isUploading ? 'Uploading...' : `Apply ${filesToUpload.length} File(s)`}
             </Button>
           </Box>
         </Box>

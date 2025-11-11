@@ -25,8 +25,7 @@ import { AppDispatch } from "src/redux/store";
 
 export function PaymentSuccess() {
     const [status, setStatus] = useState<'checking' | 'successful' | 'pending' | 'failed' | 'expired' | 'invalid'>('checking');
-    console.log('status>',status);
-    
+    const [payData,setPayData]=useState<any>()
     const location = useLocation();
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
@@ -40,9 +39,8 @@ export function PaymentSuccess() {
             if (transactionId) {
                 try {
                     const result = await dispatch(checkPayConStat(transactionId));
-                    console.log(result);
-                    
                     setStatus(result.data.status as any);
+                    setPayData(result.data);
                     localStorage.removeItem('currentTransactionId');
                 } catch (error) {
                     setStatus('error' as any);
@@ -167,7 +165,7 @@ export function PaymentSuccess() {
                     <StatusCard
                         icon={<CheckCircle sx={{ fontSize: 80 }} />}
                         title="Payment Successful!"
-                        message="Thank you for your payment of 1000 XAF. Our team will contact you shortly to discuss your requirements."
+                        message={`Thank you for your payment of ${payData.amount||0} ${payData.currency||'XAF'}. Our team will contact you shortly to discuss your requirements.`}
                         severity="success"
                         actions={
                             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>

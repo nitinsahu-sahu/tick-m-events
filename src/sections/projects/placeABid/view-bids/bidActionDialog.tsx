@@ -175,6 +175,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
             const adminFee = bidAmount * 0.1;
             const fapshiPayload = {
                 placeABidId: project._id,
+                bidAmount: bidData?.bidAmount || 0,
                 bidId: selectedBid._id,
                 eventId: project.eventId._id,
                 amount: Math.round(adminFee), // Round to whole number
@@ -216,7 +217,7 @@ export function BidActionDialog({ open, selectedBid, onClose, onAction, project 
         const { name, value } = e.target;
         setBidData(prev => ({ ...prev, [name]: value }));
     };
-    
+
     const handleConfirmAction = useCallback(async () => {
         const newErrors = { acceptedAmount: "", rejectionReason: "", message: "" };
 

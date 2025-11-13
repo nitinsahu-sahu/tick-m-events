@@ -79,21 +79,25 @@ export function TicketManagementView() {
     setVisibleHistoryCount(prev => prev + 4);
   };
   useEffect(() => {
-    async function fetchTickets() {
+  async function fetchTickets() {
       try {
         const response = await axios.get(`/event-order/user/${_id}`);
         const allTickets: Ticket[] = response.data;
-        // Filter out refunded tickets
-        const nonRefundedTickets = allTickets.filter(ticket => {
-          // If there's no refund request, keep the ticket
-          if (!ticket.refundRequest) return true;
 
-          // If there's a refund request, only keep if status is not 'refunded'
+        // ✅ Only include tickets with confirmed payments
+        const confirmedTickets = allTickets.filter(
+          (ticket: any) => ticket.paymentStatus === 'confirmed'
+        );
+
+        // Filter out refunded tickets
+        const nonRefundedTickets = confirmedTickets.filter(ticket => {
+          if (!ticket.refundRequest) return true;
           return ticket.refundRequest.refundStatus !== 'refunded';
         });
 
         setTickets(nonRefundedTickets);
-        const upcomingTicket = allTickets
+
+        const upcomingTicket = confirmedTickets
           .filter(ticket => {
             const dateStr = ticket.eventDetails?.date;
             const eventDate = dateStr ? new Date(dateStr) : null;

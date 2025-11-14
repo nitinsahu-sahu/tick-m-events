@@ -67,48 +67,60 @@ export function HomeAndRecommendationsView() {
     }
   };
 
-  useEffect(() => {
-    async function fetchTickets() {
-      try {
-        const response = await axios.get(`/event-order/user/${_id}`);
+ useEffect(() => {
+  async function fetchTickets() {
+    try {
+      const response = await axios.get(`/event-order/user/${_id}`);
+      const allTickets: Ticket[] = response.data;
 
-        const allTickets: Ticket[] = response.data;
-        // Filter out refunded tickets
-        const nonRefundedTickets = allTickets.filter(ticket => {
-          // If there's no refund request, keep the ticket
-          if (!ticket.refundRequest) return true;
+      console.log("res", response.data); // Your log shows the data is coming correctly
 
-          // If there's a refund request, only keep if status is not 'refunded'
-          return ticket.refundRequest.refundStatus !== 'refunded';
-        });
+      // Filter out refunded tickets AND only confirmed payments
+      const confirmedNonRefundedTickets = allTickets.filter(ticket => {
+        // Check payment status first - ONLY include confirmed payments
+        if (ticket.paymentStatus !== "confirmed") return false;
+        
+        // Then check refund status
+        if (!ticket.refundRequest) return true;
+        return ticket.refundRequest.refundStatus !== 'refunded';
+      });
 
-        setTickets(nonRefundedTickets);
+      console.log("Confirmed non-refunded tickets:", confirmedNonRefundedTickets);
+      setTickets(confirmedNonRefundedTickets);
 
-        const upcomingTicket = allTickets
-          .filter(ticket => {
-            const dateStr = ticket.eventDetails?.date;
-            const eventDate = dateStr ? new Date(dateStr) : null;
-            return eventDate !== null &&
-              !Number.isNaN(eventDate.getTime()) &&
-              eventDate > new Date() &&
-              ticket.qrCode;
-          })
-          .sort((a, b) => {
-            const dateA = new Date(a.eventDetails?.date || '');
-            const dateB = new Date(b.eventDetails?.date || '');
-            return dateA.getTime() - dateB.getTime();
-          })[0];
-        setUpcomingQrTicket(upcomingTicket || null);
+      // Filter for upcoming confirmed tickets (for QR ticket and time left notification)
+      const upcomingConfirmedTickets = confirmedNonRefundedTickets.filter(ticket => {
+        const dateStr = ticket.eventDetails?.date;
+        const eventDate = dateStr ? new Date(dateStr) : null;
+        return eventDate !== null &&
+          !Number.isNaN(eventDate.getTime()) &&
+          eventDate > new Date();
+      });
 
-      } catch (error) {
-        console.error("Error fetching tickets:", error);
-      }
+      console.log("Upcoming confirmed tickets:", upcomingConfirmedTickets);
+      setUpcomingTickets(upcomingConfirmedTickets);
+
+      // Find the next upcoming QR ticket from confirmed tickets
+      const upcomingTicket = upcomingConfirmedTickets
+        .filter(ticket => ticket.qrCode) // Only tickets with QR code
+        .sort((a, b) => {
+          const dateA = new Date(a.eventDetails?.date || '');
+          const dateB = new Date(b.eventDetails?.date || '');
+          return dateA.getTime() - dateB.getTime();
+        })[0];
+      
+      console.log("Next upcoming QR ticket:", upcomingTicket);
+      setUpcomingQrTicket(upcomingTicket || null);
+
+    } catch (error) {
+      console.error("Error fetching tickets:", error);
     }
+  }
 
-    if (_id) {
-      fetchTickets();
-    }
-  }, [_id]);
+  if (_id) {
+    fetchTickets();
+  }
+}, [_id]);
 
   useEffect(() => {
     async function fetchLatestEventActivity() {
@@ -200,14 +212,30 @@ export function HomeAndRecommendationsView() {
     }
   };
 
+    // Only show time left notification if there are confirmed upcoming tickets
+  const timeLeftNotification = upcomingTickets.length > 0 && upcomingQrTicket
+    ? [{ text: getTimeLeft(upcomingTickets), eventId: upcomingQrTicket.eventId }]
+    : [];
+
   const visibleNotifications = [
     ...unreadNotifications,
-    { text: getTimeLeft(upcomingTickets), eventId: upcomingQrTicket?.eventId },
+    ...timeLeftNotification,
     { text: latestEventText, eventId: latestEventActivity?.metadata?.params?.eventId },
     // { text: 'A festival is happening 2km from you!', disabled: false },
     // { text: 'Reminder: DJ Party this weekend!' },
     // { text: 'Exclusive Pass offer expires soon!' },
   ].filter((item, index) => !hiddenNotifIds.includes(item._id || String(index)));
+
+  // const visibleNotifications = [
+  //   ...unreadNotifications,
+  //   { text: getTimeLeft(upcomingTickets), eventId: upcomingQrTicket?.eventId },
+  //   { text: latestEventText, eventId: latestEventActivity?.metadata?.params?.eventId },
+  //   // { text: 'A festival is happening 2km from you!', disabled: false },
+  //   // { text: 'Reminder: DJ Party this weekend!' },
+  //   // { text: 'Exclusive Pass offer expires soon!' },
+  // ].filter((item, index) => !hiddenNotifIds.includes(item._id || String(index)));
+
+  
 
   return (
     <DashboardContent>

@@ -42,6 +42,7 @@ interface Ticket {
   eventDate?: string;
   refundRequest?: any;
   participantDetails?: ParticipantDetail[];
+  paymentStatus?: string;
 }
 
 export function HomeAndRecommendationsView() {
@@ -230,19 +231,23 @@ export function HomeAndRecommendationsView() {
               }
             }}
           >
-            {tickets?.slice()?.reverse()?.map((ticket, index) => (
-              <Grid item key={index} sx={{ minWidth: 400 }}>
-                <UpComingCard
-                  ticket={ticket}
-                  onShareClick={() => {
-                    setSelectedTicketForTransfer(ticket);
-                    setBeneficiaryId('');
-                    setBeneficiaryNames(ticket.participantDetails?.map((p: any) => p.name || "") || []);
-                  }}
-                />
+            {tickets
+              ?.filter(ticket => ticket.paymentStatus === "confirmed")  // ⬅️ Filter here
+              ?.slice()
+              ?.reverse()
+              ?.map((ticket, index) => (
+                <Grid item key={index} sx={{ minWidth: 400 }}>
+                  <UpComingCard
+                    ticket={ticket}
+                    onShareClick={() => {
+                      setSelectedTicketForTransfer(ticket);
+                      setBeneficiaryId('');
+                      setBeneficiaryNames(ticket.participantDetails?.map((p: any) => p.name || "") || []);
+                    }}
+                  />
 
-              </Grid>
-            ))}
+                </Grid>
+              ))}
           </Grid>
         ) : (
           <Box

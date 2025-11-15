@@ -11,7 +11,6 @@ export function BestSelling(
         chartOptions, selectedEvent
     }: any) {
     const [selectedTicket, setSelectedTicket] = useState<any>({});
-
     const totalTickets = Number(selectedEvent?.ticketQuantity) || 0;
     const soldTickets = Number(selectedEvent?.soldTicket) || 0;
     const ticketsLeft = totalTickets - soldTickets;

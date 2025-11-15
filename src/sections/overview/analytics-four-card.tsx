@@ -232,7 +232,7 @@ export function AnalyticsFourCards({
                                 sx={{ fill: theme.palette.success.main }}
                             />
                             <HeadingCommon
-                                title={`Total scanned tickets: ${selectedEvent?.statistics?.tickets?.verifiedEntries}`}
+                                title={`Total scanned tickets: ${selectedEvent?.statistics?.tickets?.verifiedEntries||0}`}
                                 weight={300}
                                 baseSize="12px"
                             />

@@ -23,6 +23,7 @@ export function AnalyticsFourCards({
     selectedEvent,
 }: any) {
     const theme = useTheme();
+    console.log(selectedEvent?.statistics);
 
     const totalTickets = parseInt(selectedEvent?.ticketQuantity ?? "0", 10);
     // Calculate attendee engagement percentage
@@ -232,7 +233,7 @@ export function AnalyticsFourCards({
                                 sx={{ fill: theme.palette.success.main }}
                             />
                             <HeadingCommon
-                                title={`Total scanned tickets: ${selectedEvent?.statistics?.tickets?.verifiedEntries||0}`}
+                                title={`Total scanned tickets: ${scannedTickets}`}
                                 weight={300}
                                 baseSize="12px"
                             />
@@ -268,7 +269,7 @@ export function AnalyticsFourCards({
                             </Box>
                         </Box>
                         <HeadingCommon
-                            title={`Tickets sold: ${selectedEvent?.statistics?.tickets?.soldTickets} vs. Tickets scanned: ${selectedEvent?.statistics?.tickets?.verifiedEntries}`}
+                            title={`Tickets sold: ${soldTickets} vs. Tickets scanned: ${scannedTickets}`}
                             weight={600}
                             baseSize="13px"
                         />

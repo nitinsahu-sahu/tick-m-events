@@ -15,7 +15,7 @@ export function CommonBarHead({ totalCount, leftHead, head }: any) {
     return (
         <Box display="flex" justifyContent="space-between" mb={1} alignItems="center">
             <Typography variant="h6" sx={{ flex: 1, textAlign: "left" }}>
-                {totalCount || leftHead}
+                {totalCount !== undefined && totalCount !== null ? totalCount : leftHead}
             </Typography>
             <Typography sx={{ flex: 1, textAlign: "left", fontSize: "13px", color: "#2395D4", fontWeight: 500 }}>
                 {head}
@@ -26,9 +26,7 @@ export function CommonBarHead({ totalCount, leftHead, head }: any) {
 
 export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisticsProps) {
     const dispatch = useDispatch<AppDispatch>();
-    const { overview, graph, peakSalesInfo } = useSelector((state: RootState) => state?.organizer);
-    console.log('graph', graph);
-
+    const { overview, graph } = useSelector((state: RootState) => state?.organizer);
     useEffect(() => {
         dispatch(fatchDashBoardStatisitcs(selectedEvent?._id));
     }, [dispatch, selectedEvent?._id]);
@@ -59,14 +57,6 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
     };
 
     // Get date labels for x-axis if needed
-    const getDateLabels = (data: any[]) => {
-        if (!Array.isArray(data)) return [];
-        return data.map(item => {
-            const date = new Date(item.date);
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        });
-    };
-
     const isRefundApproved = (orderId: string): boolean =>
         Array.isArray(selectedEvent?.refundRequests) &&
         selectedEvent.refundRequests.some(
@@ -206,13 +196,13 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
             <Grid container spacing={2} mt={1}>
                 {[
                     {
-                        totalCount: overview?.totalTicketsSold || 0,
+                        totalCount: overview?.totalTicketsSold,
                         head: "Total Tickets Sold",
                         chartOptions: lineChartOptions,
                         chartSeries: [{ data: totalTicketsSoldData }],
                     },
                     {
-                        totalCount: `$${overview?.totalRevenue?.toLocaleString() || 0}`,
+                        totalCount: `${overview?.totalRevenue?.toLocaleString() || 0} XAF`,
                         head: "Revenue Generated",
                         chartOptions: RevenueGenerateChartOptions,
                         chartSeries: [{ data: revenueGeneratedData }],

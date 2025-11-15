@@ -15,7 +15,7 @@ import { fetchLatestSales, recommTrandingPopularEventFetch } from 'src/redux/act
 
 import { CountDownView } from '../count-down';
 import {
-  donutBestSellingChartSeries, donutBestSellingChartOptions, chartrevenuSeries,
+  donutBestSellingChartSeries, donutBestSellingChartOptions,
   chartOptions, donutChartOptions, getChartOptions, TicketTypes,
   TimePeriod, ChartData, ticketSalesData
 } from "../utils";

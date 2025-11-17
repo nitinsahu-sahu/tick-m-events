@@ -27,7 +27,6 @@ export const ticketTrnasFetch = () => async (dispatch) => {
 
     try {
         const response = await axios.get(`/admin/ticket-trnsa`);
-        console.log(response);
         
         dispatch({
             type: ticketTransSuperConstants.GET_TICKET_TRNS_SUCCESS,

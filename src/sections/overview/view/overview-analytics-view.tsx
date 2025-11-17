@@ -16,8 +16,8 @@ import { fetchLatestSales, recommTrandingPopularEventFetch } from 'src/redux/act
 import { CountDownView } from '../count-down';
 import {
   donutBestSellingChartSeries, donutBestSellingChartOptions,
-  chartOptions, donutChartOptions, getChartOptions, TicketTypes,
-  TimePeriod, ChartData, ticketSalesData
+  chartOptions, donutChartOptions, TicketTypes,
+  TimePeriod
 } from "../utils";
 import { AnalyticsFourCards } from '../analytics-four-card';
 import { BestSelling } from '../best-selling';
@@ -49,10 +49,6 @@ export function OverviewAnalyticsView() {
   const dispatch = useDispatch<AppDispatch>();
   const [ticketType, setTicketType] = useState<TicketTypes>('VIP');
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('monthly');
-  const [chartData, setChartData] = useState<ChartData>({
-    series: [{ name: 'Sales', data: [] }],
-    options: getChartOptions([])
-  });
   const currentDate = new Date()
   const [selectedTicket, setSelectedTicket] = useState("VIP");
   const theme = useTheme();
@@ -71,38 +67,6 @@ export function OverviewAnalyticsView() {
     dispatch(fetchLatestSales());
     dispatch(fatchOrgEvents());
   }, [dispatch]);
-
-
-
-  // Generate appropriate x-axis categories based on time period
-  const getCategories = (period: TimePeriod): string[] => {
-    switch (period) {
-      case 'daily':
-        return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      case 'weekly':
-        return ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7'];
-      case 'monthly':
-        return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
-      default:
-        return [];
-    }
-  };
-
-  // Update chart when filters change
-  useEffect(() => {
-    const data = ticketSalesData[ticketType][timePeriod];
-    const categories = getCategories(timePeriod);
-
-    setChartData({
-      series: [{ name: 'Sales', data }],
-      options: getChartOptions(categories)
-    });
-  }, [ticketType, timePeriod]);
-
-  // Event handlers with proper typing
-  const handleTicketTypeChange = (event: SelectChangeEvent<TicketTypes>) => {
-    setTicketType(event.target.value as TicketTypes);
-  };
 
   const handleTimePeriodChange = (event: SelectChangeEvent<TimePeriod>) => {
     setTimePeriod(event.target.value as TimePeriod);

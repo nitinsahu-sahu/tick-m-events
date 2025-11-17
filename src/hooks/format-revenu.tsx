@@ -1,6 +1,4 @@
 export function formatRevenue(amount: number | undefined | null): string {
-  console.log(amount);
-  
   if (typeof amount !== 'number' || Number.isNaN(amount)) return '0 XAF';
   
   const absAmount = Math.abs(amount);

@@ -244,8 +244,6 @@ const ChartCard: React.FC<ChartCardProps> = ({ title, options, series, type }) =
 
 
 export function MainChartComponents({ selectedEvent }: MainChartComponentsProps) {
-  console.log(selectedEvent);
-  // ----------------- Gender Breakdown -----------------
   let maleCount = 0;
   let femaleCount = 0;
   selectedEvent.order.forEach((order: any) => {
@@ -316,14 +314,15 @@ export function MainChartComponents({ selectedEvent }: MainChartComponentsProps)
 
   // ----------------- Geographical Distribution (Dynamic) -----------------
 
-  const geoDisplayOrder = ["USA", "UK", "Germany", "France", "India"];
+  const geoDisplayOrder = ["USA", "UK", "Germany", "France", "India","Cameroon"];
 
   const countryAliasMap: Record<string, string> = {
     "united states": "USA",
     "united kingdom": "UK",
     "india": "India",
     "germany": "Germany",
-    "france": "France"
+    "france": "France",
+    "cameroon": "Cameroon"
   };
 
   const geoCounts: Record<string, number> = {};
@@ -412,7 +411,7 @@ export function MainChartComponents({ selectedEvent }: MainChartComponentsProps)
   return (
     <Box mt={3}>
       <Grid container spacing={{ xs: 2, md: 3 }}>
-        {chartData.map((chart, index) => (
+        {chartData?.map((chart, index) => (
           <ChartCard key={index} {...chart} />
         ))}
       </Grid>

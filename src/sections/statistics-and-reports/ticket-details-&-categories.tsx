@@ -1,6 +1,7 @@
 import { Box, Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Grid, } from "@mui/material";
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
+import { formatRevenue } from "src/hooks/format-revenu";
 
 type TicketDetailsAndCategoriesProps = {
     selectedEvent: any;
@@ -41,7 +42,6 @@ export function TicketDetailsAndCategories({
             color: getColorByTicketType(ticket.name, index),
         };
     });
-    console.log('ticketData', ticketData);
     // Chart configuration
     const chartOptions: ApexOptions = {
         chart: { type: "radialBar" },
@@ -93,43 +93,34 @@ export function TicketDetailsAndCategories({
                     <Table>
                         <TableHead>
                             <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                                <TableCell align="center">
-                                    <b>Ticket Type</b>
-                                </TableCell>
-                                <TableCell align="center">
-                                    <b>Price</b>
-                                </TableCell>
-                                <TableCell align="center">
-                                    <b>Total Stock</b>
-                                </TableCell>
-                                <TableCell align="center">
-                                    <b>Tickets Sold</b>
-                                </TableCell>
-                                <TableCell align="center">
-                                    <b>% of Sales</b>
-                                </TableCell>
-                                <TableCell align="center">
-                                    <b>Revenue</b>
-                                </TableCell>
+                                {
+                                    ["Ticket Type", "Price", "Total Stock", "Tickets Sold", "% of Sales", "Revenue"].map((header) => (
+                                        <TableCell key={header} align="center">
+                                            {header}
+                                        </TableCell>
+                                    ))
+                                }
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {ticketData.map((ticket, index) => (
+                            {ticketData.map((ticket:any, index:any) => (
                                 <TableRow key={index}>
                                     <TableCell align="center">{ticket.type}</TableCell>
                                     <TableCell align="center">
-                                        {ticket.price === 0 ? "Free" : `${ticket.price} XAF`}
+                                        {selectedEvent?.payStatus === "paid"
+                                            ? `${ticket.price} XAF`
+                                            : "Free"}
                                     </TableCell>
                                     <TableCell align="center">
-                                         {Number(ticket.stock + ticket.sold) >= 10000 ? "Unlimited" : ticket.stock}
- 
+                                        {Number(ticket.stock + ticket.sold) >= 10000 ? "Unlimited" : ticket.stock}
+
                                     </TableCell>
                                     <TableCell align="center">{ticket.sold}</TableCell>
                                     <TableCell align="center">{ticket.percentage}%</TableCell>
                                     <TableCell align="center">
-                                        {ticket.revenue === 0
-                                            ? "Free"
-                                            : `${ticket.revenue} XAF`}
+                                        {selectedEvent?.payStatus === "paid"
+                                            ? formatRevenue(ticket.revenue)
+                                            : "Free"}
                                     </TableCell>
                                 </TableRow>
                             ))}

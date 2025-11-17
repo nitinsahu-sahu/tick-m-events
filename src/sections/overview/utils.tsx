@@ -123,25 +123,6 @@ export const eventsDate: Record<string, EventData> = {
   "2024-03-16": { type: "highlight", color: "#001f3f" }, // Dark event
 };
 
-
-export const getChartOptions = (categories: string[]): ApexOptions => ({
-  chart: { type: 'line', toolbar: { show: false } },
-  xaxis: {
-    categories,
-    labels: { style: { colors: '#777', fontSize: '12px' } },
-  },
-  yaxis: {
-    labels: {
-      formatter: (val: number) => `${val}k XAF`,
-      style: { colors: '#777', fontSize: '12px' },
-    },
-  },
-  stroke: { curve: 'smooth', width: 3 },
-  grid: { strokeDashArray: 5 },
-  tooltip: { theme: 'light' },
-  colors: ['#007BFF'],
-});
-
 export type TicketTypes = 'VIP' | 'Standard' | 'EarlyBird' | 'Group' | 'Student';
 export type TimePeriod = 'daily' | 'weekly' | 'monthly';
 

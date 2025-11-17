@@ -314,7 +314,7 @@ export function MainChartComponents({ selectedEvent }: MainChartComponentsProps)
 
   // ----------------- Geographical Distribution (Dynamic) -----------------
 
-  const geoDisplayOrder = ["USA", "UK", "Germany", "France", "India","Cameroon"];
+  const geoDisplayOrder = ["USA", "UK", "Germany", "France", "India", "Cameroon"];
 
   const countryAliasMap: Record<string, string> = {
     "united states": "USA",
@@ -372,7 +372,8 @@ export function MainChartComponents({ selectedEvent }: MainChartComponentsProps)
       }
     }]
   };
-  const geographicalDistributionSeries = [{ data: geoData }];
+  const geographicalDistributionSeries = [{ name: "Regional Statistics", data: geoData }];
+
 
   // ----------------- Ticket Sales Distribution (Dynamic) -----------------
   const salesLabels = [
@@ -389,12 +390,12 @@ export function MainChartComponents({ selectedEvent }: MainChartComponentsProps)
     salesCounts[label] = 0;
   });
 
- selectedEvent.order.forEach((order: any) => {
-  const source = order.orderAddress?.hearAboutEvent;
-  if (salesLabels.includes(source)) {
-    salesCounts[source] += 1;
-  }
-});
+  selectedEvent.order.forEach((order: any) => {
+    const source = order.orderAddress?.hearAboutEvent;
+    if (salesLabels.includes(source)) {
+      salesCounts[source] += 1;
+    }
+  });
 
   const TicketSalesChartSeries = salesLabels.map(label => salesCounts[label]);
 

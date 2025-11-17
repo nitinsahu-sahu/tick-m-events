@@ -51,8 +51,8 @@ const GlobalStatistics = ({ statistics }: any) => (
     {/* Stat Cards */}
     <Grid container spacing={2} mt={0.5} mb={2} justifyContent="center">
       {[
-        { label: 'Users', value: statistics?.totalUsers },
-        { label: 'Events', value: statistics?.totalEvents },
+        { label: 'Users', value: statistics?.totalUsers||0 },
+        { label: 'Events', value: statistics?.totalEvents||0 },
         { label: 'Revenue', value: formatRevenue(statistics?.totalRevenue) },
       ].map((stat, i) => (
         <Grid item xs={12} sm={6} md={4} key={i}>
@@ -60,37 +60,6 @@ const GlobalStatistics = ({ statistics }: any) => (
         </Grid>
       ))}
     </Grid>
-    {/* Action Buttons */}
-
-    {/* <Grid container spacing={2} justifyContent="center">
-      {['Moderate an Event', 'Validate a Provider', 'Verify a Suspicious Transaction'].map(
-        (label, idx) => (
-          <Grid item xs={12} sm={6} md={4} key={idx}>
-            <Button
-              onClick={() => {
-                if (label === 'Validate a Provider') {
-                  window.location.href = '/user-management';
-                }
-                // Add other click handlers here if needed
-              }}
-              fullWidth
-              sx={{
-                backgroundColor: '#0B2E4C',
-                color: 'white',
-                fontWeight: '500',
-                borderRadius: 2,
-                py: 1.2,
-                '&:hover': {
-                  backgroundColor: '#09304e',
-                },
-              }}
-            >
-              {label}
-            </Button>
-          </Grid>
-        )
-      )}
-    </Grid> */}
   </Box>
 );
 

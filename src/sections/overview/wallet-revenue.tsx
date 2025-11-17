@@ -1,15 +1,14 @@
-import { Box, Button, Card, CardContent, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import { Chart } from "src/components/chart";
 import { ApexOptions } from "apexcharts";
 
-type WalletBalanceProps = {
-    selectedEvent: any;
-};
+import { formatRevenue } from "src/hooks/format-revenu";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+import { Chart } from "src/components/chart";
 
-export function WalletBalance({ selectedEvent }: WalletBalanceProps) {
-      const navigate = useNavigate();
-    
+export function WalletBalance({ selectedEvent }: any) {
+    const navigate = useNavigate();
+
     // Calculate total confirmed sales
     const totalConfirmedSales = selectedEvent?.order
         ?.filter((order: any) => order.paymentStatus === "confirmed")
@@ -95,13 +94,16 @@ export function WalletBalance({ selectedEvent }: WalletBalanceProps) {
                     textAlign: "center",
                 }}
             >
-                <Typography variant="h6">Wallet Balance</Typography>
-                <Typography variant="h4" fontWeight="bold">
-                    {walletBalance.toFixed(2)} XAF
-                </Typography>
+                <HeadingCommon title="Wallet Balance" color="#fff" baseSize="22px" weight={700} mb={0} />
+                <HeadingCommon title={formatRevenue(walletBalance)} color="#fff" baseSize="20px" weight={700} mt={0} mb={0} />
 
                 <Box display="flex" gap={2} mt={1}>
-                    <Button variant="contained" color="secondary"
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        sx={{
+                            fontSize: { xs: 12, sm: 13, md: 14 }
+                        }}
                         onClick={(e) => {
                             e.preventDefault();
                             navigate('/transaction-and-payment', { state: { scrollTo: 't&pay' } });
@@ -109,24 +111,13 @@ export function WalletBalance({ selectedEvent }: WalletBalanceProps) {
                     >
                         Withdraw
                     </Button>
-                    {/* <Button variant="contained" color="warning">
-                        Top Up
-                    </Button> */}
                 </Box>
 
-                <Typography variant="body2" mt={1}>
-                    Transaction History:
-                </Typography>
-                <Typography variant="body2">
-                    • +{totalConfirmedSales.toFixed(2)} XAF (Total Sales)
-                </Typography>
-                <Typography variant="body2">
-                    • -{(totalConfirmedSales * 0.1).toFixed(2)} XAF (10% Platform Fee)
-                </Typography>
+                <HeadingCommon title="Transaction History:" variant="body2" color="#fff" baseSize="14px" mt={1} />
+                <HeadingCommon title={`• +${formatRevenue(totalConfirmedSales)} (Total Sales)`} variant="body2" color="#fff" baseSize="13px" mt={0} mb={0} />
+                <HeadingCommon title={`• -${formatRevenue(totalConfirmedSales * 0.1)} (10% Platform Fee)`} variant="body2" color="#fff" baseSize="13px" mt={0} mb={0} />
                 {totalApprovedWithdrawals > 0 && (
-                    <Typography variant="body2">
-                        • -{totalApprovedWithdrawals.toFixed(2)} XAF (Withdrawals)
-                    </Typography>
+                    <HeadingCommon title={`• -${formatRevenue(totalApprovedWithdrawals)} (Withdrawals)`} variant="body2" color="#fff" baseSize="13px" mt={0} mb={0} />
                 )}
             </CardContent>
 
@@ -140,7 +131,7 @@ export function WalletBalance({ selectedEvent }: WalletBalanceProps) {
                     alignItems: "center",
                 }}
             >
-                <Typography variant="h6">Sales Revenue</Typography>
+                <HeadingCommon title="Sales Revenue" baseSize="22px" weight={700} mb={0} />
                 <Chart
                     options={chartrevenuOptions}
                     series={chartrevenuSeries}
@@ -151,9 +142,11 @@ export function WalletBalance({ selectedEvent }: WalletBalanceProps) {
                     <Button
                         variant="contained"
                         sx={{
+                            fontSize: { xs: 12, sm: 13, md: 14 },
                             mt: 1,
                             backgroundColor: "#0B2E4E",
                             width: "100%",
+                            fontWeight:600
                         }}
                     >
                         Boost Sales

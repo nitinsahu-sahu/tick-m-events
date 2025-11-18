@@ -212,140 +212,96 @@ export function LiveSalesRevenueData({ selectedEvent }: { selectedEvent: any }) 
 
   const lineChartSeries = [{ name: "Sales", data: revenueData }];
 
-  // const salesComparisonSeries = useMemo(() => {
-  //   if (!selectedEvent?.order) return [];
-  //   const hourLabels = getDynamicHourLabels(comparisonHours);
+  const hourLabels = useMemo(() => getDynamicHourLabels(comparisonHours), [comparisonHours]);
 
-  //   const todayData = Array(hourLabels.length).fill(0);
-  //   const yesterdayData = Array(hourLabels.length).fill(0);
+  const salesComparisonSeries = useMemo(() => {
+    if (!selectedEvent?.order) return [];
 
-  //   const today = new Date();
-  //   const yesterday = new Date(today);
-  //   yesterday.setDate(today.getDate() - 1);
+    const todayData = Array(hourLabels.length).fill(0);
+    const yesterdayData = Array(hourLabels.length).fill(0);
 
-  //   selectedEvent.order.forEach((order: Order) => {
-  //     const orderDate = new Date(order.createdAt);
-  //     const hourLabel = orderDate.getHours().toString().padStart(2, "0");
-  //     const index = hourLabels.indexOf(hourLabel);
+    const now = new Date();
+    const currentHour = now.getHours();
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
 
-  //     if (index === -1) return;
+    selectedEvent.order.forEach((order: Order) => {
+      const orderDate = new Date(order.createdAt);
+      const orderHour = orderDate.getHours();
+      const isToday =
+        orderDate.getFullYear() === now.getFullYear() &&
+        orderDate.getMonth() === now.getMonth() &&
+        orderDate.getDate() === now.getDate();
 
-  //     const amount = order.totalAmount || 0;
+      const isYesterday =
+        orderDate.getFullYear() === yesterday.getFullYear() &&
+        orderDate.getMonth() === yesterday.getMonth() &&
+        orderDate.getDate() === yesterday.getDate();
 
-  //     const isToday =
-  //       orderDate.getFullYear() === today.getFullYear() &&
-  //       orderDate.getMonth() === today.getMonth() &&
-  //       orderDate.getDate() === today.getDate();
+      if (!isToday && !isYesterday) return;
 
-  //     const isYesterday =
-  //       orderDate.getFullYear() === yesterday.getFullYear() &&
-  //       orderDate.getMonth() === yesterday.getMonth() &&
-  //       orderDate.getDate() === yesterday.getDate();
+      let hourDiff;
+      if (isToday) {
+        hourDiff = currentHour - orderHour;
+      } else {
+        hourDiff = currentHour + (24 - orderHour);
+      }
 
-  //     if (isToday) todayData[index] += amount;
-  //     else if (isYesterday) yesterdayData[index] += amount;
-  //   });
+      if (hourDiff < 0 || hourDiff >= comparisonHours) return;
+      const index = comparisonHours - hourDiff - 1;
+      if (index < 0 || index >= hourLabels.length) return;
 
-  //   return [
-  //     { name: "Today", data: todayData },
-  //     { name: "Yesterday", data: yesterdayData },
-  //   ];
-  // }, [selectedEvent, comparisonHours]);
-const hourLabels = useMemo(() => getDynamicHourLabels(comparisonHours), [comparisonHours]);
+      const amount = order.totalAmount || 0;
 
-const salesComparisonSeries = useMemo(() => {
-  if (!selectedEvent?.order) return [];
+      if (isToday) {
+        todayData[index] += amount;
+      } else if (isYesterday) {
+        yesterdayData[index] += amount;
+      }
+    });
 
-  const todayData = Array(hourLabels.length).fill(0);
-  const yesterdayData = Array(hourLabels.length).fill(0);
+    // Calculate percentage comparison
+    const totalToday = todayData.reduce((sum, v) => sum + v, 0);
+    const totalYesterday = yesterdayData.reduce((sum, v) => sum + v, 0);
 
-  const now = new Date();
-  const currentHour = now.getHours();
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-
-  selectedEvent.order.forEach((order: Order) => {
-    const orderDate = new Date(order.createdAt);
-    const orderHour = orderDate.getHours();
-
-    // Check if order is today or yesterday
-    const isToday =
-      orderDate.getFullYear() === now.getFullYear() &&
-      orderDate.getMonth() === now.getMonth() &&
-      orderDate.getDate() === now.getDate();
-
-    const isYesterday =
-      orderDate.getFullYear() === yesterday.getFullYear() &&
-      orderDate.getMonth() === yesterday.getMonth() &&
-      orderDate.getDate() === yesterday.getDate();
-
-    if (!isToday && !isYesterday) return;
-
-    // Calculate difference in hours relative to current time
-    let hourDiff;
-    if (isToday) {
-      hourDiff = currentHour - orderHour;
-    } else {
-      hourDiff = currentHour + (24 - orderHour);
+    let percentage = 0;
+    if (totalYesterday > 0) {
+      percentage = ((totalToday - totalYesterday) / totalYesterday) * 100;
+    } else if (totalToday > 0) {
+      percentage = 100;
     }
 
-    if (hourDiff < 0 || hourDiff >= comparisonHours) return;
-    const index = comparisonHours - hourDiff - 1;
-    if (index < 0 || index >= hourLabels.length) return;
-     
-    const amount = order.totalAmount || 0;
+    setComparisonPercentage(Math.round(percentage));
 
-    if (isToday) {
-      todayData[index] += amount;
-    } else if (isYesterday) {
-      yesterdayData[index] += amount;
-    }
-  });
+    return [
+      { name: "Today", data: todayData },
+      { name: "Yesterday", data: yesterdayData },
+    ];
+  }, [selectedEvent, hourLabels, comparisonHours]);
 
-  // Calculate percentage comparison
-  const totalToday = todayData.reduce((sum, v) => sum + v, 0);
-  const totalYesterday = yesterdayData.reduce((sum, v) => sum + v, 0);
-
-  let percentage = 0;
-  if (totalYesterday > 0) {
-    percentage = ((totalToday - totalYesterday) / totalYesterday) * 100;
-  } else if (totalToday > 0) {
-    percentage = 100;
-  }
-
-  setComparisonPercentage(Math.round(percentage));
-
-  return [
-    { name: "Today", data: todayData },
-    { name: "Yesterday", data: yesterdayData },
-  ];
-}, [selectedEvent, hourLabels, comparisonHours]);
-
-
-
-const salesComparisonOptions = useMemo<ApexOptions>(() => ({
-  ...commonChartOptions,
-  chart: { type: "bar", stacked: false },
-  plotOptions: {
-    bar: {
-      horizontal: false,
-      columnWidth: "100%",
-      borderRadius: 0,
+  const salesComparisonOptions = useMemo<ApexOptions>(() => ({
+    ...commonChartOptions,
+    chart: { type: "bar", stacked: false },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: "100%",
+        borderRadius: 0,
+      },
     },
-  },
-  xaxis: {
-    categories: hourLabels,
-    labels: { style: { colors: "#FFFFFF" } },
-  },
-  yaxis: { show: false },
-  colors: ["#0B2E4C", "#FFFFFF"],
-  legend: {
-    show: true,
-    labels: { colors: "#FFFFFF" },
-    position: "top",
-  },
-  grid: { show: false },
-}), [hourLabels]);
+    xaxis: {
+      categories: hourLabels,
+      labels: { style: { colors: "#FFFFFF" } },
+    },
+    yaxis: { show: false },
+    colors: ["#0B2E4C", "#FFFFFF"],
+    legend: {
+      show: true,
+      labels: { colors: "#FFFFFF" },
+      position: "top",
+    },
+    grid: { show: false },
+  }), [hourLabels]);
 
 
 
@@ -415,7 +371,7 @@ const salesComparisonOptions = useMemo<ApexOptions>(() => ({
                   <MenuItem value={12}>Last 12h</MenuItem>
                   <MenuItem value={24}>Last 24h</MenuItem>
                 </Select>
-               <HeadingCommon title={`${comparisonPercentage}%`} baseSize="20px" color="white" />
+                <HeadingCommon title={`${comparisonPercentage}%`} baseSize="20px" color="white" />
               </Box>
             </Box>
 
@@ -457,7 +413,7 @@ function getDynamicHourLabels(totalHours = 24) {
   const currentHour = now.getHours();
   const hours = [];
 
-  for (let i = totalHours - 1; i >= 0; i-= 1) {
+  for (let i = totalHours - 1; i >= 0; i -= 1) {
     let hour = currentHour - i;
     if (hour < 0) hour += 24;
     hours.push(hour.toString().padStart(2, "0"));

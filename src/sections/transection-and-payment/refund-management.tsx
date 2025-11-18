@@ -1,8 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
-import { Box, Button, Radio, FormControlLabel, RadioGroup, TextField, Typography } from "@mui/material";
-import { TransactionAndPaymentTable } from "src/components/tables/transaction-&-payment-table";
+import { Box, Radio, FormControlLabel, RadioGroup, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { RefundTableData, RefundTableHeaders } from "./utils";
+
+import { TransactionAndPaymentTable } from "src/components/tables/transaction-&-payment-table";
+
+import {  RefundTableHeaders } from "./utils";
 
 type RefundManagementHistoryProps = {
     selectedEvent: any;

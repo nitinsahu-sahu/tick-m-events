@@ -1,30 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  FormControlLabel,
-  Checkbox,
-  Grid,
-  Button,
-  Input,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from '@mui/material'
-import { useSelector } from 'react-redux';
-import { RootState } from 'src/redux/store';
+import { Box, Typography, FormControlLabel, Checkbox, Grid, Button, Input } from '@mui/material'
 import { toast } from 'react-toastify';
+
 import axios from "../../redux/helper/axios";
-
-
-interface SocialPlatforms {
-  facebook: boolean;
-  instagram: boolean;
-  tiktok: boolean;
-  whatsapp: boolean;
-  // Add other platforms if needed
-}
 
 export const CustomPhotoVideoFilter = ({ __events }: any) => {
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
@@ -38,20 +16,8 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
   const [frameAspectRatio, setFrameAspectRatio] = useState<number | null>(null);
   const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
   const [isCustomFilterEnabled, setIsCustomFilterEnabled] = useState(false);
-  const [selectedSocial, setSelectedSocial] = useState<SocialPlatforms>({
-    facebook: false,
-    instagram: false,
-    tiktok: false,
-    whatsapp: false,
-  });
   const [isUploading, setIsUploading] = useState(false); // 🆕 Add loading state
 
-  // const handleSocialChange = (event: any) => {
-  //   setSelectedSocial({
-  //     ...selectedSocial,
-  //     [event.target.name]: event.target.checked,
-  //   });
-  // };
   useEffect(() => {
     // If photoFrame exists, use its frameUrls, otherwise use empty list
     if (__events?.photoFrame?.frameUrls?.length) {
@@ -218,7 +184,6 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
       setFilesToUpload([]);
 
     } catch (error) {
-      console.error("Unexpected error:", error);
       toast.error("Upload failed. Please try again.");
     } finally {
       setIsUploading(false);

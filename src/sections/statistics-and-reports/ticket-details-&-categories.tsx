@@ -28,7 +28,10 @@ export function TicketDetailsAndCategories({
         const price = ticket.price === "Free" ? "Free" : parseInt(ticket?.price, 10);
         const stock = Number(ticket.quantity - ticket.sold);
         const revenue = price === "Free" ? "Free" : price * sold;
-        const percentage = (sold / total) * 100 || 0;
+         const percentage = total > 0 ? (sold / total) * 100 : 0;
+    
+    // Format percentage to 1 decimal place
+    const formattedPercentage = Number(percentage.toFixed(1));
 
 
 
@@ -37,7 +40,7 @@ export function TicketDetailsAndCategories({
             price,
             stock,
             sold,
-            percentage,
+            percentage:formattedPercentage,
             revenue,
             color: getColorByTicketType(ticket.name, index),
         };

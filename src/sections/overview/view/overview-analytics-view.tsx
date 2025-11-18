@@ -45,7 +45,7 @@ export function OverviewAnalyticsView() {
   const { upcomingEvents, latestEvents, latestSales } = useSelector((state: RootState) => state?.homeRecom);
   const { __events } = useSelector((state: RootState) => state?.organizer);
   const eventDates = latestEvents?.map((event: any) => new Date(event.date).toDateString());
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const [ticketType, setTicketType] = useState<TicketTypes>('VIP');
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('monthly');
@@ -55,7 +55,6 @@ export function OverviewAnalyticsView() {
   const isMobileTablet = useMediaQuery(theme.breakpoints.down("sm")); // Show mobile/tablet view
   const isDesktop = useMediaQuery(theme.breakpoints.up("md")); // Show desktop view
   const up = true;
-  const percentage = 75;
 
   const handleEventSelect = (event: Event | null) => {
     setSelectedEvent(event);
@@ -64,9 +63,9 @@ export function OverviewAnalyticsView() {
 
   useEffect(() => {
     dispatch(recommTrandingPopularEventFetch());
-    dispatch(fetchLatestSales());
+    dispatch(fetchLatestSales(selectedEvent?._id));
     dispatch(fatchOrgEvents());
-  }, [dispatch]);
+  }, [dispatch,selectedEvent?._id]);
 
   const handleTimePeriodChange = (event: SelectChangeEvent<TimePeriod>) => {
     setTimePeriod(event.target.value as TimePeriod);
@@ -86,7 +85,6 @@ export function OverviewAnalyticsView() {
         <AnalyticsFourCards
           up={up}
           chartOptions={chartOptions}
-          percentage={percentage}
           donutChartOptions={donutChartOptions}
           selectedEvent={selectedEvent}
         />

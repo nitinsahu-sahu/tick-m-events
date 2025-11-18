@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { AppDispatch } from 'src/redux/store';
-import { eventCustomizationPageUpdate, eventCustomizationPageFetch } from 'src/redux/actions/event.action'; // 👈 Import fetch action
+import { eventCustomizationPageUpdate, eventCustomizationPageFetch } from 'src/redux/actions/event.action';
 
 export const EventCustomization = ({ eventId }: any) => {
   const dispatch = useDispatch<AppDispatch>();

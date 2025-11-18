@@ -84,7 +84,6 @@ export function MetricCard({ selectedEvent }: MetricCardProps) {
     const saveAvailableBalance = async () => {
       try {
         await axios.put(`/o/${eventId}/balance`, { availableBalance });
-        console.log("✅ Event balance updated:", availableBalance);
       } catch (error: any) {
         console.error("❌ Failed to update event balance:", error?.response?.data || error);
       }

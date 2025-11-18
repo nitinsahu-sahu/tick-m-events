@@ -272,7 +272,7 @@ export function MainDashboardStatistics({ selectedEvent }: any) {
                         totalCount: overview?.pendingPaymentOrders || 0,
                         head: "Tickets Pending Payment",
                         chartOptions: TicketsPendingChartOptions,
-                        chartSeries: [{ name:"Pending Payment",data: ticketsPendingData }],
+                        chartSeries: [{ name:"Pending Ticketes",data: ticketsPendingData }],
                     },
                     {
                         custom: true,

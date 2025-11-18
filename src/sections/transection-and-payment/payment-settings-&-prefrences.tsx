@@ -1,6 +1,4 @@
-import { Box, Button, Paper, Typography } from "@mui/material";
-import { TransactionAndPaymentTable } from "src/components/tables/transaction-&-payment-table";
-import { PaymentSettingTableData, PaymentSettingTableHeaders } from "./utils";
+import { Box, Typography } from "@mui/material";
 import { PaymentMethodForm } from "../transaction-&-payment-management/PaymentMethodForm";
 
 export function PaymentSettingAndPrefrenceHistory() {

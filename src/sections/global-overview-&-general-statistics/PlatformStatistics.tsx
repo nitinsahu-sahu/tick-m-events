@@ -1,7 +1,6 @@
 import React, { memo, useState } from 'react';
-import { Box, Grid, Typography, Button, Menu, MenuItem, CircularProgress } from '@mui/material';
-import { Download, PictureAsPdf, InsertDriveFile, Visibility } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { Box, Grid, Menu, MenuItem } from '@mui/material';
+import { PictureAsPdf, InsertDriveFile } from '@mui/icons-material';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { formatRevenue } from 'src/hooks/format-revenu';
 
@@ -27,8 +26,8 @@ const StatBox = memo(({ label, value }: StatBoxProps) => (
       },
     }}
   >
-    <HeadingCommon title={label} baseSize="18px" mb={0}/>
-    <HeadingCommon title={value} baseSize="17px" mb={0}/>
+    <HeadingCommon title={label} baseSize="18px" mb={0} />
+    <HeadingCommon title={value} baseSize="17px" mb={0} />
   </Box>
 ));
 
@@ -38,14 +37,11 @@ interface PlatformStatisticsProps {
     totalEvents?: string;
     totalRevenue?: any;
     activeProviders?: string;
-    processedTransactions?:any
+    processedTransactions?: any
   };
 }
 
 const PlatformStatistics = memo(({ statistics }: PlatformStatisticsProps) => {
-  console.log(statistics);
-  
-  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const open = Boolean(anchorEl);
@@ -66,15 +62,6 @@ const PlatformStatistics = memo(({ statistics }: PlatformStatisticsProps) => {
     }, 1500);
   };
 
-  const handleViewFullReport = () => {
-    navigate('/analytics/full-report', {
-      state: {
-        statistics,
-        timestamp: new Date().toISOString()
-      }
-    });
-  };
-
   return (
     <Box
       sx={{
@@ -93,24 +80,18 @@ const PlatformStatistics = memo(({ statistics }: PlatformStatisticsProps) => {
 
       <HeadingCommon variant="h5" title="Global Platform Statistics" color="#0A2540" mb={3} />
 
-      <Grid container spacing={2} mb={3}>
+      <Grid container spacing={2} mb={3} sx={{
+        display: 'flex',
+        justifyContent: 'center'
+      }}>
         {[
           { label: 'Total Users', value: statistics?.totalUsers || '0' },
           { label: 'Total Events', value: statistics?.totalEvents || '0' },
           { label: 'Total Revenue', value: formatRevenue(statistics?.totalRevenue) || '0 XAF' },
+          { label: 'Active Providers', value: statistics?.activeProviders || 0 },
+          { label: 'Processed Transactions', value: statistics?.processedTransactions || 0 },
         ].map((stat, i) => (
-          <Grid item xs={12} sm={6} md={4} key={i}>
-            <StatBox label={stat.label} value={stat.value} />
-          </Grid>
-        ))}
-      </Grid>
-
-      <Grid container spacing={2} justifyContent="space-between" mb={3}>
-        {[
-          { label: 'Active Providers', value: statistics?.activeProviders || '0' },
-          { label: 'Processed Transactions', value: statistics?.processedTransactions || 0 }, // This should come from props in a real app
-        ].map((stat, i) => (
-          <Grid item xs={12} sm={6} md={4} key={i + 3}>
+          <Grid item xs={12} sm={6} md={4} key={i} >
             <StatBox label={stat.label} value={stat.value} />
           </Grid>
         ))}

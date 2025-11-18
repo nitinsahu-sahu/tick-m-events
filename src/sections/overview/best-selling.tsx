@@ -2,17 +2,16 @@
 import { Card, Grid, Typography, Box, MenuItem, Select, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import dayjs from 'dayjs';
-import { Chart } from "src/components/chart";
-import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { ApexOptions } from 'apexcharts';
 
-export function BestSelling(
-    {
-        chartOptions, selectedEvent
-    }: any) {
+import { Chart } from "src/components/chart";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+
+export function BestSelling({ chartOptions, selectedEvent }: any) {
     const [selectedTicket, setSelectedTicket] = useState<any>({});
     const totalTickets = Number(selectedEvent?.ticketQuantity) || 0;
-    const soldTickets = Number(selectedEvent?.soldTicket) || 0;
+    const soldTickets = selectedEvent?.statistics?.tickets?.soldTickets || 0;
+    // const soldTickets = Number(selectedEvent?.soldTicket) || 0;
     const ticketsLeft = totalTickets - soldTickets;
     const percentSold = totalTickets > 0 ? (soldTickets / totalTickets) * 100 : 0;
     const ticketData = getLast7DaysTicketData(selectedEvent);
@@ -79,11 +78,12 @@ export function BestSelling(
             <Grid item xs={12} md={6}>
                 <Card sx={{ p: 3, borderRadius: 3, boxShadow: 3, height: "100%", display: "flex", flexDirection: "column" }}>
                     <Stack direction={{ xs: "column", md: "row" }} alignItems="center" justifyContent="space-between" spacing={2}>
-                        <Typography variant="h6" color="primary">Best Selling</Typography>
+                        <HeadingCommon title="Best Selling" color="primary" baseSize="18px" weight={600} mb={0} />
 
                         {/* Ticket Type Selector */}
                         <Stack direction="row" alignItems="center" spacing={1}>
-                            <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>Ticket Type:</Typography>
+                            <HeadingCommon title="Ticket Type:" baseSize="14px" weight={500} mb={0} />
+
                             <Select
                                 value={selectedTicket?._id || ""}
                                 onChange={(e) => {
@@ -92,15 +92,21 @@ export function BestSelling(
                                     setSelectedTicket(ticket); // This sets the entire ticket object
                                 }}
                                 size="small"
-                                sx={{ minWidth: 120 }}
+                                sx={{
+                                    minWidth: 120,
+                                    textTransform: "capitalize",
+                                    fontSize: { xs: 12, sm: 13, md: 14 }
+                                }}
                                 displayEmpty
+
                             >
                                 <MenuItem value="">
                                     <em>Select a ticket</em>
                                 </MenuItem>
                                 {ticketTypes?.map((ticket: any) => (
-                                    <MenuItem key={ticket._id} value={ticket._id}>
-                                        {ticket.name} - {ticket.price}
+                                    <MenuItem key={ticket._id} value={ticket._id}
+                                    >
+                                        {ticket.name}
                                     </MenuItem>
                                 ))}
                             </Select>
@@ -133,13 +139,13 @@ export function BestSelling(
                             <Stack direction="row" spacing={2}>
                                 <Stack>
                                     <Box width={20} height={5} bgcolor="#12263F" borderRadius={2} />
-                                    <Typography variant="h6" fontWeight="bold">{Number(selectedTicket?.quantity || 0) - Number(selectedTicket?.sold || 0)}</Typography>
-                                    <Typography variant="caption" color="gray">Ticket Left</Typography>
+                                    <HeadingCommon title={Number(selectedTicket?.quantity || 0) - Number(selectedTicket?.sold || 0)} baseSize="14px" weight={500} mb={0} />
+                                    <HeadingCommon title="Ticket Left" baseSize="13px" weight={500} mb={0} color="gray" />
                                 </Stack>
                                 <Stack>
                                     <Box width={20} height={5} bgcolor="#1E88E5" borderRadius={2} />
-                                    <Typography variant="h6" fontWeight="bold">{selectedTicket?.sold || 0}</Typography>
-                                    <Typography variant="caption" color="gray">Ticket Sold</Typography>
+                                    <HeadingCommon title={selectedTicket?.sold || 0} baseSize="14px" weight={500} mb={0} />
+                                    <HeadingCommon title="Ticket Sold" baseSize="13px" weight={500} mb={0} color="gray" />
                                 </Stack>
                             </Stack>
 
@@ -154,9 +160,8 @@ export function BestSelling(
                     <Box display="flex" alignItems="center" justifyContent="space-between" flexWrap="wrap" mt={1}>
                         {/* Ticket Sold Info */}
                         <Box>
-                            <Typography variant="h6">Ticket Sold Today</Typography>
-
-                            <Typography variant="h3" fontWeight="bold">
+                            <HeadingCommon title="Ticket Sold Today" color="#fff" baseSize="18px" weight={600} mb={0} />
+                            <Typography variant="h3" fontWeight="bold" >
                                 {getTodayTicketSold(selectedEvent)} <span style={{ fontSize: "16px" }}>pcs</span>
                             </Typography>
                         </Box>
@@ -270,8 +275,10 @@ function getTicketSalesData(event: any, selectedTicket: any): { labels: string[]
             total: 0
         };
     }
+
     const soldCount = Number(selectedTicket?.sold || 0);
     const pendingCount = Number(selectedTicket?.quantity || 0) - soldCount;
+
     return {
         labels: ["Ticket Sold", "Ticket Left"],
         series: [soldCount, pendingCount],

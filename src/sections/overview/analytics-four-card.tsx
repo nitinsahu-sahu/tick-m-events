@@ -1,9 +1,10 @@
 import { Grid, Paper, Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import dayjs from "dayjs";
 
 import { Chart } from "src/components/chart";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
-import dayjs from "dayjs";
+import { formatRevenue } from "src/hooks/format-revenu";
 
 import { AnalyticsCard } from "./analytics-card";
 
@@ -23,17 +24,12 @@ export function AnalyticsFourCards({
     selectedEvent,
 }: any) {
     const theme = useTheme();
-    console.log(selectedEvent?.statistics);
-
     const totalTickets = parseInt(selectedEvent?.ticketQuantity ?? "0", 10);
-    // Calculate attendee engagement percentage
-    // (tickets scanned / tickets sold) * 100
     const soldTickets = selectedEvent?.statistics?.tickets?.soldTickets || 0;
     const scannedTickets = selectedEvent?.statistics?.tickets?.verifiedEntries || 0;
     const percentage = soldTickets > 0 ? Math.round((scannedTickets / soldTickets) * 100) : 0;
 
     const remainingTickets = totalTickets - soldTickets;
-    // --- Dates from event createdAt to event date ---
     const eventStartDate = selectedEvent?.createdAt
         ? dayjs(selectedEvent.createdAt)
         : dayjs();
@@ -152,7 +148,7 @@ export function AnalyticsFourCards({
             <Grid item xs={12} sm={6} md={3} sx={{ display: "flex" }}>
                 <AnalyticsCard
                     title="Revenue Generated"
-                    value={selectedEvent?.payStatus === "free" ? "Free Tickets" : `XAF ${revenue.toLocaleString("en-CM")}`}
+                    value={selectedEvent?.payStatus === "free" ? "Free Tickets" : formatRevenue(revenue) || '0 XAF'}
                     iconSrc={
                         up
                             ? "./assets/icons/dashboard/ic_arrow_down.svg"
@@ -221,8 +217,8 @@ export function AnalyticsFourCards({
                     <Box sx={{ flex: 1 }}>
                         <HeadingCommon
                             title={`${percentage}% of sold tickets were scanned at entrance`}
-                            weight={700}
-                            baseSize="14px"
+                            weight={600}
+                            baseSize="12px"
                         />
                         <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
                             <Box
@@ -235,7 +231,7 @@ export function AnalyticsFourCards({
                             <HeadingCommon
                                 title={`Total scanned tickets: ${scannedTickets}`}
                                 weight={300}
-                                baseSize="12px"
+                                baseSize="10px"
                             />
                             <Box>
                                 <Chart
@@ -244,10 +240,11 @@ export function AnalyticsFourCards({
                                     type="donut"
                                     height={100}
                                 />
+
                                 <Typography
                                     sx={{
                                         fontSize: "11px",
-                                        fontWeight: "bold",
+                                        fontWeight: 700,
                                         color: "black",
                                         textAlign: "center",
                                         mt: -7,
@@ -255,9 +252,10 @@ export function AnalyticsFourCards({
                                 >
                                     {percentage}%
                                 </Typography>
+                                
                                 <Typography
                                     sx={{
-                                        fontSize: "11px",
+                                        fontSize: "10px",
                                         fontWeight: "bold",
                                         color: "black",
                                         textAlign: "center",
@@ -271,7 +269,7 @@ export function AnalyticsFourCards({
                         <HeadingCommon
                             title={`Tickets sold: ${soldTickets} vs. Tickets scanned: ${scannedTickets}`}
                             weight={600}
-                            baseSize="13px"
+                            baseSize="12px"
                         />
                     </Box>
                 </Paper>

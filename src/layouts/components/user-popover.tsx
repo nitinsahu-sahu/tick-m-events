@@ -159,7 +159,6 @@ export function UserPopover() {
                                 </>
                             }
                            
-                            {/* <LanguagePopover data={_langs}/> */}
                         </Box>
                     }
 

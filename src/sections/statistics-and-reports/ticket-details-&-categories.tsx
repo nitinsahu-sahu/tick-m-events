@@ -153,7 +153,6 @@ export function TicketDetailsAndCategories({
     );
 }
 
-
 const colorPalette = ["#2196F3", "#FF5722"];
 function getColorByTicketType(type: string, index: number): string {
     return colorPalette[index % colorPalette.length];

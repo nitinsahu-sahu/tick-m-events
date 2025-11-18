@@ -33,12 +33,6 @@ export const WithdrawalTableData = [
 // Refund Management
 export const RefundTableHeaders = ["Transaction", "Participant", "Ticket Type", "Purchase Date", "Amount", "Status"];
 
-export const RefundTableData = [
-  { transaction: "#001247", participant: "Karim D.", ticketType: "VIP", purchaseDate: "12-12-25", amount: "20,000 XAF", status: "Approved" },
-  { transaction: "#001244", participant: "Karim D.", ticketType: "VIP", purchaseDate: "12-12-25", amount: "20,000 XAF", status: "Pending" },
-  { transaction: "#001242", participant: "Karim D.", ticketType: "VIP", purchaseDate: "12-12-25", amount: "20,000 XAF", status: "Approved" },
-];
-
 // Invoices & Reports
 export const InvoiceTableHeaders = ["Invoice ID", "Date", "Amount", "Method", "Status", "Action"];
 

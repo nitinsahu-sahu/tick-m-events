@@ -3,16 +3,18 @@ import {
     Box, Grid, Card, CardContent, Typography, List, Avatar,
     ListItem, ListItemAvatar, ListItemText, Divider, Select, MenuItem, Stack, IconButton, CardMedia, Button
 } from '@mui/material';
-import { Chart } from 'src/components/chart';
 import { useTheme } from '@mui/material/styles';
-import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { Link } from 'react-router-dom';
-import { truncateText } from 'src/hooks/description-cutting';
 import ReactHtmlParser from 'react-html-parser';
-import { Iconify } from 'src/components/iconify';
 import LinearProgress from '@mui/material/LinearProgress';
 import Calendar from 'react-calendar';
 import dayjs from "dayjs";
+
+import { Chart } from 'src/components/chart';
+import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
+import { truncateText } from 'src/hooks/description-cutting';
+import { Iconify } from 'src/components/iconify';
+
 
 type Props = {
     isDesktop: boolean;
@@ -54,8 +56,8 @@ export const RecentEventList: React.FC<Props> = ({
 }) => {
     const theme = useTheme();
     const ticketTypes: Ticket[] = selectedEvent?.tickets?.[0]?.tickets || [];
-  const [visibleCount, setVisibleCount] = React.useState(2);
-  
+    const [visibleCount, setVisibleCount] = React.useState(2);
+
     useEffect(() => {
         const tickets = selectedEvent?.tickets?.[0]?.tickets || [];
         if (!tickets.length) return;
@@ -147,7 +149,7 @@ export const RecentEventList: React.FC<Props> = ({
                                 )}
                                 <Grid container spacing={3}>
                                     {
-                                        upcomingEvents?.slice(0,visibleCount).map((event: any) => (
+                                        upcomingEvents?.slice(0, visibleCount).map((event: any) => (
                                             <Grid item xs={12} key={event._id}>
                                                 <Link to={`/our-event/${event._id}`} target='__blank' style={{ textDecoration: "none" }}>
 
@@ -203,7 +205,7 @@ export const RecentEventList: React.FC<Props> = ({
                                     }
                                 </Grid>
                                 {/* Conditionally show "Load More" only if 4+ events exist */}
-                               {upcomingEvents?.length > visibleCount && (
+                                {upcomingEvents?.length > visibleCount && (
                                     <Button
                                         fullWidth
                                         variant="contained"
@@ -279,7 +281,7 @@ export const RecentEventList: React.FC<Props> = ({
                                         </Grid>
                                     ))}
                                 </Grid>
-                                  {upcomingEvents?.length > visibleCount && (
+                                {upcomingEvents?.length > visibleCount && (
                                     <Button
                                         fullWidth
                                         variant="contained"
@@ -331,65 +333,70 @@ export const RecentEventList: React.FC<Props> = ({
                             )}
                         </CardContent>
                     </Card>
-                    <Card sx={{ mt: 3 }}>
-                        <CardContent>
-                            <Stack
-                                direction={{ xs: "column", md: "row" }}
-                                alignItems={{ xs: "center", md: "center" }}
-                                justifyContent="space-between"
-                                spacing={2}
-                                sx={{ textAlign: { xs: "center", md: "left" }, flexWrap: "wrap" }}
-                            >
-                                <Typography variant="h6" color="primary">Sales Revenue</Typography>
-
-                                {/* Ticket Type Selector */}
-                                <Stack
-                                    direction="row"
-                                    alignItems="center"
-                                    spacing={1}
-                                    sx={{ flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-start" } }}
-                                >
-                                    <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>Ticket Type:</Typography>
-                                    <Select
-                                        value={ticketTypes.some(t => t.ticketType === selectedTicket) ? selectedTicket : ticketTypes[0]?.ticketType || ""}
-                                        onChange={(e) => setSelectedTicket(e.target.value)}
-                                        size="small"
-                                        sx={{ minWidth: 100 }}
+                    {
+                        selectedEvent?.payStatus === "paid" && (
+                            <Card sx={{ mt: 3 }}>
+                                <CardContent>
+                                    <Stack
+                                        direction={{ xs: "column", md: "row" }}
+                                        alignItems={{ xs: "center", md: "center" }}
+                                        justifyContent="space-between"
+                                        spacing={2}
+                                        sx={{ textAlign: { xs: "center", md: "left" }, flexWrap: "wrap" }}
                                     >
-                                        {ticketTypes.map((ticket: any) => (
-                                            <MenuItem key={ticket.id} value={ticket.ticketType}>
-                                                {ticket.ticketType}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </Stack>
-                                <Stack direction="row" alignItems="center" mt={3} spacing={1}>
-                                    <Typography variant="body2">Time Period:</Typography>
-                                    <Select
-                                        value={timePeriod}
-                                        onChange={handleTimePeriodChange}
-                                        size="small"
-                                        sx={{ minWidth: 120 }}
-                                    >
-                                        <MenuItem value="daily">Daily</MenuItem>
-                                        <MenuItem value="weekly">Weekly</MenuItem>
-                                        <MenuItem value="monthly">Monthly</MenuItem>
-                                    </Select>
-                                </Stack>
-                            </Stack>
+                                        <Typography variant="h6" color="primary">Sales Revenue</Typography>
 
-                            {/* Chart */}
-                            <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
-                                <Chart
-                                    options={revenueChartData.options}
-                                    series={revenueChartData.series}
-                                    type="line"
-                                    height={250}
-                                    width="100%"
-                                />
-                            </Box>
-                        </CardContent>
-                    </Card>
+                                        {/* Ticket Type Selector */}
+                                        <Stack
+                                            direction="row"
+                                            alignItems="center"
+                                            spacing={1}
+                                            sx={{ flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-start" } }}
+                                        >
+                                            <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>Ticket Type:</Typography>
+                                            <Select
+                                                value={ticketTypes.some(t => t.ticketType === selectedTicket) ? selectedTicket : ticketTypes[0]?.ticketType || ""}
+                                                onChange={(e) => setSelectedTicket(e.target.value)}
+                                                size="small"
+                                                sx={{ minWidth: 100 }}
+                                            >
+                                                {ticketTypes.map((ticket: any) => (
+                                                    <MenuItem key={ticket.id} value={ticket.ticketType}>
+                                                        {ticket.ticketType}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </Stack>
+                                        <Stack direction="row" alignItems="center" mt={3} spacing={1}>
+                                            <Typography variant="body2">Time Period:</Typography>
+                                            <Select
+                                                value={timePeriod}
+                                                onChange={handleTimePeriodChange}
+                                                size="small"
+                                                sx={{ minWidth: 120 }}
+                                            >
+                                                <MenuItem value="daily">Daily</MenuItem>
+                                                <MenuItem value="weekly">Weekly</MenuItem>
+                                                <MenuItem value="monthly">Monthly</MenuItem>
+                                            </Select>
+                                        </Stack>
+                                    </Stack>
+
+                                    {/* Chart */}
+                                    <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
+                                        <Chart
+                                            options={revenueChartData.options}
+                                            series={revenueChartData.series}
+                                            type="line"
+                                            height={250}
+                                            width="100%"
+                                        />
+                                    </Box>
+                                </CardContent>
+                            </Card>
+                        )
+                    }
+
                 </Grid>
                 {/* Calendar & Upcoming Events */}
                 <Grid item xs={12} md={4}>

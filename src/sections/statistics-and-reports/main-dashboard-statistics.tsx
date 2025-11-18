@@ -4,27 +4,24 @@ import { useEffect } from "react";
 import Chart from "react-apexcharts";
 import { useDispatch, useSelector } from "react-redux";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+import { formatRevenue } from "src/hooks/format-revenu";
 import { fatchDashBoardStatisitcs } from "src/redux/actions/organizer/statistics-report";
 import { AppDispatch, RootState } from "src/redux/store";
-
-interface MainDashboardStatisticsProps {
-    selectedEvent: any;
-}
 
 export function CommonBarHead({ totalCount, leftHead, head }: any) {
     return (
         <Box display="flex" justifyContent="space-between" mb={1} alignItems="center">
-            <Typography variant="h6" sx={{ flex: 1, textAlign: "left" }}>
+            <Typography variant="h6" sx={{ flex: 1, textAlign: "left" }} fontSize= "13px">
                 {totalCount !== undefined && totalCount !== null ? totalCount : leftHead}
             </Typography>
             <Typography sx={{ flex: 1, textAlign: "left", fontSize: "13px", color: "#2395D4", fontWeight: 500 }}>
                 {head}
             </Typography>
-        </Box>
+        </Box >
     )
 }
 
-export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisticsProps) {
+export function MainDashboardStatistics({ selectedEvent }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const { overview, graph } = useSelector((state: RootState) => state?.organizer);
     useEffect(() => {
@@ -125,9 +122,9 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
 
     // Chart configurations
     const lineChartOptions: ApexOptions = {
-        chart: { 
-            type: "line", 
-            height: 50, 
+        chart: {
+            type: "line",
+            height: 50,
             sparkline: { enabled: true },
             zoom: { enabled: false }
         },
@@ -159,17 +156,17 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
     };
 
     const barChartOptions: ApexOptions = {
-        chart: { 
-            type: "bar", 
-            height: 50, 
+        chart: {
+            type: "bar",
+            height: 50,
             sparkline: { enabled: true },
             zoom: { enabled: false }
         },
-        plotOptions: { 
-            bar: { 
+        plotOptions: {
+            bar: {
                 columnWidth: "60%",
                 borderRadius: 2
-            } 
+            }
         },
         colors: ["#2395D4", "#FF5733"],
         tooltip: { enabled: true },
@@ -199,13 +196,14 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
                         totalCount: overview?.totalTicketsSold,
                         head: "Total Tickets Sold",
                         chartOptions: lineChartOptions,
-                        chartSeries: [{ data: totalTicketsSoldData }],
+                        chartSeries: [{ name:"Sold",data: totalTicketsSoldData }],
                     },
                     {
-                        totalCount: `${overview?.totalRevenue?.toLocaleString() || 0} XAF`,
+                     
+                        totalCount: selectedEvent?.payStatus === "free" ? "Free Tickets" : formatRevenue(overview?.totalRevenue) || '0 XAF',
                         head: "Revenue Generated",
                         chartOptions: RevenueGenerateChartOptions,
-                        chartSeries: [{ data: revenueGeneratedData }],
+                        chartSeries: [{ name:"Revenu",data: revenueGeneratedData }],
                     },
                     {
                         totalCount: overview?.remainingTickets || 0,
@@ -275,7 +273,7 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
                         totalCount: overview?.pendingPaymentOrders || 0,
                         head: "Tickets Pending Payment",
                         chartOptions: TicketsPendingChartOptions,
-                        chartSeries: [{ data: ticketsPendingData }],
+                        chartSeries: [{ name:"Pending Ticketes",data: ticketsPendingData }],
                     },
                     {
                         custom: true,
@@ -294,7 +292,7 @@ export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisti
                         totalCount: "Sales Evolution",
                         head: "This Week",
                         chartOptions: SalesEvaluationChartOptions,
-                        chartSeries: [{ data: salesEvolutionData }],
+                        chartSeries: [{ name:"Weekly Sales",data: salesEvolutionData }],
                     },
                 ].map((item, index) => (
                     <Grid item xs={12} sm={6} md={4} lg={3} key={index}>

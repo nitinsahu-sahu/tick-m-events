@@ -1,11 +1,11 @@
-import { Box, Button, Tooltip, Checkbox, IconButton, FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, TextField, Typography } from '@mui/material';
+import { Box, Button, Tooltip, IconButton, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { toast } from 'react-toastify';
 
-import { AppDispatch, RootState } from 'src/redux/store';
-import { eventUpdate, eventVisibilityUpdate } from 'src/redux/actions/event.action';
+import { AppDispatch } from 'src/redux/store';
+import { eventVisibilityUpdate } from 'src/redux/actions/event.action';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 
 interface VisibilityData {
@@ -24,7 +24,7 @@ interface VisibilityData {
 
 // Generate URL based on visibility type
 const generateDefaultUrl = (visibilityType: string, eventId: string) => {
-  
+
   const baseUrl = `${import.meta.env.VITE_Live_URL}/our-event`;
   return visibilityType === 'public' ? baseUrl : `${baseUrl}/${eventId}`;
 };
@@ -60,18 +60,6 @@ export function VisibilityType({ eventId, visibility }: any) {
       });
     }
   }, [visibility]);
-
-  // const handlePromotionChange = (field: keyof typeof promotionSettings) => {
-  //   const newSettings = {
-  //     ...promotionSettings,
-  //     [field]: !promotionSettings[field]
-  //   };
-  //   setPromotionSettings(newSettings);
-  //   setVisibilityState({
-  //     ...visibilityState,
-  //     promotionAndHighlight: newSettings
-  //   });
-  // };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(visibilityState.customUrl);
@@ -171,31 +159,6 @@ export function VisibilityType({ eventId, visibility }: any) {
         </Box>
       </Box>
 
-      {/* <Box mt={3}>
-        <Typography variant="subtitle1" mb={2}>
-          Promotion Settings
-        </Typography>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={promotionSettings?.homepageHighlighting}
-              onChange={() => handlePromotionChange('homepageHighlighting')}
-            />
-          }
-          label="Highlight on homepage"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={promotionSettings?.autoShareOnSocialMedia}
-              onChange={() => handlePromotionChange('autoShareOnSocialMedia')}
-            />
-          }
-          label="Auto share on social media"
-        />
-      </Box> */}
-
-      {/* Save Button - Disabled until event is selected */}
       <Box mt={4}>
         <Button
           fullWidth

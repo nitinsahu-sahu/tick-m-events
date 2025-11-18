@@ -45,15 +45,11 @@ export function StatisticsAndReportsView() {
   ];
   const handleEventSelect = (event: Event | null, comparisonEvent: Event | null = null) => {
     if (comparisonEvent) {
-      // This is a comparison event selection
       setComparisonEventList(comparisonEvent);
     } else {
-      // This is the main event selection
       setSelectedEvent(event);
-      // Reset comparison when main event changes
       setComparisonEventList(null);
     }
-   
   };
   return (
     <>

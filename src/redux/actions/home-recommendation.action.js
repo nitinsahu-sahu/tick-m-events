@@ -26,11 +26,11 @@ export const recommTrandingPopularEventFetch = () => async (dispatch) => {
     }
 };
 
-export const fetchLatestSales = () => async (dispatch) => {
+export const fetchLatestSales = (eventId) => async (dispatch) => {
     dispatch({ type: homeAndRecomConstants.GET_LATEST_SALES_REQUEST });
 
     try {
-        const response = await axios.get('/event-order/event-ticket-purchase-user');
+        const response = await axios.get(`/event-order/event-ticket-purchase-user/${eventId}`);
       
         dispatch({
             type: homeAndRecomConstants.GET_LATEST_SALES_SUCCESS,

@@ -3,7 +3,6 @@ import { Iconify } from "src/components/iconify";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 export function TicketDetails({ events }: { events: Array<{ eventName: string; soldTicket: number }> }) {
-  // Sort events by soldTicket (descending)
   const sortedEvents = [...(events || [])].sort((a, b) => b.soldTicket - a.soldTicket);
 
   return (

@@ -7,10 +7,6 @@ import { HeadingCommon } from "src/components/multiple-responsive-heading/headin
 import { fatchDashBoardStatisitcs } from "src/redux/actions/organizer/statistics-report";
 import { AppDispatch, RootState } from "src/redux/store";
 
-interface MainDashboardStatisticsProps {
-    selectedEvent: any;
-}
-
 export function CommonBarHead({ totalCount, leftHead, head }: any) {
     return (
         <Box display="flex" justifyContent="space-between" mb={1} alignItems="center">
@@ -24,7 +20,7 @@ export function CommonBarHead({ totalCount, leftHead, head }: any) {
     )
 }
 
-export function MainDashboardStatistics({ selectedEvent }: MainDashboardStatisticsProps) {
+export function MainDashboardStatistics({ selectedEvent }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const { overview, graph } = useSelector((state: RootState) => state?.organizer);
     useEffect(() => {

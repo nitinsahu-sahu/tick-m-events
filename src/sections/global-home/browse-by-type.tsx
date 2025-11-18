@@ -61,7 +61,7 @@ export default function BrowseByType() {
               <CardMedia
                 component="img"
                 height="150"
-                image={cat.cover?.url || "/assets/home-global-img/Card/default.png"}
+                image={cat.cover?.url || "/assets/home-global-img/Card/img.png"}
                 alt={cat.name}
               />
               <CardContent sx={{ p: 2 }}>

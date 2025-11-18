@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { _giftboxdata, _langs, _messages, _notifications } from 'src/_mock';
+import { _giftboxdata, _messages, _notifications } from 'src/_mock';
 import { Iconify } from 'src/components/iconify';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { usePathname } from 'src/routes/hooks';
@@ -206,7 +206,6 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                           </>
                         }
 
-                        {/* <LanguagePopover data={_langs}/> */}
                       </Box>
                     }
                   </>

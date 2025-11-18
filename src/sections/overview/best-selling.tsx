@@ -11,11 +11,6 @@ export function BestSelling(
         chartOptions, selectedEvent
     }: any) {
     const [selectedTicket, setSelectedTicket] = useState<any>({});
-    console.log('selectedTicket',selectedTicket);
-    // console.log('ticketQuantity',selectedEvent?.ticketQuantity);
-    // console.log('soldTicket',selectedEvent?.soldTicket);
-    // console.log('selectedEvent',selectedEvent);
-    
     const totalTickets = Number(selectedEvent?.ticketQuantity) || 0;
     const soldTickets = Number(selectedEvent?.soldTicket) || 0;
     const ticketsLeft = totalTickets - soldTickets;
@@ -138,7 +133,7 @@ export function BestSelling(
                             <Stack direction="row" spacing={2}>
                                 <Stack>
                                     <Box width={20} height={5} bgcolor="#12263F" borderRadius={2} />
-                                    <Typography variant="h6" fontWeight="bold">{Number(selectedTicket?.quantity) - selectedTicket.sold || 0}</Typography>
+                                    <Typography variant="h6" fontWeight="bold">{Number(selectedTicket?.quantity || 0) - Number(selectedTicket?.sold || 0)}</Typography>
                                     <Typography variant="caption" color="gray">Ticket Left</Typography>
                                 </Stack>
                                 <Stack>
@@ -275,11 +270,8 @@ function getTicketSalesData(event: any, selectedTicket: any): { labels: string[]
             total: 0
         };
     }
-
-    const soldCount = selectedTicket?.sold;
-
-    const pendingCount = Number(selectedTicket?.quantity) - selectedTicket.sold;
-
+    const soldCount = Number(selectedTicket?.sold || 0);
+    const pendingCount = Number(selectedTicket?.quantity || 0) - soldCount;
     return {
         labels: ["Ticket Sold", "Ticket Left"],
         series: [soldCount, pendingCount],

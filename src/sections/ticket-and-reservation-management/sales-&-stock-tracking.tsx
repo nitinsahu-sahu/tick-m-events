@@ -49,10 +49,10 @@ export function SalesAndStockTracking({ tickets, selectedEvent, ticketWiseRevenu
 
   // Get unique ticket types for the chart dropdown
   const ticketTypes = useMemo(() => {
-    if (!ticketWiseRevenue) return ["All"];
-    const types = ticketWiseRevenue.map((ticket: TicketRevenue) => ticket.ticketType);
+    if (!tickets) return ["All"];
+    const types = tickets.map((ticket: any) => ticket.name); // Ticket Type Name
     return ["All", ...new Set(types)];
-  }, [ticketWiseRevenue]);
+  }, [tickets]);
 
   // Filter tickets based on selected filters
   const filteredTickets = useMemo(() => {
@@ -91,7 +91,7 @@ export function SalesAndStockTracking({ tickets, selectedEvent, ticketWiseRevenu
     // Monthly data from ticketWiseRevenue
     if (activeTab === 'monthly') {
       // Get all unique months from all ticket types
-      const allMonths = [...new Set(ticketWiseRevenue.flatMap((ticket: TicketRevenue) => 
+      const allMonths = [...new Set(ticketWiseRevenue.flatMap((ticket: TicketRevenue) =>
         ticket.monthlyBreakdown.map((breakdown: MonthlyBreakdown) => breakdown.month)
       ))].sort();
 
@@ -108,10 +108,10 @@ export function SalesAndStockTracking({ tickets, selectedEvent, ticketWiseRevenu
 
       // Prepare series data
       const series: { name: string; data: number[] }[] = [];
-      
+
       if (selectedTicketType === "All") {
         // Show aggregated data for all ticket types
-        const aggregatedData = allMonths.map((month: string) => 
+        const aggregatedData = allMonths.map((month: string) =>
           ticketWiseRevenue.reduce((total: number, ticket: TicketRevenue) => {
             const monthlyData = ticket.monthlyBreakdown.find((breakdown: MonthlyBreakdown) => breakdown.month === month);
             return total + (monthlyData?.revenue || 0);
@@ -121,26 +121,26 @@ export function SalesAndStockTracking({ tickets, selectedEvent, ticketWiseRevenu
         series.push({ name: "Total Revenue", data: aggregatedData });
       } else {
         // Show data for selected ticket type only
-        const selectedTicket = ticketWiseRevenue.find((ticket: TicketRevenue) => 
-          ticket.ticketType === selectedTicketType
+        const selectedTicket = ticketWiseRevenue.find(
+          (ticket: TicketRevenue) => ticket.ticketType === selectedTicketType
         );
 
-        if (selectedTicket) {
-          const ticketData = allMonths.map((month: string) => {
-            const monthlyData = selectedTicket.monthlyBreakdown.find((breakdown: MonthlyBreakdown) => 
-              breakdown.month === month
-            );
-            return monthlyData?.revenue || 0;
-          });
+        // Always generate 0-filled data even if no record exists
+        const ticketData = allMonths.map((month: string) => {
+          const monthlyData = selectedTicket?.monthlyBreakdown.find(
+            (breakdown: MonthlyBreakdown) => breakdown.month === month
+          );
+          return monthlyData?.revenue || 0;
+        });
 
-          series.push({ 
-            name: `${selectedTicketType} Revenue`, 
-            data: ticketData 
-          });
-        }
+        series.push({
+          name: `${selectedTicketType} Revenue`,
+          data: ticketData
+        });
       }
 
-      return { 
+
+      return {
         monthly: { categories, series },
         weekly: generateEmptyData().weekly,
         daily: generateEmptyData().daily
@@ -162,7 +162,7 @@ export function SalesAndStockTracking({ tickets, selectedEvent, ticketWiseRevenu
     },
     yaxis: {
       title: {
-        text: "Revenue ($)"
+        text: "Revenue (XAF)"
       }
     },
     stroke: { curve: "smooth" },
@@ -170,7 +170,7 @@ export function SalesAndStockTracking({ tickets, selectedEvent, ticketWiseRevenu
     colors: [theme.palette.primary.main],
     tooltip: {
       y: {
-        formatter: (value: number) => `$${value}`
+        formatter: (value: number) => `${value} XAF`
       }
     }
   };

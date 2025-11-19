@@ -28,14 +28,12 @@ export function TicketAndReservationManagementView() {
   const { tickets,ticketWiseRevenue } = useSelector((state: RootState) => state?.ticketReservationMang);
   const { fullData } = useSelector((state: RootState) => state?.event);
   const { __events } = useSelector((state: RootState) => state?.organizer);
-console.log(ticketWiseRevenue,'ticketWiseRevenue');
 
   const dispatch = useDispatch<AppDispatch>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   
   const handleEventSelect = (event: Event | null) => {
     setSelectedEvent(event);
-    // Do something with the selected event data
   };
 
   useEffect(() => {
@@ -78,14 +76,12 @@ console.log(ticketWiseRevenue,'ticketWiseRevenue');
           desc=""
         />
         <TicketManagement tickets={tickets} selectedEvent={selectedEvent}/>
-        {/* <TicketCreationAndConfiguration /> */}
         <SalesAndStockTracking 
         tickets={tickets} 
         selectedEvent={selectedEvent}
         ticketWiseRevenue={ticketWiseRevenue}
 
         />
-        {/* {selectedEvent && <ReservationManagement orderList={selectedEvent} />} */}
         {selectedEvent ? (
           <ReservationManagement orderList={selectedEvent}/>
         ) : (
@@ -129,7 +125,6 @@ console.log(ticketWiseRevenue,'ticketWiseRevenue');
             <Typography variant="body1" sx={{ mb: 2 }}>
               Please select an event to view reservation details
             </Typography>
-            {/* <EventIcon sx={{ fontSize: 60, color: '#bdbdbd' }} /> */}
           </Box>
         )}
       </DashboardContent>

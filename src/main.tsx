@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 
 import App from './app';
 import { store } from './redux/store';
+import { TranslateWidget } from '../TranslateWidget';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -16,6 +17,7 @@ root.render(
         <Provider store={store}>
           <Suspense>
             <App />
+            <TranslateWidget />
           </Suspense>
         </Provider>
       </BrowserRouter>

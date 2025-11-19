@@ -14,7 +14,6 @@ const Protected = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("user");
     localStorage.removeItem("expiresAt");
 
-    // Redirect to sign-in page
     return <Navigate to="/home" />;
 };
 

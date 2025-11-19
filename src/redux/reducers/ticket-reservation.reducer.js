@@ -2,7 +2,8 @@ import { ticketTypeConstants } from "../actions/constants";
 
 const initialState = {
     message: '',
-    tickets: []
+    tickets: [],
+    ticketWiseRevenue:[]
 };
 
 const ticketTypeReducer = (state, action) => {
@@ -37,6 +38,7 @@ const ticketTypeReducer = (state, action) => {
                 ...state,
                 message: action.payload.message,
                 tickets: action.payload.data,
+                ticketWiseRevenue: action.payload.ticketWiseRevenue,
             };
 
         case ticketTypeConstants.GET_FAILURE:

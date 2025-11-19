@@ -30,7 +30,7 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
     const [comparisonEvent, setComparisonEvent] = useState<Event | null>(null);
     const showSection = location.pathname === '/entry-validation';
     const statisticsAndReport = location.pathname === '/statistics-&-reports';
-const [availableViews, setAvailableViews] = useState<('scan' | 'list')[]>(['scan']); // Default to scan only
+    const [availableViews, setAvailableViews] = useState<('scan' | 'list')[]>(['scan']); // Default to scan only
     useEffect(() => {
         const handleOnline = () => setIsOnline(true);
         const handleOffline = () => setIsOnline(false);
@@ -83,7 +83,7 @@ const [availableViews, setAvailableViews] = useState<('scan' | 'list')[]>(['scan
         }
     }, [_selectEve, setView, view, availableViews]);
 
-   
+
     // Check if a view is available
     const isViewAvailable = (viewType: 'scan' | 'list') => availableViews.includes(viewType);
 

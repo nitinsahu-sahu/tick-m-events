@@ -41,5 +41,9 @@ export const RoleProtectedRoute = ({
     return <Navigate to="/404" replace />;
   }
 
-  return <>{children}</>;
+  return <>
+
+    
+    {children}
+  </>;
 };

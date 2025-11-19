@@ -15,7 +15,7 @@ import NotificationsHandler from './utils/notification-handle';
 import { getPromotionLogo } from './redux/actions/customization/promotion-logo';
 import { statisticsPerformanceFetch } from './redux/actions/provider/statisticsAndPerformance';
 import { getReservationContracts } from './redux/actions/provider/reservation-contract';
-import { TranslateWidget } from '../TranslateWidget';
+
 
 
 // ----------------------------------------------------------------------
@@ -101,7 +101,6 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <TranslateWidget />
       <Router />
       <ToastContainer />
       {user && <NotificationsHandler user={user} />}

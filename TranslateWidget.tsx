@@ -1,7 +1,5 @@
-// components/TranslateWidget.tsx
 import { useEffect, useRef } from 'react';
 
-// Extend Window interface to include Google Translate properties
 declare global {
   interface Window {
     google?: {
@@ -80,7 +78,7 @@ export function TranslateWidget() {
           multilanguagePage: true
         }, 'google_translate_element');
 
-        // Add styles to hide unwanted elements
+        // Add styles to hide unwanted elements and position the widget
         addHideStyles();
 
       } catch (error) {
@@ -89,16 +87,47 @@ export function TranslateWidget() {
     };
 
     const addHideStyles = () => {
-      // Create style element to hide Google Translate elements
+      // Create style element to hide Google Translate elements and position the widget
       const style = document.createElement('style');
       style.textContent = `
+        /* Position the widget container at bottom right */
+        #google_translate_element {
+          position: fixed !important;
+          bottom: 20px !important;
+          right: 20px !important;
+          z-index: 9999 !important;
+        }
+
+        /* Style the Google Translate dropdown */
+        .goog-te-gadget {
+          font-family: Arial, sans-serif !important;
+        }
+        
+        .goog-te-gadget .goog-te-combo {
+          margin: 0 !important;
+          padding: 8px 12px !important;
+          border: 1px solid #ddd !important;
+          border-radius: 20px !important;
+          background: white !important;
+          color: #333 !important;
+          font-size: 14px !important;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+          cursor: pointer !important;
+          transition: all 0.3s ease !important;
+        }
+        
+        .goog-te-gadget .goog-te-combo:hover {
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+          transform: translateY(-1px) !important;
+        }
+
         /* Hide the Google Translate toolbar at the top */
         .goog-te-banner-frame {
           display: none !important;
         }
         
-        .VIpgJd-ZVi9od-ORHb-OEVmcd{
-         display: none !important;
+        .VIpgJd-ZVi9od-ORHb-OEVmcd {
+          display: none !important;
         }
 
         /* Hide the text selection popup (goog-gt-vt) */
@@ -121,19 +150,10 @@ export function TranslateWidget() {
           display: none !important;
         }
         
+        /* Hide gadget text */
         .goog-te-gadget {
           color: transparent !important;
           font-size: 0 !important;
-        }
-        
-        .goog-te-gadget .goog-te-combo {
-          margin: 0 !important;
-          padding: 4px 8px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          background: white;
-          color: #333;
-          font-size: 14px;
         }
         
         /* Remove any extra spacing or borders */
@@ -144,6 +164,27 @@ export function TranslateWidget() {
         /* Ensure body doesn't get pushed down by hidden banner */
         body {
           top: 0 !important;
+        }
+
+        /* Style for when the dropdown is open */
+        .goog-te-menu2 {
+          max-width: 200px !important;
+          border-radius: 8px !important;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+          border: 1px solid #e0e0e0 !important;
+        }
+
+        .goog-te-menu2-item {
+          padding: 8px 12px !important;
+          font-size: 14px !important;
+        }
+
+        .goog-te-menu2-item:hover {
+          background-color: #f5f5f5 !important;
+        }
+
+        .goog-te-menu2-item-selected {
+          background-color: #e8f0fe !important;
         }
       `;
       document.head.appendChild(style);
@@ -162,7 +203,8 @@ export function TranslateWidget() {
       const styles = document.querySelectorAll('style');
       styles.forEach(style => {
         if (style.textContent?.includes('goog-te-banner-frame') ||
-          style.textContent?.includes('goog-gt-vt')) {
+          style.textContent?.includes('goog-gt-vt') ||
+          style.textContent?.includes('google_translate_element')) {
           style.remove();
         }
       });
@@ -170,6 +212,15 @@ export function TranslateWidget() {
   }, []);
 
   return (
-    <div ref={translateRef} id="google_translate_element"></div>
+    <div
+      ref={translateRef}
+      id="google_translate_element"
+      style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        zIndex: 9999
+      }}
+    ></div>
   );
 }

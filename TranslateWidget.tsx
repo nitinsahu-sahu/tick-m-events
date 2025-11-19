@@ -80,9 +80,73 @@ export function TranslateWidget() {
           multilanguagePage: true
         }, 'google_translate_element');
 
+        // Add styles to hide unwanted elements
+        addHideStyles();
+
       } catch (error) {
         console.error('Error initializing translate widget:', error);
       }
+    };
+
+    const addHideStyles = () => {
+      // Create style element to hide Google Translate elements
+      const style = document.createElement('style');
+      style.textContent = `
+        /* Hide the Google Translate toolbar at the top */
+        .goog-te-banner-frame {
+          display: none !important;
+        }
+        
+        .VIpgJd-ZVi9od-ORHb-OEVmcd{
+         display: none !important;
+        }
+
+        /* Hide the text selection popup (goog-gt-vt) */
+        #goog-gt-vt {
+          display: none !important;
+        }
+        
+        /* Hide the translation hover popup */
+        .goog-tooltip {
+          display: none !important;
+        }
+        
+        /* Hide the translation suggestion popup */
+        .goog-te-balloon-frame {
+          display: none !important;
+        }
+        
+        /* Hide the Google attribution */
+        .goog-logo-link {
+          display: none !important;
+        }
+        
+        .goog-te-gadget {
+          color: transparent !important;
+          font-size: 0 !important;
+        }
+        
+        .goog-te-gadget .goog-te-combo {
+          margin: 0 !important;
+          padding: 4px 8px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          background: white;
+          color: #333;
+          font-size: 14px;
+        }
+        
+        /* Remove any extra spacing or borders */
+        .goog-te-gadget span {
+          display: none !important;
+        }
+        
+        /* Ensure body doesn't get pushed down by hidden banner */
+        body {
+          top: 0 !important;
+        }
+      `;
+      document.head.appendChild(style);
     };
 
     // Delay loading to ensure DOM is ready
@@ -94,6 +158,14 @@ export function TranslateWidget() {
       if (window.googleTranslateInit) {
         delete window.googleTranslateInit;
       }
+      // Remove any added styles
+      const styles = document.querySelectorAll('style');
+      styles.forEach(style => {
+        if (style.textContent?.includes('goog-te-banner-frame') || 
+            style.textContent?.includes('goog-gt-vt')) {
+          style.remove();
+        }
+      });
     };
   }, []);
 
@@ -106,7 +178,8 @@ export function TranslateWidget() {
       background: 'white',
       padding: '5px',
       borderRadius: '4px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+      boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+      border: '1px solid #ddd'
     }}>
       <div ref={translateRef} id="google_translate_element"></div>
     </div>

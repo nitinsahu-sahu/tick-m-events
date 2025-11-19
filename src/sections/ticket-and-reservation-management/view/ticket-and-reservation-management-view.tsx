@@ -25,9 +25,10 @@ interface Event {
 export function TicketAndReservationManagementView() {
   const location = useLocation();
   const locationSelectedEvent = location.state?.selectedEvent;
-  const { tickets } = useSelector((state: RootState) => state?.ticketReservationMang);
+  const { tickets,ticketWiseRevenue } = useSelector((state: RootState) => state?.ticketReservationMang);
   const { fullData } = useSelector((state: RootState) => state?.event);
   const { __events } = useSelector((state: RootState) => state?.organizer);
+console.log(ticketWiseRevenue,'ticketWiseRevenue');
 
   const dispatch = useDispatch<AppDispatch>();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -78,7 +79,12 @@ export function TicketAndReservationManagementView() {
         />
         <TicketManagement tickets={tickets} selectedEvent={selectedEvent}/>
         {/* <TicketCreationAndConfiguration /> */}
-        <SalesAndStockTracking tickets={tickets} />
+        <SalesAndStockTracking 
+        tickets={tickets} 
+        selectedEvent={selectedEvent}
+        ticketWiseRevenue={ticketWiseRevenue}
+
+        />
         {/* {selectedEvent && <ReservationManagement orderList={selectedEvent} />} */}
         {selectedEvent ? (
           <ReservationManagement orderList={selectedEvent}/>

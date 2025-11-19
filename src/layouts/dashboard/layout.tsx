@@ -26,6 +26,7 @@ import { GiftPopover } from '../components/gift-popover';
 import { UserPopover } from '../components/user-popover';
 import { WishlistPopover } from '../components/wishlist-popover';
 import { SearchEvent } from './search-box';
+import { TranslateWidget } from '../../../TranslateWidget';
 
 
 // ----------------------------------------------------------------------
@@ -415,6 +416,8 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
 
                 {/* User Profile */}
                 <UserPopover />
+<TranslateWidget />
+
               </Box>
             ),
           }}

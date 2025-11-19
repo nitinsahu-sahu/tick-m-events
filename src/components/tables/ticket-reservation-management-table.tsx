@@ -26,11 +26,8 @@ export function TicketReservationManagementTable({
     headers,
     data,
     type,
-}: {
-    headers: string[];
-    type: string;
-    data: any[];
-}) {
+    selectedEvent
+}: any) {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editedData, setEditedData] = useState<any>({});
     const dispatch = useDispatch<AppDispatch>();
@@ -205,7 +202,7 @@ export function TicketReservationManagementTable({
                 <Table>
                     <TableHead>
                         <TableRow>
-                            {headers.map((header) => (
+                            {headers.map((header: any) => (
                                 <TableCell
                                     key={header}
                                     align="center"
@@ -232,7 +229,7 @@ export function TicketReservationManagementTable({
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            data?.map((row, index) => (
+                            data?.map((row: any, index: any) => (
                                 <TableRow key={row._id} sx={{ backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#e0e0e0" }}>
                                     {
                                         type === '4' ? <TableCell align="center" sx={{ fontWeight: "bold", textTransform: 'capitalize' }}>
@@ -256,7 +253,9 @@ export function TicketReservationManagementTable({
                                                         size="small"
                                                     />
                                                 ) : (
-                                                    <span style={{ textTransform: row.price ? 'uppercase' : 'capitalize' }}>{row.price || row.email}</span>
+                                                    <span style={{ textTransform: row.price ? 'uppercase' : 'capitalize' }}>
+                                                        {selectedEvent === 'paid' ? (row.price || 'Free') : (row.email || 'Free')}
+                                                    </span>
                                                 )}
                                             </TableCell>
                                         ) : null
@@ -361,8 +360,8 @@ export function TicketReservationManagementTable({
                                                     Edit
                                                 </Button>
                                             ) : <span>
-                                                {row.price === "Free"
-                                                    ? row.price
+                                                {selectedEvent === "free"
+                                                    ? 'FREE'
                                                     : `${parseInt(row.price, 10) * parseInt(row.sold || 0, 10)} XAF`
                                                 }
                                             </span>

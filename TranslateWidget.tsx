@@ -7,7 +7,7 @@ declare global {
     google?: {
       translate: {
         TranslateElement: {
-          new (options: TranslateOptions, element: string): void;
+          new(options: TranslateOptions, element: string): void;
           InlineLayout: {
             SIMPLE: number;
             HORIZONTAL: number;
@@ -161,8 +161,8 @@ export function TranslateWidget() {
       // Remove any added styles
       const styles = document.querySelectorAll('style');
       styles.forEach(style => {
-        if (style.textContent?.includes('goog-te-banner-frame') || 
-            style.textContent?.includes('goog-gt-vt')) {
+        if (style.textContent?.includes('goog-te-banner-frame') ||
+          style.textContent?.includes('goog-gt-vt')) {
           style.remove();
         }
       });
@@ -170,18 +170,6 @@ export function TranslateWidget() {
   }, []);
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: '10px',
-      right: '10px',
-      zIndex: 1000,
-      background: 'white',
-      padding: '5px',
-      borderRadius: '4px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-      border: '1px solid #ddd'
-    }}>
-      <div ref={translateRef} id="google_translate_element"></div>
-    </div>
+    <div ref={translateRef} id="google_translate_element"></div>
   );
 }

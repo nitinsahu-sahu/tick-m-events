@@ -1,5 +1,6 @@
-import { Paper, Typography } from "@mui/material";
+import { Paper,Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 interface Event {
     _id: string;
@@ -90,25 +91,14 @@ export function CountDownView({ selectedEvent }: any) {
                 minWidth: { xs: "120px", sm: "140px", md: "180px" },
             }}
         >
-            <Typography
-                sx={{
-                    fontWeight: "bold",
-                    fontSize: { xs: "12px", sm: "13px", md: "14px" },
-                    fontFamily: "Poppins, sans-serif",
-                }}
-            >
-                Countdown to Event
-            </Typography>
-            <Typography
-                sx={{
-                    fontSize: { xs: "12px", sm: "13px", md: "14px" },
-                    fontFamily: "Poppins, sans-serif",
-                    color: "#333",
-                    textTransform: "capitalize"
-                }}
-            >
-                {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
-            </Typography>
+            <HeadingCommon title="Countdown to Event" baseSize="15px" weight={700} />
+            <Box>
+                <span>{timeLeft.days}</span>d&nbsp;
+                <span>{timeLeft.hours}</span>h&nbsp;
+                <span>{timeLeft.minutes}</span>m&nbsp;
+                <span>{timeLeft.seconds}</span>s
+            </Box>
+           
             <Typography
                 sx={{
                     fontSize: { xs: "10px", sm: "11px", md: "12px" },
@@ -118,7 +108,7 @@ export function CountDownView({ selectedEvent }: any) {
                     textTransform: "capitalize"
                 }}
             >
-                {selectedEvent.eventName}
+                {selectedEvent?.eventName}
             </Typography>
         </Paper>
     );

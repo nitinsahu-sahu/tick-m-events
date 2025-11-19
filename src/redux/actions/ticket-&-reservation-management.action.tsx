@@ -18,6 +18,7 @@ interface ApiResponse {
     status: number;
     message: string;
     data?: any;
+    ticketWiseRevenue?: any
 }
 interface TicketFormData {
     name: string;
@@ -42,11 +43,12 @@ interface RefundPolicyPayload {
     noRefundDate?: string | null;
     isRefundPolicyEnabled: boolean;
 }
- 
+
 interface ApiResponse {
     status: number;
     message: string;
     data?: any;
+    ticketWiseRevenue?: any
 }
 interface TicketFormData {
     name: string;
@@ -61,7 +63,7 @@ interface TicketFormData {
     };
     eventId: string;
 }
- 
+
 interface RefundPolicyPayload {
     eventId: string;
     fullRefund: boolean;
@@ -72,14 +74,14 @@ interface RefundPolicyPayload {
     noRefundDate?: string | null;
     isRefundPolicyEnabled: boolean;
 }
- 
+
 // Create ticket type api implementaion
 export const createTicketType = (
     ticketTypeCreate: TicketFormData
 ): AppThunk<Promise<ApiResponse>> => async (dispatch) => {
- 
+
     dispatch({ type: ticketTypeConstants.CREATE_TICKET_TYPE_REQUEST });
- 
+
     try {
         const response = await axios.post("/tickets", ticketTypeCreate);
         dispatch({
@@ -87,23 +89,23 @@ export const createTicketType = (
             payload: { message: response?.data?.message },
             ticketTypeId: response?.data?.ticketTypeId
         });
- 
+
         // 👇 Fix: use ticketTypeCreate.eventId here
         dispatch(fetchTicketType(ticketTypeCreate.eventId));
- 
+
         return {
             type: ticketTypeConstants.CREATE_TICKET_TYPE_SUCCESS,
             status: response.status,
             message: response?.data?.message,
             ticketTypeId: response?.data?.ticketTypeId
         };
- 
+
     } catch (error: any) {
         dispatch({
             type: ticketTypeConstants.CREATE_TICKET_TYPE_FAILURE,
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },
         });
- 
+
         return {
             type: ticketTypeConstants.CREATE_TICKET_TYPE_FAILURE,
             message: error?.response?.data?.message || "Server error",
@@ -111,51 +113,54 @@ export const createTicketType = (
         };
     }
 };
- 
+
 export const fetchTicketType = (eventId: string): AppThunk<Promise<ApiResponse>> => async (dispatch) => {
     dispatch({ type: ticketTypeConstants.GET_REQUEST });
- 
+
     try {
         const response = await axios.get(`/tickets?eventId=${eventId}`);
+
         const successResponse: ApiResponse = {
             status: response.status,
             message: 'Success',
-            data: response?.data?.data
+            data: response?.data?.data,
+            ticketWiseRevenue: response?.data?.revenueData?.ticketWiseRevenue
+
         };
- 
+
         dispatch({
             type: ticketTypeConstants.GET_SUCCESS,
             payload: successResponse,
         });
- 
+
         return successResponse;
- 
+
     } catch (error: any) {
         const errorResponse: ApiResponse = {
             status: error?.response?.status || 500,
             message: error?.response?.data?.message || "Server error",
             data: null
         };
- 
+
         dispatch({
             type: ticketTypeConstants.GET_FAILURE,
             payload: errorResponse,
         });
- 
+
         return errorResponse;
     }
 };
 
 export const updateTicketType = ({ editedData }: any): AppThunk<Promise<ApiResponse>> => async (dispatch) => {
     dispatch({ type: ticketTypeConstants.UPDATE_REQUEST });
- 
+
     try {
         const response = await axios.patch(`/tickets/${editedData._id}`, editedData);
         const successResponse: ApiResponse = {
             status: response.status,
             message: response.data.message,
         };
- 
+
         dispatch({
             type: ticketTypeConstants.UPDATE_SUCCESS,
             payload: successResponse,
@@ -163,20 +168,20 @@ export const updateTicketType = ({ editedData }: any): AppThunk<Promise<ApiRespo
         if (editedData.eventId) {
             dispatch(fetchTicketType(editedData.eventId));
         }
- 
+
         return successResponse;
- 
+
     } catch (error: any) {
         const errorResponse: ApiResponse = {
             status: error?.response?.status || 500,
             message: error?.response?.data?.message || "Server error",
         };
- 
+
         dispatch({
             type: ticketTypeConstants.UPDATE_FAILURE,
             payload: errorResponse,
         });
- 
+
         return errorResponse;
     }
 };
@@ -186,7 +191,7 @@ export const updateRefundPolicy = (
     payload: RefundPolicyPayload
 ): AppThunk<Promise<ApiResponse>> => async (dispatch) => {
     dispatch({ type: ticketTypeConstants.UPDATE_REFUND_POLICY_REQUEST });
- 
+
     try {
         const {
             eventId,
@@ -198,7 +203,7 @@ export const updateRefundPolicy = (
             noRefundDate,
             isRefundPolicyEnabled
         } = payload;
- 
+
         const response = await axios.patch(`/tickets/refund-policy/${eventId}`, {
             fullRefund,
             fullRefundDaysBefore,
@@ -208,31 +213,31 @@ export const updateRefundPolicy = (
             noRefundDate,
             isRefundPolicyEnabled
         });
- 
+
         const successResponse: ApiResponse = {
             status: response.status,
             message: response.data.message,
             data: response.data.data,
         };
- 
+
         dispatch({
             type: ticketTypeConstants.UPDATE_REFUND_POLICY_SUCCESS,
             payload: successResponse,
         });
- 
+
         return successResponse;
- 
+
     } catch (error: any) {
         const errorResponse: ApiResponse = {
             status: error?.response?.status || 500,
             message: error?.response?.data?.message || "Server error",
         };
- 
+
         dispatch({
             type: ticketTypeConstants.UPDATE_REFUND_POLICY_FAILURE,
             payload: errorResponse,
         });
- 
+
         return errorResponse;
     }
 };

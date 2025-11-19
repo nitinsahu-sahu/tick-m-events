@@ -6,7 +6,7 @@ export function HeadingCommon({
     color = "black",
     weight = 500,
     baseSize = "26px",
-    mb, mt, width,css
+    mb, mt, width, css, textTransform = "capitalize"
 }: any) {
     // Convert base size string (e.g., "26px") to number
     const baseSizeNum = parseInt(baseSize, 10);
@@ -19,7 +19,7 @@ export function HeadingCommon({
     };
     return (
         <Typography
-            sx={{ textTransform: "capitalize",...css }}
+            sx={{ textTransform, ...css }}
             variant={variant}
             color={color}
             width={width}

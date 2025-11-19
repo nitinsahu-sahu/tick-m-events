@@ -102,8 +102,6 @@ export function UserPopover() {
                     variant="square"
                 />
             }
-
-
             {/* Popover for Mobile & Tablet */}
             {isMobileOrTablet && (
                 <Popover

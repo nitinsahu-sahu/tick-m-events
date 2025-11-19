@@ -63,9 +63,12 @@ export function OverviewAnalyticsView() {
 
   useEffect(() => {
     dispatch(recommTrandingPopularEventFetch());
-    dispatch(fetchLatestSales(selectedEvent?._id));
     dispatch(fatchOrgEvents());
-  }, [dispatch,selectedEvent?._id]);
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchLatestSales(selectedEvent?._id));
+  }, [dispatch, selectedEvent?._id]);
 
   const handleTimePeriodChange = (event: SelectChangeEvent<TimePeriod>) => {
     setTimePeriod(event.target.value as TimePeriod);
@@ -79,7 +82,7 @@ export function OverviewAnalyticsView() {
 
         <PageTitleSection
           title="Dashboard"
-          rightCom={<CountDownView selectedEvent={selectedEvent} />} // Passing SearchBar component as a prop
+          rightCom={<CountDownView selectedEvent={selectedEvent} />}
         />
 
         <AnalyticsFourCards

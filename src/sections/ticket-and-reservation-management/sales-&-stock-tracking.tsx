@@ -134,7 +134,7 @@ export function SalesAndStockTracking({ tickets, selectedEvent, ticketWiseRevenu
           });
 
           series.push({ 
-            name: `${selectedTicketType} Revenue`, 
+            name: `XAF{selectedTicketType} Revenue`, 
             data: ticketData 
           });
         }

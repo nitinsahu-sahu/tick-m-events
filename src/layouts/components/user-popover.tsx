@@ -190,9 +190,9 @@ export function UserPopover() {
             {!isPathHidden(HIDDEN_PATHS.GLOBAL_OVERVIEW) && (
               <>
                 <MessagePopover data={_messages} />
-                {!isPathHidden(HIDDEN_PATHS.RESERVATIONS_CONTRACTS) && (
+                {/* {!isPathHidden(HIDDEN_PATHS.RESERVATIONS_CONTRACTS) && (
                   <GiftPopover data={_giftboxdata} />
-                )}
+                )} */}
               </>
             )}
           </>

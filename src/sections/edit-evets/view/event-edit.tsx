@@ -34,9 +34,6 @@ const getStatusColor = (status: string) => {
 
 export function EditEventsView() {
   const { eventsLists } = useSelector((state: RootState) => state.editEvent);
-  console.log('====================================');
-  console.log(eventsLists);
-  console.log('====================================');
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);

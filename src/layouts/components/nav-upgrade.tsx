@@ -1,15 +1,14 @@
-import { Box, Card, Typography, Link, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Card, Link } from "@mui/material";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 export function NavUpgrade() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Responsive check
 
   return (
     <Card
       sx={{
         p: { xs: 2, sm: 3 },
         width: { xs: "90%", sm: 245 },
-        minHeight: { xs: 140, sm: 160 }, // Use minHeight instead of fixed height
+        minHeight: { xs: 120, sm: 130 }, // Use minHeight instead of fixed height
         aspectRatio: "16 / 9", // Keeps a responsive height
         borderRadius: "15px",
         color: "common.white",
@@ -38,28 +37,8 @@ export function NavUpgrade() {
 
       {/* Title */}
       <Box sx={{ mt: 2 }}>
-        <Typography
-          variant="h6"
-          fontWeight="bold"
-          sx={{
-            fontFamily: "Poppins, sans-serif",
-            fontWeight: 600,
-            fontSize: { xs: "16px", sm: "18px" }, // Adjust font size
-          }}
-        >
-          Ticket Sales
-        </Typography>
-        <Typography
-          variant="h6"
-          fontWeight="bold"
-          sx={{
-            fontFamily: "Poppins, sans-serif",
-            fontWeight: 600,
-            fontSize: { xs: "16px", sm: "18px" }, // Adjust font size
-          }}
-        >
-          Weekly Report
-        </Typography>
+        <HeadingCommon title="Ticket Sales" color="#fff" weight={600} baseSize="16px" mb={0} mt={0} />
+        <HeadingCommon title="Weekly Report" color="#fff" weight={600} baseSize="16px" mb={0} mt={0} />
       </Box>
 
       {/* Link and Icon Inline Container */}

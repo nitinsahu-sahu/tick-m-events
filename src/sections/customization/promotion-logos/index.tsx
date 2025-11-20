@@ -1,27 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-    Typography,
-    Box,
-    Paper,
-    Grid,
-    Card,
-    CardMedia,
-    CardContent,
-    CardActions,
-    Button,
-    TextField,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    IconButton,
-    Snackbar,
-    Alert,
-    CircularProgress,
-    FormControl,
-    FormLabel,
-    Chip,
-    Divider
+    Typography, Box, Paper, Grid, Card, CardMedia, CardContent, CardActions, Button,
+    TextField, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert,
+    CircularProgress, FormControl, FormLabel, Chip, Divider
 } from "@mui/material";
 import {
     Add as AddIcon,
@@ -75,17 +56,9 @@ interface SnackbarState {
     severity: 'success' | 'error' | 'warning' | 'info';
 }
 
-interface ApiResponse<T> {
-    success: boolean;
-    message: string;
-    logos?: T[];
-    logo?: T;
-}
-
 export function PromotionLogos(): JSX.Element {
     const dispatch = useDispatch<AppDispatch>()
     const { promotionLogos, loading } = useSelector((state: RootState) => state.customization);
-
     const [uploading, setUploading] = useState<boolean>(false);
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [editingLogo, setEditingLogo] = useState<Logo | null>(null);
@@ -215,7 +188,6 @@ export function PromotionLogos(): JSX.Element {
                 showSnackbar(response.message || 'Operation failed', 'error');
             }
         } catch (error) {
-            // Fixed: Using template literal instead of string concatenation
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
             showSnackbar(`Error: ${errorMessage}`, 'error');
         } finally {
@@ -268,17 +240,14 @@ export function PromotionLogos(): JSX.Element {
         setOpenDialog(false);
     };
 
-    // Show snackbar notification
     const showSnackbar = (message: string, severity: SnackbarState['severity']): void => {
         setSnackbar({ open: true, message, severity });
     };
 
-    // Close snackbar
     const handleCloseSnackbar = (): void => {
         setSnackbar(prev => ({ ...prev, open: false }));
     };
 
-    // Load logos on component mount
     useEffect(() => {
         dispatch(getPromotionLogo())
     }, [dispatch]); // Fixed: Added fetchLogos to dependency array

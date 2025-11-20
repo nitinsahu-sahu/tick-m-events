@@ -1,8 +1,8 @@
-import { Box, Button, Tooltip, IconButton, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { toast } from 'react-toastify';
+import { Box, Button, Tooltip, IconButton, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 import { AppDispatch } from 'src/redux/store';
 import { eventVisibilityUpdate } from 'src/redux/actions/event.action';

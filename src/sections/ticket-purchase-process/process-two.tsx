@@ -616,7 +616,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
               }}
               disabled={!isFormValid() || loading}
             >
-              {loading ? 'Loading...' : 'Proceed to Participant Details'}
+              {loading ? 'Loading...' : 'Proceed to payment'}
             </Button>
           </Box>
         </Paper>

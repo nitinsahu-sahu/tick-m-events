@@ -416,7 +416,6 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
 
                 {/* User Profile */}
                 <UserPopover />
-{/* <TranslateWidget /> */}
 
               </Box>
             ),

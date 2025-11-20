@@ -19,9 +19,7 @@ export function CustomPhotoAndVideoFiltersforEventsView() {
         <Box mt={4}>
          <FilterGrid onShare={(img) => setSharedImage(img)}  frameSize={{ width: 400, height: 300}}  />
         </Box>
-        {/* <Box mt={4}>
-       <ShareSection image={sharedImage} />
-      </Box> */}
+       
       </DashboardContent>
     </FrameProvider>
   );

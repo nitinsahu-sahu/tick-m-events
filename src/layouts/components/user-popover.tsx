@@ -13,349 +13,310 @@ import { NotificationsPopover } from './notifications-popover';
 import { MessagePopover } from './message-popover';
 import { GiftPopover } from './gift-popover';
 
+// Constants for hidden paths
+const HIDDEN_PATHS = {
+  USER_MANAGEMENT: ['/user-management'],
+  TICKET_MANAGEMENT: ['/ticket-management'],
+  TICKET_PURCHASE: ['/ticket-purchase-process'],
+  PATHS: ['/ticket-validation-at-entry', '/loyalty-program'],
+  PROFILE_SERVICE: ['/profile-&-services-management'],
+  TICKETING_TRANSACTION: ['/ticketing-&-transactions-supervision'],
+  GLOBAL_OVERVIEW: ['/global-overview-&-general-statistics'],
+  STATISTICS_PERFORMANCE: ['/statistics-&-performance'],
+  MESSAGE_CLIENT: ['/messaging-&-client-relationship'],
+  TRANSACTION_PAYMENT: ['/transaction-&-payment-management'],
+  SERVICE_CALENDAR: ['/confirmed-service-calendar'],
+  RESERVATIONS_CONTRACTS: ['/reservations-and-contracts'],
+  CUSTOM_PHOTO_VIDEO: ['/custom-photo-or-video-filters-for-events'],
+  EVENT_SEARCH_DETAILS: ['/event-search-and-details'],
+  TRANSACTION_PAYMENT_SIMPLE: ['/transaction-and-payment'],
+  DASHBOARD: ['/'],
+  EVENT_DETAILS: ['/events/add-new'],
+  VISIBILITY_ACCESS: ['/visibility-and-access-settings'],
+  SEARCH_SELECT: ['/search-&-select-service-providers'],
+} as const;
+
+// Role constants
+const ROLE = {
+  PARTICIPANT: 'participant',
+  PROVIDER: 'provider',
+  ADMIN: 'admin',
+  ORGANIZER: 'organizer',
+} as const;
+
 export function UserPopover() {
-    const [anchorEl, setAnchorEl] = useState(null);
-    const theme = useTheme();
-    const pathname = usePathname()
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const hiddenTicketManagement = ["/ticket-management"];
-    const hiddenTicketPurchasePro = ['/ticket-purchase-process'];
-    const hiddenPaths = ['/ticket-validation-at-entry', '/loyalty-program'];
-    const hiddenProfileService = ['/profile-&-services-management'];
-    const hiddenTicketingAndTransection = ['/ticketing-&-transactions-supervision'];
-    const hiddenUsrMange = ['/user-management'];
-    const hiddenGlobalOverview = ['/global-overview-&-general-statistics'];
-    const hiddenStatisticsPerform = ['/statistics-&-performance'];
-    const hiddenMessageClientRel = ['/messaging-&-client-relationship'];
-    const hiddenTransectionPayment = ['/transaction-&-payment-management'];
-    const hiddenServiceCal = ['/confirmed-service-calendar'];
-    const hiddenReserContracts = ['/reservations-and-contracts'];
-    const hiddenCustomPhotoVideo = ['/custom-photo-or-video-filters-for-events'];
-    const hiddenEventSearchDetails = ['/event-search-and-details'];
-    const hiddenTranPaymet = ['/transaction-and-payment'];
-    const hiddenDashboard = ['/'];
-    const hiddenEventDetails = ['/events/add-new'];
-    const hiddenVisibilityAccess = ['/visibility-and-access-settings'];
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const theme = useTheme();
+  const pathname = usePathname();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  const { _id, name, role, avatar } = useSelector((state: RootState) => state?.auth?.user);
+  const isMobileOrTablet = useMediaQuery(theme.breakpoints.down("md"));
 
-    const { _id, name, role, avatar } = useSelector((state: RootState) => state?.auth?.user);
+  // Helper functions
+  const isPathHidden = (pathGroup: readonly string[]) => 
+    pathGroup.some(path => pathname.includes(path));
 
-    const isMobileOrTablet = useMediaQuery(theme.breakpoints.down("md")); // Hide on md & below
+  const shouldShowUserInfo = !isMobileOrTablet && !isPathHidden(HIDDEN_PATHS.USER_MANAGEMENT);
+  const shouldShowAvatar = !isPathHidden(HIDDEN_PATHS.USER_MANAGEMENT);
 
-    const hiddenSearchSelect = ['/search-&-select-service-providers'];
-    const handleOpen = (event: any) => {
-        if (isMobileOrTablet) {
-            setAnchorEl(event.currentTarget);
-        }
-    };
+  const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
+    if (isMobileOrTablet) {
+      setAnchorEl(event.currentTarget);
+    }
+  };
 
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
-    const handleLogout = async () => {
-        await dispatch(logout() as any); // Ensure TypeScript recognizes the async action
-        navigate("/sign-in"); // Redirect after logout
-    };
+  const handleLogout = async () => {
+    await dispatch(logout() as any);
+    navigate("/sign-in");
+  };
 
-    return (
-        <Box display="flex" alignItems="center" gap={1}>
-            {/* Name & Role (Only visible on Desktop) */}
-            {!isMobileOrTablet &&
-                !hiddenUsrMange.some(path => pathname.includes(path)) && (
-                    <Box key={_id}>
-                        <Typography textTransform="capitalize" fontWeight={600} color="#2295D4" fontFamily="Poppins, sans-serif">
-                            {name}
-                        </Typography>
-                        <Typography
-                            textTransform="capitalize"
-                            fontSize={12}
-                            color="gray"
-                            fontFamily="Poppins, sans-serif"
-                        >
-                            {role} |&nbsp;
-                            <span
-                                role="button"
-                                tabIndex={0}
-                                style={{ cursor: 'pointer', color: 'red' }}
-                                onClick={handleLogout}
-                                onKeyDown={(e) => {
-                                    // Trigger logout on both Enter and Spacebar
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                        handleLogout();
-                                    }
-                                }}
-                                aria-label="Logout"
-                            >
-                                Logout
-                            </span>
-                        </Typography>
-                    </Box>
-                )}
-            {/* Avatar (Click to Show Name & Role Only on Mobile & Tablet) */}
-            {
-                !hiddenUsrMange.some(path => pathname.includes(path)) &&
-                <Avatar
-                    src={avatar?.url}
-                    sx={{ width: 40, height: 40, cursor: isMobileOrTablet ? "pointer" : "default" }}
-                    onClick={handleOpen}
-                    variant="square"
-                />
+  // Conditionals for popover content
+  const shouldShowNotificationIcons = 
+    !isPathHidden(HIDDEN_PATHS.EVENT_SEARCH_DETAILS) &&
+    !isPathHidden(HIDDEN_PATHS.TICKET_PURCHASE) &&
+    !isPathHidden(HIDDEN_PATHS.PATHS) &&
+    !isPathHidden(HIDDEN_PATHS.CUSTOM_PHOTO_VIDEO);
+
+  const shouldShowOrganizerButtons = 
+    role === ROLE.ORGANIZER && 
+    !isPathHidden(HIDDEN_PATHS.TRANSACTION_PAYMENT_SIMPLE);
+
+  const shouldShowExportHelpButtons = 
+    isPathHidden(HIDDEN_PATHS.TRANSACTION_PAYMENT_SIMPLE);
+
+  const shouldShowSavePublishButtons = 
+    !isPathHidden(HIDDEN_PATHS.DASHBOARD) &&
+    !isPathHidden(HIDDEN_PATHS.TRANSACTION_PAYMENT_SIMPLE) &&
+    role !== ROLE.PARTICIPANT &&
+    !isPathHidden(HIDDEN_PATHS.EVENT_SEARCH_DETAILS) &&
+    !isPathHidden(HIDDEN_PATHS.TICKET_PURCHASE) &&
+    !isPathHidden(HIDDEN_PATHS.TICKET_MANAGEMENT) &&
+    !isPathHidden(HIDDEN_PATHS.PATHS) &&
+    !isPathHidden(HIDDEN_PATHS.SEARCH_SELECT) &&
+    !isPathHidden(HIDDEN_PATHS.STATISTICS_PERFORMANCE) &&
+    !isPathHidden(HIDDEN_PATHS.GLOBAL_OVERVIEW) &&
+    !isPathHidden(HIDDEN_PATHS.USER_MANAGEMENT) &&
+    !isPathHidden(HIDDEN_PATHS.TRANSACTION_PAYMENT) &&
+    !isPathHidden(HIDDEN_PATHS.TICKETING_TRANSACTION) &&
+    !isPathHidden(HIDDEN_PATHS.MESSAGE_CLIENT) &&
+    !isPathHidden(HIDDEN_PATHS.PROFILE_SERVICE) &&
+    !isPathHidden(HIDDEN_PATHS.SERVICE_CALENDAR) &&
+    role !== ROLE.PROVIDER &&
+    role !== ROLE.ADMIN &&
+    !isPathHidden(HIDDEN_PATHS.CUSTOM_PHOTO_VIDEO) &&
+    !isPathHidden(HIDDEN_PATHS.RESERVATIONS_CONTRACTS);
+
+  // Reusable button styles
+  const buttonStyles = {
+    contained: {
+      backgroundColor: "#0C2340",
+      color: "white",
+      borderRadius: "8px",
+      px: 1,
+      fontSize: 14,
+      fontFamily: "Poppins, sans-serif",
+      fontWeight: 600,
+    },
+    outlined: {
+      borderRadius: "8px",
+      px: 1,
+      borderColor: "#C8C8C8",
+      color: "#2295D4",
+      fontSize: 14,
+      fontFamily: "Poppins, sans-serif",
+      fontWeight: 600,
+    },
+    logout: {
+      color: "red",
+      borderColor: "red",
+      my: 1,
+      p: 1,
+      width: "100%",
+      fontSize: 16,
+      fontWeight: 500,
+    },
+  };
+
+  // User info component
+  const UserInfo = () => (
+    <Box key={_id}>
+      <Typography textTransform="capitalize" fontWeight={600} color="#2295D4" fontFamily="Poppins, sans-serif">
+        {name}
+      </Typography>
+      <Typography textTransform="capitalize" fontSize={12} color="gray" fontFamily="Poppins, sans-serif">
+        {role} |&nbsp;
+        <span
+          role="button"
+          tabIndex={0}
+          style={{ cursor: 'pointer', color: 'red' }}
+          onClick={handleLogout}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleLogout();
             }
-            {/* Popover for Mobile & Tablet */}
-            {isMobileOrTablet && (
-                <Popover
-                    open={Boolean(anchorEl)}
-                    anchorEl={anchorEl}
-                    onClose={handleClose}
-                    anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-                    transformOrigin={{ vertical: "top", horizontal: "center" }}
+          }}
+          aria-label="Logout"
+        >
+          Logout
+        </span>
+      </Typography>
+    </Box>
+  );
 
-                >
-                    <Box p={2} textAlign="center" key={_id}>
-                        <Typography textTransform="capitalize" fontWeight={600} color="#2295D4" fontFamily="Poppins, sans-serif">
-                            {name}
-                        </Typography>
-                        <Typography textTransform="capitalize" fontSize={12} color="gray" fontFamily="Poppins, sans-serif">
-                            {role}
-                        </Typography>
-                    </Box>
-                    {
-                        !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
-                        !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
-                        !hiddenPaths.some(path => pathname.includes(path)) &&
-                        !hiddenCustomPhotoVideo.some(path => pathname.includes(path)) &&
-                        <Box display="flex" gap={1} alignItems="center" justifyContent="center">
-                            <NotificationsPopover data={_notifications} />
-                            {
-                                role !== 'participant' &&
-                                !hiddenTicketManagement.some(path => pathname.includes(path)) &&
-                                role !== 'provider' &&
-                                role !== 'admin' &&
-                                !hiddenDashboard.some(path => pathname.includes(path)) &&
-                                !hiddenServiceCal.some(path => pathname.includes(path)) &&
-                                !hiddenTransectionPayment.some(path => pathname.includes(path)) &&
-                                !hiddenUsrMange.some(path => pathname.includes(path)) &&
-                                !hiddenSearchSelect.some(path => pathname.includes(path)) &&
-                                !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
-                                !hiddenProfileService.some(path => pathname.includes(path)) &&
-                                !hiddenMessageClientRel.some(path => pathname.includes(path)) &&
-                                !hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
-                                <>
-                                    {
-                                        !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
-                                        <>
-                                            <MessagePopover data={_messages} />
-                                            {
-                                                !hiddenReserContracts.some(path => pathname.includes(path)) && <GiftPopover data={_giftboxdata} />
-                                            }
-                                        </>
-                                    }
-                                    {/* {
-                                        !hiddenReserContracts.some(path => pathname.includes(path)) && <EmailPopover totalUnRead="2" />
-                                    } */}
-                                </>
-                            }
-                           
-                        </Box>
-                    }
-
-                    {
-                        !hiddenDashboard.some(path => pathname.includes(path)) &&
-                        !hiddenTranPaymet.some(path => pathname.includes(path)) &&
-                        role !== 'participant' &&
-                        !hiddenEventSearchDetails.some(path => pathname.includes(path)) &&
-                        !hiddenTicketPurchasePro.some(path => pathname.includes(path)) &&
-                        !hiddenTicketManagement.some(path => pathname.includes(path)) &&
-                        !hiddenPaths.some(path => pathname.includes(path)) &&
-                        !hiddenSearchSelect.some(path => pathname.includes(path)) &&
-                        !hiddenStatisticsPerform.some(path => pathname.includes(path)) &&
-                        !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
-                        !hiddenUsrMange.some(path => pathname.includes(path)) &&
-                        !hiddenTransectionPayment.some(path => pathname.includes(path)) &&
-                        !hiddenTicketingAndTransection.some(path => pathname.includes(path)) &&
-                        !hiddenMessageClientRel.some(path => pathname.includes(path)) &&
-                        !hiddenProfileService.some(path => pathname.includes(path)) &&
-                        !hiddenServiceCal.some(path => pathname.includes(path)) &&
-                        role !== 'provider' &&
-                        role !== 'admin' &&
-
-                        !hiddenCustomPhotoVideo.some(path => pathname.includes(path)) &&
-                        !hiddenReserContracts.some(path => pathname.includes(path)) &&
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
-                            <Button
-                                sx={{
-                                    backgroundColor: "#0C2340",
-                                    color: "white",
-                                    borderRadius: 1,
-                                    px: 1,
-                                    fontSize: 14,
-                                    fontFamily: "Poppins, sans-serif",
-                                    fontWeight: 600,
-                                }}
-                            >
-                                Save Changes
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                sx={{
-                                    borderRadius: 1,
-                                    px: 1,
-                                    borderColor: "#C8C8C8",
-                                    color: "#2295D4",
-                                    fontSize: 14,
-                                    fontFamily: "Poppins, sans-serif",
-                                    fontWeight: 600,
-                                }}
-                            >
-                                Publish Events
-                            </Button>
-
-                        </Box>
-                    }
-                    {
-                        role === 'organizer' &&
-                        !hiddenTranPaymet.some(path => pathname.includes(path)) &&
-                        (
-                            <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
-                                <Button
-                                    variant="contained"
-                                    disabled={hiddenEventDetails?.toString() === pathname?.toString()}
-                                    onClick={() => navigate("/events/add-new")} // Redirect on click
-                                    sx={{
-                                        backgroundColor: "#0C2340",
-                                        color: "white",
-                                        borderRadius: "8px",
-                                        px: 1,
-                                        fontSize: 14,
-                                        fontFamily: "Poppins, sans-serif",
-                                        fontWeight: 600
-                                    }}
-                                >
-                                    Create an Events
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    sx={{
-                                        borderRadius: "8px",
-                                        px: 1,
-                                        borderColor: "#C8C8C8",
-                                        color: "#2295D4",
-                                        fontSize: 14,
-                                        fontFamily: "Poppins, sans-serif",
-                                        fontWeight: 600
-                                    }}
-                                    disabled={hiddenVisibilityAccess?.toString() === pathname?.toString()}
-
-                                >
-                                    <Link
-                                        to="/visibility-and-access-settings"
-                                        style={{
-                                            textDecoration: 'none', // Removes underline
-                                            color: 'inherit', // Inherits parent color
-                                            // Or set specific color:
-                                            // color: '#yourColor',
-                                        }}
-                                    >
-                                        Settings
-                                    </Link>
-
-                                </Button>
-                            </Box>
-                        )
-
-                    }
-                    {
-                        hiddenTranPaymet.some(path => pathname.includes(path)) &&
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
-                            <Button
-                                variant="contained"
-                                sx={{
-                                    backgroundColor: "#0C2340",
-                                    color: "white",
-                                    borderRadius: "8px",
-                                    px: 1,
-                                    fontSize: 14,
-                                    fontFamily: "Poppins, sans-serif",
-                                    fontWeight: 600
-                                }}
-                            >
-                                Export
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                sx={{
-                                    borderRadius: "8px",
-                                    px: 1,
-                                    borderColor: "#C8C8C8",
-                                    color: "#2295D4",
-                                    fontSize: 14,
-                                    fontFamily: "Poppins, sans-serif",
-                                    fontWeight: 600
-                                }}
-                            >
-                                Request Help
-                            </Button>
-                        </Box>
-                    }
-                    {pathname.includes('/ticket-management') && (
-                        <Box sx={{ px: 1, display: 'flex', justifyContent: 'center' }}>
-                            <Button
-                                variant="contained"
-                                sx={{
-                                    backgroundColor: "#0C2340",
-                                    color: "white",
-                                    borderRadius: 1,
-                                    p: 1,
-                                    fontSize: 14,
-                                    width: "100%",
-                                    fontWeight: 500
-                                }}
-                            >
-                                My Tickets
-                            </Button>
-                        </Box>
-                    )}
-                    {hiddenCustomPhotoVideo.some(path => pathname.includes(path)) && (
-                        <Box sx={{ px: 1, display: 'flex', justifyContent: 'center' }}><Button
-                            variant="contained"
-                            size='small'
-                            sx={{
-                                backgroundColor: "#0C2340",
-                                color: "white",
-                                borderRadius: 1,
-                                p: 1,
-                                fontSize: 14,
-                                width: "100%",
-                                fontWeight: 500
-                            }}
-                        >
-                            Gallery
-                        </Button>
-                        </Box>
-                    )}
-                    <Box sx={{ px: 1, display: 'flex', justifyContent: 'center' }}>
-
-                        <Button
-                            variant="outlined"
-                            size='small'
-                            onClick={() => handleLogout()}
-                            sx={{
-                                color: "red",
-                                borderColor: "red",
-                                my: 1,
-                                p: 1,
-                                width: "100%",
-                                fontSize: 16,
-                                fontWeight: 500
-                            }}
-                        >
-                            Logout
-                        </Button>
-                    </Box>
-
-                </Popover>
+  // Notification icons component
+  const NotificationIcons = () => (
+    <Box display="flex" gap={1} alignItems="center" justifyContent="center">
+      <NotificationsPopover data={_notifications} />
+      {role !== ROLE.PARTICIPANT &&
+        !isPathHidden(HIDDEN_PATHS.TICKET_MANAGEMENT) &&
+        role !== ROLE.PROVIDER &&
+        role !== ROLE.ADMIN &&
+        !isPathHidden(HIDDEN_PATHS.DASHBOARD) &&
+        !isPathHidden(HIDDEN_PATHS.SERVICE_CALENDAR) &&
+        !isPathHidden(HIDDEN_PATHS.TRANSACTION_PAYMENT) &&
+        !isPathHidden(HIDDEN_PATHS.USER_MANAGEMENT) &&
+        !isPathHidden(HIDDEN_PATHS.SEARCH_SELECT) &&
+        !isPathHidden(HIDDEN_PATHS.TICKETING_TRANSACTION) &&
+        !isPathHidden(HIDDEN_PATHS.PROFILE_SERVICE) &&
+        !isPathHidden(HIDDEN_PATHS.MESSAGE_CLIENT) &&
+        !isPathHidden(HIDDEN_PATHS.STATISTICS_PERFORMANCE) && (
+          <>
+            {!isPathHidden(HIDDEN_PATHS.GLOBAL_OVERVIEW) && (
+              <>
+                <MessagePopover data={_messages} />
+                {!isPathHidden(HIDDEN_PATHS.RESERVATIONS_CONTRACTS) && (
+                  <GiftPopover data={_giftboxdata} />
+                )}
+              </>
             )}
-        </Box>
-    )
+          </>
+        )}
+    </Box>
+  );
+
+  return (
+    <Box display="flex" alignItems="center" gap={1}>
+      {/* Name & Role (Only visible on Desktop) */}
+      {shouldShowUserInfo && <UserInfo />}
+
+      {/* Avatar (Click to Show Name & Role Only on Mobile & Tablet) */}
+      {shouldShowAvatar && (
+        <Avatar
+          src={avatar?.url}
+          sx={{ 
+            width: 40, 
+            height: 40, 
+            cursor: isMobileOrTablet ? "pointer" : "default" 
+          }}
+          onClick={handleOpen}
+          variant="square"
+        />
+      )}
+
+      {/* Popover for Mobile & Tablet */}
+      {isMobileOrTablet && (
+        <Popover
+          open={Boolean(anchorEl)}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          transformOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Box p={2} textAlign="center" key={_id}>
+            <Typography textTransform="capitalize" fontWeight={600} color="#2295D4" fontFamily="Poppins, sans-serif">
+              {name}
+            </Typography>
+            <Typography textTransform="capitalize" fontSize={12} color="gray" fontFamily="Poppins, sans-serif">
+              {role}
+            </Typography>
+          </Box>
+
+          {shouldShowNotificationIcons && <NotificationIcons />}
+
+          {shouldShowSavePublishButtons && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
+              <Button sx={buttonStyles.contained}>
+                Save Changes
+              </Button>
+              <Button variant="outlined" sx={buttonStyles.outlined}>
+                Publish Events
+              </Button>
+            </Box>
+          )}
+
+          {shouldShowOrganizerButtons && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
+              <Button
+                variant="contained"
+                disabled={HIDDEN_PATHS.EVENT_DETAILS[0] === pathname}
+                onClick={() => navigate("/events/add-new")}
+                sx={buttonStyles.contained}
+              >
+                Create an Events
+              </Button>
+              <Button
+                variant="outlined"
+                disabled={HIDDEN_PATHS.VISIBILITY_ACCESS[0] === pathname}
+                sx={buttonStyles.outlined}
+              >
+                <Link
+                  to="/visibility-and-access-settings"
+                  style={{
+                    textDecoration: 'none',
+                    color: 'inherit',
+                  }}
+                >
+                  Settings
+                </Link>
+              </Button>
+            </Box>
+          )}
+
+          {shouldShowExportHelpButtons && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1, marginX: 1 }}>
+              <Button variant="contained" sx={buttonStyles.contained}>
+                Export
+              </Button>
+              <Button variant="outlined" sx={buttonStyles.outlined}>
+                Request Help
+              </Button>
+            </Box>
+          )}
+
+          {isPathHidden(HIDDEN_PATHS.TICKET_MANAGEMENT) && (
+            <Box sx={{ px: 1, display: 'flex', justifyContent: 'center' }}>
+              <Button variant="contained" sx={{ ...buttonStyles.contained, width: "100%" }}>
+                My Tickets
+              </Button>
+            </Box>
+          )}
+
+          {isPathHidden(HIDDEN_PATHS.CUSTOM_PHOTO_VIDEO) && (
+            <Box sx={{ px: 1, display: 'flex', justifyContent: 'center' }}>
+              <Button variant="contained" size='small' sx={{ ...buttonStyles.contained, width: "100%" }}>
+                Gallery
+              </Button>
+            </Box>
+          )}
+
+          <Box sx={{ px: 1, display: 'flex', justifyContent: 'center' }}>
+            <Button
+              variant="outlined"
+              size='small'
+              onClick={handleLogout}
+              sx={buttonStyles.logout}
+            >
+              Logout
+            </Button>
+          </Box>
+        </Popover>
+      )}
+    </Box>
+  );
 }

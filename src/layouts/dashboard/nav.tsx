@@ -197,7 +197,11 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                           <Box
                             alt="Single logo"
                             component="img"
-                            src={openMenus[item.title] ? downIcon : upIcon}
+                            src={
+                              openMenus[item.title] ?
+                                '/assets/icons/navbar/ic_chevron_down.svg' :
+                                '/assets/icons/navbar/ic_chevron_up.svg'
+                            }
                             width={16}
                             height={16}
                           />

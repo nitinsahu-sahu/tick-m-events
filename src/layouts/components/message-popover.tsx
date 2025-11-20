@@ -74,9 +74,7 @@ const activityIconMap: Record<string, string> = {
   'login success': '/assets/icons/notification/ic-login.png',
   'logout success': '/assets/icons/notification/ic-logout.png',
   'event_created': '/assets/icons/notification/ic-event.png',
-  // 'ticket_purchased': '/assets/icons/notification/ic-ticket.png',
   'profile_updated': '/assets/icons/notification/ic-profile.png',
-  // 'password_changed': '/assets/icons/notification/ic-password.png',
 };
 
 export function MessagePopover({ data = [], sx, ...other }: NotificationsPopoverProps) {

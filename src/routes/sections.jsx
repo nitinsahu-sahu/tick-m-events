@@ -204,15 +204,19 @@ export function Router() {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state?.auth);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-
   const currentRole = auth?.user?.role || ROLES.PARTICIPANT;
 
   useEffect(() => {
-    dispatch(isUserLoggedIn()).finally(() => {
+    const checkAuth = async () => {
+      await dispatch(isUserLoggedIn());
       setIsCheckingAuth(false);
-    });
+    };
+
+    checkAuth();
   }, [dispatch]);
 
+ 
+ 
   const routes = useMemo(() => {
     const protectedChildren = PROTECTED_ROUTES.map((route) => ({
       path: route.path,
@@ -221,7 +225,7 @@ export function Router() {
 
     const publicRoutes = PUBLIC_ROUTES.map((route) => {
       let element = route.element;
-      
+
       if (route.layout === 'auth') {
         element = wrapWithAuthLayout(element);
       }
@@ -251,7 +255,7 @@ export function Router() {
 
   const routing = useRoutes(routes);
 
-  if (isCheckingAuth) {
+   if (isCheckingAuth) {
     return renderFallback;
   }
 

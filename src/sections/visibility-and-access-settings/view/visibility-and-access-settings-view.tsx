@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { DashboardContent } from "src/layouts/dashboard";
 import { PageTitleSection } from "src/components/page-title-section";
-import { fatchOrgEvents } from "src/redux/actions/organizer/pageEvents";
 import { EventBreadCrum } from "src/sections/entry-validation/event-status";
-import { AppDispatch, RootState } from "src/redux/store";
+import { fatchOrgEvents } from "src/redux/actions/organizer/pageEvents";
+import type { AppDispatch, RootState } from "src/redux/store";
 
+import { CustomPhotoVideoFilter } from "../custom-photo-video-filter";
 import { EventCustomization } from "../event-page-customization";
 import { VisibilityType } from "../visibility-type";
-import { CustomPhotoVideoFilter } from "../custom-photo-video-filter";
 
 interface EventVisibility {
   _id: string;

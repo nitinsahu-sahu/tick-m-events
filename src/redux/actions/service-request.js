@@ -13,6 +13,7 @@ export const getRequestsByProvider = (data) => async (dispatch) => {
       type: serviceRequestConstants.GET_REQUESTED_SERVICE_SUCCESS,
       payload: {
         message: response?.data?.message,
+        allActiveProjects: response?.data?.allActiveProjects,
         completedRequests: response?.data?.completedRequests,
         signedReqests: response?.data?.signedReqests,
         pendingRequests: response?.data?.pendingRequests,
@@ -103,7 +104,7 @@ export const sendProviderProposal = (eventRequestId, proposalData) => async (dis
 
   try {
     const response = await axios.post(`/event-requests/${eventRequestId}/propose`, proposalData);
-   
+
     dispatch({
       type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_SUCCESS,
       payload: {

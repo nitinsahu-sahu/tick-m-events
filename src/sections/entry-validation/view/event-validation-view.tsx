@@ -67,10 +67,8 @@ export function EventValidationView() {
           view === 'scan' ? <TicketScanner /> : <EnterTicketCode _selectEve={selectedEvent?.validationOptions} eventSelected={selectedEvent}/>
         }
 
-        {/* Entry List Section */}
         <EntryListView _selectEve={selectedEvent}/>
 
-        {/* Statistics Section */}
         <RealTimeStatistics statistics={selectedEvent?.statistics} />
       </DashboardContent>
     </>

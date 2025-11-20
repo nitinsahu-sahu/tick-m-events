@@ -47,12 +47,12 @@ export function SalesAndStockTracking({ tickets, selectedEvent, ticketWiseRevenu
         return ["All", ...new Set(price)];
     }, [tickets]);
 
-    // Get unique ticket types for the chart dropdown
-    const ticketTypes = useMemo(() => {
-        if (!tickets) return ["All"];
-        const types = tickets.map((ticket: any) => ticket.name); // Ticket Type Name
-        return ["All", ...new Set(types)];
-    }, [tickets]);
+  // Get unique ticket types for the chart dropdown
+  const ticketTypes = useMemo(() => {
+    if (!tickets) return ["All"];
+    const types = tickets.map((ticket: any) => ticket.name); // Ticket Type Name
+    return ["All", ...new Set(types)];
+  }, [tickets]);
 
     // Filter tickets based on selected filters
     const filteredTickets = useMemo(() => {
@@ -88,12 +88,12 @@ export function SalesAndStockTracking({ tickets, selectedEvent, ticketWiseRevenu
             return generateEmptyData();
         }
 
-        // Monthly data from ticketWiseRevenue
-        if (activeTab === 'monthly') {
-            // Get all unique months from all ticket types
-            const allMonths = [...new Set(ticketWiseRevenue.flatMap((ticket: TicketRevenue) =>
-                ticket.monthlyBreakdown.map((breakdown: MonthlyBreakdown) => breakdown.month)
-            ))].sort();
+    // Monthly data from ticketWiseRevenue
+    if (activeTab === 'monthly') {
+      // Get all unique months from all ticket types
+      const allMonths = [...new Set(ticketWiseRevenue.flatMap((ticket: TicketRevenue) =>
+        ticket.monthlyBreakdown.map((breakdown: MonthlyBreakdown) => breakdown.month)
+      ))].sort();
 
             if (allMonths.length === 0) {
                 return generateEmptyData();
@@ -106,74 +106,74 @@ export function SalesAndStockTracking({ tickets, selectedEvent, ticketWiseRevenu
                 return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
             });
 
-            // Prepare series data
-            const series: { name: string; data: number[] }[] = [];
+      // Prepare series data
+      const series: { name: string; data: number[] }[] = [];
 
-            if (selectedTicketType === "All") {
-                // Show aggregated data for all ticket types
-                const aggregatedData = allMonths.map((month: string) =>
-                    ticketWiseRevenue.reduce((total: number, ticket: TicketRevenue) => {
-                        const monthlyData = ticket.monthlyBreakdown.find((breakdown: MonthlyBreakdown) => breakdown.month === month);
-                        return total + (monthlyData?.revenue || 0);
-                    }, 0)
-                );
+      if (selectedTicketType === "All") {
+        // Show aggregated data for all ticket types
+        const aggregatedData = allMonths.map((month: string) =>
+          ticketWiseRevenue.reduce((total: number, ticket: TicketRevenue) => {
+            const monthlyData = ticket.monthlyBreakdown.find((breakdown: MonthlyBreakdown) => breakdown.month === month);
+            return total + (monthlyData?.revenue || 0);
+          }, 0)
+        );
 
-                series.push({ name: "Total Revenue", data: aggregatedData });
-            } else {
-                // Show data for selected ticket type only
-                const selectedTicket = ticketWiseRevenue.find(
-                    (ticket: TicketRevenue) => ticket.ticketType === selectedTicketType
-                );
+        series.push({ name: "Total Revenue", data: aggregatedData });
+      } else {
+        // Show data for selected ticket type only
+        const selectedTicket = ticketWiseRevenue.find(
+          (ticket: TicketRevenue) => ticket.ticketType === selectedTicketType
+        );
 
-                // Always generate 0-filled data even if no record exists
-                const ticketData = allMonths.map((month: string) => {
-                    const monthlyData = selectedTicket?.monthlyBreakdown.find(
-                        (breakdown: MonthlyBreakdown) => breakdown.month === month
-                    );
-                    return monthlyData?.revenue || 0;
-                });
+        // Always generate 0-filled data even if no record exists
+        const ticketData = allMonths.map((month: string) => {
+          const monthlyData = selectedTicket?.monthlyBreakdown.find(
+            (breakdown: MonthlyBreakdown) => breakdown.month === month
+          );
+          return monthlyData?.revenue || 0;
+        });
 
-                series.push({
-                    name: `${selectedTicketType} Revenue`,
-                    data: ticketData
-                });
-            }
+        series.push({
+          name: `${selectedTicketType} Revenue`,
+          data: ticketData
+        });
+      }
 
 
-            return {
-                monthly: { categories, series },
-                weekly: generateEmptyData().weekly,
-                daily: generateEmptyData().daily
-            };
-        }
+      return {
+        monthly: { categories, series },
+        weekly: generateEmptyData().weekly,
+        daily: generateEmptyData().daily
+      };
+    }
 
         // For weekly and daily tabs - return empty data since we only have monthly data
         // You can implement weekly/daily logic here when you have the data
         return generateEmptyData();
     }, [ticketWiseRevenue, activeTab, selectedTicketType]);
 
-    const salesGraphChartOptions: ApexOptions = {
-        chart: {
-            type: "line",
-            toolbar: { show: false },
-        },
-        xaxis: {
-            categories: salesGraphChartData[activeTab].categories,
-        },
-        yaxis: {
-            title: {
-                text: "Revenue (XAF)"
-            }
-        },
-        stroke: { curve: "smooth" },
-        markers: { size: 5 },
-        colors: [theme.palette.primary.main],
-        tooltip: {
-            y: {
-                formatter: (value: number) => `XAF ${value}`
-            }
-        }
-    };
+  const salesGraphChartOptions: ApexOptions = {
+    chart: {
+      type: "line",
+      toolbar: { show: false },
+    },
+    xaxis: {
+      categories: salesGraphChartData[activeTab].categories,
+    },
+    yaxis: {
+      title: {
+        text: "Revenue (XAF)"
+      }
+    },
+    stroke: { curve: "smooth" },
+    markers: { size: 5 },
+    colors: [theme.palette.primary.main],
+    tooltip: {
+      y: {
+        formatter: (value: number) => `${value} XAF`
+      }
+    }
+  };
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
         setActiveTab(newValue as TabType);

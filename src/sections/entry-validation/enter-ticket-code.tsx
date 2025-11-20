@@ -1,4 +1,4 @@
-import { Box, Button, Card, Grid, TextField, IconButton, Typography, Tooltip, Table, TableHead, TableCell, TableBody, TableRow } from "@mui/material";
+import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from 'react-toastify';
@@ -6,11 +6,12 @@ import { toast } from 'react-toastify';
 import { confirmTicketEntry, verifyTicketCode } from "src/redux/actions/eventOrder";
 import { AppDispatch } from 'src/redux/store';
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
+
 import { EarlyEntryCountdown } from "./validation-cards/too-early";
 import { InvalidAndExpiry } from "./validation-cards/invalid-and-expiry";
 import { PaymentPending } from "./validation-cards/payment-pending";
 import { Already } from "./validation-cards/already";
-import { Granted } from "./validation-cards/granted"; // Import the new component
+import { Granted } from "./validation-cards/granted";
 
 interface Ticket {
     _id: string;
@@ -96,7 +97,6 @@ export function EnterTicketCode({ _selectEve, eventSelected }: any) {
             const result = await dispatch(verifyTicketCode({ ...verifyData, eventId: eventSelected._id })) as ApiResult;
 
             if (result?.status === 200) {
-                // 🚨 Always check paymentStatus (works for ticketCode, userId, or both)
                 if (result.ticket?.paymentStatus !== "confirmed") {
                     setFlag({
                         counter: "paymentPending",

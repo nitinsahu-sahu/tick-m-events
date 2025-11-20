@@ -13,8 +13,6 @@ export function EntryListView({ _selectEve }: any) {
     const [searchTerm, setSearchTerm] = useState('');
     const exportToExcel = useExcelExport();
     const exportToCSV = useCSVExport();
-    // Filter data based on search term
-    // Filter data based on search term and ticket code
     const filteredData = useMemo(() =>
         _selectEve?.verifiedTickets?.filter((item: any) =>
             item?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -90,8 +88,6 @@ export function EntryListView({ _selectEve }: any) {
                             />
                         </Grid>
 
-                        {/* Clear Filters Button */}
-                        {/* Clear Filters Button - Only show when data exists and filters are active */}
                         {filteredData?.length && isFilterActive && (
                             <Grid item xs={12} md={2}>
                                 <Button

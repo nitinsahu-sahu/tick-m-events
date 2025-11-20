@@ -110,7 +110,7 @@ export function NavMobile({
 
 export function DashboardHF({ title }: any) {
   return (
-    <HeadingCommon title={title} color="#C8C8C8" variant="h6" weight={600} baseSize="16px" mb={1} mt={1} />
+    <HeadingCommon title={title} color="#C8C8C8" variant="h6" weight={600} baseSize="12px" mb={1} mt={1} />
   )
 }
 // Add this custom hook to filter nav items by role
@@ -142,7 +142,6 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
     <>
       <Logo />
       <HeadingCommon baseSize="13px" title={`Account ID: ${user?.__id || user?.name}`} />
-      {/* Account ID: TM-{user._id} */}
       {slots?.topArea}
       <DashboardHF title="MAIN MENU" />
       <Scrollbar fillContent>
@@ -197,7 +196,11 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                           <Box
                             alt="Single logo"
                             component="img"
-                            src={openMenus[item.title] ? downIcon : upIcon}
+                            src={
+                              openMenus[item.title] ?
+                                '/assets/icons/navbar/ic_chevron_down.svg' :
+                                '/assets/icons/navbar/ic_chevron_up.svg'
+                            }
                             width={16}
                             height={16}
                           />

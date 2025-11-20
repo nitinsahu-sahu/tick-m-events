@@ -184,8 +184,6 @@ export function SignInView() {
   useEffect(() => {
     if (authenticate) {
       navigate("/", { replace: true });
-    }else{
-      navigate("/sign-in", { replace: true });
     }
   }, [authenticate, navigate]);
 

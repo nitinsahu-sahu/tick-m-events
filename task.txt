@@ -1,7 +1,804 @@
-Phase 2 Task
-//Particiapant Reffral task
-1. For the referral program, the 100 points are only awarded to both parties (the referrer and the referee) 
-when the referee buys their first ticket. Here, the referrer received 100 points even though the referee 
-hasn't purchased their first ticket yet. And when the referee buys their first ticket, both receive 100 points, 
-with the referee first getting 100 points in addition to the points granted for purchasing a ticket in the app.
-2. Chat pannel video call
+
+/var/www/tick-m-events/src/sections/overview/wallet-revenue.tsx
+  1:23  warning  Expected "Card" to come before "Button"                                                                            perfectionists
+  2:1   warning  Expected "react-router-dom" to come before "@mui/material"                                                         perfectionists
+  3:1   warning  All imports in the declaration are only used as types. Use `import type`                                           @typescript-es
+  3:1   warning  Expected "apexcharts" to come before "react-router-dom"                                                            perfectionists
+  6:1   warning  Missed spacing between "src/hooks/format-revenu" and "src/components/multiple-responsive-heading/heading" imports  perfectionists
+  7:1   warning  Expected "src/components/chart" to come before "src/components/multiple-responsive-heading/heading"                perfectionists
+
+/var/www/tick-m-events/src/sections/paritcipant/profile/profile.tsx
+   2:17  warning  Expected "Card" to come before "Typography"                                     perfectionist/sort-named-imports
+   2:23  warning  Expected "Box" to come before "Card"                                            perfectionist/sort-named-imports
+   2:45  warning  Expected "Button" to come before "TextField"                                    perfectionist/sort-named-imports
+   3:5   warning  Expected "Avatar" to come before "IconButton"                                   perfectionist/sort-named-imports
+   3:13  warning  Expected "Chip" to come before "Avatar"                                         perfectionist/sort-named-imports
+   3:19  warning  Expected "Fab" to come before "Chip"                                            perfectionist/sort-named-imports
+   3:62  warning  Expected "DialogTitle" to come before "DialogContent"                           perfectionist/sort-named-imports
+   5:1   warning  Expected "@mui/icons-material" to come before "@mui/material"                   perfectionist/sort-imports
+   6:33  warning  Expected "Email" to come before "LocationOn"                                    perfectionist/sort-named-imports
+   7:5   warning  Expected "Star" to come before "Person"                                         perfectionist/sort-named-imports
+   7:11  warning  'Share' is defined but never used                                               @typescript-eslint/no-unused-vars
+   7:11  warning  'Share' is defined but never used                                               unused-imports/no-unused-imports
+   9:1   warning  Expected "react" to come before "@mui/icons-material"                           perfectionist/sort-imports
+   9:21  warning  Expected "useRef" to come before "useEffect"                                    perfectionist/sort-named-imports
+  11:1   warning  Expected "react-toastify" to come before "react-redux"                          perfectionist/sort-imports
+  12:1   warning  Missed spacing between "react-toastify" and "@mui/icons-material/Edit" imports  perfectionist/sort-imports
+  14:1   warning  All imports in the declaration are only used as types. Use `import type`        @typescript-eslint/consistent-type-imports
+  14:23  warning  Expected "RootState" to come before "AppDispatch"                               perfectionist/sort-named-imports
+  15:10  warning  'profileGet' is defined but never used                                          @typescript-eslint/no-unused-vars
+  15:10  warning  'profileGet' is defined but never used                                          unused-imports/no-unused-imports
+  15:39  warning  Expected "updateProCover" to come before "updateProAvatar"                      perfectionist/sort-named-imports
+  18:1   warning  All imports in the declaration are only used as types. Use `import type`        @typescript-eslint/consistent-type-imports
+  18:23  warning  Expected "ApiResult" to come before "ProfileData"                               perfectionist/sort-named-imports
+  23:12  warning  'isEditing' is assigned a value but never used                                  @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/password-recovery/view/password-recovery-view.tsx
+  33:11  warning  'isXs' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/payment-success/index.tsx
+   4:5   warning  Expected "Button" to come before "Typography"                                                                                  s
+   5:5   warning  Expected "Card" to come before "Button"                                                                                        s
+   8:5   warning  Expected "Alert" to come before "CircularProgress"                                                                             s
+  11:1   warning  Expected "@mui/icons-material" to come before "@mui/material"                                                                  s
+  13:5   warning  Expected "Pending" to come before "CheckCircle"                                                                                s
+  14:5   warning  Expected "Error" to come before "Pending"                                                                                      s
+  15:5   warning  Expected "Home" to come before "Error"                                                                                         s
+  19:1   warning  Expected "react" to come before "@mui/icons-material"                                                                          s
+  19:21  warning  Expected "useState" to come before "useEffect"                                                                                 s
+  20:1   warning  Expected "react-redux" to come before "react"                                                                                  s
+  24:1   warning  All imports in the declaration are only used as types. Use `import type`                                                       s
+  24:1   warning  Expected "src/redux/store" to come before "src/redux/actions/contactpayment/contact-payment"                                   s
+  60:24  warning  Do not define components during render. React will see a new component type on every render and destroy the entire subtrees DOMs
+
+/var/www/tick-m-events/src/sections/profile-&-services-management/main-profile.tsx
+   2:13  warning  Expected "Box" to come before "Avatar"                                                          perfectionist/sort-named-imports
+   2:26  warning  Expected "Grid" to come before "Button"                                                         perfectionist/sort-named-imports
+   3:5   warning  Expected "Menu" to come before "IconButton"                                                     perfectionist/sort-named-imports
+   3:35  warning  Expected "Dialog" to come before "ListItemIcon"                                                 perfectionist/sort-named-imports
+   4:35  warning  Expected "Collapse" to come before "DialogActions"                                              perfectionist/sort-named-imports
+   6:1   warning  Expected "react-redux" to come before "@mui/material"                                           perfectionist/sort-imports
+   7:1   warning  Missed spacing between "react-redux" and "@mui/icons-material/Edit" imports                     perfectionist/sort-imports
+   8:1   warning  Expected "react" to come before "@mui/icons-material/Edit"                                      perfectionist/sort-imports
+   8:21  warning  Expected "useRef" to come before "useEffect"                                                    perfectionist/sort-named-imports
+   9:1   warning  Expected "react-toastify" to come before "react"                                                perfectionist/sort-imports
+  10:1   warning  Missed spacing between "react-toastify" and "@mui/icons-material" imports                       perfectionist/sort-imports
+  10:30  warning  Expected "Twitter" to come before "Facebook"                                                    perfectionist/sort-named-imports
+  10:78  warning  Expected "ExpandMore" to come before "LinkIcon"                                                 perfectionist/sort-named-imports
+  11:1   warning  Imports "CountryCode" are only used as type                                                     @typescript-eslint/consistent-ts
+  11:1   warning  Expected "libphonenumber-js" to come before "@mui/icons-material"                               perfectionist/sort-imports
+  12:1   warning  Expected "react-phone-number-input/flags" to come before "libphonenumber-js"                    perfectionist/sort-imports
+  15:1   warning  All imports in the declaration are only used as types. Use `import type`                        @typescript-eslint/consistent-ts
+  15:1   warning  Expected "src/redux/store" to come before "src/components/multiple-responsive-heading/heading"  perfectionist/sort-imports
+  15:23  warning  Expected "RootState" to come before "AppDispatch"                                               perfectionist/sort-named-imports
+  16:39  warning  Expected "updateProCover" to come before "updateProAvatar"                                      perfectionist/sort-named-imports
+  17:1   warning  Missed spacing between "src/redux/actions" and "./utills" imports                               perfectionist/sort-imports
+  18:1   warning  Expected "react-phone-number-input/style.css" to come before "./utills"                         perfectionist/sort-imports
+  38:12  warning  'avatarerror' is assigned a value but never used                                                @typescript-eslint/no-unused-vas
+
+/var/www/tick-m-events/src/sections/profile-&-services-management/offer-and-service.tsx
+   2:1   warning  Expected "react" to come before "@mui/material"                                              perfectionist/sort-imports
+   2:23  warning  Expected "useEffect" to come before "useCallback"                                            perfectionist/sort-named-imports
+   2:34  warning  Expected "useState" to come before "useEffect"                                               perfectionist/sort-named-imports
+   3:1   warning  Expected "react-redux" to come before "react"                                                perfectionist/sort-imports
+   7:1   warning  All imports in the declaration are only used as types. Use `import type`                     @typescript-eslint/consistent-types
+   7:1   warning  Expected "src/redux/store" to come before "src/components/tables/profile-and-service-table"  perfectionist/sort-imports
+   7:23  warning  Expected "RootState" to come before "AppDispatch"                                            perfectionist/sort-named-imports
+  11:1   warning  Expected "./add-service" to come before "./utills"                                           perfectionist/sort-imports
+
+/var/www/tick-m-events/src/sections/profile-&-services-management/provider-availability.tsx
+  20:12  warning  'loading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/profile-&-services-management/single-profile/index.tsx
+   65:11  warning  'ProfileData' is defined but never used                                                                                       s
+  116:22  warning  Do not define components during render. React will see a new component type on every render and destroy the entire subtree’s Ds
+
+/var/www/tick-m-events/src/sections/profile-&-services-management/verification.tsx
+  27:21  warning  'email' is assigned a value but never used             @typescript-eslint/no-unused-vars
+  41:12  warning  'country' is assigned a value but never used           @typescript-eslint/no-unused-vars
+  41:21  warning  'setCountry' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  42:12  warning  'paymentMethod' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  42:27  warning  'setPaymentMethod' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/projects/placeABid/Add/index.tsx
+   1:1    warning  Imports "SelectChangeEvent" are only used as type                                                      @typescript-eslint/conss
+   2:23   warning  Expected "Button" to come before "FormControl"                                                         perfectionist/sort-names
+   2:43   warning  Expected "TextField" to come before "InputLabel"                                                       perfectionist/sort-names
+   2:72   warning  Expected "Select" to come before "CircularProgress"                                                    perfectionist/sort-names
+   2:95   warning  Expected "MenuItem" to come before "ListSubheader"                                                     perfectionist/sort-names
+   2:105  warning  Expected "Avatar" to come before "MenuItem"                                                            perfectionist/sort-names
+   2:105  warning  'Avatar' is defined but never used                                                                     @typescript-eslint/no-us
+   2:105  warning  'Avatar' is defined but never used                                                                     unused-imports/no-unuses
+   3:24   warning  Expected "Typography" to come before "SelectChangeEvent"                                               perfectionist/sort-names
+   5:1    warning  Expected "react-toastify" to come before "@mui/material"                                               perfectionist/sort-impos
+   6:1    warning  Expected "react-quill" to come before "react-toastify"                                                 perfectionist/sort-impos
+   7:1    warning  Expected "react-quill/dist/quill.snow.css" to come before "react-quill"                                perfectionist/sort-impos
+   8:1    warning  Missed spacing between "react-quill/dist/quill.snow.css" and "react" imports                           perfectionist/sort-impos
+   8:23   warning  Expected "useEffect" to come before "useCallback"                                                      perfectionist/sort-names
+   8:34   warning  Expected "useRef" to come before "useEffect"                                                           perfectionist/sort-names
+   8:34   warning  'useRef' is defined but never used                                                                     @typescript-eslint/no-us
+   8:34   warning  'useRef' is defined but never used                                                                     unused-imports/no-unuses
+   9:1    warning  Expected "react-redux" to come before "react"                                                          perfectionist/sort-impos
+  10:1    warning  Missed spacing between "react-redux" and "src/components/multiple-responsive-heading/heading" imports  perfectionist/sort-impos
+  11:1    warning  Expected "src/layouts/dashboard" to come before "src/components/multiple-responsive-heading/heading"   perfectionist/sort-impos
+  15:1    warning  All imports in the declaration are only used as types. Use `import type`                               @typescript-eslint/conss
+  15:1    warning  Expected "src/redux/store" to come before "src/redux/actions/organizer/place-a-bid.action"             perfectionist/sort-impos
+  15:23   warning  Expected "RootState" to come before "AppDispatch"                                                      perfectionist/sort-names
+  16:1    warning  Missed spacing between "src/redux/store" and "src/sections/entry-validation/event-status" imports      perfectionist/sort-impos
+
+/var/www/tick-m-events/src/sections/projects/placeABid/list/index.tsx
+   1:28  warning  Expected "useState" to come before "useEffect"                                                     perfectionist/sort-named-imps
+   3:1   warning  Missed spacing between "react-redux" and "@mui/material" imports                                   perfectionist/sort-imports
+   5:5   warning  Expected "Card" to come before "Typography"                                                        perfectionist/sort-named-imps
+   7:5   warning  Expected "Grid" to come before "CardContent"                                                       perfectionist/sort-named-imps
+   8:5   warning  Expected "Box" to come before "Grid"                                                               perfectionist/sort-named-imps
+  14:1   warning  Missed spacing between "@mui/material" and "src/layouts/dashboard" imports                         perfectionist/sort-imports
+  16:1   warning  All imports in the declaration are only used as types. Use `import type`                           @typescript-eslint/consistens
+  16:1   warning  Expected "src/redux/store" to come before "src/redux/actions/organizer/pageEvents"                 perfectionist/sort-imports
+  16:23  warning  Expected "RootState" to come before "AppDispatch"                                                  perfectionist/sort-named-imps
+  17:1   warning  Missed spacing between "src/redux/store" and "src/sections/entry-validation/event-status" imports  perfectionist/sort-imports
+  18:1   warning  Expected "react-router-dom" to come before "src/sections/entry-validation/event-status"            perfectionist/sort-imports
+  19:1   warning  Missed spacing between "react-router-dom" and "src/hooks/formate-time" imports                     perfectionist/sort-imports
+
+/var/www/tick-m-events/src/sections/projects/placeABid/signed-project-list/index.tsx
+  194:36  warning  Do not define components during render. React will see a new component type on every render and destroy the entire subtree’s Ds
+  360:38  warning  Dangerous property 'dangerouslySetInnerHTML' found                                                                            r
+
+/var/www/tick-m-events/src/sections/projects/placeABid/view-bids/Confirm-acceptance-dialog.tsx
+  2:17  warning  Expected "Box" to come before "Typography"    perfectionist/sort-named-imports
+  2:33  warning  Expected "Button" to come before "TextField"  perfectionist/sort-named-imports
+  2:41  warning  Expected "Alert" to come before "Button"      perfectionist/sort-named-imports
+
+/var/www/tick-m-events/src/sections/projects/placeABid/view-bids/bidActionDialog.tsx
+   1:1   warning  Imports "SelectChangeEvent" are only used as type                                          @typescript-eslint/consistent-type-is
+   2:17  warning  Expected "Box" to come before "Typography"                                                 perfectionist/sort-named-imports
+   2:33  warning  Expected "Chip" to come before "TextField"                                                 perfectionist/sort-named-imports
+   2:33  warning  'Chip' is defined but never used                                                           @typescript-eslint/no-unused-vars
+   2:33  warning  'Chip' is defined but never used                                                           unused-imports/no-unused-imports
+   2:68  warning  Expected "InputLabel" to come before "FormControl"                                         perfectionist/sort-named-imports
+   3:5   warning  Expected "Alert" to come before "InputLabel"                                               perfectionist/sort-named-imports
+   3:33  warning  Expected "Grid" to come before "DialogTitle"                                               perfectionist/sort-named-imports
+   3:68  warning  Expected "Tooltip" to come before "SelectChangeEvent"                                      perfectionist/sort-named-imports
+   4:35  warning  Expected "Stack" to come before "DialogActions"                                            perfectionist/sort-named-imports
+   4:63  warning  Expected "Select" to come before "IconButton"                                              perfectionist/sort-named-imports
+   6:1   warning  Expected "@mui/icons-material/Info" to come before "@mui/material"                         perfectionist/sort-imports
+   8:1   warning  Expected "react" to come before "react-router-dom"                                         perfectionist/sort-imports
+   8:33  warning  Expected "useEffect" to come before "useCallback"                                          perfectionist/sort-named-imports
+   9:1   warning  Expected "react-redux" to come before "react"                                              perfectionist/sort-imports
+  10:1   warning  Missed spacing between "react-redux" and "@mui/icons-material" imports                     perfectionist/sort-imports
+  10:23  warning  Expected "Cancel" to come before "CheckCircle"                                             perfectionist/sort-named-imports
+  10:31  warning  Expected "Edit" to come before "Cancel"                                                    perfectionist/sort-named-imports
+  11:1   warning  Expected "@mui/icons-material/Add" to come before "@mui/icons-material"                    perfectionist/sort-imports
+  15:1   warning  All imports in the declaration are only used as types. Use `import type`                   @typescript-eslint/consistent-type-is
+  15:1   warning  Expected "src/redux/store" to come before "src/redux/actions/organizer/pageEvents"         perfectionist/sort-imports
+  15:23  warning  Expected "RootState" to come before "AppDispatch"                                          perfectionist/sort-named-imports
+  16:1   warning  Expected "src/hooks/formate-time" to come before "src/redux/store"                         perfectionist/sort-imports
+  17:1   warning  Missed spacing between "src/hooks/formate-time" and "./Confirm-acceptance-dialog" imports  perfectionist/sort-imports
+  18:1   warning  Expected "../../../../redux/helper/axios" to come before "./Confirm-acceptance-dialog"     perfectionist/sort-imports
+  51:11  warning  'navigate' is assigned a value but never used                                              @typescript-eslint/no-unused-vars
+  52:12  warning  'status' is assigned a value but never used                                                @typescript-eslint/no-unused-vars
+  52:20  warning  'setStatus' is assigned a value but never used                                             @typescript-eslint/no-unused-vars
+  53:12  warning  'message' is assigned a value but never used                                               @typescript-eslint/no-unused-vars
+  53:21  warning  'setMessage' is assigned a value but never used                                            @typescript-eslint/no-unused-vars
+  61:12  warning  'statusUpdates' is assigned a value but never used                                         @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/projects/placeABid/view-bids/index.tsx
+    3:23  warning  Expected "useParams" to come before "useNavigate"                                                 perfectionist/sort-named-imps
+    4:1   warning  Missed spacing between "react-router-dom" and "@mui/icons-material/Chat" imports                  perfectionist/sort-imports
+    6:1   warning  Expected "@mui/icons-material/Star" to come before "@mui/icons-material/EmojiEvents"              perfectionist/sort-imports
+    8:17  warning  Expected "Box" to come before "Typography"                                                        perfectionist/sort-named-imps
+    9:16  warning  Expected "Paper" to come before "Container"                                                       perfectionist/sort-named-imps
+    9:23  warning  Expected "Tabs" to come before "Paper"                                                            perfectionist/sort-named-imps
+    9:29  warning  Expected "Tab" to come before "Tabs"                                                              perfectionist/sort-named-imps
+    9:44  warning  Expected "Alert" to come before "Skeleton"                                                        perfectionist/sort-named-imps
+   11:1   warning  Expected "@mui/icons-material" to come before "@mui/material"                                     perfectionist/sort-imports
+   11:21  warning  Expected "Schedule" to come before "ArrowBack"                                                    perfectionist/sort-named-imps
+   11:31  warning  Expected "Person" to come before "Schedule"                                                       perfectionist/sort-named-imps
+   11:39  warning  Expected "Work" to come before "Person"                                                           perfectionist/sort-named-imps
+   11:57  warning  Expected "Event" to come before "LocationOn"                                                      perfectionist/sort-named-imps
+   14:1   warning  All imports in the declaration are only used as types. Use `import type`                          @typescript-eslint/consistens
+   14:1   warning  Expected "src/redux/store" to come before "src/redux/actions/organizer/pageEvents"                perfectionist/sort-imports
+   14:23  warning  Expected "RootState" to come before "AppDispatch"                                                 perfectionist/sort-named-imps
+   15:1   warning  Expected "src/hooks/formate-time" to come before "src/redux/store"                                perfectionist/sort-imports
+   16:1   warning  Missed spacing between "src/hooks/formate-time" and "src/components/text-with-show-more" imports  perfectionist/sort-imports
+  117:15  warning  Use object destructuring                                                                          prefer-destructuring
+  336:11  warning  'BidCardProps' is defined but never used                                                          @typescript-eslint/no-unuseds
+
+/var/www/tick-m-events/src/sections/projects/placeABid/view-bids/reject-confirmation-dialog.tsx
+  2:16  warning  Expected "Button" to come before "TextField"  perfectionist/sort-named-imports
+  2:24  warning  Expected "Alert" to come before "Button"      perfectionist/sort-named-imports
+
+/var/www/tick-m-events/src/sections/projects/projects-single-page/client-info.tsx
+   2:1   warning  Expected "@mui/icons-material/Facebook" to come before "@mui/icons-material/Instagram"          perfectionist/sort-imports
+   4:1   warning  Expected "@mui/icons-material/MusicNote" to come before "@mui/icons-material/LinkedIn"          perfectionist/sort-imports
+   6:22  warning  Expected "Paper" to come before "Typography"                                                    perfectionist/sort-named-imports
+   6:38  warning  Expected "Stack" to come before "Divider"                                                       perfectionist/sort-named-imports
+   7:17  warning  Expected "Link" to come before "IconButton"                                                     perfectionist/sort-named-imports
+   7:40  warning  Expected "Button" to come before "Tooltip"                                                      perfectionist/sort-named-imports
+   9:1   warning  Expected "react-router-dom" to come before "@mui/material"                                      perfectionist/sort-imports
+  10:1   warning  Missed spacing between "react-router-dom" and "@mui/icons-material/Chat" imports                perfectionist/sort-imports
+  13:1   warning  Expected "@mui/icons-material/Cancel" to come before "@mui/icons-material/CheckCircle"          perfectionist/sort-imports
+  14:1   warning  Expected "react-redux" to come before "@mui/icons-material/Cancel"                              perfectionist/sort-imports
+  17:1   warning  Missed spacing between "src/hooks/formate-time" and "src/redux/actions/secure.acation" imports  perfectionist/sort-imports
+  18:1   warning  Expected "react" to come before "src/redux/actions/secure.acation"                              perfectionist/sort-imports
+  19:1   warning  All imports in the declaration are only used as types. Use `import type`                        @typescript-eslint/consistent-ts
+  19:1   warning  Missed spacing between "react" and "src/redux/store" imports                                    perfectionist/sort-imports
+  19:23  warning  Expected "RootState" to come before "AppDispatch"                                               perfectionist/sort-named-imports
+  24:13  warning  'isAssigned' is assigned a value but never used                                                 @typescript-eslint/no-unused-vas
+
+/var/www/tick-m-events/src/sections/projects/projects-single-page/place-project-bid.tsx
+   2:1   warning  Missed spacing between "react" and "@mui/material" imports                                         perfectionist/sort-imports
+   3:22  warning  Expected "Grid" to come before "Typography"                                                        perfectionist/sort-named-imps
+   3:44  warning  Expected "Stack" to come before "Divider"                                                          perfectionist/sort-named-imps
+   4:16  warning  Expected "MenuItem" to come before "TextField"                                                     perfectionist/sort-named-imps
+   4:26  warning  Expected "Button" to come before "MenuItem"                                                        perfectionist/sort-named-imps
+   5:5   warning  Expected "Alert" to come before "IconButton"                                                       perfectionist/sort-named-imps
+   5:30  warning  Expected "Card" to come before "CircularProgress"                                                  perfectionist/sort-named-imps
+   7:1   warning  Expected "react-router-dom" to come before "@mui/material"                                         perfectionist/sort-imports
+   8:1   warning  Expected "react-quill" to come before "react-router-dom"                                           perfectionist/sort-imports
+   9:1   warning  Expected "react-quill/dist/quill.snow.css" to come before "react-quill"                            perfectionist/sort-imports
+  10:1   warning  Missed spacing between "react-quill/dist/quill.snow.css" and "@mui/icons-material/Add" imports     perfectionist/sort-imports
+  13:1   warning  Expected "react-redux" to come before "@mui/icons-material/CheckCircle"                            perfectionist/sort-imports
+  16:1   warning  All imports in the declaration are only used as types. Use `import type`                           @typescript-eslint/consistens
+  16:1   warning  Expected "src/redux/store" to come before "src/redux/actions/provider/projects/place-a-bd.action"  perfectionist/sort-imports
+
+/var/www/tick-m-events/src/sections/projects/provider-bids-list/index.tsx
+  303:9   warning  'formatDate' is assigned a value but never used                                                                               s
+  339:29  warning  Do not define components during render. React will see a new component type on every render and destroy the entire subtree’s Ds
+
+/var/www/tick-m-events/src/sections/reservations-and-contracts/reservationTable.tsx
+   3:1  warning  Missed spacing between "react" and "@mui/material" imports                         perfectionist/sort-imports
+   8:3  warning  Expected "TableHead" to come before "TableContainer"                               perfectionist/sort-named-imports
+   9:3  warning  Expected "TableRow" to come before "TableHead"                                     perfectionist/sort-named-imports
+  10:3  warning  Expected "Paper" to come before "TableRow"                                         perfectionist/sort-named-imports
+  11:3  warning  Expected "Grid" to come before "Paper"                                             perfectionist/sort-named-imports
+  13:3  warning  Expected "Box" to come before "Button"                                             perfectionist/sort-named-imports
+  15:3  warning  Expected "Chip" to come before "Typography"                                        perfectionist/sort-named-imports
+  20:3  warning  Expected "IconButton" to come before "DialogActions"                               perfectionist/sort-named-imports
+  22:1  warning  Expected "@mui/icons-material" to come before "@mui/material"                      perfectionist/sort-imports
+  23:1  warning  Missed spacing between "@mui/icons-material" and "src/hooks/formate-time" imports  perfectionist/sort-imports
+
+/var/www/tick-m-events/src/sections/reservations-and-contracts/view/reservations-and-contracts-view.tsx
+  2:1   warning  Expected "react" to come before "react-redux"                                                                      perfectionists
+  2:21  warning  Expected "useState" to come before "useEffect"                                                                     perfectionists
+  3:1   warning  Missed spacing between "react" and "@mui/material" imports                                                         perfectionists
+  4:1   warning  Missed spacing between "@mui/material" and "src/layouts/dashboard" imports                                         perfectionists
+  5:1   warning  Missed spacing between "src/layouts/dashboard" and "src/components/matrix-three-cards/matrix-three-cards" imports  perfectionists
+  6:1   warning  All imports in the declaration are only used as types. Use `import type`                                           @typescript-es
+  6:1   warning  Expected "src/redux/store" to come before "src/components/matrix-three-cards/matrix-three-cards"                   perfectionists
+  6:23  warning  Expected "RootState" to come before "AppDispatch"                                                                  perfectionists
+  8:1   warning  Missed spacing between "src/redux/actions/provider/reservation-contract" and "../reservationTable" imports         perfectionists
+
+/var/www/tick-m-events/src/sections/search-&-select-service-providers/ProposalsList.tsx
+   2:1   warning  Missed spacing between "react-router-dom" and "@mui/material" imports                   perfectionist/sort-imports
+   3:20  warning  Expected "Avatar" to come before "Typography"                                           perfectionist/sort-named-imports
+   3:28  warning  Expected "Grid" to come before "Avatar"                                                 perfectionist/sort-named-imports
+   3:42  warning  Expected "Paper" to come before "Button"                                                perfectionist/sort-named-imports
+   3:67  warning  Expected "Stack" to come before "Tooltip"                                               perfectionist/sort-named-imports
+   3:67  warning  'Stack' is defined but never used                                                       @typescript-eslint/no-unused-vars
+   3:67  warning  'Stack' is defined but never used                                                       unused-imports/no-unused-imports
+   4:54  warning  Expected "Chip" to come before "DialogActions"                                          perfectionist/sort-named-imports
+   4:72  warning  Expected "TextField" to come before "IconButton"                                        perfectionist/sort-named-imports
+   7:1   warning  Expected "@mui/icons-material/Info" to come before "@mui/material"                      perfectionist/sort-imports
+   9:23  warning  Expected "useState" to come before "useCallback"                                        perfectionist/sort-named-imports
+  10:1   warning  Missed spacing between "react" and "@mui/icons-material/Close" imports                  perfectionist/sort-imports
+  11:1   warning  Expected "@mui/icons-material/Star" to come before "@mui/icons-material/Close"          perfectionist/sort-imports
+  14:1   warning  Expected "@mui/icons-material/Cancel" to come before "@mui/icons-material/CheckCircle"  perfectionist/sort-imports
+  16:1   warning  Expected "react-redux" to come before "@mui/icons-material/EmojiEvents"                 perfectionist/sort-imports
+  17:1   warning  Missed spacing between "react-redux" and "@mui/icons-material" imports                  perfectionist/sort-imports
+  20:1   warning  All imports in the declaration are only used as types. Use `import type`                @typescript-eslint/consistent-type-impos
+  20:1   warning  Expected "src/redux/store" to come before "src/redux/actions/organizer/pageEvents"      perfectionist/sort-imports
+  21:1   warning  Missed spacing between "src/redux/store" and "./socialLinks" imports                    perfectionist/sort-imports
+  81:17  warning  'transId' is assigned a value but never used                                            @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/search-&-select-service-providers/ProviderCardList.tsx
+  1:34  warning  Expected "Button" to come before "Typography"      perfectionist/sort-named-imports
+  1:42  warning  Expected "Grid" to come before "Button"            perfectionist/sort-named-imports
+  1:80  warning  Expected "Avatar" to come before "ListItemAvatar"  perfectionist/sort-named-imports
+  2:1   warning  Expected "react" to come before "@mui/material"    perfectionist/sort-imports
+
+/var/www/tick-m-events/src/sections/search-&-select-service-providers/ServiceCard.tsx
+    2:20   warning  Expected "Chip" to come before "Typography"                                                                                pes
+    2:55   warning  Expected "Paper" to come before "DialogTitle"                                                                              pes
+    2:96   warning  Expected "IconButton" to come before "useMediaQuery"                                                                       pes
+    3:18   warning  Expected "TextField" to come before "DialogContent"                                                                        pes
+    3:47   warning  Expected "Collapse" to come before "FormControlLabel"                                                                      pes
+    3:47   warning  'Collapse' is defined but never used                                                                                       @ts
+    3:47   warning  'Collapse' is defined but never used                                                                                       uns
+    3:100  warning  Expected "InputAdornment" to come before "CircularProgress"                                                                pes
+    5:1    warning  Expected "@mui/icons-material/ChevronLeft" to come before "@mui/material"                                                  pes
+    8:1    warning  Expected "react-redux" to come before "@mui/icons-material/CheckCircle"                                                    pes
+    9:1    warning  Expected "react" to come before "react-redux"                                                                              pes
+   11:1    warning  Missed spacing between "react-toastify" and "@mui/icons-material/LocationOn" imports                                       pes
+   13:1    warning  Missed spacing between "@mui/icons-material/AttachMoney" and "src/components/multiple-responsive-heading/heading" imports  pes
+   14:1    warning  Expected "src/redux/actions/service-request" to come before "src/components/multiple-responsive-heading/heading"           pes
+   15:1    warning  All imports in the declaration are only used as types. Use `import type`                                                   @ts
+   15:1    warning  Expected "src/redux/store" to come before "src/redux/actions/service-request"                                              pes
+   16:1    warning  Expected "@mui/icons-material/Close" to come before "src/redux/store"                                                      pes
+  148:9    warning  'today' is assigned a value but never used                                                                                 @ts
+
+/var/www/tick-m-events/src/sections/search-&-select-service-providers/view/search-&-select-service-providers-view.tsx
+   1:21  warning  Expected "useState" to come before "useEffect"                                                                              pers
+   2:1   warning  Missed spacing between "react" and "@mui/material" imports                                                                  pers
+   3:1   warning  Expected "react-redux" to come before "@mui/material"                                                                       pers
+   6:1   warning  Expected "src/layouts/dashboard" to come before "src/components/page-title-section"                                         pers
+   7:1   warning  Missed spacing between "src/layouts/dashboard" and "src/components/button/multiple-button" imports                          pers
+   8:1   warning  All imports in the declaration are only used as types. Use `import type`                                                    @tys
+   8:1   warning  Expected "src/redux/store" to come before "src/components/button/multiple-button"                                           pers
+   8:23  warning  Expected "RootState" to come before "AppDispatch"                                                                           pers
+  11:1   warning  Missed spacing between "src/redux/actions/organizer/pageEvents" and "src/sections/entry-validation/event-status" imports    pers
+  12:1   warning  Expected "src/redux/actions/event.action" to come before "src/sections/entry-validation/event-status"                       pers
+  13:55  warning  Expected "getRequestsByProvider" to come before "getRequestsByOrganizer"                                                    pers
+  14:1   warning  Missed spacing between "src/redux/actions/service-request" and "src/components/modal/provider-orgnizer-info-modal" imports  pers
+  17:1   warning  Expected "../ProviderCardList" to come before "../SearchAndAdvanceFilter"                                                   pers
+  18:1   warning  Expected "../ProposalsList" to come before "../ProviderCardList"                                                            pers
+  19:1   warning  Expected "../RequestService" to come before "../ProposalsList"                                                              pers
+  35:10  warning  'offerList' is assigned a value but never used                                                                              @tys
+
+/var/www/tick-m-events/src/sections/statistics-&-performance/RevenueStats.tsx
+  59:9  warning  'isMobile' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/statistics-&-performance/TopNavButtons.tsx
+  12:9  warning  'isMobile' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/statistics-and-reports/live-sales-&-revenue-data.tsx
+   1:1   warning  All imports in the declaration are only used as types. Use `import type`                           @typescript-eslint/consistens
+   2:1   warning  Expected "react-apexcharts" to come before "apexcharts"                                            perfectionist/sort-imports
+   3:1   warning  Missed spacing between "react-apexcharts" and "@mui/material" imports                              perfectionist/sort-imports
+   3:29  warning  Expected "ToggleButton" to come before "ToggleButtonGroup"                                         perfectionist/sort-named-imps
+   3:43  warning  Expected "Box" to come before "ToggleButton"                                                       perfectionist/sort-named-imps
+   4:1   warning  Expected "react" to come before "@mui/material"                                                    perfectionist/sort-imports
+   4:20  warning  Expected "useMemo" to come before "useState"                                                       perfectionist/sort-named-imps
+   5:1   warning  Missed spacing between "react" and "src/components/multiple-responsive-heading/heading" imports    perfectionist/sort-imports
+   6:1   warning  Missed spacing between "src/components/multiple-responsive-heading/heading" and "./utils" imports  perfectionist/sort-imports
+  31:10  warning  'getISOWeek' is defined but never used                                                             @typescript-eslint/no-unuseds
+  96:10  warning  'getWeekdayLabel' is defined but never used                                                        @typescript-eslint/no-unuseds
+
+/var/www/tick-m-events/src/sections/statistics-and-reports/main-dashboard-statistics.tsx
+  1:33  warning  Expected "Card" to come before "Typography"                                                                   perfectionist/sorts
+  2:1   warning  All imports in the declaration are only used as types. Use `import type`                                      @typescript-eslints
+  2:1   warning  Expected "apexcharts" to come before "@mui/material"                                                          perfectionist/sorts
+  3:1   warning  Expected "react" to come before "apexcharts"                                                                  perfectionist/sorts
+  6:1   warning  Missed spacing between "react-redux" and "src/components/multiple-responsive-heading/heading" imports         perfectionist/sorts
+  7:1   warning  Expected "src/hooks/format-revenu" to come before "src/components/multiple-responsive-heading/heading"        perfectionist/sorts
+  8:1   warning  Missed spacing between "src/hooks/format-revenu" and "src/redux/actions/organizer/statistics-report" imports  perfectionist/sorts
+  9:1   warning  All imports in the declaration are only used as types. Use `import type`                                      @typescript-eslints
+  9:1   warning  Expected "src/redux/store" to come before "src/redux/actions/organizer/statistics-report"                     perfectionist/sorts
+  9:23  warning  Expected "RootState" to come before "AppDispatch"                                                             perfectionist/sorts
+
+/var/www/tick-m-events/src/sections/statistics-and-reports/report-data-export.tsx
+  1:39  warning  Expected "Table" to come before "Typography"                              perfectionist/sort-named-imports
+  1:84  warning  Expected "TableHead" to come before "TableContainer"                      perfectionist/sort-named-imports
+  1:95  warning  Expected "TableRow" to come before "TableHead"                            perfectionist/sort-named-imports
+  2:1   warning  All imports in the declaration are only used as types. Use `import type`  @typescript-eslint/consistent-type-imports
+  2:1   warning  Expected "apexcharts" to come before "@mui/material"                      perfectionist/sort-imports
+  3:1   warning  Expected "react-apexcharts" to come before "apexcharts"                   perfectionist/sort-imports
+
+/var/www/tick-m-events/src/sections/statistics-and-reports/small-charts/main-chart-componets.tsx
+    2:1   warning  Missed spacing between "react" and "@mui/material" imports                perfectionist/sort-imports
+    2:39  warning  Expected "useTheme" to come before "Typography"                           perfectionist/sort-named-imports
+    2:39  warning  'useTheme' is defined but never used                                      @typescript-eslint/no-unused-vars
+    2:39  warning  'useTheme' is defined but never used                                      unused-imports/no-unused-imports
+    2:49  warning  'useMediaQuery' is defined but never used                                 @typescript-eslint/no-unused-vars
+    2:49  warning  'useMediaQuery' is defined but never used                                 unused-imports/no-unused-imports
+    3:1   warning  Expected "react-apexcharts" to come before "@mui/material"                perfectionist/sort-imports
+    4:1   warning  All imports in the declaration are only used as types. Use `import type`  @typescript-eslint/consistent-type-imports
+  149:7   warning  'clickRatesOptions' is assigned a value but never used                    @typescript-eslint/no-unused-vars
+  166:7   warning  'clickRatesSeries' is assigned a value but never used                     @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/statistics-and-reports/ticket-details-&-categories.tsx
+  1:33   warning  Expected "Table" to come before "Typography"                               perfectionist/sort-named-imports
+  1:78   warning  Expected "TableHead" to come before "TableContainer"                       perfectionist/sort-named-imports
+  1:89   warning  Expected "TableRow" to come before "TableHead"                             perfectionist/sort-named-imports
+  1:99   warning  Expected "Paper" to come before "TableRow"                                 perfectionist/sort-named-imports
+  1:106  warning  Expected "Grid" to come before "Paper"                                     perfectionist/sort-named-imports
+  2:1    warning  Expected "react-apexcharts" to come before "@mui/material"                 perfectionist/sort-imports
+  3:1    warning  All imports in the declaration are only used as types. Use `import type`   @typescript-eslint/consistent-type-imports
+  4:1    warning  Missed spacing between "apexcharts" and "src/hooks/format-revenu" imports  perfectionist/sort-imports
+
+/var/www/tick-m-events/src/sections/statistics-and-reports/ticket-details.tsx
+  1:18  warning  Expected "Box" to come before "Avatar"                                       perfectionist/sort-named-imports
+  2:1   warning  Missed spacing between "@mui/material" and "src/components/iconify" imports  perfectionist/sort-imports
+
+/var/www/tick-m-events/src/sections/statistics-and-reports/utils.tsx
+  1:1  warning  All imports in the declaration are only used as types. Use `import type`  @typescript-eslint/consistent-type-imports
+
+/var/www/tick-m-events/src/sections/statistics-and-reports/view/statistics-and-reports-view.tsx
+   1:21  warning  Expected "useState" to come before "useEffect"                                                                 perfectionist/sos
+   3:1   warning  Missed spacing between "react-redux" and "@mui/material" imports                                               perfectionist/sos
+   3:18  warning  Expected "Box" to come before "Button"                                                                         perfectionist/sos
+   6:1   warning  All imports in the declaration are only used as types. Use `import type`                                       @typescript-eslis
+   6:1   warning  Expected "src/redux/store" to come before "src/redux/actions/event.action"                                     perfectionist/sos
+   6:23  warning  Expected "RootState" to come before "AppDispatch"                                                              perfectionist/sos
+   7:1   warning  Missed spacing between "src/redux/store" and "src/components/page-title-section" imports                       perfectionist/sos
+   8:1   warning  Expected "src/layouts/dashboard" to come before "src/components/page-title-section"                            perfectionist/sos
+   9:1   warning  Missed spacing between "src/layouts/dashboard" and "src/sections/entry-validation/event-status" imports        perfectionist/sos
+  10:1   warning  Expected "src/redux/actions/organizer/pageEvents" to come before "src/sections/entry-validation/event-status"  perfectionist/sos
+  15:1   warning  Expected "../small-charts/main-chart-componets" to come before "../ticket-details-&-categories"                perfectionist/sos
+  16:1   warning  Expected "../report-data-export" to come before "../small-charts/main-chart-componets"                         perfectionist/sos
+  17:1   warning  Expected "../ticket-details" to come before "../report-data-export"                                            perfectionist/sos
+
+/var/www/tick-m-events/src/sections/ticket-and-reservation-management/reservation-management.tsx
+   1:51  warning  Expected "Typography" to come before "FormControlLabel"                                                               perfectios
+   1:76  warning  Expected "Radio" to come before "FormControl"                                                                         perfectios
+   2:1   warning  Expected "apexcharts" to come before "@mui/material"                                                                  perfectios
+   2:10  warning  'ApexOptions' is defined but never used                                                                               @typescris
+   2:10  warning  'ApexOptions' is defined but never used                                                                               unused-ims
+   3:1   warning  Expected "react-apexcharts" to come before "apexcharts"                                                               perfectios
+   5:1   warning  Missed spacing between "react-router-dom" and "src/components/multiple-responsive-heading/heading" imports            perfectios
+   6:1   warning  All imports in the declaration are only used as types. Use `import type`                                              @typescris
+   6:1   warning  Expected "src/redux/store" to come before "src/components/multiple-responsive-heading/heading"                        perfectios
+   7:1   warning  Missed spacing between "src/redux/store" and "src/components/tables/ticket-reservation-management-table" imports      perfectios
+   8:1   warning  Expected "src/hooks/download_unique_name" to come before "src/components/tables/ticket-reservation-management-table"  perfectios
+  10:1   warning  Expected "react" to come before "src/hooks/downloadable"                                                              perfectios
+  11:1   warning  Expected "react-redux" to come before "react"                                                                         perfectios
+  12:1   warning  Expected "react-toastify" to come before "react-redux"                                                                perfectios
+  13:1   warning  Missed spacing between "react-toastify" and "../../redux/actions/event.action" imports                                perfectios
+  14:1   warning  Imports "ListViewMethod" and "ValidationOptions" are only used as type                                                @typescris
+  14:32  warning  Expected "ListViewMethod" to come before "chartRealTimeOptions"                                                       perfectios
+  14:83  warning  Expected "ValidationOptions" to come before "reservationManagementTableHeaders"                                       perfectios
+
+/var/www/tick-m-events/src/sections/ticket-and-reservation-management/sales-&-stock-tracking.tsx
+    1:28  warning  Expected "MenuItem" to come before "FormControl"                                                                              s
+    1:38  warning  Expected "Paper" to come before "MenuItem"                                                                                    s
+    1:53  warning  Expected "Tab" to come before "Select"                                                                                        s
+    1:53  warning  'Tab' is defined but never used                                                                                               s
+    1:53  warning  'Tab' is defined but never used                                                                                               s
+    1:58  warning  'Tabs' is defined but never used                                                                                              s
+    1:58  warning  'Tabs' is defined but never used                                                                                              s
+    2:1   warning  Expected "react" to come before "@mui/material"                                                                               s
+    3:1   warning  Missed spacing between "react" and "@mui/material/styles" imports                                                             s
+    4:1   warning  Expected "react-apexcharts" to come before "@mui/material/styles"                                                             s
+    5:1   warning  All imports in the declaration are only used as types. Use `import type`                                                      s
+    6:1   warning  Missed spacing between "apexcharts" and "src/components/multiple-responsive-heading/heading" imports                          s
+    8:1   warning  Extra spacing between "src/components/multiple-responsive-heading/heading" and "src/components/tables/ticket-reservation-manags
+    9:1   warning  Missed spacing between "src/components/tables/ticket-reservation-management-table" and "./utills" imports                     s
+  178:9   warning  'handleTabChange' is assigned a value but never used                                                                          s
+
+/var/www/tick-m-events/src/sections/ticket-and-reservation-management/utills.tsx
+  1:1  warning  All imports in the declaration are only used as types. Use `import type`  @typescript-eslint/consistent-type-imports
+
+/var/www/tick-m-events/src/sections/ticket-and-reservation-management/view/ticket-and-reservation-management-view.tsx
+   2:1   warning  Expected "react" to come before "react-redux"                                                                                  s
+   2:21  warning  Expected "useState" to come before "useEffect"                                                                                 s
+   3:1   warning  Missed spacing between "react" and "@mui/material" imports                                                                     s
+   4:1   warning  Expected "react-router-dom" to come before "@mui/material"                                                                     s
+   5:1   warning  Missed spacing between "react-router-dom" and "src/components/page-title-section" imports                                      s
+   6:1   warning  Expected "src/layouts/dashboard" to come before "src/components/page-title-section"                                            s
+   7:1   warning  All imports in the declaration are only used as types. Use `import type`                                                       s
+   7:23  warning  Expected "RootState" to come before "AppDispatch"                                                                              s
+   9:1   warning  Missed spacing between "src/redux/actions/ticket-&-reservation-management.action" and "src/sections/entry-validation/event-stats
+  10:1   warning  Expected "src/redux/actions/event.action" to come before "src/sections/entry-validation/event-status"                          s
+
+/var/www/tick-m-events/src/sections/ticket-management/t-h-c-r.tsx
+  4:3  warning  Expected "Card" to come before "Button"       perfectionist/sort-named-imports
+  6:3  warning  Expected "Grid" to come before "CardContent"  perfectionist/sort-named-imports
+
+/var/www/tick-m-events/src/sections/ticket-management/ticket-card.tsx
+    1:23  warning  Expected "Card" to come before "Button"                                                                perfectionist/sort-names
+    1:42  warning  Expected "Grid" to come before "CardContent"                                                           perfectionist/sort-names
+    1:60  warning  Expected "Avatar" to come before "Typography"                                                          perfectionist/sort-names
+    2:1   warning  Expected "react" to come before "@mui/material"                                                        perfectionist/sort-impos
+    4:1   warning  Expected "react-toastify" to come before "react-router-dom"                                            perfectionist/sort-impos
+    7:1   warning  Expected "src/hooks/formate-time" to come before "src/components/multiple-responsive-heading/heading"  perfectionist/sort-impos
+  101:19  warning  'response' is assigned a value but never used                                                          @typescript-eslint/no-us
+  161:24  warning  'setAdminNotes' is assigned a value but never used                                                     @typescript-eslint/no-us
+
+/var/www/tick-m-events/src/sections/ticket-management/view/ticket-management-view.tsx
+   1:21  warning  Expected "useState" to come before "useEffect"                                                                     perfectioniss
+   1:31  warning  Expected "useMemo" to come before "useState"                                                                       perfectioniss
+   2:1   warning  Missed spacing between "react" and "@mui/material" imports                                                         perfectioniss
+   2:23  warning  Expected "Card" to come before "Button"                                                                            perfectioniss
+   2:29  warning  'CardContent' is defined but never used                                                                            @typescript-s
+   2:29  warning  'CardContent' is defined but never used                                                                            unused-impors
+   2:42  warning  Expected "Grid" to come before "CardContent"                                                                       perfectioniss
+   3:1   warning  Expected "@mui/icons-material/QrCode" to come before "@mui/material"                                               perfectioniss
+   3:8   warning  'QrCodeIcon' is defined but never used                                                                             @typescript-s
+   3:8   warning  'QrCodeIcon' is defined but never used                                                                             unused-impors
+   4:1   warning  Expected "react-redux" to come before "@mui/icons-material/QrCode"                                                 perfectioniss
+   7:1   warning  Expected "src/layouts/dashboard" to come before "src/components/page-title-section"                                perfectioniss
+   8:1   warning  Missed spacing between "src/layouts/dashboard" and "src/components/matrix-three-cards/matrix-three-cards" imports  perfectioniss
+   9:1   warning  All imports in the declaration are only used as types. Use `import type`                                           @typescript-s
+   9:1   warning  Expected "src/redux/store" to come before "src/components/matrix-three-cards/matrix-three-cards"                   perfectioniss
+  10:1   warning  Expected "axios" to come before "src/redux/store"                                                                  perfectioniss
+  10:10  warning  'all' is defined but never used                                                                                    @typescript-s
+  10:10  warning  'all' is defined but never used                                                                                    unused-impors
+  11:1   warning  Missed spacing between "axios" and "../../../redux/helper/axios" imports                                           perfectioniss
+  13:1   warning  Expected "../ticket-card" to come before "../t-h-c-r"                                                              perfectioniss
+  52:11  warning  'Props' is defined but never used                                                                                  @typescript-s
+
+/var/www/tick-m-events/src/sections/ticket-purchase-process/process-two.tsx
+    1:23  warning  Expected "Grid" to come before "Button"                                        perfectionist/sort-named-imports
+    1:47  warning  Expected "MenuItem" to come before "TextField"                                 perfectionist/sort-named-imports
+    1:90  warning  Expected "Alert" to come before "CircularProgress"                             perfectionist/sort-named-imports
+    2:1   warning  Expected "react-redux" to come before "@mui/material"                          perfectionist/sort-imports
+    3:23  warning  Expected "useEffect" to come before "useCallback"                              perfectionist/sort-named-imports
+    3:34  warning  Expected "useState" to come before "useEffect"                                 perfectionist/sort-named-imports
+    4:1   warning  Expected "react-phone-number-input" to come before "react"                     perfectionist/sort-imports
+    4:8   warning  'PhoneInput' is defined but never used                                         @typescript-eslint/no-unused-vars
+    4:8   warning  'PhoneInput' is defined but never used                                         unused-imports/no-unused-imports
+    5:1   warning  Expected "libphonenumber-js" to come before "react-phone-number-input"         perfectionist/sort-imports
+    6:1   warning  All imports in the declaration are only used as types. Use `import type`       @typescript-eslint/consistent-type-imports
+    6:1   warning  Missed spacing between "libphonenumber-js" and "src/redux/store" imports       perfectionist/sort-imports
+    7:1   warning  Expected "axios" to come before "src/redux/store"                              perfectionist/sort-imports
+    8:1   warning  Missed spacing between "axios" and "./head-process" imports                    perfectionist/sort-imports
+    9:1   warning  Expected "react-phone-number-input/style.css" to come before "./head-process"  perfectionist/sort-imports
+  265:9   warning  'handlePhoneChange' is assigned a value but never used                         @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/ticket-validation-at-entry/view/ticket-validation-at-entry-view.tsx
+  40:30  warning  'setUpcomingQrTicket' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/ticketing-&-transactions-supervision/EventManagementTable.tsx
+   2:1   warning  Missed spacing between "react" and "@mui/material" imports                                          perfectionist/sort-imports
+   3:20  warning  Expected "Paper" to come before "Typography"                                                        perfectionist/sort-named-ims
+   3:45  warning  Expected "TableRow" to come before "TableHead"                                                      perfectionist/sort-named-ims
+   4:3   warning  Expected "Button" to come before "TableBody"                                                        perfectionist/sort-named-ims
+   4:42  warning  Expected "InputLabel" to come before "FormControl"                                                  perfectionist/sort-named-ims
+   4:54  warning  Expected "Stack" to come before "InputLabel"                                                        perfectionist/sort-named-ims
+   4:61  warning  Expected "Chip" to come before "Stack"                                                              perfectionist/sort-named-ims
+   4:78  warning  Expected "Modal" to come before "TextField"                                                         perfectionist/sort-named-ims
+   6:1   warning  Expected "@mui/icons-material/ExpandMore" to come before "@mui/material"                            perfectionist/sort-imports
+   7:1   warning  Expected "react-redux" to come before "@mui/icons-material/ExpandMore"                              perfectionist/sort-imports
+   8:1   warning  All imports in the declaration are only used as types. Use `import type`                            @typescript-eslint/consistes
+   8:1   warning  Missed spacing between "react-redux" and "src/redux/store" imports                                  perfectionist/sort-imports
+   8:23  warning  Expected "RootState" to come before "AppDispatch"                                                   perfectionist/sort-named-ims
+   9:1   warning  Missed spacing between "src/redux/store" and "src/components/modal/event-verification" imports      perfectionist/sort-imports
+  10:1   warning  Expected "src/redux/actions/event.action" to come before "src/components/modal/event-verification"  perfectionist/sort-imports
+  24:10  warning  'success' is assigned a value but never used                                                        @typescript-eslint/no-unuses
+  25:10  warning  'cancelModalOpen' is assigned a value but never used                                                @typescript-eslint/no-unuses
+  25:27  warning  'setCancelModalOpen' is assigned a value but never used                                             @typescript-eslint/no-unuses
+  26:10  warning  'eventToCancel' is assigned a value but never used                                                  @typescript-eslint/no-unuses
+  26:25  warning  'setEventToCancel' is assigned a value but never used                                               @typescript-eslint/no-unuses
+
+/var/www/tick-m-events/src/sections/ticketing-&-transactions-supervision/InfoCard.tsx
+  3:3  warning  Expected "Grid" to come before "Button"  perfectionist/sort-named-imports
+
+/var/www/tick-m-events/src/sections/ticketing-&-transactions-supervision/PaymentMonitoringTable.tsx
+   2:1  warning  Missed spacing between "react" and "@mui/material" imports  perfectionist/sort-imports
+   5:3  warning  Expected "Paper" to come before "Typography"                perfectionist/sort-named-imports
+   8:3  warning  Expected "TableRow" to come before "TableHead"              perfectionist/sort-named-imports
+  11:3  warning  Expected "Button" to come before "TableBody"                perfectionist/sort-named-imports
+  11:3  warning  'Button' is defined but never used                          @typescript-eslint/no-unused-vars
+  11:3  warning  'Button' is defined but never used                          unused-imports/no-unused-imports
+  12:3  warning  Expected "Stack" to come before "Button"                    perfectionist/sort-named-imports
+  12:3  warning  'Stack' is defined but never used                           @typescript-eslint/no-unused-vars
+  12:3  warning  'Stack' is defined but never used                           unused-imports/no-unused-imports
+  13:3  warning  'Container' is defined but never used                       @typescript-eslint/no-unused-vars
+  13:3  warning  'Container' is defined but never used                       unused-imports/no-unused-imports
+  14:3  warning  'TableContainer' is defined but never used                  @typescript-eslint/no-unused-vars
+  14:3  warning  'TableContainer' is defined but never used                  unused-imports/no-unused-imports
+
+/var/www/tick-m-events/src/sections/ticketing-&-transactions-supervision/ticketing-statistics.tsx
+  3:3  warning  Expected "Paper" to come before "Typography"                                  perfectionist/sort-named-imports
+  4:3  warning  Expected "Grid" to come before "Paper"                                        perfectionist/sort-named-imports
+  5:3  warning  Expected "Box" to come before "Grid"                                          perfectionist/sort-named-imports
+  7:1  warning  Missed spacing between "@mui/material" and "src/hooks/format-revenu" imports  perfectionist/sort-imports
+
+/var/www/tick-m-events/src/sections/ticketing-&-transactions-supervision/view/ticketing-&-transactions-supervision-view.tsx
+   1:21  warning  Expected "useState" to come before "useEffect"                                                   perfectionist/sort-named-impors
+   2:1   warning  Missed spacing between "react" and "@mui/material" imports                                       perfectionist/sort-imports
+   3:1   warning  Expected "react-redux" to come before "@mui/material"                                            perfectionist/sort-imports
+   7:1   warning  All imports in the declaration are only used as types. Use `import type`                         @typescript-eslint/consistent-s
+   7:1   warning  Expected "src/redux/store" to come before "src/redux/actions/admin/ticket-trans-supervision"     perfectionist/sort-imports
+  11:1   warning  Expected "../InfoCard" to come before "../PaymentMonitoringTable"                                perfectionist/sort-imports
+  39:9   warning  Fragments should contain more than one child - otherwise, theres no need for a Fragment at all  react/jsx-no-useless-fragment
+
+/var/www/tick-m-events/src/sections/transaction-&-payment-management/PaymentMethodForm.tsx
+   52:12  warning  'tabValue' is assigned a value but never used          @typescript-eslint/no-unused-vars
+   61:11  warning  'handleTabChange' is assigned a value but never used   @typescript-eslint/no-unused-vars
+   65:13  warning  'loading' is assigned a value but never used           @typescript-eslint/no-unused-vars
+  103:26  warning  'setStatusFilter' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  104:27  warning  'setServiceFilter' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  107:11  warning  'uniqueServices' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  110:11  warning  'filteredData' is assigned a value but never used      @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/transaction-&-payment-management/tab-with-table.tsx
+  34:11  warning  'PaymentSetting' is defined but never used              @typescript-eslint/no-unused-vars
+  41:7   warning  'methodFields' is assigned a value but never used       @typescript-eslint/no-unused-vars
+  54:23  warning  'setEditingId' is assigned a value but never used       @typescript-eslint/no-unused-vars
+  61:13  warning  'loading' is assigned a value but never used            @typescript-eslint/no-unused-vars
+  61:38  warning  'withDrawalGateway' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  95:12  warning  'formValues' is assigned a value but never used         @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/transection-and-payment/help-center-and-security.tsx
+  1:27  warning  Expected "Button" to come before "Typography"                                                    perfectionist/sort-named-imports
+  1:35  warning  Expected "Grid" to come before "Button"                                                          perfectionist/sort-named-imports
+  2:1   warning  Expected "react-router-dom" to come before "@mui/material"                                       perfectionist/sort-imports
+  6:9   warning  Fragments should contain more than one child - otherwise, theres no need for a Fragment at all  react/jsx-no-useless-fragment
+
+/var/www/tick-m-events/src/sections/transection-and-payment/invoices-&-reports.tsx
+  1:21  warning  Expected "useState" to come before "useEffect"                                                                                  s
+  2:1   warning  Missed spacing between "react" and "@mui/material" imports                                                                      s
+  2:22  warning  Expected "Tab" to come before "Paper"                                                                                           s
+  3:1   warning  Missed spacing between "@mui/material" and "src/components/tables/transaction-&-payment-table" imports                          s
+  4:1   warning  Expected "src/components/multiple-responsive-heading/heading" to come before "src/components/tables/transaction-&-payment-table"s
+  5:1   warning  Expected "src/redux/helper/axios" to come before "src/components/multiple-responsive-heading/heading"                           s
+  6:1   warning  Imports "EventData" are only used as type                                                                                       s
+  6:1   warning  Missed spacing between "src/redux/helper/axios" and "./utils" imports                                                           s
+  6:31  warning  Expected "EventData" to come before "InvoiceTableHeaders"                                                                       s
+
+/var/www/tick-m-events/src/sections/transection-and-payment/metric-card.tsx
+  4:3  warning  Expected "Grid" to come before "CardContent"                         perfectionist/sort-named-imports
+  7:1  warning  Expected "react" to come before "@mui/material"                      perfectionist/sort-imports
+  8:1  warning  Missed spacing between "react" and "src/redux/helper/axios" imports  perfectionist/sort-imports
+
+/var/www/tick-m-events/src/sections/transection-and-payment/payment-history.tsx
+  2:1   warning  Expected "react" to come before "@mui/material"                                                                                 s
+  2:20  warning  Expected "useMemo" to come before "useState"                                                                                    s
+  3:1   warning  Missed spacing between "react" and "src/components/tables/select-bar" imports                                                   s
+  5:1   warning  Expected "src/components/multiple-responsive-heading/heading" to come before "src/components/tables/transaction-&-payment-table"s
+  6:1   warning  Missed spacing between "src/components/multiple-responsive-heading/heading" and "./utils" imports                               s
+  6:35  warning  Expected "tableHeaders" to come before "mapOrdersToAllTableData"                                                                s
+
+/var/www/tick-m-events/src/sections/transection-and-payment/payment-settings-&-prefrences.tsx
+  2:1  warning  Missed spacing between "@mui/material" and "../transaction-&-payment-management/PaymentMethodForm" imports  perfectionist/sort-ims
+
+/var/www/tick-m-events/src/sections/transection-and-payment/refund-management.tsx
+   1:21  warning  Expected "useState" to come before "useEffect"              perfectionist/sort-named-imports
+   1:31  warning  Expected "useMemo" to come before "useState"                perfectionist/sort-named-imports
+   2:1   warning  Missed spacing between "react" and "@mui/material" imports  perfectionist/sort-imports
+   2:40  warning  Expected "RadioGroup" to come before "FormControlLabel"     perfectionist/sort-named-imports
+   3:1   warning  Expected "react-router-dom" to come before "@mui/material"  perfectionist/sort-imports
+  37:11  warning  'navigate' is assigned a value but never used               @typescript-eslint/no-unused-vars
+  39:12  warning  'daysBeforeEvent' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  40:12  warning  'partialRefundPercent' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  41:12  warning  'cutoffDate' is assigned a value but never used             @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/transection-and-payment/view/transection-and-payment-view.tsx
+   1:21  warning  Expected "useRef" to come before "useEffect"                                                         perfectionist/sort-named-is
+   3:1   warning  Expected "react-router-dom" to come before "react-redux"                                             perfectionist/sort-imports
+   5:1   warning  All imports in the declaration are only used as types. Use `import type`                             @typescript-eslint/consists
+   5:23  warning  Expected "RootState" to come before "AppDispatch"                                                    perfectionist/sort-named-is
+   7:1   warning  Missed spacing between "src/layouts/dashboard" and "src/components/page-title-section" imports       perfectionist/sort-imports
+   8:1   warning  Expected "src/redux/actions" to come before "src/components/page-title-section"                      perfectionist/sort-imports
+   9:1   warning  Missed spacing between "src/redux/actions" and "src/sections/entry-validation/event-status" imports  perfectionist/sort-imports
+  12:1   warning  Expected "../invoices-&-reports" to come before "../help-center-and-security"                        perfectionist/sort-imports
+  13:1   warning  Expected "../metric-card" to come before "../invoices-&-reports"                                     perfectionist/sort-imports
+  16:1   warning  Expected "../refund-management" to come before "../payment-settings-&-prefrences"                    perfectionist/sort-imports
+  17:1   warning  Expected "../withdrawal-request" to come before "../refund-management"                               perfectionist/sort-imports
+  19:1   warning  All imports in the declaration are only used as types. Use `import type`                             @typescript-eslint/consists
+  19:1   warning  Expected "../utils" to come before "../withdrawal-table-history"                                     perfectionist/sort-imports
+
+/var/www/tick-m-events/src/sections/transection-and-payment/withdrawal-request.tsx
+    2:1   warning  Missed spacing between "react" and "@mui/material" imports                               perfectionist/sort-imports
+    3:28  warning  Expected "Paper" to come before "MenuItem"                                               perfectionist/sort-named-imports
+    3:79  warning  Expected "InputLabel" to come before "FormControl"                                       perfectionist/sort-named-imports
+    4:5   warning  Expected "Grid" to come before "InputLabel"                                              perfectionist/sort-named-imports
+    6:1   warning  Expected "react-toastify" to come before "@mui/material"                                 perfectionist/sort-imports
+    9:49  warning  Expected "sendWithdrawalOTP" to come before "verifyWithdrawalOTP"                        perfectionist/sort-named-imports
+   10:1   warning  All imports in the declaration are only used as types. Use `import type`                 @typescript-eslint/consistent-type-ims
+   10:1   warning  Expected "src/redux/store" to come before "src/redux/actions/transactionPaymentActions"  perfectionist/sort-imports
+   10:23  warning  Expected "RootState" to come before "AppDispatch"                                        perfectionist/sort-named-imports
+   28:13  warning  'loading' is assigned a value but never used                                             @typescript-eslint/no-unused-vars
+   28:22  warning  'error' is assigned a value but never used                                               @typescript-eslint/no-unused-vars
+   28:29  warning  'success' is assigned a value but never used                                             @typescript-eslint/no-unused-vars
+  373:47  warning  Use object destructuring                                                                 prefer-destructuring
+
+/var/www/tick-m-events/src/sections/transection-and-payment/withdrawal-table-history.tsx
+  2:1   warning  Expected "react-redux" to come before "@mui/material"                                                                           s
+  3:1   warning  Expected "react" to come before "react-redux"                                                                                   s
+  4:1   warning  All imports in the declaration are only used as types. Use `import type`                                                        s
+  4:1   warning  Missed spacing between "react" and "src/redux/store" imports                                                                    s
+  4:23  warning  Expected "RootState" to come before "AppDispatch"                                                                               s
+  6:1   warning  Extra spacing between "src/redux/store" and "src/redux/actions/transactionPaymentActions" imports                               s
+  7:1   warning  Missed spacing between "src/redux/actions/transactionPaymentActions" and "src/components/tables/transaction-&-payment-table" imps
+  8:1   warning  Missed spacing between "src/components/tables/transaction-&-payment-table" and "./utils" imports                                s
+
+/var/www/tick-m-events/src/sections/user-management/KycDocumentTableCard.tsx
+   5:3   warning  Expected "Button" to come before "Typography"                             perfectionist/sort-named-imports
+   6:3   warning  Expected "Stack" to come before "Button"                                  perfectionist/sort-named-imports
+   6:46  warning  Expected "IconButton" to come before "DialogContent"                      perfectionist/sort-named-imports
+   8:1   warning  Expected "react-redux" to come before "@mui/material"                     perfectionist/sort-imports
+   9:1   warning  All imports in the declaration are only used as types. Use `import type`  @typescript-eslint/consistent-type-imports
+   9:1   warning  Missed spacing between "react-redux" and "src/redux/store" imports        perfectionist/sort-imports
+   9:23  warning  Expected "RootState" to come before "AppDispatch"                         perfectionist/sort-named-imports
+  10:1   warning  Expected "react" to come before "src/redux/store"                         perfectionist/sort-imports
+  10:21  warning  Expected "useState" to come before "useEffect"                            perfectionist/sort-named-imports
+  11:1   warning  Missed spacing between "react" and "@mui/icons-material/Close" imports    perfectionist/sort-imports
+  12:1   warning  Expected "react-toastify" to come before "@mui/icons-material/Close"      perfectionist/sort-imports
+  14:36  warning  Expected "approveIdentity" to come before "getAllAdminVerifications"      perfectionist/sort-named-imports
+  14:53  warning  Expected "rejectIdentity" to come before "approveIdentity"                perfectionist/sort-named-imports
+  31:11  warning  'loading' is assigned a value but never used                              @typescript-eslint/no-unused-vars
+  31:41  warning  'error' is assigned a value but never used                                @typescript-eslint/no-unused-vars
+  40:9   warning  'getFirstValidDocument' is assigned a value but never used                @typescript-eslint/no-unused-vars
+
+/var/www/tick-m-events/src/sections/user-management/OverviewTableCard.tsx
+   2:27  warning  Expected "Button" to come before "Typography"                                                          perfectionist/sort-nameds
+   2:35  warning  Expected "Stack" to come before "Button"                                                               perfectionist/sort-nameds
+   3:30  warning  Expected "IconButton" to come before "InputAdornment"                                                  perfectionist/sort-nameds
+   5:1   warning  Imports "GridColDef" are only used as type                                                             @typescript-eslint/consis
+   5:1   warning  Expected "@mui/x-data-grid" to come before "@mui/material"                                             perfectionist/sort-impors
+   6:1   warning  Expected "react" to come before "@mui/x-data-grid"                                                     perfectionist/sort-impors
+   6:21  warning  Expected "useState" to come before "useEffect"                                                         perfectionist/sort-nameds
+   8:1   warning  Missed spacing between "react-redux" and "@mui/icons-material/Search" imports                          perfectionist/sort-impors
+  10:1   warning  Expected "@mui/icons-material/Clear" to come before "@mui/icons-material/FilterList"                   perfectionist/sort-impors
+  11:1   warning  Expected "@mui/material/styles" to come before "@mui/icons-material/Clear"                             perfectionist/sort-impors
+  11:10  warning  'useTheme' is defined but never used                                                                   @typescript-eslint/no-uns
+  11:10  warning  'useTheme' is defined but never used                                                                   unused-imports/no-unuseds
+  12:1   warning  Expected "react-toastify" to come before "@mui/material/styles"                                        perfectionist/sort-impors
+  14:1   warning  All imports in the declaration are only used as types. Use `import type`                               @typescript-eslint/consis
+  14:23  warning  Expected "RootState" to come before "AppDispatch"                                                      perfectionist/sort-nameds
+  15:1   warning  Missed spacing between "src/redux/store" and "src/components/modal/confirm-action-modal" imports       perfectionist/sort-impors
+  17:37  warning  Expected "blockUser" to come before "validateUser"                                                     perfectionist/sort-nameds
+  18:1   warning  Expected "../../components/modal/user-details-modal" to come before "../../redux/actions/userActions"  perfectionist/sort-impors
+
+/var/www/tick-m-events/src/sections/user-management/RoundedButton.tsx
+  1:33  warning  Expected "useTheme" to come before "useMediaQuery"  perfectionist/sort-named-imports
+
+/var/www/tick-m-events/src/sections/user-management/TopNavButtons.tsx
+  1:18  warning  Expected "Grid" to come before "Button"  perfectionist/sort-named-imports
+
+/var/www/tick-m-events/src/sections/user-management/UserActivityCard.tsx
+   1:1   warning  Imports "ButtonProps" are only used as type                                           @typescript-eslint/consistent-type-imports
+   2:27  warning  Expected "Button" to come before "Typography"                                         perfectionist/sort-named-imports
+   2:35  warning  Expected "Grid" to come before "Button"                                               perfectionist/sort-named-imports
+   2:59  warning  Expected "InputAdornment" to come before "CircularProgress"                           perfectionist/sort-named-imports
+   2:75  warning  Expected "IconButton" to come before "InputAdornment"                                 perfectionist/sort-named-imports
+   2:87  warning  Expected "TextField" to come before "IconButton"                                      perfectionist/sort-named-imports
+   2:98  warning  Expected "Stack" to come before "TextField"                                           perfectionist/sort-named-imports
+   4:1   warning  Expected "react-redux" to come before "@mui/material"                                 perfectionist/sort-imports
+   5:1   warning  Expected "react" to come before "react-redux"                                         perfectionist/sort-imports
+   5:21  warning  Expected "useMemo" to come before "useEffect"                                         perfectionist/sort-named-imports
+   6:20  warning  Expected "Bar" to come before "BarChart"                                              perfectionist/sort-named-imports
+   7:1   warning  Imports "GridColDef" are only used as type                                            @typescript-eslint/consistent-type-imports
+   7:1   warning  Missed spacing between "recharts" and "@mui/x-data-grid" imports                      perfectionist/sort-imports
+   8:1   warning  Expected "@mui/icons-material/Search" to come before "@mui/x-data-grid"               perfectionist/sort-imports
+  10:1   warning  Expected "@mui/icons-material/Clear" to come before "@mui/icons-material/FilterList"  perfectionist/sort-imports
+  13:1   warning  Imports "AppDispatch" are only used as type                                           @typescript-eslint/consistent-type-imports
+  13:1   warning  Expected "src/redux/store" to come before "src/redux/actions/activityActions"         perfectionist/sort-imports
+  13:23  warning  Expected "RootState" to come before "AppDispatch"                                     perfectionist/sort-named-imports
+  13:23  warning  'RootState' is defined but never used                                                 @typescript-eslint/no-unused-vars
+  13:23  warning  'RootState' is defined but never used                                                 unused-imports/no-unused-imports
+
+/var/www/tick-m-events/src/sections/user-management/view/user-management-view.tsx
+   2:1  warning  Missed spacing between "react" and "src/components/page-title-section" imports                   perfectionist/sort-imports
+   3:1  warning  Expected "src/layouts/dashboard" to come before "src/components/page-title-section"              perfectionist/sort-imports
+   4:1  warning  Missed spacing between "src/layouts/dashboard" and "../TopNavButtons" imports                    perfectionist/sort-imports
+   7:1  warning  Expected "../UserActivityCard" to come before "../KycDocumentTableCard"                          perfectionist/sort-imports
+  18:9  warning  Fragments should contain more than one child - otherwise, there’s no need for a Fragment at all  react/jsx-no-useless-fragment
+
+/var/www/tick-m-events/src/sections/visibility-and-access-settings/custom-photo-video-filter.tsx
+   1:27  warning  Expected "useRef" to come before "useState"                 perfectionist/sort-named-imports
+   2:1   warning  Missed spacing between "react" and "@mui/material" imports  perfectionist/sort-imports
+   2:45  warning  Expected "Checkbox" to come before "FormControlLabel"       perfectionist/sort-named-imports
+   2:55  warning  Expected "Grid" to come before "Checkbox"                   perfectionist/sort-named-imports
+   2:69  warning  Expected "Input" to come before "Button"                    perfectionist/sort-named-imports
+   3:1   warning  Expected "react-toastify" to come before "@mui/material"    perfectionist/sort-imports
+  36:20  warning  Unexpected unnamed function                                 func-names
+  65:11  warning  Use object destructuring                                    prefer-destructuring
+
+/var/www/tick-m-events/src/sections/visibility-and-access-settings/event-page-customization.tsx
+   1:20  warning  Expected "useRef" to come before "useState"                                                     perfectionist/sort-named-imports
+   2:1   warning  Missed spacing between "react" and "@mui/material" imports                                      perfectionist/sort-imports
+   2:35  warning  Expected "TextField" to come before "Typography"                                                perfectionist/sort-named-imports
+   2:46  warning  Expected "Input" to come before "TextField"                                                     perfectionist/sort-named-imports
+   3:1   warning  Expected "react-toastify" to come before "@mui/material"                                        perfectionist/sort-imports
+   7:1   warning  All imports in the declaration are only used as types. Use `import type`                        @typescript-eslint/consistent-ts
+   7:1   warning  Expected "src/redux/store" to come before "src/components/multiple-responsive-heading/heading"  perfectionist/sort-imports
+   8:40  warning  Expected "eventCustomizationPageFetch" to come before "eventCustomizationPageUpdate"            perfectionist/sort-named-imports
+  29:15  warning  Use object destructuring                                                                        prefer-destructuring
+
+/var/www/tick-m-events/src/sections/visibility-and-access-settings/view/visibility-and-access-settings-view.tsx
+   1:21  warning  Expected "useState" to come before "useEffect"                                                                            perfes
+   5:1   warning  Missed spacing between "src/layouts/dashboard" and "src/components/page-title-section" imports                            perfes
+   6:1   warning  Expected "src/redux/actions/organizer/pageEvents" to come before "src/components/page-title-section"                      perfes
+   7:1   warning  Missed spacing between "src/redux/actions/organizer/pageEvents" and "src/sections/entry-validation/event-status" imports  perfes
+   8:1   warning  All imports in the declaration are only used as types. Use `import type`                                                  @types
+   8:1   warning  Expected "src/redux/store" to come before "src/sections/entry-validation/event-status"                                    perfes
+   8:23  warning  Expected "RootState" to come before "AppDispatch"                                                                         perfes
+  11:1   warning  Expected "../visibility-type" to come before "../event-page-customization"                                                perfes
+
+/var/www/tick-m-events/src/sections/visibility-and-access-settings/visibility-type.tsx
+  1:62  warning  Expected "Radio" to come before "FormControlLabel"                                                                        perfecs
+  2:1   warning  Expected "react" to come before "@mui/material"                                                                           perfecs
+  2:21  warning  Expected "useState" to come before "useEffect"                                                                            perfecs
+  3:1   warning  Expected "react-redux" to come before "react"                                                                             perfecs
+  4:1   warning  Missed spacing between "react-redux" and "@mui/icons-material/ContentCopy" imports                                        perfecs
+  5:1   warning  Expected "react-toastify" to come before "@mui/icons-material/ContentCopy"                                                perfecs
+  7:1   warning  All imports in the declaration are only used as types. Use `import type`                                                  @typess
+  9:1   warning  Missed spacing between "src/redux/actions/event.action" and "src/components/multiple-responsive-heading/heading" imports  perfecs
+
+/var/www/tick-m-events/src/utils/notification-handle.ts
+  5:1   warning  All imports in the declaration are only used as types. Use `import type`  @typescript-eslint/consistent-type-imports
+  5:23  warning  Expected "RootState" to come before "AppDispatch"                         perfectionist/sort-named-imports
+  6:34  warning  Expected "markNotificationRead" to come before "fetchUserNotifications"   perfectionist/sort-named-imports

@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { Box, Button, Typography, TextField, Input } from '@mui/material';
-import { toast } from 'react-toastify';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
+import { Box, Button, Input, TextField, Typography } from '@mui/material';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { AppDispatch } from 'src/redux/store';
-import { eventCustomizationPageUpdate, eventCustomizationPageFetch } from 'src/redux/actions/event.action';
+import type { AppDispatch } from 'src/redux/store';
+import { eventCustomizationPageFetch, eventCustomizationPageUpdate } from 'src/redux/actions/event.action';
 
 export const EventCustomization = ({ eventId }: any) => {
   const dispatch = useDispatch<AppDispatch>();

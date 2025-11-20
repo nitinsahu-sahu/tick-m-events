@@ -107,8 +107,7 @@ export function EventBreadCrum({ _selectEve, view, setView, eventInformation, ev
         const selectedId = e.target.value;
         const event = events.find((ev: any) => ev._id === selectedId) || null;
         setComparisonEvent(event);
-        // Pass both selected event and comparison event to parent
-        onEventSelect?.(selectedEvent, event); // Modified to pass both events
+        onEventSelect?.(selectedEvent, event);
     };
 
 

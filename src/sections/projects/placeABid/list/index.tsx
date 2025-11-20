@@ -179,11 +179,17 @@ function BidCard({ bid }: { bid: any }) {
             <CardContent sx={{ flexGrow: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                     <Chip
+                        sx={{
+                            textTransform: "capitalize"
+                        }}
                         label={bid.status}
                         color={getStatusColor(bid.status)}
                         size="small"
                     />
                     <Chip
+                        sx={{
+                            textTransform: "capitalize"
+                        }}
                         label={bid.bidStatus}
                         color={getBidStatusColor(bid.bidStatus)}
                         size="small"

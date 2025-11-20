@@ -17,9 +17,6 @@ interface EditEventFormProps {
 
 export function EditEventForm({ eventData, onSuccess }: EditEventFormProps) {
   const dispatch = useDispatch<AppDispatch>();
-  console.log('====================================');
-  console.log(eventData);
-  console.log('====================================');
   const [formData, setFormData] = useState(eventData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

@@ -70,14 +70,11 @@ export function TicketScanner() {
         setIsScanning(false);
         setTimeout(() => setScanMessage(null), 3000);
 
-        // ✅ Immediately verify ticket after scan
         try {
             const parts = scannedText.split("/");
             const ticketCode = parts[parts.length - 1];
 
             const res = await dispatch(verifyTicketCode({ ticketCode }));
-            console.log("Verify on Scan:", res);
-
             if (res.type === "VERIFY_TICKET_SUCCESS") {
                 const ticket = res.ticket;
 
@@ -133,8 +130,6 @@ export function TicketScanner() {
         }
         try {
             const res = await dispatch(verifyTicketCode({ ticketCode }));
-            console.log("Action Result:", res);
-
             if (res.type === "VERIFY_TICKET_SUCCESS") {
                 // Check ticket status
                 if (res.flag === "granted") {
@@ -172,8 +167,6 @@ export function TicketScanner() {
                 entryTime
             })
         );
-
-        console.log("Confirm Entry Response:", res);
 
         if (res.type === "ENTER_USER_EVENT_SUCCESS") {
             setFlag((prev) => ({
@@ -324,8 +317,6 @@ export function TicketScanner() {
                                         width={{ md: "34%" }}
                                     />
 
-                                    {/* 👇 Add this box to show participants */}
-                                    {/* 👇 Add this box to show participants */}
                                     <Box mt={2} p={2} border="1px solid #ccc" borderRadius="8px" bgcolor="#f9f9f9">
                                         <Typography variant="h6" mb={1}>Participant Details</Typography>
 

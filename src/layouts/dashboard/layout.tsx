@@ -194,9 +194,9 @@ export function DashboardLayout({ sx, children, header }: DashboardLayoutProps) 
                               !hiddenGlobalOverview.some(path => pathname.includes(path)) &&
                               <>
                                 <MessagePopover data={_messages} />
-                                {
+                                {/* {
                                   !hiddenReserContracts.some(path => pathname.includes(path)) && <GiftPopover data={_giftboxdata} />
-                                }
+                                } */}
 
                               </>
                             }

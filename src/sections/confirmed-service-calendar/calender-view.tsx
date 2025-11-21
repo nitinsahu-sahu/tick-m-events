@@ -1,3 +1,4 @@
+// ---- SAME IMPORTS ----
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Calendar from "react-calendar";
@@ -13,13 +14,13 @@ import { getRequestsByProvider } from "src/redux/actions/service-request";
 import { ServiceRequestModal } from "../../components/modal/service-request-modal";
 import "./index.css";
 
-const options = ["View Details", "Contact Organizer", "Modify Availability"];
+// const options = ["View Details", "Contact Organizer", "Modify Availability"];
+const options = ["View Details"];
 
 export const CalenderView = () => {
-    const {
-        completedRequests = [],
-        signedReqests = [],
-    } = useSelector((state: RootState) => state?.serviceRequest || {});
+
+    // ✅ USE allActiveProjects instead of completed/signed arrays
+    const { allActiveProjects } = useSelector((state: RootState) => state.serviceRequest);
 
     const dispatch = useDispatch<AppDispatch>();
     useEffect(() => {
@@ -31,23 +32,24 @@ export const CalenderView = () => {
 
     const eventDays: { [key: string]: string } = {};
 
-    // ✅ Completed requests → mark as gold
-    completedRequests.forEach((r: any) => {
-        if (r?.projectStatus === "completed" && r?.isSigned) {
-            const eventDateKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
-            eventDays[eventDateKey] = "gold";
+    // --------------------------------------------------------------------
+    // ✅ Mark event circles using ALL ACTIVE PROJECTS and serviceTime only
+    // --------------------------------------------------------------------
+    allActiveProjects?.forEach((p: any) => {
+        const serviceDate = p.serviceTime || p.projectId?.serviceTime;
+        if (!serviceDate) return;
+
+        const key = new Date(serviceDate).toLocaleDateString("en-CA");
+
+        if (p.projectStatus === "completed") {
+            eventDays[key] = "gold";
+        } else if (p.isSigned || p.projectId?.isSigned) {
+            eventDays[key] = "red";
         }
     });
 
-    // ✅ Signed requests (isSigned = true) → mark as red
-    signedReqests.forEach((r: any) => {
-        if (r?.isSigned) {
-            const eventDateKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
-            eventDays[eventDateKey] = "red";
-        }
-    });
 
-    // ------------------ Utility Functions ------------------
+    // -------- Same utility functions (NOT touched) --------
     const getWeekStart = (date: Date): Date => {
         const newDate = new Date(date);
         const day = newDate.getDay();
@@ -79,22 +81,22 @@ export const CalenderView = () => {
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-    // 🔎 Match clicked date with signed/completed requests
+    // --------------------------------------------------------------------
+    // ✅ MATCH click with allActiveProjects → by serviceTime
+    // --------------------------------------------------------------------
     const handleTileClick = (date: Date, event: any) => {
         const key = date.toLocaleDateString("en-CA");
 
-        const matchedRequest =
-            signedReqests.find((r: any) => {
-                const eventKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
-                return eventKey === key && r?.isSigned;
-            }) ||
-            completedRequests.find((r: any) => {
-                const eventKey = new Date(r.eventId?.date).toLocaleDateString("en-CA");
-                return eventKey === key;
-            });
+        const matchedProject = allActiveProjects?.find((p: any) => {
+            const serviceDate = p.serviceTime || p.projectId?.serviceTime;
+            if (!serviceDate) return false;
 
-        if (matchedRequest) {
-            setSelectedRequest(matchedRequest);
+            const projectKey = new Date(serviceDate).toLocaleDateString("en-CA");
+            return projectKey === key;
+        });
+
+        if (matchedProject) {
+            setSelectedRequest(matchedProject);
             setAnchorEl(event.currentTarget);
         } else {
             setSelectedRequest(null);
@@ -117,9 +119,18 @@ export const CalenderView = () => {
         setValue(newDate);
     };
 
-    const handleViewChange = (type: "month" | "week" | "day") => {
-        setViewType(type);
-    };
+    const handleViewChange = (type: "month" | "week" | "day") => setViewType(type);
+
+    const eventName =
+        selectedRequest?.eventId?.eventName ||
+        selectedRequest?.projectId?.eventId?.eventName ||
+        "No Title";
+
+    const eventDate =
+        selectedRequest?.serviceTime ||
+        selectedRequest?.projectId?.serviceTime ||
+        null;
+
 
     return (
         <Box>
@@ -141,65 +152,33 @@ export const CalenderView = () => {
                 />
 
                 <Box display="flex" alignItems="center" gap={2}>
-                    <Button
-                        onClick={handlePrev}
-                        sx={{
-                            borderRadius: 3,
-                            color: "black",
-                            backgroundColor: "white",
-                            p: "5px",
-                            minWidth: "38px",
-                        }}
-                    >
+                    <Button onClick={handlePrev} sx={{ borderRadius: 3, color: "black", backgroundColor: "white", p: "5px", minWidth: "38px" }}>
                         <ArrowBack />
                     </Button>
+
                     <Typography variant="h6" color="white">
-                        {value.toLocaleString("default", { month: "long" })}{" "}
-                        {value.getFullYear()}
+                        {value.toLocaleString("default", { month: "long" })} {value.getFullYear()}
                     </Typography>
-                    <Button
-                        onClick={handleNext}
-                        sx={{
-                            borderRadius: 3,
-                            color: "black",
-                            backgroundColor: "white",
-                            p: "5px",
-                            minWidth: "38px",
-                        }}
-                    >
+
+                    <Button onClick={handleNext} sx={{ borderRadius: 3, color: "black", backgroundColor: "white", p: "5px", minWidth: "38px" }}>
                         <ArrowForward />
                     </Button>
                 </Box>
 
                 <Box display="flex" gap={1} mt={isXs ? 2 : 0}>
-                    <Button
-                        variant={viewType === "month" ? "contained" : "outlined"}
-                        size="small"
-                        sx={{ color: "#0B2E4C", backgroundColor: "white" }}
-                        onClick={() => handleViewChange("month")}
-                    >
+                    <Button variant={viewType === "month" ? "contained" : "outlined"} size="small" sx={{ color: "#0B2E4C", backgroundColor: "white" }} onClick={() => handleViewChange("month")}>
                         Month
                     </Button>
-                    <Button
-                        variant={viewType === "week" ? "contained" : "outlined"}
-                        size="small"
-                        sx={{ color: "#0B2E4C", backgroundColor: "white" }}
-                        onClick={() => handleViewChange("week")}
-                    >
+                    <Button variant={viewType === "week" ? "contained" : "outlined"} size="small" sx={{ color: "#0B2E4C", backgroundColor: "white" }} onClick={() => handleViewChange("week")}>
                         Week
                     </Button>
-                    <Button
-                        variant={viewType === "day" ? "contained" : "outlined"}
-                        size="small"
-                        sx={{ color: "#0B2E4C", backgroundColor: "white" }}
-                        onClick={() => handleViewChange("day")}
-                    >
+                    <Button variant={viewType === "day" ? "contained" : "outlined"} size="small" sx={{ color: "#0B2E4C", backgroundColor: "white" }} onClick={() => handleViewChange("day")}>
                         Day
                     </Button>
                 </Box>
             </Box>
 
-            {/* Calendar */}
+            {/* Month View */}
             {viewType === "month" && (
                 <Box
                     sx={{
@@ -226,50 +205,17 @@ export const CalenderView = () => {
                         prevLabel={null}
                         nextLabel={null}
                     />
-                    <Popover
-                        open={Boolean(anchorEl)}
-                        anchorEl={anchorEl}
-                        onClose={handleClose}
-                        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-                    >
-                        {selectedRequest ? (
-                            <Box sx={{ p: 2, maxWidth: 300 }}>
-                                <Typography variant="subtitle1" fontWeight={600}>
-                                    {selectedRequest.eventId?.eventName || "No Title"}
-                                </Typography>
-                                <Typography variant="body2">
-                                    Date:{" "}
-                                    {new Date(selectedRequest.eventId?.date).toLocaleDateString()}
-                                </Typography>
-                                <Typography variant="body2">
-                                    Time:{" "}
-                                    {selectedRequest.eventId?.time ||
-                                        new Date(selectedRequest.eventId?.date).toLocaleTimeString(
-                                            [],
-                                            { hour: "2-digit", minute: "2-digit" }
-                                        )}
-                                </Typography>
-                                <Typography variant="body2">
-                                    Status:{" "}
-                                    {selectedRequest.contractStatus ||
-                                        selectedRequest.projectStatus}
-                                </Typography>
-                            </Box>
-                        ) : (
-                            <Box sx={{ p: 2 }}>
-                                <Typography>No event</Typography>
-                            </Box>
-                        )}
-                    </Popover>
+
+                    {/* Popup */}
+
                 </Box>
             )}
 
-            {/* Week View */}
+            {/* Week View — unchanged design, only color logic updated */}
             {viewType === "week" && (
                 <Box p={2}>
                     <Typography variant="h6" mb={2}>
-                        Week of {getWeekStart(value).toDateString()} -{" "}
-                        {getWeekEnd(value).toDateString()}
+                        Week of {getWeekStart(value).toDateString()} - {getWeekEnd(value).toDateString()}
                     </Typography>
 
                     <Box
@@ -289,6 +235,7 @@ export const CalenderView = () => {
                             const isToday = date.toDateString() === new Date().toDateString();
 
                             const bgColor = isToday ? "#1976d2" : eventColor || "#fff";
+
                             return (
                                 <Box
                                     key={key}
@@ -303,8 +250,7 @@ export const CalenderView = () => {
                                         display: "flex",
                                         flexDirection: "column",
                                         justifyContent: "space-between",
-                                        color:
-                                            isToday || eventColor ? "white" : "black",
+                                        color: isToday || eventColor ? "white" : "black",
                                     }}
                                 >
                                     <Typography fontWeight="bold">
@@ -318,7 +264,7 @@ export const CalenderView = () => {
                 </Box>
             )}
 
-            {/* Day View */}
+            {/* Day View — unchanged */}
             {viewType === "day" && (
                 <Box p={2}>
                     <Typography variant="h6" gutterBottom>
@@ -360,18 +306,42 @@ export const CalenderView = () => {
                 </Box>
             )}
 
-            {/* Popup Actions */}
+            {/* Popup actions — same */}
             <Popover
-                open={open}
+                open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
                 onClose={handleClose}
-                anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "center",
-                }}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
             >
-                <Box sx={{ p: 1 }}>
-                    <Stack spacing={1}>
+                <Box sx={{ p: 2, maxWidth: 300 }}>
+
+                    {/* Event Card */}
+                    {selectedRequest ? (
+                        <>
+                            <Typography variant="subtitle1" fontWeight={600}>
+                                {eventName}
+                            </Typography>
+
+                            <Typography variant="body2">
+                                Date: {eventDate ? new Date(eventDate).toLocaleDateString() : "Invalid Date"}
+                            </Typography>
+
+                            <Typography variant="body2">
+                                Time: {eventDate ? new Date(eventDate).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                }) : "Invalid Time"}
+                            </Typography>
+                            <Typography variant="body2" mb={1}>
+                                Status: {selectedRequest.contractStatus || selectedRequest.projectStatus}
+                            </Typography>
+                        </>
+                    ) : (
+                        <Typography>No event</Typography>
+                    )}
+
+                    {/* Options */}
+                    <Stack spacing={1} mt={2}>
                         {options.map((option, i) => (
                             <Button
                                 key={i}
@@ -380,23 +350,24 @@ export const CalenderView = () => {
                                 onClick={() => {
                                     if (option === "View Details") {
                                         setIsModalOpen(true);
-                                        handleClose();
                                     }
+                                    handleClose();
                                 }}
                             >
                                 {option}
                             </Button>
                         ))}
                     </Stack>
+
                 </Box>
             </Popover>
+
 
             {selectedRequest && (
                 <ServiceRequestModal
                     open={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
-                    data={selectedRequest}
-                />
+                    data={selectedRequest} />
             )}
         </Box>
     );

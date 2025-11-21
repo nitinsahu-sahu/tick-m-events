@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "src/redux/store";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import { publicHomeEventsFetch } from "src/redux/actions/home-recommendation.action";
@@ -25,6 +25,10 @@ export function GlobalHome() {
     const [filteredEvents, setFilteredEvents] = useState([]);
     const faqSectionRef = useRef<HTMLDivElement>(null);
     const location = useLocation();
+
+    const approvedEvents = useMemo(() =>
+        filteredEvents?.filter((event: any) => event.status === 'approved' && event.eventType!=="Private") || []
+        , [filteredEvents]);
 
     useEffect(() => {
         dispatch(getPromotionLogo())
@@ -61,7 +65,7 @@ export function GlobalHome() {
             <UpcomingEvents
                 title="Upcoming Events"
                 des="The world's leading car brands"
-                filterdEvent={filteredEvents}
+                filterdEvent={approvedEvents}
                 loading={loading}
             />
             <LiveEventPromo />

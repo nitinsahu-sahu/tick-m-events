@@ -220,6 +220,7 @@ export function SignInView() {
           fullWidth
           required
           name="password"
+          placeholder='********'
           label="Password"
           value={formData.password}
           onChange={handleChange}

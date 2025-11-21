@@ -166,14 +166,14 @@ export function AddServices({ setActiveSection }: any) {
             </Typography>
             <TextField
                 placeholder={placeholder}
-                
+
                 required={name !== 'coverImage'}
                 name={name}
                 type={type}
                 value={formData[name as keyof typeof formData] || ''}
                 onChange={handleChange}
                 fullWidth
-                sx={{...inputStyles, textTransform:"capitalize"}}
+                sx={{ ...inputStyles, textTransform: "capitalize" }}
                 InputLabelProps={type === 'datetime-local' ? { shrink: true } : undefined}
                 InputProps={name === 'coverImage' ? {
                     inputProps: { accept: "image/*" }
@@ -187,12 +187,14 @@ export function AddServices({ setActiveSection }: any) {
             <Typography fontWeight={600} color="text.primary" mb={1}>
                 {label}
             </Typography>
-            <ReactQuill
-                placeholder={label.includes('Full') ? 'Description...' : 'Add Additional...'}
-                theme="snow"
-                className="custom-quill"
-                ref={ref}
-            />
+            <div translate="no" className="notranslate" data-nosnippet>
+                <ReactQuill
+                    placeholder={label.includes('Full') ? 'Description...' : 'Add Additional...'}
+                    theme="snow"
+                    className="custom-quill"
+                    ref={ref}
+                />
+            </div>
         </Box>
     );
 
@@ -215,7 +217,7 @@ export function AddServices({ setActiveSection }: any) {
                         />
                         <IconButton
                             size="small"
-                            
+
                             onClick={() => removeImage(index)}
                             sx={{
                                 position: 'absolute',

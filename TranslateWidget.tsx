@@ -186,6 +186,16 @@ export function TranslateWidget() {
         .goog-te-menu2-item-selected {
           background-color: #e8f0fe !important;
         }
+
+        /* Remove ALL Google Translate injected hover highlights */
+[class^="VIpgJd-"],
+[class*=" VIpgJd-"] {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  text-decoration: none !important;
+}
+
       `;
       document.head.appendChild(style);
     };

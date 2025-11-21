@@ -19,7 +19,6 @@ import {
   AccessTime as TimeIcon
 } from "@mui/icons-material";
 import { useRef } from "react";
-import { HeadingCommon } from "../multiple-responsive-heading/heading";
 
 const ModalContainer = styled(Box)(({ theme }) => ({
   position: 'absolute',
@@ -168,8 +167,69 @@ interface DetailsModalProps {
 
 export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) => {
   const printRef = useRef<HTMLDivElement>(null);
-
+  
   if (!data) return null;
+
+  // Helper function to get data based on projectType
+ const getEventData = () => {
+  if (data.projectType === "EventReq") {
+    return {
+      eventData: data.eventId,
+      serviceRequest: data.serviceRequestId,
+      organizer: data.organizerId,
+      provider: data.providerId,
+      projectStatus: data.projectStatus,
+      providerStatus: data.providerStatus,
+      orgStatus: data.orgStatus,
+      winningBid: data.winningBid,
+      providerProposal: data.providerProposal,
+      providerHasProposed: data.providerHasProposed,
+      serviceTime: data.serviceTime,
+      eventLocation: data.eventLocation,
+      orgBudget: data.orgBudget,
+      orgRequirement: data.orgRequirement
+    };
+  }
+  
+  // For "Bid" project type
+  return {
+    eventData: data.projectId?.eventId,
+    serviceRequest: data.projectId,
+    organizer: data.projectId?.createdBy,
+    provider: data.providerId,
+    projectStatus: data.projectStatus,
+    providerStatus: data.status,
+    orgStatus: data.isOrgnizerAccepted ? "accepted" : "pending",
+    winningBid: data.winningBid,
+    providerProposal: {
+      amount: data.bidAmount,
+      days: data.deliveryTime,
+      message: data.proposal
+    },
+    providerHasProposed: true,
+    serviceTime: data.projectId?.serviceTime,
+    eventLocation: data.projectId?.eventLocation,
+    orgBudget: data.projectId?.orgBudget,
+    orgRequirement: data.projectId?.orgRequirement
+  };
+};
+
+  const {
+    eventData,
+    serviceRequest,
+    organizer,
+    provider,
+    projectStatus,
+    providerStatus,
+    orgStatus,
+    winningBid,
+    providerProposal,
+    providerHasProposed,
+    serviceTime,
+    eventLocation,
+    orgBudget,
+    orgRequirement
+  } = getEventData();
 
   const handlePrint = () => {
     const printContent = printRef.current;
@@ -186,7 +246,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Service Request - ${data.eventId?.eventName || 'Details'}</title>
+          <title>Service Request - ${eventData?.eventName || 'Details'}</title>
           <meta charset="utf-8">
           <style>
             @media print {
@@ -219,32 +279,33 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
 
   const PrintContent = () => (
     <div ref={printRef}>
-
-      <LogoSection sx={{ justifyContent: 'space-between' }}>
-        <Box flex={1}>
-          <Typography variant="h4" fontWeight="bold" sx={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-            📋 Service Request Details
+      <HeaderSection>
+        <LogoSection sx={{ justifyContent: 'space-between' }}>
+          <Box flex={1}>
+            <Typography variant="h4" fontWeight="bold" sx={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+              📋 Service Request Details
+            </Typography>
+            <Typography variant="subtitle1" sx={{ opacity: 0.9, mt: 1 }}>
+              Project Type: <strong>{data.projectType}</strong>
+            </Typography>
+          </Box>
+          <LogoStamp>
+            TICK-M<br />EVENTS
+          </LogoStamp>
+        </LogoSection>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="body2" sx={{ opacity: 0.9 }}>
+            Organized by: <strong>{organizer?.name || "N/A"}</strong>
           </Typography>
-          <Typography variant="subtitle1" sx={{ opacity: 0.9, mt: 1 }}>
-            Event: <strong>{data.eventId?.eventName || 'N/A'}</strong>
+          <Typography variant="body2" sx={{ opacity: 0.9 }}>
+            Generated on: {new Date().toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
           </Typography>
         </Box>
-        <LogoStamp>
-          TICK-M<br />EVENTS
-        </LogoStamp>
-      </LogoSection>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="body2" sx={{ opacity: 0.9 }}>
-          Organized by: <strong>{data.organizerId?.name}</strong>
-        </Typography>
-        <Typography variant="body2" sx={{ opacity: 0.9 }}>
-          Generated on: {new Date().toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}
-        </Typography>
-      </Box>
+      </HeaderSection>
 
       <Box sx={{ py: 3 }}>
         <Grid container spacing={3}>
@@ -257,11 +318,21 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
               <Stack spacing={2}>
                 <DetailItem>
                   <DetailLabel variant="body2">
+                    <EventIcon sx={{ fontSize: 18 }} />
+                    Event Name:
+                  </DetailLabel>
+                  <DetailValue variant="body2">
+                    {eventData?.eventName || "N/A"}
+                  </DetailValue>
+                </DetailItem>
+
+                <DetailItem>
+                  <DetailLabel variant="body2">
                     <ScheduleIcon sx={{ fontSize: 18 }} />
                     Date & Time:
                   </DetailLabel>
                   <DetailValue variant="body2">
-                    {new Date(data.eventId?.date).toLocaleDateString()} at {data.eventId?.time}
+                    {eventData?.date ? new Date(eventData.date).toLocaleDateString() : "N/A"} at {eventData?.time || "N/A"}
                   </DetailValue>
                 </DetailItem>
 
@@ -271,7 +342,21 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                     Location:
                   </DetailLabel>
                   <DetailValue variant="body2">
-                    {data.eventId?.location}
+                    {eventLocation || eventData?.location || "N/A"}
+                  </DetailValue>
+                </DetailItem>
+
+                <DetailItem>
+                  <DetailLabel variant="body2">Project Status:</DetailLabel>
+                  <DetailValue variant="body2">
+                    <StatusChip
+                      label={projectStatus || "N/A"}
+                      color={
+                        projectStatus === 'active' ? 'success' :
+                        projectStatus === 'completed' ? 'primary' :
+                        projectStatus === 'cancelled' ? 'error' : 'default'
+                      }
+                    />
                   </DetailValue>
                 </DetailItem>
               </Stack>
@@ -286,7 +371,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                   <DetailLabel variant="body2">Service Type:</DetailLabel>
                   <DetailValue variant="body2">
                     <StatusChip
-                      label={data.serviceRequestId?.serviceType}
+                      label={serviceRequest?.serviceType || "N/A"}
                       color="primary"
                       size="small"
                     />
@@ -299,7 +384,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                     Budget:
                   </DetailLabel>
                   <DetailValue variant="body2">
-                    {data.serviceRequestId?.budget}
+                    {orgBudget || serviceRequest?.budget || "N/A"}
                   </DetailValue>
                 </DetailItem>
 
@@ -307,26 +392,33 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                   <DetailLabel variant="body2">Organizer Status:</DetailLabel>
                   <DetailValue variant="body2">
                     <StatusChip
-                      label={data.orgStatus}
+                      label={orgStatus || "N/A"}
                       color={
-                        data.orgStatus === 'accepted' ? 'success' :
-                          data.orgStatus === 'rejected' ? 'error' :
-                            data.orgStatus === 'request' ? 'info' : 'info'
+                        orgStatus === 'accepted' ? 'success' :
+                        orgStatus === 'rejected' ? 'error' :
+                        orgStatus === 'request' ? 'info' : 'default'
                       }
                     />
                   </DetailValue>
                 </DetailItem>
 
-                <DetailItem>
-                  <DetailLabel variant="body2">Organizer Requirement:</DetailLabel>
-                  <DetailValue variant="body2" textTransform="capitalize">
-                    {data.orgRequirement}
-                  </DetailValue>
-                </DetailItem>
+                {winningBid && (
+                  <DetailItem>
+                    <DetailLabel variant="body2">Winning Bid:</DetailLabel>
+                    <DetailValue variant="body2">
+                      <StatusChip
+                        label={`${winningBid} XAF`}
+                        color="success"
+                        size="small"
+                        variant="outlined"
+                      />
+                    </DetailValue>
+                  </DetailItem>
+                )}
               </Stack>
             </Paper>
 
-            {data.providerHasProposed && (
+            {providerHasProposed && providerProposal && (
               <Paper className="section-paper" sx={{ mt: 2 }}>
                 <SectionHeader variant="h6">
                   <CheckIcon /> Provider Proposal
@@ -336,8 +428,8 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                     <DetailLabel variant="body2">Proposed Amount:</DetailLabel>
                     <DetailValue variant="body2">
                       <StatusChip
-                        label={`${data.providerProposal?.amount} XAF` || 'NA'}
-                        color={data.providerProposal?.amount ? "success" : "default"}
+                        label={`${providerProposal?.amount} XAF` || 'N/A'}
+                        color={providerProposal?.amount ? "success" : "default"}
                         size="small"
                         variant="outlined"
                       />
@@ -350,19 +442,19 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                       Duration:
                     </DetailLabel>
                     <DetailValue variant="body2">
-                      {data.providerProposal?.days} days
+                      {providerProposal?.days || 'N/A'} days
                     </DetailValue>
                   </DetailItem>
 
                   <DetailItem>
-                    <DetailLabel variant="body2">Status:</DetailLabel>
+                    <DetailLabel variant="body2">Provider Status:</DetailLabel>
                     <DetailValue variant="body2">
                       <StatusChip
-                        label={data.providerStatus}
+                        label={providerStatus || "N/A"}
                         color={
-                          data.providerStatus === 'accepted' ? 'success' :
-                            data.providerStatus === 'rejected' ? 'error' :
-                              data.providerStatus === 'request' ? 'info' : 'info'
+                          providerStatus === 'accepted' ? 'success' :
+                          providerStatus === 'rejected' ? 'error' :
+                          providerStatus === 'request' ? 'info' : 'default'
                         }
                       />
                     </DetailValue>
@@ -382,7 +474,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                 <DetailItem>
                   <DetailLabel variant="body2">Name:</DetailLabel>
                   <DetailValue variant="body2">
-                    {data.organizerId?.name}
+                    {organizer?.name || "N/A"}
                   </DetailValue>
                 </DetailItem>
 
@@ -405,39 +497,58 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                         userSelect: 'none',
                         WebkitUserSelect: 'none',
                         MozUserSelect: 'none',
-                        // '&:hover': {
-                        //   filter: 'blur(0px)', // Remove blur on hover to reveal
-                        //   transition: 'filter 0.3s ease'
-                        // }
                       }}
                     >
-                      {data.organizerId?.email}
+                      {organizer?.email || "N/A"}
                     </Typography>
                   </DetailValue>
                 </DetailItem>
               </Stack>
             </Paper>
 
-            <Paper className="section-paper" sx={{ mt: 2 }}>
-              <SectionHeader variant="h6">
-                <DescriptionIcon /> Event Description
-              </SectionHeader>
-              <HtmlContent dangerouslySetInnerHTML={{ __html: data.eventId?.description || '' }} />
-            </Paper>
+            {eventData?.description && (
+              <Paper className="section-paper" sx={{ mt: 2 }}>
+                <SectionHeader variant="h6">
+                  <DescriptionIcon /> Event Description
+                </SectionHeader>
+                <HtmlContent dangerouslySetInnerHTML={{ __html: eventData.description }} />
+              </Paper>
+            )}
 
-            <Paper className="section-paper" sx={{ mt: 2 }}>
-              <SectionHeader variant="h6">
-                <DescriptionIcon /> Service Details
-              </SectionHeader>
-              <HtmlContent dangerouslySetInnerHTML={{ __html: data.serviceRequestId?.description || '' }} />
-            </Paper>
+            {serviceRequest?.description && (
+              <Paper className="section-paper" sx={{ mt: 2 }}>
+                <SectionHeader variant="h6">
+                  <DescriptionIcon /> Service Details
+                </SectionHeader>
+                <HtmlContent dangerouslySetInnerHTML={{ __html: serviceRequest.description }} />
+              </Paper>
+            )}
 
-            {data.providerHasProposed && data.providerProposal?.message && (
+            {orgRequirement && (
+              <Paper className="section-paper" sx={{ mt: 2 }}>
+                <SectionHeader variant="h6">
+                  <DescriptionIcon /> Organizer Requirements
+                </SectionHeader>
+                <HtmlContent>
+                  {typeof orgRequirement === 'string' && orgRequirement.startsWith('<') ? 
+                    <div dangerouslySetInnerHTML={{ __html: orgRequirement }} /> : 
+                    <Typography>{orgRequirement}</Typography>
+                  }
+                </HtmlContent>
+              </Paper>
+            )}
+
+            {providerHasProposed && providerProposal?.message && (
               <Paper className="section-paper" sx={{ mt: 2 }}>
                 <SectionHeader variant="h6">
                   <DescriptionIcon /> Provider Message
                 </SectionHeader>
-                <HtmlContent dangerouslySetInnerHTML={{ __html: data.providerProposal?.message || '' }} />
+                <HtmlContent>
+                  {typeof providerProposal.message === 'string' && providerProposal.message.startsWith('<') ? 
+                    <div dangerouslySetInnerHTML={{ __html: providerProposal.message }} /> : 
+                    <Typography>{providerProposal.message}</Typography>
+                  }
+                </HtmlContent>
               </Paper>
             )}
           </Grid>
@@ -459,7 +570,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
           <LogoStamp sx={{ width: 24, height: 24, fontSize: '8px', marginRight: '8px' }}>
             TM
           </LogoStamp>
-          Tick-M Events Official Document
+          Tick-M Events Official Document - Project Type: {data.projectType}
         </Box>
       </Box>
     </div>
@@ -492,7 +603,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
             Service Request Details
           </Typography>
           <Typography variant="subtitle2" sx={{ opacity: 0.9 }}>
-            {data.eventId?.eventName}
+            {eventData?.eventName || "Service Project"} - {data.projectType}
           </Typography>
         </Box>
 

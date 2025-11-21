@@ -125,7 +125,7 @@ const EventBooking: React.FC<EventBookingProps> = ({
 
   // Extract only approved events
   const approvedEvents = useMemo(
-    () => fullData?.filter((event: any) => event.status === "approved") || [],
+    () => fullData?.filter((event: any) => event.status === "approved"&& event.eventType !== "Private") || [],
     [fullData]
   );
 

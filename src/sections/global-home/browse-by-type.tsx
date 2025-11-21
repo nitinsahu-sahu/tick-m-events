@@ -26,7 +26,7 @@ export default function BrowseByType() {
             Find the perfect event for any occasion
           </Typography>
         </Box>
-        <Button
+        {/* <Button
           variant="contained"
           sx={{
             borderRadius: 2,
@@ -38,7 +38,7 @@ export default function BrowseByType() {
           endIcon={<ArrowForwardIosIcon />}
         >
           View More
-        </Button>
+        </Button> */}
       </Box>
 
       {/* Loader */}

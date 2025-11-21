@@ -24,6 +24,7 @@ import {
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/store";
+import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 
 export function Referral() {
     const { user } = useSelector((state: RootState) => state?.auth);
@@ -65,59 +66,77 @@ export function Referral() {
 
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Typography variant="h3" gutterBottom sx={{
-                fontWeight: 'bold',
-                textAlign: 'center',
-                color: 'primary.main',
-                mb: 4
-            }}>
-                Referral Program
-            </Typography>
+            <HeadingCommon
+                title="Referral Program"
+                color='primary.main'
+                weight="bold"
+                css={{ textAlign: 'center' }}
+                mb={4}
+            />
 
             <Grid container spacing={4}>
                 {/* Main Referral Card */}
                 <Grid item xs={12} md={8}>
                     <Paper elevation={3} sx={{ p: 4, borderRadius: 3, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
                         <Box sx={{ textAlign: 'center', mb: 3 }}>
+
                             <Redeem sx={{ fontSize: 60, mb: 2 }} />
-                            <Typography variant="h4" gutterBottom>
-                                Invite Friends & Earn Rewards
-                            </Typography>
-                            <Typography variant="h6" sx={{ opacity: 0.9 }}>
-                                Share your referral link and get 100 points for each friend who joins
-                            </Typography>
+                            <HeadingCommon
+                                title="Invite Friends & Earn Rewards"
+                                color='#fff'
+                                weight="bold"
+                                baseSize="22px"
+                            />
+                            <HeadingCommon
+                                title="Share your referral link and get 100 points for each friend who joins"
+                                color='#fff'
+                                weight={600}
+                                baseSize="18px"
+                                css={{ opacity: 0.9 }}
+                            />
+
                         </Box>
 
                         <Box sx={{ bgcolor: 'rgba(255,255,255,0.1)', p: 3, borderRadius: 2, mb: 3 }}>
-                            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography variant="h6" fontSize={{ xs: 14, sm: 16, md: 18 }} gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
                                 <AccountBalanceWallet sx={{ mr: 1 }} />
                                 Your Referral Link
                             </Typography>
 
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <Paper
-                                    sx={{
-                                        flexGrow: 1,
-                                        p: 1.5,
-                                        bgcolor: 'rgba(255,255,255,0.9)',
-                                        color: 'text.primary',
-                                        borderRadius: 1,
-                                        fontFamily: 'monospace',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis'
-                                    }}
-                                >
-                                    <Typography fontSize={13}>{referralLink}</Typography>
-                                </Paper>
-                                <Button
-                                    variant="contained"
-                                    startIcon={<ContentCopy />}
-                                    onClick={handleCopyLink}
-                                    sx={{ ml: 1, minWidth: 'auto' }}
-                                >
-                                    {copied ? 'Copied!' : 'Copy'}
-                                </Button>
-                            </Box>
+                            <Grid container spacing={2} sx={{ my: 2 }} width="100%">
+                                <Grid item xs={12} sm={6} md={10}>
+                                    <Paper
+                                        sx={{
+                                            p: 1.5,
+                                            bgcolor: 'rgba(255,255,255,0.9)',
+                                            color: 'text.primary',
+                                            borderRadius: 1,
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            height: '100%',
+                                            display: 'flex',
+                                        }}
+                                    >
+                                        <Typography fontSize={13} sx={{ wordBreak: 'break-all' }}>
+                                            {referralLink}
+                                        </Typography>
+                                    </Paper>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={2}>
+                                    <Button
+                                        variant="contained"
+                                        startIcon={<ContentCopy />}
+                                        onClick={handleCopyLink}
+                                        sx={{
+                                            width: { xs: '100%', sm: 'auto' },
+                                            minWidth: 'auto',
+                                            height: '100%'
+                                        }}
+                                    >
+                                        {copied ? 'Copied!' : 'Copy'}
+                                    </Button>
+                                </Grid>
+                            </Grid>
 
                             <Typography variant="body2" sx={{ opacity: 0.8 }}>
                                 Share this link with your friends. When they sign up using your link, you&apos;ll both receive 100 points!
@@ -222,7 +241,7 @@ export function Referral() {
                                         Next Reward at
                                     </Typography>
                                     <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                        {user?.referralCount || 0} referrals • {user?.rewardPoints||0} pts
+                                        {user?.referralCount || 0} referrals • {user?.rewardPoints || 0} pts
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
                                         Unlock exclusive benefits

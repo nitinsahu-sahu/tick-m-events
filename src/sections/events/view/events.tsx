@@ -15,7 +15,7 @@ export function EventsView() {
   const [showEvents, setShowEvents] = useState(false);
 
   const approvedEvents = useMemo(() =>
-    fullData?.filter((event: any) => event.status === 'approved') || []
+    fullData?.filter((event: any) => event.status === 'approved' && event.eventType!=="Private") || []
     , [fullData]);
 
 

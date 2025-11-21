@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Paper, TextField, MenuItem,InputAdornment, CircularProgress, Alert } from "@mui/material";
+import { Box, Button, Grid, Paper, TextField, MenuItem, InputAdornment, CircularProgress, Alert } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
 import PhoneInput from 'react-phone-number-input'
@@ -357,7 +357,6 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
     );
     const allParticipantsValid = formData.every(p =>
       p.name.trim() &&
-      p.age.trim() &&
       p.gender
     );
     return requiredAddressFieldsFilled && allParticipantsValid;
@@ -376,46 +375,53 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
           )}
 
           <Grid container rowSpacing={2} mt={2}>
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <Box display="flex" fontWeight="bold">
-                <Box width="33%">Full Name</Box>
+                <Box width="33%">Full Name *</Box>
                 <Box width="33%" pl={1}>Age</Box>
                 <Box width="33%" pl={2}>Gender</Box>
               </Box>
-            </Grid>
+            </Grid> */}
 
             {formData.map((participant, index) => (
               <Grid item xs={12} key={index}>
                 <Box display="flex" gap={2}>
                   <TextField
                     fullWidth
+                    required
                     name={`name-${index}`}
+                    label="Full Name"
+                    placeholder="Enter Full Name"
                     value={participant.name}
                     onChange={(e) => handleChange(index, 'name', e.target.value)}
-                    placeholder="Full Name"
-                    variant="outlined"
+                    InputLabelProps={{ shrink: true }}
                     error={formTouched && !participant.name}
                     helperText={formTouched && !participant.name ? 'Name is required' : ''}
                   />
                   <TextField
                     fullWidth
                     name={`age-${index}`}
+                     label="Age (optional)"
                     value={participant.age}
                     onChange={(e) => handleChange(index, 'age', e.target.value)}
                     placeholder="Age"
                     type="number"
                     variant="outlined"
+                    InputLabelProps={{ shrink: true }}
                     error={formTouched && !participant.age}
-                    helperText={formTouched && !participant.age ? 'Age is required' : ''}
+                    helperText=""
                   />
-                  <TextField
+                   <TextField
                     select
                     fullWidth
+                    required
                     name={`gender-${index}`}
+                    label="Gender"
                     value={participant.gender}
                     onChange={(e) => handleChange(index, 'gender', e.target.value)}
                     SelectProps={{ native: true }}
                     variant="outlined"
+                     InputLabelProps={{ shrink: true }}
                     error={formTouched && !participant.gender}
                     helperText={formTouched && !participant.gender ? 'Please Select Gender' : ''}
                   >
@@ -424,6 +430,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
                   </TextField>
+                  
                 </Box>
               </Grid>
             ))}
@@ -432,7 +439,9 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
               <Grid item xs={12}>
                 <TextField
                   fullWidth
+                  required
                   name="email"
+                  label="Email"
                   value={formData[0]?.email || ''}
                   onChange={(e) => handleChange(0, 'email', e.target.value)}
                   type="email"
@@ -480,6 +489,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                 <TextField
                   select
                   fullWidth
+                  required
                   label={loading ? "Loading countries..." : "Country"}
                   value={formData[0]?.country || 'Cameroon'}
                   onChange={(e) => handleChange(0, "country", e.target.value)}
@@ -504,6 +514,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                 <TextField
                   select
                   fullWidth
+                  required
                   label={loading ? "Loading states..." : "State"}
                   value={formData[0]?.state || ''}
                   onChange={(e) => handleChange(0, "state", e.target.value)}
@@ -522,6 +533,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                 <TextField
                   select
                   fullWidth
+                  required
                   label={loading ? "Loading cities..." : "City"}
                   value={formData[0]?.city || ''}
                   onChange={(e) => handleChange(0, "city", e.target.value)}
@@ -540,6 +552,8 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                 <TextField
                   fullWidth
                   name="address"
+                  required
+                  label="Address"
                   value={formData[0]?.address || ''}
                   onChange={(e) => handleChange(0, 'address', e.target.value)}
                   type="text"
@@ -555,6 +569,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                 <TextField
                   select
                   fullWidth
+                  required
                   name="hearAboutEvent"
                   label="How did you hear about the event?"
                   value={formData[0]?.hearAboutEvent || ''}
@@ -616,7 +631,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
               }}
               disabled={!isFormValid() || loading}
             >
-              {loading ? 'Loading...' : 'Proceed to payment'}
+              {loading ? 'Loading...' : 'Proceed to Payment'}
             </Button>
           </Box>
         </Paper>

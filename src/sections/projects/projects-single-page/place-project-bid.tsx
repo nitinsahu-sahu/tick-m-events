@@ -456,7 +456,8 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
                                         ['link', 'clean']
                                     ]
                                 }}
-                            /></div>
+                            />
+                            </div>
                             <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between' }}>
                                 <Typography
                                     variant="caption"

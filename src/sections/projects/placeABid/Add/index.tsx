@@ -346,22 +346,23 @@ export function AddPlaceABid() {
                                 <Typography fontWeight={600} color="text.secondary" mb={1}>
                                     Full Description of Requirements *
                                 </Typography>
-                                 <div translate="no" className="notranslate" data-nosnippet>
-                                <ReactQuill
-                                    theme="snow"
-                                    value={formData.orgRequirement}
-                                    onChange={handleDescriptionChange}
-                                    className="custom-quill"
-                                    placeholder="Full Description of Requirements (minimum 80 characters)"
-                                    modules={{
-                                        toolbar: [
-                                            [{ 'header': [1, 2, false] }],
-                                            ['bold', 'italic', 'underline', 'strike'],
-                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                            ['link', 'clean']
-                                        ]
-                                    }}
-                                /></div>
+                                <div translate="no" className="notranslate" data-nosnippet>
+                                    <ReactQuill
+                                        theme="snow"
+                                        value={formData.orgRequirement}
+                                        onChange={handleDescriptionChange}
+                                        className="custom-quill"
+                                        placeholder="Full Description of Requirements (minimum 80 characters)"
+                                        modules={{
+                                            toolbar: [
+                                                [{ 'header': [1, 2, false] }],
+                                                ['bold', 'italic', 'underline', 'strike'],
+                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                ['link', 'clean']
+                                            ]
+                                        }}
+                                    />
+                                </div>
                                 <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between' }}>
                                     <Typography
                                         variant="caption"

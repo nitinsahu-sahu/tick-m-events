@@ -14,14 +14,13 @@ import { getRequestsByProvider } from "src/redux/actions/service-request";
 import { ServiceRequestModal } from "../../components/modal/service-request-modal";
 import "./index.css";
 
-const options = ["View Details", "Contact Organizer", "Modify Availability"];
+// const options = ["View Details", "Contact Organizer", "Modify Availability"];
+const options = ["View Details"];
 
 export const CalenderView = () => {
 
     // ✅ USE allActiveProjects instead of completed/signed arrays
     const { allActiveProjects } = useSelector((state: RootState) => state.serviceRequest);
-
-    console.log("allActiveProjects", allActiveProjects);
 
     const dispatch = useDispatch<AppDispatch>();
     useEffect(() => {
@@ -365,7 +364,10 @@ export const CalenderView = () => {
 
 
             {selectedRequest && (
-                <ServiceRequestModal open={isModalOpen} onClose={() => setIsModalOpen(false)} data={selectedRequest} />
+                <ServiceRequestModal
+                    open={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    data={selectedRequest} />
             )}
         </Box>
     );

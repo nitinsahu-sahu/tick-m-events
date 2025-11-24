@@ -302,24 +302,32 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                             </Grid>
                         </Grid>
                         {/* Description - Full width always */}
-                        <Grid item xs={12} sx={{ mt: 2 }}>
-                              <div translate="no" className="notranslate" data-nosnippet>
-                            <ReactQuill
-                                placeholder='Enter your event description (required)'
-                                theme="snow"
-                                value={description}
-                                onChange={(content) => {
-                                    setDescription(content);
-                                    setDescriptionError(false); // Clear error when typing
-                                }}
-                                style={{
-                                    height: '90px',
-                                    margin: "20px 0px 10px 0px",
-                                    // border: descriptionError ? '1px solid red' : '1px solid #ccc',
-                                    borderRadius: '4px'
-                                }}
-                                ref={quillRef}
-                            /></div>
+                        <Grid
+                            item
+                            xs={12}
+                            sx={{
+                                mt: 2,
+                                mb: { xs: 5, sm: 2, md: 2 }
+                            }}
+                        >
+                            <div translate="no" className="notranslate" data-nosnippet>
+                                <ReactQuill
+                                    placeholder='Enter your event description (required)'
+                                    theme="snow"
+                                    value={description}
+                                    onChange={(content) => {
+                                        setDescription(content);
+                                        setDescriptionError(false); // Clear error when typing
+                                    }}
+                                    style={{
+                                        height: '90px',
+                                        margin: "20px 0px 10px 0px",
+                                        // border: descriptionError ? '1px solid red' : '1px solid #ccc',
+                                        borderRadius: '4px'
+                                    }}
+                                    ref={quillRef}
+                                />
+                            </div>
                             {descriptionError && (
                                 <Typography color="error" variant="caption" >
                                     Please enter a description for your event

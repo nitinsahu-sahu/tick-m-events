@@ -10,9 +10,9 @@ import {
 import { Link } from "react-router-dom";
 
 
-export default function UpcomingEvents({ title, des,filterdEvent,loading }: any) {
+export default function UpcomingEvents({ title, des, filterdEvent, loading }: any) {
   const theme = useTheme();
-  
+
 
   return (
     <Box

@@ -79,7 +79,8 @@ export function UpdateServices({ updateData, setServiceOfferRowData }: any) {
                             ref={fullDesRef}
                             value={updateData.description || ''}
                             onChange={(value) => setServiceOfferRowData((prev: any) => ({ ...prev, description: value }))}
-                        /></div>
+                        />
+                    </div>
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
@@ -133,7 +134,8 @@ export function UpdateServices({ updateData, setServiceOfferRowData }: any) {
                             ref={addOptionRef}
                             value={updateData.additionalOptions || ''}
                             onChange={(value) => setServiceOfferRowData((prev: any) => ({ ...prev, additionalOptions: value }))}
-                        /></div>
+                        />
+                    </div>
                 </Grid>
                 <Grid item xs={12}>
                     <Button

@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { AppDispatch, RootState } from 'src/redux/store';
 import { eventUpdate } from 'src/redux/actions/event.action';
+import { fatchOrgEvents } from 'src/redux/actions/organizer/pageEvents';
 
 interface Event {
   _id: string;
@@ -45,13 +46,14 @@ const style = {
 };
 
 export function SecurityAndConfirmation() {
-  const { basicDetails } = useSelector((state: RootState) => state?.event);
+  // const { basicDetails } = useSelector((state: RootState) => state?.event);
+  const { __events } = useSelector((state: RootState) => state?.organizer);
 
   const dispatch = useDispatch<AppDispatch>();
   const [openReschedule, setOpenReschedule] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
-  const [events, setEvents] = useState<Event[]>(basicDetails || []);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(basicDetails[0] || null);
+  const [events, setEvents] = useState<Event[]>(__events || []);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(__events[0] || null);
   const [updateEvent, setUpdateEvent] = useState<UpdateEvent>({
     _id: '',
     date: '',
@@ -59,6 +61,11 @@ export function SecurityAndConfirmation() {
     eventName: '',
     isDelete: false
   })
+
+
+  useEffect(() => {
+    dispatch(fatchOrgEvents());
+  }, [dispatch]);
 
   const handleOpenReschedule = () => setOpenReschedule(true);
   const handleCloseReschedule = () => setOpenReschedule(false);

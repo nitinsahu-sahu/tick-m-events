@@ -184,8 +184,6 @@ export function SignInView() {
   useEffect(() => {
     if (authenticate) {
       navigate("/", { replace: true });
-    }else{
-      navigate("/sign-in", { replace: true });
     }
   }, [authenticate, navigate]);
 
@@ -222,6 +220,7 @@ export function SignInView() {
           fullWidth
           required
           name="password"
+          placeholder='********'
           label="Password"
           value={formData.password}
           onChange={handleChange}

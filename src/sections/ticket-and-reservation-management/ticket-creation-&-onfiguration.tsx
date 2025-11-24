@@ -264,8 +264,8 @@ export function TicketCreationAndConfiguration({ onSuccess, eventId }: any) {
                         value={ticketTypeData.description}
                         onChange={handleDescriptionChange}
                         style={{ height: '90px', margin: "20px 0px 40px 0px" }}
-                    /></div>
-
+                    />
+</div>
                     {/* Validity */}
                     <TextField
                         label="Validity e.g., 2025-06-15"

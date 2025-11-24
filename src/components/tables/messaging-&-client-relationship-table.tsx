@@ -194,7 +194,6 @@ export function MessagingAndClientRelationshipTable({
             : messages?.receiver?.receiverId;
 
         if (!receiverId && messages?.conversationId === 'new') {
-            console.error('Receiver ID is required for new conversation');
             return;
         }
 
@@ -246,7 +245,6 @@ export function MessagingAndClientRelationshipTable({
             await axios.post(`/conv/message`, messageData);
 
         } catch (error) {
-            console.error('Error sending message:', error);
             // Rollback optimistic update on error
             setMessages(prev => ({
                 ...prev,

@@ -20,11 +20,6 @@ export function PhotoFilterSection() {
   const frames = selectedEvent?.customPhotoFrame?.frameUrls || [];
   const frameList = Array.isArray(frames) ? frames : [frames];
   const allFrames = [...frameList, ...userFrames];
-
-  console.log("Selected Event:", selectedEvent);
-  console.log("Frames:", selectedEvent?.customPhotoFrame);
-
-  // const [selectedFrame, setSelectedFrame] = useState<string | null>(null);
   const [customFilters, setCustomFilters] = useState({
     brightness: 100,
     contrast: 100,
@@ -102,18 +97,17 @@ export function PhotoFilterSection() {
                 eventId,
                 {
                   ...ticket.eventDetails,
-                  customPhotoFrame: ticket.customPhotoFrame ?? null, // attach the frame manually
+                  customPhotoFrame: ticket.customPhotoFrame ?? null, 
                 },
               ];
             })
           ).values()
         );
 
-        console.log("Unique events with frames:", uniqueEvents); // ✅ Debug: See if frame is present
-
+     
         setEvents(uniqueEvents);
       } catch (error) {
-        console.error('Failed to fetch events:', error);
+         toast.error("Failed to fetch events. Please try again.");
       }
     }
 

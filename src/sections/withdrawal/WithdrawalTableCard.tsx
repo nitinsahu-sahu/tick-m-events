@@ -34,7 +34,7 @@ type Withdrawal = {
   updatedAt?: string;
   payment?: {
     paymentMethod: string;
-    method: string; // like 'mtn'
+    method: string; 
     details?: {
       mobileNetwork?: string;
       mobileNumber?: string;

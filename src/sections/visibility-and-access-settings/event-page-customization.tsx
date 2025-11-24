@@ -22,7 +22,7 @@ export const EventCustomization = ({ eventId }: any) => {
   // Fetch existing customization on event change
   useEffect(() => {
     const fetchEventCustomization = async () => {
-      if (!eventId) return; // Don't run if no eventId is selected
+      if (!eventId) return; 
 
       const result = await dispatch(eventCustomizationPageFetch(eventId));
       if ('customization' in result && result.status === 200) {
@@ -46,7 +46,7 @@ export const EventCustomization = ({ eventId }: any) => {
     };
 
     fetchEventCustomization();
-  }, [eventId, dispatch]); // Run whenever eventId changes
+  }, [eventId, dispatch]); 
 
   const handleEventThemeLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
@@ -139,8 +139,8 @@ export const EventCustomization = ({ eventId }: any) => {
 
           <Box
             display="flex"
-            flexDirection={{ xs: 'column', sm: 'row' }} // Column on mobile, row on larger screens
-            gap={2} // Space between boxes
+            flexDirection={{ xs: 'column', sm: 'row' }} 
+            gap={2} 
             mt={2}
           >
             {/* Cover Image Box - 60% width on desktop */}
@@ -220,7 +220,7 @@ export const EventCustomization = ({ eventId }: any) => {
               >
                 {portraitImagePreview ? (
                   <img
-                    src={portraitImagePreview} // State to hold portrait image URL
+                    src={portraitImagePreview}
                     alt="Portrait"
                     style={{ width: '100%', borderRadius: 8, maxHeight: '300px', objectFit: 'cover' }}
                   />

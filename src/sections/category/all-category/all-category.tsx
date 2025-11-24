@@ -173,7 +173,6 @@ export function AllCategoriesView() {
                             height: '100%',
                             color: 'text.primary',
                             backgroundColor: 'transparent',
-                            // Add this new rule:
                             '& h6': {
                               color: 'common.white',
                             },
@@ -195,7 +194,7 @@ export function AllCategoriesView() {
                               textOverflow: 'ellipsis',
                               WebkitLineClamp: 2,
                               WebkitBoxOrient: 'vertical',
-                              color: 'text.primary', // Added white color
+                              color: 'text.primary', 
                             }}
                           />
                           <Box sx={{ flexGrow: 1 }} /> {/* Spacer to push content down */}

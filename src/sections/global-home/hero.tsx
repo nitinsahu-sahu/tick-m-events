@@ -15,7 +15,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link} from 'react-router-dom';
 
 import { RootState } from 'src/redux/store';
 import { PromotionLogoBar } from 'src/components/brands-logo';
@@ -314,6 +314,8 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                                         variant="contained"
                                         startIcon={<CheckCircleIcon sx={{ color: "white" }} />}
                                         onClick={() => handleButtonClick(item.path)}
+                                        // component={Link}    
+                                        // to={item.path}
                                         sx={{
                                             bgcolor: '#00AEEF',
                                             color: 'white',

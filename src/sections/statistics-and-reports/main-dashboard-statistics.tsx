@@ -27,7 +27,6 @@ export function MainDashboardStatistics({ selectedEvent }: any) {
     useEffect(() => {
         dispatch(fatchDashBoardStatisitcs(selectedEvent?._id));
     }, [dispatch, selectedEvent?._id]);
-
     // Transform graph data for ApexCharts
     const transformGraphData = (data: any[], valueKey: string) => {
         if (!Array.isArray(data)) return [];

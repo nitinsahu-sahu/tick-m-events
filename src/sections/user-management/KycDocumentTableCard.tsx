@@ -31,8 +31,6 @@ export function KycDocumentTableCard() {
   const { loading, data: verifications, error } = useSelector(
     (state: RootState) => state.adminVerificationList
   );
-  console.log("data", verifications);
-
   useEffect(() => {
     dispatch(getAllAdminVerifications());
   }, [dispatch]);
@@ -45,17 +43,13 @@ export function KycDocumentTableCard() {
     const status = item.identityDocuments?.[0]?.status;
     const hasDocuments = Array.isArray(item.identityDocuments) &&
       item.identityDocuments.some((doc: any) => doc?.url);
-
-
     let actions: string[] = [];
-
-    // if (status === 'pending') actions = ['Approve', 'Request Modification', 'Reject'];
     if (status === 'pending') actions = ['Approved', 'Reject'];
     else if (status === 'approved') actions = ['Download'];
     else actions = ['Review'];
 
     if (hasDocuments) {
-      actions.unshift('View'); // Add "View" at the beginning
+      actions.unshift('View'); 
     }
 
     return actions;

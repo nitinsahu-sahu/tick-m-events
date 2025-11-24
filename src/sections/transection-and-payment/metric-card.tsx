@@ -6,6 +6,7 @@ import {
 } from "@mui/material";
 import { useEffect } from "react";
 import axios from "src/redux/helper/axios";
+import { toast } from "react-toastify";
 
 type MetricCardProps = {
   selectedEvent: any;
@@ -85,7 +86,12 @@ export function MetricCard({ selectedEvent }: MetricCardProps) {
       try {
         await axios.put(`/o/${eventId}/balance`, { availableBalance });
       } catch (error: any) {
-        console.error("❌ Failed to update event balance:", error?.response?.data || error);
+        const message =
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        "Failed to update event balance. Please try again.";
+
+    toast.error(message);
       }
     };
 

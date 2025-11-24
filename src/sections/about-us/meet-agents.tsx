@@ -54,8 +54,6 @@ export default function AgentsSection() {
                             sx={{
                                 borderRadius: 3,
                                 boxShadow: 3,
-                                // textAlign: "center",
-                                // p: 2,
                             }}
                         >
                             <Avatar

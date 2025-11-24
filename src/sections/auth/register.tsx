@@ -329,7 +329,6 @@ export function Register() {
                         px: 2,
                         borderRadius: '10px',
                         marginRight: '8px',
-                        // Style for the country container to show it's fixed
                         opacity: 0.7,
                         cursor: 'not-allowed',
                     },
@@ -337,7 +336,6 @@ export function Register() {
                         display: 'none !important', // Completely hide the select dropdown
                     },
                     '& .PhoneInputCountryIcon': {
-                        // Style the flag to indicate it's not changeable
                         opacity: 0.7,
                     },
                     '& .PhoneInputCountrySelectArrow': {

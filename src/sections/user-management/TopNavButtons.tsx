@@ -8,7 +8,6 @@ interface TopNavButtonsProps {
 const options = [
   'User List',
   'KYC Verification',
-  // 'Actions & Sanctions',
   'Activity History',
 ];
 
@@ -25,9 +24,9 @@ export function TopNavButtons({ active, onChange }: TopNavButtonsProps) {
         <Grid
           item
           key={label}
-          xs={12}   // full width on mobile
-          sm={6}    // half width on small screens
-          md={3}    // quarter width on medium and up (i.e., all in one row)
+          xs={12}   
+          sm={6}   
+          md={3}    
         >
           <Button
             fullWidth

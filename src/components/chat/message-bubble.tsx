@@ -6,8 +6,6 @@ import { formatTimeToAMPM } from 'src/hooks/formate-time';
 import { downloadFile, formatFileSize } from './utills';
 
 export const MessageBubble = ({ message, isCurrentUser }: any) => {
-    // console.log('message', message);
-
     const { type, message: content, updatedAt, files } = message;
 
     const bubbleStyle = {

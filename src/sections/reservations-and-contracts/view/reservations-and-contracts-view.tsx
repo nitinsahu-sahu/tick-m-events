@@ -15,7 +15,7 @@ export function ReservationsAndContractsView() {
         error 
     } = useSelector((state: RootState) => state?.resContracts || {});
     const [viewType, setViewType] = useState<null | "active" | "completed">('active');
-
+console.log("totalActiveProjects",contracts);
     useEffect(() => {
         dispatch(getReservationContracts());
     }, [dispatch]);

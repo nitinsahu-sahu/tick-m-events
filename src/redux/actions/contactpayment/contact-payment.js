@@ -62,33 +62,3 @@ export const checkPayConStat = (transactionId) => async (dispatch) => {
         };
     }
 };
-
-export const getUserTrnsConStat = (userId) => async (dispatch) => {
-    dispatch({ type: contactPayConstants.GET_TRNS_CON_PAYMET_REQUEST });
-
-    try {
-        const response = await axios.get(`/contact-pay/transactions/${userId}`);
-        dispatch({
-            type: contactPayConstants.GET_TRNS_CON_PAYMET_SUCCESS,
-            payload: {
-                message: response?.data?.message
-            },
-        });
-        return {
-            type: contactPayConstants.GET_TRNS_CON_PAYMET_SUCCESS,
-            message: response?.data?.message,
-            status: response?.status,
-            data: response?.data,
-        };
-    } catch (error) {
-        dispatch({
-            type: contactPayConstants.GET_TRNS_CON_PAYMET_FAILURE,
-            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
-        });
-        return {
-            type: contactPayConstants.GET_TRNS_CON_PAYMET_FAILURE,
-            message: error?.response?.data?.message || 'Failed to check payment status',
-            status: error?.status,
-        };
-    }
-};

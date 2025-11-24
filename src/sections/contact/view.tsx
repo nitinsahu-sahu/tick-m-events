@@ -133,20 +133,6 @@ export function Contact() {
                                 </IconButton>
                             </Tooltip>
                         </Box>
-                        {/* <Box sx={{ display: 'flex', gap: 1 }}>
-                            <IconButton sx={{ color: 'black' }}>
-                                <FacebookIcon />
-                            </IconButton>
-                            <IconButton sx={{ color: 'black' }}>
-                                <TwitterIcon />
-                            </IconButton>
-                            <IconButton sx={{ color: 'black' }}>
-                                <InstagramIcon />
-                            </IconButton>
-                            <IconButton sx={{ color: 'black' }}>
-                                <GoogleIcon />
-                            </IconButton>
-                        </Box> */}
                     </Grid>
 
                     {/* Right Section - Form */}

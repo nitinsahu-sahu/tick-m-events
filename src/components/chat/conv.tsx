@@ -242,7 +242,6 @@ export function ChatPanel() {
         dispatch(fetchConversation());
       }
     } catch (error) {
-      console.error('Error sending message:', error);
       // Rollback optimistic update on error
       setMessages(prev => ({
         ...prev,
@@ -873,9 +872,6 @@ export function ChatPanel() {
                     ),
                     endAdornment: (
                       <InputAdornment position="end">
-                        {/* <IconButton onClick={() => console.log('Camera clicked')}>
-                        <CameraAlt fontSize="small" />
-                      </IconButton> */}
                         <IconButton
                           onClick={handleClick}
                           aria-controls={open ? 'attachment-menu' : undefined}

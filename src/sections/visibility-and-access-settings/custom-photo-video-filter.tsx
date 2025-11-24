@@ -138,14 +138,10 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
               const latestUrl = frameData?.frameUrls?.slice(-1)[0];
               return { success: true, url: latestUrl, fileName: file.name };
             }
-
-            console.error("Upload failed with status:", response.status);
             toast.error(`Failed to upload ${file.name}`);
             return { success: false, url: null, fileName: file.name, error: `Status: ${response.status}` };
 
           } catch (err: any) {
-            console.error("Upload error for file:", file.name, err);
-
             let errorMessage = "Upload failed";
             if (err.code === 'ECONNABORTED') {
               errorMessage = "Upload timeout - check your connection";
@@ -247,7 +243,6 @@ export const CustomPhotoVideoFilter = ({ __events }: any) => {
       }
     } catch (error) {
       toast.error("Error deleting filter.");
-      console.error(error);
     }
 
     // Clear selection if deleted filter was selected

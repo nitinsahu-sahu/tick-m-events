@@ -57,7 +57,7 @@ export function HeroSection() {
                 <Grid
                     container
                     spacing={4}
-                    alignItems="center"   // <-- important: vertical centering
+                    alignItems="center"  
                     justifyContent="center"
                 >
                     {/* Heading Column */}

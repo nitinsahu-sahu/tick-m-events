@@ -193,13 +193,6 @@ export function OverviewTableCard() {
         </Typography>
       )
     },
-    // {
-    //   field: 'email',
-    //   headerName: 'Email',
-    //   flex: 1.5,
-    //   align: 'center',
-    //   headerAlign: 'center',
-    // },
     {
       field: 'createdAt',
       headerName: 'Registration Date',
@@ -495,19 +488,19 @@ export function OverviewTableCard() {
             sx={{
               '& .MuiDataGrid-columnHeaders': {
                 backgroundColor: '#1976d2',
-                color: '#2395D4', // Changed to white for better contrast
+                color: '#2395D4', 
                 fontSize: '1rem',
               },
               '& .MuiDataGrid-cell': {
                 borderBottom: '1px solid #E0E0E0',
                 display: 'flex',
-                alignItems: 'center', // Vertical center
-                justifyContent: 'center', // Horizontal center
+                alignItems: 'center', 
+                justifyContent: 'center', 
               },
               '& .MuiDataGrid-row': {
 
                 '&:hover': {
-                  backgroundColor: 'rgba(35, 149, 212, 0.08)', // Updated to match new color
+                  backgroundColor: 'rgba(35, 149, 212, 0.08)', 
                 },
                 '&.Mui-selected': {
                   backgroundColor: 'rgba(35, 149, 212, 0.12)',

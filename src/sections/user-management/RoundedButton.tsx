@@ -14,7 +14,7 @@ export function RoundedButton({
   const isContained = variant === 'contained';
 
   const theme = useTheme();
-  const isMediumUp = useMediaQuery(theme.breakpoints.up('md')); // lg = 1200px+
+  const isMediumUp = useMediaQuery(theme.breakpoints.up('md')); 
 
   return (
     <Button

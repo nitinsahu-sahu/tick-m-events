@@ -133,7 +133,7 @@ export function SingleCategoriesView() {
           px: { xs: 2, sm: 3, md: 4 },
           maxWidth: '1400px',
           mx: 'auto',
-          mb: 8, // Added proper bottom margin for the page
+          mb: 8, 
         }}
       >
         <Typography

@@ -76,7 +76,7 @@ export default function UserActivityCard() {
       date: new Date(item.timestamp).toLocaleDateString(),
       user: item.userId?.name || item.userId?.email || 'N/A',
       action: activityOptions.find(opt => opt.key === raw)?.label || raw,
-      rawAction: raw,                // use for filtering
+      rawAction: raw,             
       location: item.location?.split(',')[0]?.trim() || '-',
 
     };
@@ -301,7 +301,7 @@ export default function UserActivityCard() {
                     sx={{
                       textTransform: "capitalize",
                       color: selectedActions.includes(option.key) ? 'white' : '#2395d4',
-                      borderColor: '#2395d4', // blue border
+                      borderColor: '#2395d4', 
                       backgroundColor: selectedActions.includes(option.key) ? '#2395d4' : 'transparent',
                       '&:hover': {
                         backgroundColor: selectedActions.includes(option.key) ? '#1565c0' : 'rgba(25, 118, 210, 0.1)',
@@ -371,7 +371,7 @@ export default function UserActivityCard() {
               sx={{
                 '& .MuiDataGrid-columnHeaders': {
                   backgroundColor: '#1976d2',
-                  color: '#2395D4', // Changed to white for better contrast
+                  color: '#2395D4', 
                   fontSize: '1rem',
                 },
                 '& .MuiDataGrid-cell': {
@@ -448,10 +448,10 @@ function StyledActionButton({ sx, children, ...rest }: ButtonProps) {
         '&:hover': {
           backgroundColor: '#071E33',
         },
-        ...sx, // Now using destructured `sx`
+        ...sx, 
       }}
     >
-      {children} {/* Now using destructured `children` */}
+      {children} 
     </Button>
   );
 }

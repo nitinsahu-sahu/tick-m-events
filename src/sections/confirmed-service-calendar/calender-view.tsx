@@ -1,4 +1,3 @@
-// ---- SAME IMPORTS ----
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Calendar from "react-calendar";
@@ -14,7 +13,6 @@ import { getRequestsByProvider } from "src/redux/actions/service-request";
 import { ServiceRequestModal } from "../../components/modal/service-request-modal";
 import "./index.css";
 
-// const options = ["View Details", "Contact Organizer", "Modify Availability"];
 const options = ["View Details"];
 
 export const CalenderView = () => {

@@ -1,4 +1,4 @@
-import { Box, Typography, Grid, Button, Paper } from "@mui/material";
+import { Box, Typography, Grid, Button} from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import StarIcon from "@mui/icons-material/Star";
 import PeopleIcon from "@mui/icons-material/People";
@@ -150,7 +150,7 @@ export function MissionSection() {
                                             sx={{
                                                 width: "100%",
                                                 height: "100%",
-                                                objectFit: "cover", // ✅ crop image to fit square box
+                                                objectFit: "cover", 
                                             }}
                                         />
                                     </Box>

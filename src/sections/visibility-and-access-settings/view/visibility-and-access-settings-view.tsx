@@ -40,7 +40,7 @@ interface Event {
     url: string;
   };
   customization: any
-  // Add other properties as needed
+
 }
 export function VisibilityAndAccessSettingsView() {
   const { __events } = useSelector((state: RootState) => state.organizer);

@@ -17,8 +17,6 @@ const messaging = firebase.messaging();
 const channel = new BroadcastChannel('fcm-messages');
 
 messaging.onBackgroundMessage((payload) => {
-  console.log('[📦 Background message received]', payload);
-
   const title = payload.data?.title || 'New Notification';
   const options = {
     body: payload.data?.body || '',

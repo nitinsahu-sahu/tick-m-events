@@ -109,44 +109,6 @@ export function OurAgent() {
                                     objectFit: "cover",
                                 }}
                             />
-
-                            {/* Overlay Box on the right */}
-                            {/* <Box
-                                sx={{
-                                    position: "absolute",
-                                    bottom: 16,
-                                    right: 16,
-                                    backgroundColor: "#fff",
-                                    px: 2,
-                                    py: 1,
-                                    borderRadius: "8px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-                                }}
-                            >
-                                <Typography
-                                    variant="h4"
-                                    sx={{
-                                        fontWeight: 700,
-                                        mr: 2,
-                                        fontSize: { xs: "1.8rem", md: "2.2rem" }, // Number size
-                                    }}
-                                >
-                                    86
-                                </Typography>
-                                <Typography
-                                    variant="body1"
-                                    sx={{
-                                        fontWeight: 500,
-                                        lineHeight: 1.2,
-                                        fontSize: { xs: "0.9rem", md: "1rem" }, // Text size
-                                        textAlign: "left",
-                                    }}
-                                >
-                                    Industry <br /> Experts
-                                </Typography>
-                            </Box> */}
                         </Box>
 
                     </Grid>
@@ -203,76 +165,6 @@ export function OurAgent() {
                             />
                         </Box>
                     </Grid>
-                    {/* Right: Top box + Bottom image */}
-                    {/* <Grid item xs={12} md={4}>
-                        <Grid container direction="column" spacing={4}>
-                         
-                            <Grid item>
-                                <Box
-                                    sx={{
-                                        backgroundColor: "#2395d4",
-                                        color: "#fff",
-                                        px: 4,
-                                        py: 3,
-                                        borderRadius: "12px",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        gap: 2, // space between number and text
-                                        minWidth: "180px", // optional, ensures consistent box width
-                                    }}
-                                >
-                                    <Typography
-                                        variant="h3"
-                                        sx={{
-                                            fontWeight: 700,
-                                            fontSize: { xs: "1.3rem", md: "3.8rem" },
-                                        }}
-                                    >
-                                        25
-                                    </Typography>
-                                    <Typography
-                                        variant="body1"
-                                        sx={{
-                                            fontWeight: 500,
-                                            fontSize: { xs: "0.9rem", md: "1.6rem" },
-                                            lineHeight: 1.2,
-                                        }}
-                                    >
-                                        Years in <br /> Business
-                                    </Typography>
-                                </Box>
-                            </Grid>
-
-
-                   
-                            <Grid item>
-                                <Box
-                                    sx={{
-                                        height: "100%",
-                                        borderRadius: "12px",
-                                        overflow: "hidden",
-                                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                                        "&:hover": {
-                                            boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-                                        },
-                                        transition: "box-shadow 0.3s ease",
-                                    }}
-                                >
-                                    <Box
-                                        component="img"
-                                        src="/assets/images/about/about.png"
-                                        alt="Team dinner"
-                                        sx={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                        }}
-                                    />
-                                </Box>
-                            </Grid>
-                        </Grid>
-                    </Grid> */}
                 </Grid>
                 {/* Features Section */}
                 <Box
@@ -343,7 +235,7 @@ export function OurAgent() {
                                         "&:hover": {
                                             boxShadow: 4,
                                         },
-                                        height: "100%", // Ensure card takes full height
+                                        height: "100%", 
                                         display: "flex",
                                         flexDirection: "column",
                                     }}
@@ -351,24 +243,24 @@ export function OurAgent() {
                                     <Box sx={{
                                         display: "flex",
                                         justifyContent: "center",
-                                        backgroundColor: "#f8f9fa", // Optional: subtle background
-                                        p: 2 // Optional: add some padding around the avatar
+                                        backgroundColor: "#f8f9fa", 
+                                        p: 2 
                                     }}>
                                         <Avatar
                                             src={agent.img}
                                             alt={agent.name}
                                             sx={{
                                                 width: "100%",
-                                                maxWidth: 200, // Control maximum width
-                                                height: 250, // Fixed height for consistency
+                                                maxWidth: 200, 
+                                                height: 250, 
                                                 objectFit: "cover",
                                                 objectPosition: "center",
-                                                borderRadius: 2, // Slight rounding for better look
+                                                borderRadius: 2, 
                                             }}
                                         />
                                     </Box>
                                     <CardContent sx={{
-                                        flexGrow: 1, // Allow content to grow and push socials to bottom
+                                        flexGrow: 1, 
                                         display: "flex",
                                         flexDirection: "column",
                                         p: 2
@@ -398,7 +290,7 @@ export function OurAgent() {
                                             display: "flex",
                                             gap: 1,
                                             justifyContent: "center",
-                                            mt: "auto" // Push social icons to bottom
+                                            mt: "auto" 
                                         }}>
                                             {agent.socials.map((social, i) => (
                                                 <Box

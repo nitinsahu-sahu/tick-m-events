@@ -3,6 +3,7 @@ import { Box, Paper, Tab, Tabs } from "@mui/material";
 import { TransactionAndPaymentTable } from "src/components/tables/transaction-&-payment-table";
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import axios from "src/redux/helper/axios";
+import { toast } from "react-toastify";
 import { InvoiceTableHeaders, EventData } from "./utils";
 
 type InvoiceHistoryProps = {
@@ -50,7 +51,7 @@ export function InvoiceHistory({ selectedEvent }: InvoiceHistoryProps) {
                     setRefunds(refundResp.data.data);
                 }
             } catch (error) {
-                console.error("Error fetching transactions:", error);
+                toast.error("Failed to load transactions.");
             }
         };
 
@@ -59,11 +60,11 @@ export function InvoiceHistory({ selectedEvent }: InvoiceHistoryProps) {
 
     const handleDownloadInvoice = async (transId: string, status: string, type: "withdrawal" | "refund") => {
         if (status.toLowerCase() !== "approved" && type === "withdrawal") {
-            alert("Invoice can only be downloaded for approved withdrawals");
+            toast.warning("Invoice can only be downloaded for approved withdrawals");
             return;
         }
         if (type === "refund" && status.toLowerCase() !== "refunded") {
-            alert("Invoice can only be downloaded for refunded transactions");
+            toast.warning("Invoice can only be downloaded for refunded transactions");
             return;
         }
 
@@ -86,9 +87,9 @@ export function InvoiceHistory({ selectedEvent }: InvoiceHistoryProps) {
             document.body.appendChild(link);
             link.click();
             link.remove();
+              toast.success("Invoice downloaded successfully!");
         } catch (error) {
-            console.error("Error downloading invoice:", error);
-            alert("Failed to download invoice. Please try again.");
+           toast.error("Failed to download invoice. Please try again.");
         }
     };
 

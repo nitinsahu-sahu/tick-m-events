@@ -100,7 +100,6 @@ export function TicketReservationManagementTable({
                 dispatch(fatchOrgEvents())
             }
         } catch (error) {
-            console.error('Error processing refund request:', error);
             toast.error('An error occurred while processing the request');
         } finally {
             setLoading(false);

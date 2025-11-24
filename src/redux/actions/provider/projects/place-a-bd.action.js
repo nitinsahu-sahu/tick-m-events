@@ -21,27 +21,6 @@ export const placeBid = (projectId,bidPayload) => async (dispatch) => {
   }
 };
 
-// Organizer see project bids only
-export const getProjectBids = (projectId) => async (dispatch) => {
-  dispatch({ type: providerProposalConstants.GET_SENDPROPOSAL_REQUEST });
-  try {
-    const response = await axios.get(`/p/project/${projectId}/bids`);
-    
-    dispatch({
-      type: providerProposalConstants.GET_SENDPROPOSAL_SUCCESS,
-      payload: {
-        message: response?.data?.message,
-        project: response?.data?.project,
-      },
-    });
-  } catch (error) {
-    dispatch({
-      type: providerProposalConstants.GET_SENDPROPOSAL_FAILURE,
-      payload: { message: error?.response?.data?.message || "Server error", error: error.status },
-    });
-  }
-};
-
 // Provider see all bids only
 export const getMyBids = () => async (dispatch) => {
   dispatch({ type: providerProposalConstants.GET_MYBIDS_REQUEST });

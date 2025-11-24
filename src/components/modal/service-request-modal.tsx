@@ -170,7 +170,21 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
   const printRef = useRef<HTMLDivElement>(null);
 
   if (!data) return null;
+    console.log("data",data);
+  const eventData = data.eventId || data.projectId?.eventId || {};
+  const serviceRequest = data.serviceRequestId || data.projectId || {};
+  const organizer = 
+  data.organizerId ??
+  data.projectId?.organizerId ??
+  data.projectId?.organizer ??
+  data.projectId?.eventId?.organizer ??
+  data.projectId?.createdBy ??   
+  {};
 
+console.log("Organizer:", organizer);
+console.log("Organizer Name:", organizer?.name ?? "N/A");
+
+  console.log("or",organizer);
   const handlePrint = () => {
     const printContent = printRef.current;
     if (!printContent) return;
@@ -226,7 +240,9 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
             📋 Service Request Details
           </Typography>
           <Typography variant="subtitle1" sx={{ opacity: 0.9, mt: 1 }}>
-            Event: <strong>{data.eventId?.eventName || 'N/A'}</strong>
+            Event: <strong>{eventData?.date
+                        ? new Date(eventData.date).toLocaleDateString()
+                        : "N/A"}</strong>
           </Typography>
         </Box>
         <LogoStamp>
@@ -271,7 +287,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                     Location:
                   </DetailLabel>
                   <DetailValue variant="body2">
-                    {data.eventId?.location}
+                   {eventData?.location || "N/A"}
                   </DetailValue>
                 </DetailItem>
               </Stack>
@@ -382,7 +398,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                 <DetailItem>
                   <DetailLabel variant="body2">Name:</DetailLabel>
                   <DetailValue variant="body2">
-                    {data.organizerId?.name}
+                   {organizer?.name || "N/A"}
                   </DetailValue>
                 </DetailItem>
 
@@ -411,7 +427,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                         // }
                       }}
                     >
-                      {data.organizerId?.email}
+                      {organizer?.email || "N/A"}
                     </Typography>
                   </DetailValue>
                 </DetailItem>

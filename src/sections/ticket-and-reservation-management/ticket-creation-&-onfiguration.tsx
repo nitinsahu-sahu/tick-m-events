@@ -258,12 +258,13 @@ export function TicketCreationAndConfiguration({ onSuccess, eventId }: any) {
                     </Box>
 
                     {/* Description */}
+                       <div translate="no" className="notranslate" data-nosnippet>
                     <ReactQuill
                         theme="snow"
                         value={ticketTypeData.description}
                         onChange={handleDescriptionChange}
                         style={{ height: '90px', margin: "20px 0px 40px 0px" }}
-                    />
+                    /></div>
 
                     {/* Validity */}
                     <TextField

@@ -35,7 +35,7 @@ export function UpdateServices({ updateData, setServiceOfferRowData }: any) {
             const result = await dispatch(serviceReqUpdate({ serviceUpdateData, serviceId: updateData?._id }));
             if ((result as ApiResult)?.status === 200) {
                 toast.success(result?.message);
-        
+
             } else {
                 toast.error(result?.message);
             }
@@ -71,14 +71,15 @@ export function UpdateServices({ updateData, setServiceOfferRowData }: any) {
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <ReactQuill
-                        placeholder="Description..."
-                        theme="snow"
-                        className="custom-quill"
-                        ref={fullDesRef}
-                        value={updateData.description || ''}
-                        onChange={(value) => setServiceOfferRowData((prev: any) => ({ ...prev, description: value }))}
-                    />
+                    <div translate="no" className="notranslate" data-nosnippet>
+                        <ReactQuill
+                            placeholder="Description..."
+                            theme="snow"
+                            className="custom-quill"
+                            ref={fullDesRef}
+                            value={updateData.description || ''}
+                            onChange={(value) => setServiceOfferRowData((prev: any) => ({ ...prev, description: value }))}
+                        /></div>
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
@@ -124,14 +125,15 @@ export function UpdateServices({ updateData, setServiceOfferRowData }: any) {
 
                 </Grid>
                 <Grid item xs={12}>
-                    <ReactQuill
-                        placeholder="Additional Options..."
-                        theme="snow"
-                        className="custom-quill"
-                        ref={addOptionRef}
-                        value={updateData.additionalOptions || ''}
-                        onChange={(value) => setServiceOfferRowData((prev: any) => ({ ...prev, additionalOptions: value }))}
-                    />
+                    <div translate="no" className="notranslate" data-nosnippet>
+                        <ReactQuill
+                            placeholder="Additional Options..."
+                            theme="snow"
+                            className="custom-quill"
+                            ref={addOptionRef}
+                            value={updateData.additionalOptions || ''}
+                            onChange={(value) => setServiceOfferRowData((prev: any) => ({ ...prev, additionalOptions: value }))}
+                        /></div>
                 </Grid>
                 <Grid item xs={12}>
                     <Button

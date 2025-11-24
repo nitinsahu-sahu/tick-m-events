@@ -346,6 +346,7 @@ export function AddPlaceABid() {
                                 <Typography fontWeight={600} color="text.secondary" mb={1}>
                                     Full Description of Requirements *
                                 </Typography>
+                                 <div translate="no" className="notranslate" data-nosnippet>
                                 <ReactQuill
                                     theme="snow"
                                     value={formData.orgRequirement}
@@ -360,7 +361,7 @@ export function AddPlaceABid() {
                                             ['link', 'clean']
                                         ]
                                     }}
-                                />
+                                /></div>
                                 <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between' }}>
                                     <Typography
                                         variant="caption"

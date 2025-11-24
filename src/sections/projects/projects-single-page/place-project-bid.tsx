@@ -441,6 +441,7 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
                             <Typography variant="subtitle2" mb={1}>
                                 Describe your proposal (minimum 100 characters)
                             </Typography>
+                               <div translate="no" className="notranslate" data-nosnippet>
                             <ReactQuill
                                 theme="snow"
                                 value={bidData.proposal}
@@ -455,7 +456,7 @@ export function PlaceBidOnProject({ project }: { project: Project }) {
                                         ['link', 'clean']
                                     ]
                                 }}
-                            />
+                            /></div>
                             <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between' }}>
                                 <Typography
                                     variant="caption"

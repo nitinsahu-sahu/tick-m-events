@@ -187,12 +187,13 @@ export function AddServices({ setActiveSection }: any) {
             <Typography fontWeight={600} color="text.primary" mb={1}>
                 {label}
             </Typography>
+               <div translate="no" className="notranslate" data-nosnippet>
             <ReactQuill
                 placeholder={label.includes('Full') ? 'Description...' : 'Add Additional...'}
                 theme="snow"
                 className="custom-quill"
                 ref={ref}
-            />
+            /></div>
         </Box>
     );
 

@@ -303,6 +303,7 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                         </Grid>
                         {/* Description - Full width always */}
                         <Grid item xs={12} sx={{ mt: 2 }}>
+                              <div translate="no" className="notranslate" data-nosnippet>
                             <ReactQuill
                                 placeholder='Enter your event description (required)'
                                 theme="snow"
@@ -318,7 +319,7 @@ export function StepperStepOne({ handleEventThemeLogo, fileInputRef, handlePortr
                                     borderRadius: '4px'
                                 }}
                                 ref={quillRef}
-                            />
+                            /></div>
                             {descriptionError && (
                                 <Typography color="error" variant="caption" >
                                     Please enter a description for your event

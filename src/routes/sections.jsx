@@ -142,6 +142,8 @@ const PROTECTED_ROUTES = [
   // Common Routes (All roles)
   { path: '/', element: <MultipleDashboard />, roles: ALL_ROLES },
   { path: '/password-recovery', element: <LAZY_IMPORTS.PasswordRecoveryPage />, roles: ALL_ROLES },
+  { path: '/payment-success', element: <LAZY_IMPORTS.ContactPayPage />, roles: ALL_ROLES },
+
 ];
 
 const PUBLIC_ROUTES = [

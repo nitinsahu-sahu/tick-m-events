@@ -16,7 +16,7 @@ export function StepperStepThree() {
     const [loading, setLoading] = useState(false);
     const [eventLogo, setEventLogo] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [selectedFrame, setSelectedFrame] = useState('');
+    const [selectedFrame, setSelectedFrame] = useState('circle');
     const [selectedColor, setSelectedColor] = useState("#F68CB9");
     const [customColor, setCustomColor] = useState("#FF66A1");
     const handleEventThemeLogo = (e: React.ChangeEvent<HTMLInputElement>) => {

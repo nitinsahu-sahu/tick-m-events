@@ -237,6 +237,8 @@ export const eventCustomizationCreate = ({ formEventCustomizeData, eventId, tick
                 'Content-Type': 'multipart/form-data'
             }
         });
+        console.log(response);
+        
         dispatch({
             type: eventConstants.EVENT_CUSTOMIZTION_CREATE_SUCCESS,
             payload: {
@@ -251,6 +253,8 @@ export const eventCustomizationCreate = ({ formEventCustomizeData, eventId, tick
             eventCustomizationId: response?.data?.eventCustomizationId
         };
     } catch (error) {
+        console.log(error);
+
         dispatch({
             type: eventConstants.EVENT_CUSTOMIZTION_CREATE_FAILURE,
             payload: { message: error?.response?.data?.message || "Server error", error: error.status },

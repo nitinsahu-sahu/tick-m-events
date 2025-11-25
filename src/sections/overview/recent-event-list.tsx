@@ -358,7 +358,10 @@ export const RecentEventList: React.FC<Props> = ({
                                                 value={ticketTypes.some(t => t.ticketType === selectedTicket) ? selectedTicket : ticketTypes[0]?.ticketType || ""}
                                                 onChange={(e) => setSelectedTicket(e.target.value)}
                                                 size="small"
-                                                sx={{ minWidth: 100 }}
+                                                sx={{
+                                                    minWidth: 100,
+                                                    fontSize: { xs: 10, sm: 11, md: 12 }
+                                                }}
                                             >
                                                 {ticketTypes.map((ticket: any) => (
                                                     <MenuItem key={ticket.id} value={ticket.ticketType}>
@@ -373,7 +376,11 @@ export const RecentEventList: React.FC<Props> = ({
                                                 value={timePeriod}
                                                 onChange={handleTimePeriodChange}
                                                 size="small"
-                                                sx={{ minWidth: 120 }}
+                                                sx={{ 
+                                                    minWidth: 120, 
+                                                    fontSize: { xs: 10, sm: 11, md: 12 }
+
+                                                }}
                                             >
                                                 <MenuItem value="daily">Daily</MenuItem>
                                                 <MenuItem value="weekly">Weekly</MenuItem>

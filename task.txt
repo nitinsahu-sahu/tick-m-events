@@ -1,9 +1,0 @@
-UPDATE FILE
-front
--src/routes/sections.jsx
--src/sections/payemtn-success
-back
-routes/payment.js
-controller/admin/fapshi/index
-controller/contactpaycontroller
-event-order-controller //267

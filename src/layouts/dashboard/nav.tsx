@@ -141,7 +141,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
   return (
     <>
       <Logo />
-      <HeadingCommon baseSize="13px" title={`Account ID: ${user?.__id || user?.name}`} />
+      <HeadingCommon baseSize="13px" title={`Account ID: ${user?.__id || user?.name}`} mt={1} />
       {slots?.topArea}
       <DashboardHF title="MAIN MENU" />
       <Scrollbar fillContent>
@@ -181,11 +181,34 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                         }),
                       }}
                     >
-                      <Box component="span" sx={{ width: 24, height: 24 }}>{item.icon}</Box>
-                      <Box component="span" flexGrow={1} sx={{ fontFamily: "Poppins, sans-serif", fontWeight: 600 }}>
+                      <Box
+                        component="span"
+                        sx={{
+                          width: { xs: 20, sm: 22, md: 24 },
+                          height: { xs: 20, sm: 22, md: 24 }
+                        }}
+                      >
+                        {item.icon}
+                      </Box>
+                      <Box
+                        component="span"
+                        flexGrow={1}
+                        sx={{
+                          fontFamily: "Poppins, sans-serif",
+                          fontWeight: 600,
+                          fontSize: { xs: 11, sm: 13, md: 15 }
+                        }}
+                      >
                         {item.title}
                         {item.info && (
-                          <Box component="span" sx={{ marginLeft: 1, borderRadius: "12px" }}> {/* Adjust marginLeft value as needed */}
+                          <Box
+                            component="span"
+                            sx={{
+                              marginLeft: 1,
+                              borderRadius: "12px",
+                              fontSize: { xs: 10, sm: 12, md: 14 }
+                            }}
+                          >
                             {item.info}
                           </Box>
                         )}
@@ -242,8 +265,22 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                                   },
                                 }}
                               >
-                                <Box component="span" sx={{ width: 24, height: 24 }}>{child.icon}</Box>
-                                <Box component="span" flexGrow={1}>{child.title}</Box>
+                                <Box
+                                  component="span"
+                                  sx={{
+                                    width: { xs: 18, sm: 20, md: 22 },
+                                    height: { xs: 18, sm: 20, md: 22 }
+
+                                  }}>
+                                  {child.icon}
+                                </Box>
+                                <Box
+                                  component="span"
+                                  flexGrow={1}
+                                  sx={{
+                                    fontSize: { xs: 10, sm: 12, md: 14 }
+                                  }}
+                                >{child.title}</Box>
                               </ListItemButton>
                             </ListItem>
                           );

@@ -992,7 +992,7 @@ const EventBooking: React.FC<EventBookingProps> = ({
                     <Card
                       sx={{
                         display: "flex",
-                        flexDirection: "row",
+                        flexDirection: { xs: "column", md: "row" },
                         borderRadius: 2,
                         overflow: "hidden",
                         boxShadow: 3,
@@ -1008,6 +1008,7 @@ const EventBooking: React.FC<EventBookingProps> = ({
                           width: { xs: "100%", md: 300 },
                           height: { xs: 200, md: 325 },
                           objectFit: "cover",
+                          p: { xs: 2, md: 3 }
                         }}
                       />
                       <CardContent

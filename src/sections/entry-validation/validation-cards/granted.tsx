@@ -41,12 +41,10 @@ export function Granted({ flagData, onConfirmEntry, onCancel }: GrantedProps) {
             baseSize="23px"
             width={{ md: "34%" }}
           />
-          
+
           {Array.isArray(flagData.ticket.participantDetails) && (
             <Box mt={3}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
-                Participant Details
-              </Typography>
+              <HeadingCommon title="Participant Details" color="#2aaa54ff" weight={600} baseSize="20px" />
 
               {flagData.ticket.participantDetails.length > 0 ? (
                 <Table size="small">
@@ -97,7 +95,7 @@ export function Granted({ flagData, onConfirmEntry, onCancel }: GrantedProps) {
               )}
             </Box>
           )}
-          
+
           <Box
             display="flex"
             justifyContent="space-between"

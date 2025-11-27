@@ -17,7 +17,6 @@ import { chartRealTimeOptions, ListViewMethod, reservationManagementTableHeaders
 export function ReservationManagement({ orderList }: any) {
 
     const { order, validationOptions: initialValidationOptions } = orderList
-    console.log("orderList",orderList);
     const dispatch = useDispatch<AppDispatch>();
     const exportToExcel = useExcelExport();
     const exportToCSV = useCSVExport();

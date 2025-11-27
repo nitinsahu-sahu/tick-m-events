@@ -18,7 +18,11 @@ export function TicketManagement({ tickets, selectedEvent }: any) {
         <Box>
             <HeadingCommon baseSize="33px" weight={600} variant="h5" title="Ticket Management" />
 
-            <TicketReservationManagementTable headers={ticketManagementTableHeaders} data={tickets} type="1" />
+            <TicketReservationManagementTable
+                headers={ticketManagementTableHeaders}
+                data={tickets}
+                type="1"
+            />
             <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
                 <Button
                     variant="contained"

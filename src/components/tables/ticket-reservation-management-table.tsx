@@ -194,6 +194,7 @@ export function TicketReservationManagementTable({
 
         return null;
     };
+    console.log('==<', data)
 
     return (
         <>
@@ -229,6 +230,7 @@ export function TicketReservationManagementTable({
                             </TableRow>
                         ) : (
                             data?.map((row: any, index: any) => (
+
                                 <TableRow key={row._id} sx={{ backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#e0e0e0" }}>
                                     {
                                         type === '4' ? <TableCell align="center" sx={{ fontWeight: "bold", textTransform: 'capitalize' }}>
@@ -253,7 +255,10 @@ export function TicketReservationManagementTable({
                                                     />
                                                 ) : (
                                                     <span style={{ textTransform: row.price ? 'uppercase' : 'capitalize' }}>
-                                                        {selectedEvent === 'paid' ? (row.price || 'Free') : (row.email || 'Free')}
+
+                                                        {selectedEvent === 'paid' ?
+                                                            (row.price || 'Free') :
+                                                            (row.email || row.price==="0"?"Free":row.price)}
                                                     </span>
                                                 )}
                                             </TableCell>

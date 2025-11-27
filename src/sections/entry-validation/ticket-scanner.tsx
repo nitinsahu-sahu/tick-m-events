@@ -34,7 +34,11 @@ interface Ticket {
 
 }
 
-export function TicketScanner() {
+interface TicketScannerProps {
+    _selectEve: any;
+}
+
+export function TicketScanner({ _selectEve }: TicketScannerProps) {
 
     const dispatch = useDispatch<AppDispatch>();
     const [delay] = useState<number>(100);
@@ -48,65 +52,66 @@ export function TicketScanner() {
     const [isScanning, setIsScanning] = useState(false);
     const [scanMessage, setScanMessage] = useState<string | null>(null);
     const [hasScanned, setHasScanned] = useState(false);
-     const allParticipantsValidated = flag.ticket?.participantDetails?.every(p => p.validation) ?? false;
+    const allParticipantsValidated = flag.ticket?.participantDetails?.every(p => p.validation) ?? false;
 
-   const handleScan = async (data: any) => {
-    if (data && !hasScanned) {
-        let scannedText = "";
+    const handleScan = async (data: any) => {
+        if (data && !hasScanned) {
+            let scannedText = "";
 
-        if (typeof data === "string") {
-            scannedText = data;
-        } else if (typeof data === "object" && data?.text) {
-            scannedText = data.text;
-        } else {
-            console.error("Unexpected scan data:", data);
-            return;
-        }
-
-        setResult(scannedText);
-        setScanMessage("✅ QR Code scanned successfully!");
-        setHasScanned(true);
-        setShowScanner(false);
-        setIsScanning(false);
-        setTimeout(() => setScanMessage(null), 3000);
-
-        try {
-            const parts = scannedText.split("/");
-            const ticketCode = parts[parts.length - 1];
-
-            const res = await dispatch(verifyTicketCode({ ticketCode }));
-            if (res.type === "VERIFY_TICKET_SUCCESS") {
-                const ticket = res.ticket;
-
-                // 🔴 check payment status first
-                if (ticket.paymentStatus !== "confirmed") {
-                    setFlag({
-                        status: "payment-pending",
-                        message: "❌ Payment not confirmed. Please complete payment.",
-                        ticket: null,
-                    });
-                    return;
-                }
-
-                // proceed with normal checks
-                if (res.flag === "granted") {
-                    setFlag({ status: "granted", message: res.message, ticket });
-                } else if (res.flag === "already") {
-                    setFlag({ status: "already", message: "Ticket already used.", ticket });
-                } else if (res.flag === "expired") {
-                    setFlag({ status: "expired", message: "Ticket has expired.", ticket });
-                } else {
-                    setFlag({ status: "invalid", message: "Invalid or expired ticket.", ticket: null });
-                }
+            if (typeof data === "string") {
+                scannedText = data;
+            } else if (typeof data === "object" && data?.text) {
+                scannedText = data.text;
             } else {
-                setFlag({ status: "error", message: res.message, ticket: null });
+                console.error("Unexpected scan data:", data);
+                return;
             }
-        } catch (err) {
-            console.error(err);
-            setFlag({ status: "error", message: "Verification failed. Try again." });
+
+            setResult(scannedText);
+            setScanMessage("✅ QR Code scanned successfully!");
+            setHasScanned(true);
+            setShowScanner(false);
+            setIsScanning(false);
+            setTimeout(() => setScanMessage(null), 3000);
+
+            try {
+                const parts = scannedText.split("/");
+                const ticketCode = parts[parts.length - 1];
+                const eventId = parts[parts.length - 1];
+
+                const res = await dispatch(verifyTicketCode({ ticketCode, eventId: _selectEve?._id, }));
+                if (res.type === "VERIFY_TICKET_SUCCESS") {
+                    const ticket = res.ticket;
+
+                    // 🔴 check payment status first
+                    if (ticket.paymentStatus !== "confirmed") {
+                        setFlag({
+                            status: "payment-pending",
+                            message: "❌ Payment not confirmed. Please complete payment.",
+                            ticket: null,
+                        });
+                        return;
+                    }
+
+                    // proceed with normal checks
+                    if (res.flag === "granted") {
+                        setFlag({ status: "granted", message: res.message, ticket });
+                    } else if (res.flag === "already") {
+                        setFlag({ status: "already", message: "Ticket already used.", ticket });
+                    } else if (res.flag === "expired") {
+                        setFlag({ status: "expired", message: "Ticket has expired.", ticket });
+                    } else {
+                        setFlag({ status: "invalid", message: "Invalid or expired ticket.", ticket: null });
+                    }
+                } else {
+                    setFlag({ status: "error", message: res.message, ticket: null });
+                }
+            } catch (err) {
+                console.error(err);
+                setFlag({ status: "error", message: "Verification failed. Try again." });
+            }
         }
-    }
-};
+    };
 
 
     const handleError = (err: Error) => {
@@ -129,7 +134,7 @@ export function TicketScanner() {
             ticketCode = parts[parts.length - 1];
         }
         try {
-            const res = await dispatch(verifyTicketCode({ ticketCode }));
+            const res = await dispatch(verifyTicketCode({ ticketCode, eventId: _selectEve?._id, }));
             if (res.type === "VERIFY_TICKET_SUCCESS") {
                 // Check ticket status
                 if (res.flag === "granted") {
@@ -161,7 +166,8 @@ export function TicketScanner() {
         const res = await dispatch(
             confirmTicketEntry({
                 verifyData: {
-                    ticketCode
+                    ticketCode,
+                    eventId: _selectEve?._id
                 },
                 verifyEntry: true,
                 entryTime
@@ -194,7 +200,7 @@ export function TicketScanner() {
             confirmTicketEntry({
                 verifyData: {
                     ticketCode,
-                    participantId, 
+                    participantId,
                 },
                 verifyEntry: true,
                 entryTime,
@@ -216,6 +222,15 @@ export function TicketScanner() {
             }));
         }
     };
+    const [cameraFacing, setCameraFacing] = useState<"user" | "environment">("environment");
+
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const cameraConstraints = {
+        video: {
+            facingMode: { ideal: cameraFacing }, // important fix
+        }
+    };
+
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
@@ -245,13 +260,25 @@ export function TicketScanner() {
                     )}
 
                     {showScanner && (
+                        // <QrReader
+                        //     delay={delay}
+                        //     style={{ width: "100%", height: 240 }}
+                        //     onError={handleError}
+                        //     onScan={handleScan}
+                        //     constraints={cameraConstraints as any}
+                        // />
                         <QrReader
+                         key={cameraFacing}
                             delay={delay}
                             style={{ width: "100%", height: 240 }}
                             onError={handleError}
                             onScan={handleScan}
+                             constraints={cameraConstraints as any} // THIS WORKS ON MOBILE
                         />
+
                     )}
+
+
                     {isScanning && (
                         <Typography align="center" mt={1} color="white">
                             Scanning...
@@ -265,6 +292,7 @@ export function TicketScanner() {
                     )}
 
                 </Button>
+
             </Box>
             <Box display="flex" mt={2} gap={1}>
                 <Button
@@ -276,15 +304,28 @@ export function TicketScanner() {
                         "&:hover": { backgroundColor: "#0A1E36" }
                     }}
                     onClick={handleVerifyClick}
-                     disabled={flag.status === "payment-pending"}  
+                    disabled={flag.status === "payment-pending"}
                 >
                     Verify
                 </Button>
 
+                {isMobile && showScanner && (
+                    <Button
+                        variant="outlined"
+                        sx={{ borderRadius: "8px" }}
+                        onClick={() =>
+                            setCameraFacing(prev =>
+                                prev === "environment" ? "user" : "environment"
+                            )
+                        }
+                    >
+                        Switch Camera
+                    </Button>
+                )}
             </Box>
-        
-        
-         {["granted", "already", "invalid", "error", "payment-pending", "expired"].includes(flag.status) && (
+
+
+            {["granted", "already", "invalid", "error", "payment-pending", "expired"].includes(flag.status) && (
                 <Grid container spacing={2} mt={2}>
                     <Grid item xs={12}>
                         <Card

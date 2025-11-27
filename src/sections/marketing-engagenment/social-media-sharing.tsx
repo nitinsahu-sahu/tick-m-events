@@ -43,7 +43,6 @@ const platforms = [
 ];
 
 export function SocialMediaSharing({ selEvent }: any) {
-    console.log("sss", selEvent);
     const [description, setDescription] = useState('Join us for an unforgettable experience! Get your tickets now!');
     const [reservationLink, setReservationLink] = useState('');
     const [hashtag, setHashtag] = useState('#AmazingEvent2025');

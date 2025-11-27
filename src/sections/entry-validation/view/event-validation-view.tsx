@@ -64,10 +64,15 @@ export function EventValidationView() {
           title="Entry Validation (QR Code Scan)"
         />
         {
-          view === 'scan' ? <TicketScanner /> : <EnterTicketCode _selectEve={selectedEvent?.validationOptions} eventSelected={selectedEvent}/>
+          view === 'scan' ?
+            <TicketScanner _selectEve={selectedEvent} /> :
+            <EnterTicketCode
+              _selectEve={selectedEvent?.validationOptions}
+              eventSelected={selectedEvent}
+            />
         }
 
-        <EntryListView _selectEve={selectedEvent}/>
+        <EntryListView _selectEve={selectedEvent} />
 
         <RealTimeStatistics statistics={selectedEvent?.statistics} />
       </DashboardContent>

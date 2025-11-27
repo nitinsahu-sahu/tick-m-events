@@ -22,7 +22,7 @@ export function ReservationManagement({ orderList }: any) {
     const exportToCSV = useCSVExport();
     // Initialize state with either the existing options or defaults
     const [validationOption, setValidationOption] = useState<ValidationOptions>(
-        initialValidationOptions || {  // Remove .validationOptions here
+        initialValidationOptions || {
             selectedView: 'scan',
             listViewMethods: []
         }
@@ -36,7 +36,8 @@ export function ReservationManagement({ orderList }: any) {
             ...prev,
             selectedView: value,
             // Clear list methods when switching to scan view
-            ...(value === 'scan' ? { listViewMethods: [] } : {})
+            ...(value === 'scan' ? { listViewMethods: [] } : {}),
+            ...(value === 'both' ? { listViewMethods: ['manualCode', 'nameList', 'accountId'] } : {})
         }));
         setIsModified(true);
         setError(null); // Clear error when view changes

@@ -141,7 +141,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
   return (
     <>
       <Logo />
-      <HeadingCommon baseSize="13px" title={`Account ID: ${user?.__id || user?.name}`} mt={1} />
+      <HeadingCommon baseSize="13px" title={`Account ID: ${user?.__id || user?.name}`} mt={1} textTransform="none"/>
       {slots?.topArea}
       <DashboardHF title="MAIN MENU" />
       <Scrollbar fillContent>

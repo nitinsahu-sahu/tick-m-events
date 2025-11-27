@@ -206,8 +206,13 @@ export function EnterTicketCode({ _selectEve, eventSelected }: any) {
 
     return (
         <Box mt={3} boxShadow={3} borderRadius={3} p={3} bgcolor="white">
-            <HeadingCommon title="Enter Ticket Code" color="#0B2E4C" weight={600} baseSize="33px" />
-            <Typography mt={3} mb={0} color='red'>{flag.counter === 'field' ? flag.message : null}</Typography>
+            <HeadingCommon title="Enter Ticket Code" color="#0B2E4C" weight={600} baseSize="30px" />
+            <HeadingCommon
+                title={flag.counter === 'field' ? flag.message : null}
+                color="#e22121ff"
+                weight={600}
+                baseSize="13px"
+            />
 
             {/* Form with proper submission handling */}
             <form onSubmit={handleVerifyTicketCode}>
@@ -315,8 +320,8 @@ export function EnterTicketCode({ _selectEve, eventSelected }: any) {
             )}
 
             {flag.counter === 'granted' && (
-                <Granted 
-                    flagData={flag} 
+                <Granted
+                    flagData={flag}
                     onConfirmEntry={handleConfirmEntry}
                     onCancel={handleCancelState}
                 />

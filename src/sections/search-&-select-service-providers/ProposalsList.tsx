@@ -4,7 +4,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, Chip, IconButton, TextField,
   InputAdornment
 } from '@mui/material';
-import InfoIcon from '@mui/icons-material/Info'; // or your preferred info icon
+import InfoIcon from '@mui/icons-material/Info';
 
 import { useCallback, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
@@ -23,77 +23,71 @@ import axios from "../../redux/helper/axios";
 
 interface StatusUpdateResponse {
   status: number;
-  // Add other properties that might be in the response
   data?: any;
   message?: string;
 }
 
 export function ProposalsCard({ proposals }: any) {
- 
   const location = useLocation();
-  const [bidData, setBidData] = useState<any>({
-    bidAmount: proposals?.providerProposal?.amount || '',
-  });
-
   const dispatch = useDispatch<AppDispatch>();
+
   const [selectedProposal, setSelectedProposal] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [bidAmount, setBidAmount] = useState<string>('');
 
   const handleAwardClick = (proposal: any) => {
     setSelectedProposal(proposal);
-    setBidData({
-      bidAmount: proposal?.providerProposal?.amount || '',
-    });
+    // Set the bid amount to the proposal's amount when opening dialog
+    setBidAmount(proposal?.providerProposal?.amount?.toString() || '');
     setDialogOpen(true);
   };
 
   const handleDialogClose = () => {
     setDialogOpen(false);
     setSelectedProposal(null);
+    setBidAmount(''); // Reset bid amount when closing
   };
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setBidData((prev: any) => ({ ...prev, [name]: value }));
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+    // Allow only numbers and decimal point
+    const sanitizedValue = value.replace(/[^0-9.]/g, '');
+
+    // Ensure only one decimal point
+    const parts = sanitizedValue.split('.');
+    if (parts.length > 2) {
+      return; // Invalid input, don't update state
+    }
+
+    setBidAmount(sanitizedValue);
   };
 
   const handleAwardedProject = useCallback(async (id: any, status: any, proposal: any) => {
     if (status === 'accepted') {
-      // Calculate 10% admin fee
-      const bidAmount = bidData?.bidAmount || 0;
-      const adminFee = bidAmount * 0.1;
+      // Calculate 10% admin fee using the updated bidAmount
+      const bidAmountNum = parseFloat(bidAmount) || 0;
+      const adminFee = bidAmountNum * 0.1;
       const fapshiPayload = {
         eventReqId: selectedProposal?._id,
-        bidAmount,
+        bidAmount: bidAmountNum,
         eventId: proposal.eventId,
-        amount: Math.round(adminFee), // Round to whole number
+        amount: Math.round(adminFee),
         email: proposal?.providerId?.email,
         userId: proposal?.providerId?._id.toString(),
         redirectUrl: `${window.location.origin}${location.pathname}?projectId=${selectedProposal?._id}&bidId=${proposal?._id}&adminFee=true`,
-
       };
+
       // Process admin fee payment first
       try {
-        // Step 1️⃣: Initiate payment
+        // Step 1: Initiate payment
         const paymentResponse = await axios.post('/payment/initiate', fapshiPayload);
 
         if (paymentResponse.status === 200) {
           // Extract transaction ID from backend response
           const transId = paymentResponse.data?.paymentInfo?.transId || paymentResponse.data?.paymentInfo?.transactionId;
 
-          // Step 2️⃣: Call webhook endpoint manually (simulate payment success)
-          // try {
-          //   const webhookPayload = {
-          //     transId,
-          //     status: 'success', // simulate success
-          //     winningBid: bidData?.bidAmount, // simulate success
-          //   };
-
-          //   await axios.post('/payment/webhook', webhookPayload);
-          // } catch (webhookError) {
-          //   console.error('Manual webhook trigger failed:', webhookError);
-          // }
-
-          // Step 3️⃣: Redirect user to payment page
+          // Step 2: Redirect user to payment page
           window.open(paymentResponse.data.paymentInfo.paymentLink, '_self');
         }
       } catch (error) {
@@ -106,8 +100,7 @@ export function ProposalsCard({ proposals }: any) {
         setDialogOpen(false);
       }
     }
-
-  }, [dispatch, location.pathname,selectedProposal?._id, bidData?.bidAmount])
+  }, [dispatch, location.pathname, selectedProposal?._id, bidAmount]);
 
   const manualBids = proposals || [];
 
@@ -135,12 +128,13 @@ export function ProposalsCard({ proposals }: any) {
         </DialogTitle>
 
         <DialogContent dividers>
-
-
           {selectedProposal && (
-            <ProposalDetails proposal={selectedProposal} bidData={bidData} handleInputChange={handleInputChange} />
+            <ProposalDetails
+              proposal={selectedProposal}
+              bidAmount={bidAmount}
+              handleInputChange={handleInputChange}
+            />
           )}
-
         </DialogContent>
 
         <DialogActions sx={{ p: 2, gap: 1 }}>
@@ -157,27 +151,18 @@ export function ProposalsCard({ proposals }: any) {
             variant="contained"
             color="success"
             onClick={() => handleAwardedProject(selectedProposal?._id, 'accepted', selectedProposal)}
-
             disabled={selectedProposal?.providerProposal?.isSigned}
           >
             Award Request
-            {selectedProposal?.providerProposal?.amount && (
+            {bidAmount && (
               <Tooltip
-                title={`10% admin fee: ${(parseFloat(bidData?.bidAmount) * 0.1).toFixed(2)} XAF will be deducted`}
+                title={`10% admin fee: ${(parseFloat(bidAmount) * 0.1).toFixed(2)} XAF will be deducted`}
                 placement="top"
               >
                 <InfoIcon fontSize="small" sx={{ ml: 1 }} />
               </Tooltip>
             )}
           </Button>
-          {/* <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleAwardedProject(selectedProposal?._id, 'accepted')}
-            sx={{ minWidth: 120 }}
-          >
-            Award Request
-          </Button> */}
         </DialogActions>
       </Dialog>
     </Box>
@@ -305,9 +290,7 @@ function ProposalItem({ proposal, onAwardClick }: any) {
                   size="small"
                   disabled={proposal?.isSigned}
                 >
-                  {
-                    proposal?.isSigned ? 'Awarded' : 'Award'
-                  }
+                  {proposal?.isSigned ? 'Awarded' : 'Award'}
                 </Button>
               </Box>
             </Grid>
@@ -323,7 +306,7 @@ function ProposalItem({ proposal, onAwardClick }: any) {
 }
 
 // Component to display proposal details in the dialog
-function ProposalDetails({ proposal, bidData, handleInputChange }: any) {
+function ProposalDetails({ proposal, bidAmount, handleInputChange }: any) {
   return (
     <Box>
       <Box display="flex" alignItems="center" gap={2} mb={2}>
@@ -386,6 +369,11 @@ function ProposalDetails({ proposal, bidData, handleInputChange }: any) {
             name="bidAmount"
             variant="outlined"
             size="small"
+            type="text"
+            inputProps={{
+              inputMode: 'decimal',
+              pattern: '[0-9.]*',
+            }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="start">
@@ -393,9 +381,13 @@ function ProposalDetails({ proposal, bidData, handleInputChange }: any) {
                 </InputAdornment>
               ),
             }}
-            value={bidData?.bidAmount || proposal?.providerProposal?.amount || ''}
+            value={bidAmount}
             onChange={handleInputChange}
+            placeholder="Enter amount"
           />
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+            You can modify the proposed amount above
+          </Typography>
         </Grid>
       </Grid>
 
@@ -424,6 +416,7 @@ function ProposalDetails({ proposal, bidData, handleInputChange }: any) {
     </Box>
   );
 }
+
 // Component for empty state
 function EmptyProposals({ message }: any) {
   return (

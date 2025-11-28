@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import { updateAcceptProviderStatus } from "src/redux/actions/service-request";
 import { AppDispatch } from "src/redux/store";
 import { ServiceRequestModal } from "../modal/service-request-modal";
+import { ProposalDetailsModal } from "../modal/provider-dashboard-modal";
 
 export function HomeAndGlobalTable({
     headers,
@@ -32,6 +33,8 @@ export function HomeAndGlobalTable({
     const [modalOpen, setModalOpen] = useState(false);
 
     const handleViewDetails = (row: any) => {
+        console.log(row);
+
         setSelectedItem(row);
         setModalOpen(true);
         onViewDetails?.(row);
@@ -260,10 +263,11 @@ export function HomeAndGlobalTable({
                     </TableBody>
                 </Table>
             </TableContainer>
-            <ServiceRequestModal
+            <ProposalDetailsModal
                 open={modalOpen}
-                onClose={handleCloseModal}
+                onClose={() => setModalOpen(false)}
                 data={selectedItem}
+                title="Proposal Information"
             />
         </>
     );

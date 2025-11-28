@@ -104,33 +104,34 @@ export const sendProviderProposal = (eventRequestId, proposalData) => async (dis
 
   try {
     const response = await axios.post(`/event-requests/${eventRequestId}/propose`, proposalData);
-
+    console.log(response);
     dispatch({
       type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_SUCCESS,
-      payload: {
-        message: response?.data?.message,
-        updatedRequest: response?.data?.eventRequest
-      },
+      payload: response.data,
     });
 
     return {
       type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_SUCCESS,
-      message: response?.data?.message,
-      status: response?.status,
+      data: response.data,
+      status: response.status,
     };
+
+
   } catch (error) {
     dispatch({
       type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_FAILURE,
       payload: {
         message: error?.response?.data?.message || "Server error",
-        error: error.status
+        error: error?.status,
       },
     });
 
     return {
       type: serviceRequestConstants.SEND_PROVIDER_PROPOSAL_FAILURE,
-      message: error?.response?.data?.message,
-      status: error?.status
+      message: error?.response?.data?.message || "Server error",
+      error: error?.status,
+      status: error.status,
+
     };
   }
 };

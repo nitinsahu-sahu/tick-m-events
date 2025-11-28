@@ -195,9 +195,7 @@ export default function UpcomingEvents({ title, des, filterdEvent, loading }: an
                               },
                               Infinity
                             );
-                            // extract currency (if any, e.g. "600 XAF")
-                            const firstPrice = ev.tickets[0].tickets[0].price;
-                            const currency = firstPrice.replace(/[0-9.\s]/g, "") || "";
+                            const currency = "XAF";
                             return `${minPrice} ${currency}`.trim();
                           })()
                           : "0"}

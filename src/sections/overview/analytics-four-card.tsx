@@ -28,7 +28,6 @@ export function AnalyticsFourCards({
     const soldTickets = selectedEvent?.statistics?.tickets?.soldTickets || 0;
     const scannedTickets = selectedEvent?.statistics?.tickets?.verifiedEntries || 0;
     const percentage = soldTickets > 0 ? Math.round((scannedTickets / soldTickets) * 100) : 0;
-      console.log("selectedEvent",selectedEvent);
     const remainingTickets = totalTickets - soldTickets;
     const eventStartDate = selectedEvent?.createdAt
         ? dayjs(selectedEvent.createdAt)

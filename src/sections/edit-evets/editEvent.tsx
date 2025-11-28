@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   TextField, Button, Grid, Select, MenuItem, InputLabel, FormControl, Typography,
-  Checkbox, FormControlLabel, Box, Divider, RadioGroup, Radio,FormLabel
+  Checkbox, FormControlLabel, Box, Divider, RadioGroup, Radio, FormLabel
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 import { editEventsFetch, updateEvent } from 'src/redux/actions/organizer/editEventAction';
 import { AppDispatch } from 'src/redux/store';
@@ -19,10 +21,22 @@ export function EditEventForm({ eventData, onSuccess }: EditEventFormProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [formData, setFormData] = useState(eventData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const quillRef = useRef<ReactQuill>(null);
+
 
   useEffect(() => {
     setFormData(eventData);
   }, [eventData]);
+
+  const handleDescriptionChange = (content: string) => {
+    setFormData(prev => ({
+      ...prev,
+      event: {
+        ...prev.event,
+        description: content
+      }
+    }));
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -76,12 +90,25 @@ export function EditEventForm({ eventData, onSuccess }: EditEventFormProps) {
   };
 
   const handleSelectChange = (e: any) => {
-    const { name, value } = e.target;
+  const { name, value } = e.target;
+  
+  if (name.includes('.')) {
+    // Handle nested fields like event.eventType, event.format, etc.
+    const [parent, child] = name.split('.');
+    setFormData((prev: any) => ({
+      ...prev,
+      [parent]: {
+        ...prev[parent],
+        [child]: value
+      }
+    }));
+  } else {
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-  };
+  }
+};
 
   const handleTicketChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -219,13 +246,36 @@ export function EditEventForm({ eventData, onSuccess }: EditEventFormProps) {
                 label="Format"
                 onChange={handleSelectChange}
               >
-                <MenuItem value="In-person">In-person</MenuItem>
-                <MenuItem value="Virtual">Virtual</MenuItem>
-                <MenuItem value="Hybrid">Hybrid</MenuItem>
+                <MenuItem value="In-person">In-person (with a physical location)</MenuItem>
+                <MenuItem value="Online">Online (with a connection link or streaming platform)</MenuItem>
+                <MenuItem value="Hybrid">Hybrid (combining both formats)</MenuItem>
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
+          <Grid
+            item
+            xs={12}
+            sx={{
+              mt: { xs: 2, sm: 2, md: 0 },
+              mb: { xs: 5, sm: 2, md: 2 }
+            }}
+          >
+           <div translate="no" className="notranslate" data-nosnippet>
+              <ReactQuill
+                placeholder='Enter your event description (required)'
+                theme="snow"
+                value={formData.event.description}
+                onChange={handleDescriptionChange} // Use the new handler
+                style={{
+                  height: '120px', // Increased height for better editing
+                  margin: "10px 0px 40px 0px", // Adjusted margin
+                  borderRadius: '4px'
+                }}
+                ref={quillRef}
+              />
+            </div>
+          </Grid>
+          {/* <Grid item xs={12}>
             <TextField
               required
               name="event.description"
@@ -236,7 +286,7 @@ export function EditEventForm({ eventData, onSuccess }: EditEventFormProps) {
               value={formData.event.description}
               onChange={handleChange}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
       </Box>
 
@@ -580,7 +630,7 @@ export function EditEventForm({ eventData, onSuccess }: EditEventFormProps) {
               </Select>
             </FormControl>
           </Grid>
-          
+
         </Grid>
       </Box>
 

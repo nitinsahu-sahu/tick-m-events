@@ -43,7 +43,7 @@ export function StepperStepTwo() {
     const [ticketConfigData, setTicketConfigData] = useState<TicketConfigData>({
         purchaseDeadlineDate: "",
         isPurchaseDeadlineEnabled: "true",
-        paymentMethods: [],
+        paymentMethods: ["Mobile Money"],
         fullRefundDaysBefore: "",
         partialRefundPercent: "",
         noRefundDate: "",
@@ -56,9 +56,9 @@ export function StepperStepTwo() {
         {
             id: 1,
             ticketType: '',
-            price: '0 XAF',
+            price: 0, // Keep as number for backend
             isLinkPramotion: false,
-            totalTickets: '0',
+            totalTickets: 0, // Keep as number for backend
             description: '',
             isLimitedSeat: true
         }
@@ -66,9 +66,10 @@ export function StepperStepTwo() {
 
     const filteredTickets = tickets?.filter((ticket: any) => {
         if (payStatus === 'free') {
-            return ticket.price === '0' || ticket.price === '0 XAF' || ticket.price.includes('Free');
+            // Convert price to string for comparison, or check if it's 0
+            return ticket?.price === 0 || String(ticket?.price).includes('Free');
         }
-        return ticket.price !== '0' && ticket.price !== '0 XAF' && !ticket.price.includes('Free');
+        return ticket?.price !== 0 && !String(ticket?.price).includes('Free');
     });
 
     useEffect(() => {
@@ -144,11 +145,7 @@ export function StepperStepTwo() {
             }
         }
     };
-    // const handleTickteConfigChange = (event: any) => {
-    //     event.preventDefault(); // Prevent default form submission behavior
-    //     const { name, value } = event.target;
-    //     setTicketConfigData((prevData) => ({ ...prevData, [name]: value }));
-    // };
+
     const handleTickteConfigChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, checked } = event.target;
 
@@ -168,19 +165,36 @@ export function StepperStepTwo() {
     const addRow = () => {
         setTicketRows([
             ...ticketRows,
-            { id: Date.now(), isLimitedSeat: true, ticketType: '', price: '', isLinkPramotion: false, totalTickets: '', description: '' }
+            {
+                id: Date.now(),
+                isLimitedSeat: true,
+                ticketType: '',
+                price: 0, // Keep as number
+                isLinkPramotion: false,
+                totalTickets: 0, // Keep as number
+                description: ''
+            }
         ]);
     };
 
     // Update field values
-  const handleChange = (id: any, field: any, value: any) => {
+    const handleChange = (id: any, field: any, value: any) => {
         setTicketRows(
             ticketRows.map(row => {
                 if (row.id === id) {
                     if (field === "isLimitedSeat" && value === false) {
                         // Unlimited seat selected, set totalTickets = 10000
-                        return { ...row, [field]: value, totalTickets: "10000" };
+                        return { ...row, [field]: value, totalTickets: 10000 };
                     }
+
+                    // Convert to number for numeric fields, handle empty input as 0
+                    if (field === 'price' || field === 'totalTickets') {
+                        return {
+                            ...row,
+                            [field]: value === '' ? 0 : Number(value)
+                        };
+                    }
+
                     return { ...row, [field]: value };
                 }
                 return row;
@@ -230,7 +244,7 @@ export function StepperStepTwo() {
 
                     return {
                         ticketType: row.ticketType,
-                        id: res?.ticketTypeId, 
+                        id: res?.ticketTypeId,
                         price: payStatus === "free" ? "0" : String(row.price),
                         totalTickets: row.totalTickets,
                         description: row.description,
@@ -288,9 +302,9 @@ export function StepperStepTwo() {
             {
                 id: 1,
                 ticketType: '',
-                price: '0 XAF',
+                price: 0,
                 isLinkPramotion: false,
-                totalTickets: '0',
+                totalTickets: 0,
                 description: '',
                 isLimitedSeat: true
             }
@@ -330,21 +344,6 @@ export function StepperStepTwo() {
                         </Select>
                     </FormControl>
                 ) : (
-                    // <Box sx={{ ml: 2, display: 'flex', alignItems: 'center' }}>
-                    //     <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
-                    //         No {payStatus === 'free' ? 'free' : 'paid'} tickets available.
-                    //     </Typography>
-                    //     <Link
-                    //         to="/ticket-and-reservation-management"
-                    //         style={{
-                    //             color: "primary",
-                    //             textDecoration: 'underline',
-                    //             cursor: 'pointer'
-                    //         }}
-                    //     >
-                    //         Create ticket
-                    //     </Link>
-                    // </Box>
                     null
                 )}
             </Box>
@@ -372,7 +371,7 @@ export function StepperStepTwo() {
                 </ToggleButtonGroup>
             </Box>
             <form encType='multipart/form-data' onSubmit={handleTicketConfig}>
-                {ticketRows.map((row, index) => (
+                {ticketRows.map((row: any, index: any) => (
                     <Grid container spacing={2} alignItems="center" key={row.id} sx={{ mt: index > 0 ? 2 : 0, alignItems: "flex-start" }}>
                         {/* Ticket Types */}
                         <Grid item xs={12} sm={5} md={3}>
@@ -395,34 +394,21 @@ export function StepperStepTwo() {
                         {
                             payStatus === 'free' ? null : <Grid item xs={12} sm={5} md={3}>
                                 <TextField
+                                    type='number'
                                     fullWidth
                                     required
                                     sx={{ textTransform: "capitalize" }}
                                     label="Price for each ticket"
-                                    placeholder="0 XAF"
-                                    value={row.price}
+                                    value={row.price === 0 ? '' : row.price} // Show empty when 0
                                     onChange={(e) => handleChange(row.id, 'price', e.target.value)}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="start">
+                                                XAF
+                                            </InputAdornment>
+                                        ),
+                                    }}
                                 />
-                                {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                size="small"
-                                                checked={row.isLinkPramotion}
-                                                onChange={(e) =>
-                                                    handleChange(row.id, "isLinkPramotion", e.target.checked)
-                                                }
-                                            />
-                                        }
-                                        label="Link to an existing promotion"
-                                        sx={{
-                                            '& .MuiFormControlLabel-label': {
-                                                fontSize: '11px',
-                                            },
-                                            mr: 1,
-                                        }}
-                                    />
-                                </Box> */}
                             </Grid>
                         }
 
@@ -431,9 +417,10 @@ export function StepperStepTwo() {
                         <Grid item xs={12} sm={5} md={payStatus === 'free' ? 4 : 3}>
                             <TextField
                                 fullWidth
+                                type='number'
                                 label="Total Tickets"
-                             placeholder={row.isLimitedSeat ? "100" : "Unlimited"}
-                                value={row.totalTickets}
+                                placeholder={row?.isLimitedSeat ? "100" : "Unlimited"}
+                                value={row.totalTickets === 0 ? '' : row.totalTickets} // Show empty when 0
                                 onChange={(e) => handleChange(row.id, 'totalTickets', e.target.value)}
                                 disabled={!row.isLimitedSeat}
                             />

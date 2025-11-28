@@ -114,7 +114,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         tickets.forEach((ticket: any) => {
             ticket.tickets.forEach((item: any) => {
                 const quantity = ticketQuantities[item._id] || 0;
-                const price = item.price === "Free" ? 0 : parseFloat(item.price.replace(/[^0-9.]/g, ''));
+                const price = item.price === "Free" ? 0 : parseFloat(item.price);
                 subtotal += quantity * price;
             });
         });
@@ -150,7 +150,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                     ticket.tickets.forEach((item: any) => {
                         const quantity = ticketQuantities[item._id] || 0;
                         if (quantity > 0) {
-                            const price = parseFloat(item.price.replace(/[^0-9.]/g, '')) || 0;
+                            const price = parseFloat(item.price) || 0;
                             const freeItems = Math.floor(quantity / appliedPromo.groupBuy) * appliedPromo.groupGet;
                             totalFreeItems += freeItems * price;
                         }
@@ -191,7 +191,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                         ticketId: item.id,
                         ticketType: item.ticketType,
                         quantity,
-                        unitPrice: item.price === "Free" ? 0 : parseFloat(item.price.replace(/[^0-9.]/g, ''))
+                        unitPrice: item.price === "Free" ? 0 : parseFloat(item.price)
                     });
                 }
             });

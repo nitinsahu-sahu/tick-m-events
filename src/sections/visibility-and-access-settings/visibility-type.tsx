@@ -26,7 +26,7 @@ interface VisibilityData {
 const generateDefaultUrl = (visibilityType: string, eventId: string) => {
 
   const baseUrl = `${import.meta.env.VITE_Live_URL}/our-event`;
-  return visibilityType === 'public' ? baseUrl : `${baseUrl}/${eventId}`;
+  return visibilityType === 'public' ? `${baseUrl}/${eventId}` : `${baseUrl}/${eventId}`;
 };
 
 export function VisibilityType({ eventId, visibility }: any) {

@@ -7,8 +7,8 @@ import { formatEventDate, formatTimeTo12Hour } from "src/hooks/formate-time";
 import { availablePromoCodes, PromoCode } from './utill';
 import { PurchaseModal } from './tickte-purchase-modal';
 
-
 export function TrackingSystem({ tickets, location, date, time, eventId, eventName }: any) {
+    
     // Initialize state for ticket quantities
     const [ticketQuantities, setTicketQuantities] = useState<Record<string, number>>(() => {
         const initialQuantities: Record<string, number> = {};
@@ -28,14 +28,12 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
     const eventDateTime = new Date(`${date}T${time}`);
     const currentDateTime = new Date();
     const isEventPassed = currentDateTime > eventDateTime;
-    // Define available promo codes
 
-
-    // Handle increment
-    const handleIncrement = (ticketId: string, maxTickets?: string) => {
+    // Handle increment - Fixed TypeScript error
+    const handleIncrement = (ticketId: string, maxTickets: number | null) => {
         setTicketQuantities(prev => {
             // If there's a max tickets limit and we've reached it, don't increment
-            if (maxTickets !== undefined && prev[ticketId] >= parseInt(maxTickets, 10)) {
+            if (maxTickets !== null && prev[ticketId] >= maxTickets) {
                 return prev;
             }
             return {
@@ -59,14 +57,36 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
         });
     };
 
+    // Helper function to safely get price as number
+    const getPriceAsNumber = (price: any): number => {
+        if (typeof price === 'number') {
+            return price;
+        }
+        if (typeof price === 'string') {
+            // Extract numeric value from price string (assuming format like "10,000 XAF")
+            return parseFloat(price.replace(/[^0-9.]/g, ''));
+        }
+        return 0;
+    };
+
+    // Helper function to safely get total tickets as number
+    const getTotalTicketsAsNumber = (totalTickets: any): number => {
+        if (typeof totalTickets === 'number') {
+            return totalTickets;
+        }
+        if (typeof totalTickets === 'string') {
+            return parseInt(totalTickets, 10);
+        }
+        return 0;
+    };
+
     // Calculate subtotal before any discounts
     const calculateSubtotal = () => {
         let subtotal = 0;
         tickets?.forEach((ticket: any) => {
             ticket.tickets.forEach((item: any) => {
                 const quantity = ticketQuantities[item._id] || 0;
-                // Extract numeric value from price string (assuming format like "10,000 XAF")
-                const price = parseFloat(item.price.replace(/[^0-9.]/g, ''));
+                const price = getPriceAsNumber(item.price);
                 subtotal += quantity * price;
             });
         });
@@ -129,8 +149,8 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                     ticket.tickets.forEach((item: any) => {
                         const quantity = ticketQuantities[item._id] || 0;
                         if (quantity > 0) {
-                            const price = parseFloat(item.price.replace(/[^0-9.]/g, ''));
-                            const freeItems = Math.floor(quantity / appliedPromo.groupBuy) * appliedPromo.groupGet;
+                            const price = getPriceAsNumber(item.price);
+                            const freeItems = Math.floor(quantity / appliedPromo.groupBuy!) * appliedPromo.groupGet!;
                             totalFreeItems += freeItems * price;
                         }
                     });
@@ -165,7 +185,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                     selected.push({
                         ticketName: item.ticketType,
                         quantity,
-                        price: parseFloat(item.price.replace(/[^0-9.]/g, ''))
+                        price: getPriceAsNumber(item.price)
                     });
                 }
             });
@@ -178,6 +198,15 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
         if (calculateSubtotal() <= 0) return;
         setModalOpen(true);
     };
+
+    // Format price for display
+    const formatPriceForDisplay = (price: any): string => {
+        const priceNumber = getPriceAsNumber(price);
+        return `${priceNumber.toLocaleString()} XAF`;
+    };
+
+    // Format event time for display - Fixed ESLint error
+    const eventTimeDisplay = `Event Time: ${formatEventDate(date)}, ${formatTimeTo12Hour(time)}`;
 
     return (
         <Box mt={3}>
@@ -212,64 +241,68 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                             </Box>
                         )}
                         {tickets?.map((ticket: any) => (
-                            ticket?.tickets.map((item: any) => (
-                                <Box key={item._id} mb={3}>
-                                    <Typography fontWeight="bold" textTransform="capitalize" fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>
-                                        {item.ticketType} Ticket
-                                        {item.isLimitedSeat && item.totalTickets === "0" && (
-                                            <span style={{ color: "#3CB1F1" }}> (Sold Out)</span>
-                                        )}
-                                    </Typography>
-                                    <Box display="flex" alignItems="center" justifyContent="space-between">
-                                        <Typography fontWeight={600} textTransform="uppercase" fontSize={{ xs: "0.8rem", sm: "1rem", md: "1.2rem" }}>
-                                            {item.price}
-                                            {item.isLimitedSeat && item.totalTickets !== "0" && (
-                                                <span style={{ fontSize: "0.8rem", color: "#666" }}>
-                                                    ({item.totalTickets} available)
-                                                </span>
+                            ticket?.tickets.map((item: any) => {
+                                const totalTickets = getTotalTicketsAsNumber(item.totalTickets);
+                                const availableTickets = item.isLimitedSeat ? totalTickets : null;
+                                
+                                return (
+                                    <Box key={item._id} mb={3}>
+                                        <Typography fontWeight="bold" textTransform="capitalize" fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>
+                                            {`${item.ticketType} Ticket`}
+                                            {item.isLimitedSeat && totalTickets === 0 && (
+                                                <span style={{ color: "#3CB1F1" }}> (Sold Out)</span>
                                             )}
                                         </Typography>
-                                        <Box display="flex" alignItems="center">
-                                            <IconButton
-                                                sx={{ border: "1px solid black", borderRadius: "8px", padding: "1px" }}
-                                                onClick={() => handleDecrement(item._id)}
-                                                disabled={ticketQuantities[item._id] <= 0}
-                                            >
-                                                <RemoveIcon />
-                                            </IconButton>
-                                            <Typography mx={1}>{ticketQuantities[item._id] || 0}</Typography>
-                                            <IconButton
-                                                sx={{ border: "1px solid black", borderRadius: "8px", padding: "1px" }}
-                                                onClick={() => handleIncrement(item._id, item.totalTickets)}
-                                                disabled={item.isLimitedSeat && item.totalTickets !== "0" &&
-                                                    ticketQuantities[item._id] >= parseInt(item.totalTickets, 10)}
-                                            >
-                                                <AddIcon />
-                                            </IconButton>
+                                        <Box display="flex" alignItems="center" justifyContent="space-between">
+                                            <Typography fontWeight={600} textTransform="uppercase" fontSize={{ xs: "0.8rem", sm: "1rem", md: "1.2rem" }}>
+                                                {formatPriceForDisplay(item.price)}
+                                                {item.isLimitedSeat && totalTickets > 0 && (
+                                                    <span style={{ fontSize: "0.8rem", color: "#666" }}>
+                                                        {` (${totalTickets} available)`}
+                                                    </span>
+                                                )}
+                                            </Typography>
+                                            <Box display="flex" alignItems="center">
+                                                <IconButton
+                                                    sx={{ border: "1px solid black", borderRadius: "8px", padding: "1px" }}
+                                                    onClick={() => handleDecrement(item._id)}
+                                                    disabled={ticketQuantities[item._id] <= 0}
+                                                >
+                                                    <RemoveIcon />
+                                                </IconButton>
+                                                <Typography mx={1}>{ticketQuantities[item._id] || 0}</Typography>
+                                                <IconButton
+                                                    sx={{ border: "1px solid black", borderRadius: "8px", padding: "1px" }}
+                                                    onClick={() => handleIncrement(item._id, availableTickets)}
+                                                    disabled={item.isLimitedSeat && totalTickets > 0 &&
+                                                        ticketQuantities[item._id] >= totalTickets}
+                                                >
+                                                    <AddIcon />
+                                                </IconButton>
+                                            </Box>
                                         </Box>
+                                        <Divider sx={{ border: "1px solid black", mt: "15px" }} />
                                     </Box>
-                                    <Divider sx={{ border: "1px solid black", mt: "15px" }} />
-                                </Box>
-                            )
-                            )))}
+                                );
+                            })
+                        ))}
 
                         {/* Pricing Details */}
                         <Typography mt={2} fontSize={{ xs: "0.9rem", md: "1rem" }}>
-                            <strong>Subtotal:</strong> {calculateSubtotal().toLocaleString()} XAF
+                            <strong>Subtotal:</strong> {`${calculateSubtotal().toLocaleString()} XAF`}
                         </Typography>
 
                         {/* Promo Code Display */}
                         {appliedPromo && (
                             <Box>
                                 <Typography fontSize={{ xs: "0.9rem", md: "1rem" }} sx={{ color: "green" }}>
-                                    <strong>Promo Applied:</strong> {appliedPromo.code} (
-                                    {appliedPromo.type === 'percentage' && `${appliedPromo.value}% off`}
-                                    {appliedPromo.type === 'simple' && `${appliedPromo.value.toLocaleString()} XAF off`}
-                                    {appliedPromo.type === 'group' && `Buy ${appliedPromo.groupBuy} Get ${appliedPromo.groupGet} free`}
-                                    )
+                                    <strong>Promo Applied:</strong> {`${appliedPromo.code} (`}
+                                    {appliedPromo.type === 'percentage' && `${appliedPromo.value}% off)`}
+                                    {appliedPromo.type === 'simple' && `${appliedPromo.value!.toLocaleString()} XAF off)`}
+                                    {appliedPromo.type === 'group' && `Buy ${appliedPromo.groupBuy} Get ${appliedPromo.groupGet} free)`}
                                 </Typography>
                                 <Typography fontSize={{ xs: "0.9rem", md: "1rem" }}>
-                                    <strong>Discount:</strong> -{calculateDiscount().toLocaleString()} XAF
+                                    <strong>Discount:</strong> {`-${calculateDiscount().toLocaleString()} XAF`}
                                 </Typography>
                                 <Button
                                     size="small"
@@ -288,7 +321,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                         )}
 
                         <Typography fontSize={{ xs: "0.9rem", md: "1rem" }}>
-                            <strong>Net Amount To Pay:</strong> {calculateTotal().toLocaleString()} XAF
+                            <strong>Net Amount To Pay:</strong> {`${calculateTotal().toLocaleString()} XAF`}
                         </Typography>
 
                         {/* Promo Code */}
@@ -342,35 +375,15 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                                 selectedTickets={getSelectedTickets()}
                                 totalAmount={calculateTotal()}
                             />
-                            {/* <Grid item xs={12} sm={4}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    sx={{ fontSize: { xs: "10px", sm: "11px", md: "12px" }, backgroundColor: "#0B2E4C", color: "#fff" }}
-                                    disabled={calculateSubtotal() <= 0}
-                                >
-                                    Buy At a Physical Store
-                                </Button>
-                            </Grid> */}
-                            {/* <Grid item xs={12} sm={4}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    sx={{ fontSize: { xs: "10px", sm: "11px", md: "12px" }, backgroundColor: "#0B2E4C", color: "#fff" }}
-                                    disabled={calculateSubtotal() <= 0}
-                                >
-                                    Buy Via WhatsApp
-                                </Button>
-                            </Grid> */}
                         </Grid>
                         <Box sx={{ mt: 2, textAlign: 'center' }}>
-                            <HeadingCommon title={`Event Time: ${formatEventDate(date)}, ${formatTimeTo12Hour(time)}`} weight={400} baseSize="12px" />
+                            <HeadingCommon title={eventTimeDisplay} weight={400} baseSize="12px" />
                         </Box>
                     </Card>
                 </Grid>
 
                 {/* Location Map Section */}
-                <Grid item xs={12} sm={6} md={6}  alignContent={{ md: "center" }}>
+                <Grid item xs={12} sm={6} md={6} alignContent={{ md: "center" }}>
                     <Card
                         variant="outlined"
                         sx={{
@@ -460,5 +473,5 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                 </Grid>
             </Grid>
         </Box>
-    )
+    );
 }

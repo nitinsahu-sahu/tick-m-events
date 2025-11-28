@@ -17,8 +17,7 @@ import {
   MenuItem,
   InputAdornment,
   Card,
-  CardContent, 
-  Modal,
+  CardContent, Modal,
   Grid,
   IconButton,
   Stack
@@ -48,7 +47,7 @@ import axios from '../../redux/helper/axios';
 
 // Modal Style
 const modalStyle = {
-  position: 'absolute' as const,
+  position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
@@ -115,7 +114,7 @@ const StatusCard = ({ status, amount, date }: { status: string; amount: number; 
   return (
     <Card sx={{ bgcolor: statusConfig.bgcolor, border: `1px solid ${statusConfig.color}20` }}>
       <CardContent>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" justifyContent="space-between">
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" justifyContent="between">
           <Box>
             <Typography variant="h6" fontWeight="bold" color={statusConfig.color}>
               {statusConfig.label}
@@ -138,69 +137,46 @@ const StatusCard = ({ status, amount, date }: { status: string; amount: number; 
   );
 };
 
-// Fixed API Response Display Component
+// API Response Display Component - Human Readable
 const ApiResponseDisplay = ({ responseData, title }: { responseData: any; title: string }) => {
   if (!responseData) return null;
 
-  // Safely get display status
-  const getDisplayStatus = (): string => {
-    try {
-      // If there's an explicit error message
-      if (responseData.error && typeof responseData.error === 'string') {
-        return responseData.error;
-      }
-      // For payment status check
-      if (responseData.data?.status && typeof responseData.data.status === 'string') {
-        return responseData.data.status;
-      }
-      // For payout response - show the actual message
-      if (responseData.data?.message && typeof responseData.data.message === 'string') {
-        return responseData.data.message;
-      }
-      // Fallback to HTTP status with description
-      return `HTTP ${responseData.status} ${responseData.status >= 400 ? 'Error' : 'Success'}`;
-    } catch (error) {
-      return 'Unknown status';
+  const getDisplayStatus = () => {
+    // If there's an explicit error message
+    if (responseData.error) {
+      return responseData.error;
     }
+    // For payment status check
+    if (responseData.data?.status) {
+      return responseData.data.status;
+    }
+    // For payout response - show the actual message
+    if (responseData.data?.message) {
+      return responseData.data.message;
+    }
+    // Fallback to HTTP status with description
+    return `HTTP ${responseData.status} ${responseData.status >= 400 ? 'Error' : 'Success'}`;
   };
 
-  const displayStatus = getDisplayStatus();
-  
   const getStatusIcon = () => {
-    const status = displayStatus.toLowerCase();
-    if (status.includes('successful') || status.includes('success') || (responseData.status && responseData.status < 400)) {
-      return <CheckCircleIcon color="success" />;
-    }
-    if (status.includes('error') || status.includes('failed') || status.includes('rejected') || status.includes('not found') || (responseData.status && responseData.status >= 400)) {
-      return <ErrorIcon color="error" />;
-    }
-    if (status.includes('pending')) {
-      return <InfoIcon color="info" />;
-    }
+    const status = getDisplayStatus().toLowerCase();
+    if (status.includes('successful') || status.includes('success') || responseData.status < 400) return <CheckCircleIcon color="success" />;
+    if (status.includes('error') || status.includes('failed') || status.includes('rejected') || status.includes('not found') || responseData.status >= 400) return <ErrorIcon color="error" />;
+    if (status.includes('pending')) return <InfoIcon color="info" />;
     return <InfoIcon color="info" />;
   };
 
   const getStatusColor = () => {
-    const status = displayStatus.toLowerCase();
-    if (status.includes('successful') || status.includes('success') || (responseData.status && responseData.status < 400)) {
-      return 'success.main';
-    }
-    if (status.includes('error') || status.includes('failed') || status.includes('rejected') || status.includes('not found') || (responseData.status && responseData.status >= 400)) {
-      return 'error.main';
-    }
-    if (status.includes('pending')) {
-      return 'warning.main';
-    }
+    const status = getDisplayStatus().toLowerCase();
+    if (status.includes('successful') || status.includes('success') || responseData.status < 400) return 'success.main';
+    if (status.includes('error') || status.includes('failed') || status.includes('rejected') || status.includes('not found') || responseData.status >= 400) return 'error.main';
+    if (status.includes('pending')) return 'warning.main';
     return 'info.main';
   };
 
-  const hasError = (): boolean => {
-    const status = displayStatus.toLowerCase();
-    return status.includes('error') || 
-           status.includes('failed') || 
-           status.includes('rejected') || 
-           status.includes('not found') || 
-           (responseData.status && responseData.status >= 400);
+  const hasError = () => {
+    const status = getDisplayStatus().toLowerCase();
+    return status.includes('error') || status.includes('failed') || status.includes('rejected') || status.includes('not found') || responseData.status >= 400;
   };
 
   return (
@@ -215,7 +191,7 @@ const ApiResponseDisplay = ({ responseData, title }: { responseData: any; title:
         {hasError() && (
           <Alert severity="error" sx={{ mb: 2 }}>
             <Typography variant="body1" fontWeight="bold">
-              {displayStatus}
+              {getDisplayStatus()}
             </Typography>
           </Alert>
         )}
@@ -229,13 +205,13 @@ const ApiResponseDisplay = ({ responseData, title }: { responseData: any; title:
             <strong>Status:</strong>
             {getStatusIcon()}
             <Box component="span" color={getStatusColor()}>
-              {displayStatus}
+              {getDisplayStatus()}
             </Box>
           </Typography>
         </Box>
 
         {/* Request Body for Payout */}
-        {responseData.requestBody && typeof responseData.requestBody === 'object' && (
+        {responseData.requestBody && (
           <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1, mt: 2 }}>
             <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
               Request Sent:
@@ -243,7 +219,7 @@ const ApiResponseDisplay = ({ responseData, title }: { responseData: any; title:
             {Object.entries(responseData.requestBody).map(([key, value]: [string, any]) => (
               <Typography key={key} variant="body2" sx={{ mb: 1 }}>
                 <strong>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</strong>{' '}
-                {String(value || 'N/A')}
+                {String(value)}
               </Typography>
             ))}
           </Box>
@@ -255,7 +231,7 @@ const ApiResponseDisplay = ({ responseData, title }: { responseData: any; title:
 
 export function RefundReq() {
   const dispatch = useDispatch<AppDispatch>();
-  const { refundReqs, loading, error } = useSelector((state: RootState) => state?.admin || { refundReqs: [], loading: false, error: null });
+  const { refundReqs, loading, error } = useSelector((state: RootState) => state?.admin);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedRequest, setSelectedRequest] = useState<RefundRequestTyp | null>(null);
@@ -264,21 +240,9 @@ export function RefundReq() {
   const [adminNotes, setAdminNotes] = useState<string>('');
   const [loadingRefund, setLoadingRefund] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
-    const loadRefundRequests = async () => {
-      try {
-        await dispatch(getAdminRefundReq());
-      } catch (err) {
-        console.error('Failed to load refund requests:', err);
-        toast.error('Failed to load refund requests');
-      } finally {
-        setInitialLoad(false);
-      }
-    };
-
-    loadRefundRequests();
+    dispatch(getAdminRefundReq());
   }, [dispatch]);
 
   // Get status chip color
@@ -299,10 +263,15 @@ export function RefundReq() {
     }
   };
 
-  // Filter refund requests safely
-  const filteredRefundReqs: RefundRequestTyp[] = (refundReqs || [])?.filter((request: RefundRequestTyp) => {
-    if (!request) return false;
-    
+  // Format currency
+  const formatCurrency = (amount: number): string =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'XAF'
+    }).format(amount);
+
+  // Filter refund requests
+  const filteredRefundReqs: RefundRequestTyp[] = refundReqs?.filter((request: RefundRequestTyp) => {
     const matchesSearch =
       request.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -336,8 +305,9 @@ export function RefundReq() {
       });
       console.log("✅ Refund request approved:", res.data);
       toast.success("Refund request approved successfully!");
-      setTimeout(() => handleCloseModal(), 1500);
-      dispatch(getAdminRefundReq());
+      setTimeout(() => handleCloseModal(), 1500); // close after 1.5 sec
+      dispatch(getAdminRefundReq()); // Refresh the list
+      handleCloseModal();
     } catch (err: any) {
       console.error("❌ Failed to approve refund:", err.response?.data || err.message);
       toast.error(`Failed to approve refund: ${err.response?.data?.message || err.message}`);
@@ -353,35 +323,36 @@ export function RefundReq() {
       console.log("✅ Refund request rejected:", res.data);
       toast.success("Refund request rejected successfully!");
       setTimeout(() => handleCloseModal(), 1500);
-      dispatch(getAdminRefundReq());
+      dispatch(getAdminRefundReq()); // Refresh the list
+      handleCloseModal();
     } catch (err: any) {
       console.error("❌ Failed to reject refund:", err.response?.data || err.message);
       toast.error(`Failed to reject refund: ${err.response?.data?.message || err.message}`);
     }
   };
 
-  const handleProceedRefund = async (request: RefundRequestTyp) => {
+ const handleProceedRefund = async (request: RefundRequestTyp) => {
     try {
       console.log("🟢 Starting refund process for:", request);
       setLoadingRefund(true);
       setApiResponse(null);
-
+ 
       // Step 1: Check payment status
       const transId = request.transactionId;
       console.log("🔍 Checking payment status for transId:", transId);
-
+ 
       const statusRes = await fetch(`${import.meta.env.VITE_Live_URL}/payment-status/${transId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "apiuser": import.meta.env.VITE_API_USER,
-          "apikey": import.meta.env.VITE_API_KEY,
+          "apiuser": import.meta.env.VITE_API_USER || 'f046347f-8d27-40cd-af94-90bc44f3d2c7',
+          "apikey": import.meta.env.VITE_API_KEY || 'FAK_TEST_177a608c18c0db8c50be',
         },
       });
-
+ 
       console.log("📡 Payment status response status:", statusRes.status);
       const statusData = await statusRes.json();
-
+ 
       // Check if transaction not found or other error
       let paymentError = '';
       if (statusRes.status === 404) {
@@ -391,30 +362,31 @@ export function RefundReq() {
       } else if (statusData?.status !== "SUCCESSFUL") {
         paymentError = `Transaction status: ${statusData.status}. Refund cannot proceed.`;
       }
-
+ 
       // Store payment status response with proper typing
-      setApiResponse({
+      setApiResponse((prev: ApiResponseData | null) => ({
+        ...prev,
         paymentStatusCheck: {
-          url: `${import.meta.env.VITE_BASE_URL}/payment-status/${transId}`,
+          url: `${import.meta.env.VITE_BASE_URL || 'https://sandbox.fapshi.com'}/payment-status/${transId}`,
           status: statusRes.status,
           data: statusData,
-          error: paymentError || undefined
+          error: paymentError
         }
-      });
-
+      }));
+ 
       if (paymentError) {
         setAdminNotes(`Payment status check failed: ${paymentError}`);
         return;
       }
-
+ 
       console.log("✅ Transaction successful. Proceeding with payout...");
-
+ 
       let phoneNumber = request.user.phone || "";
       // Ensure it includes country code (Cameroon = 237)
       if (phoneNumber && !phoneNumber.startsWith("237")) {
         phoneNumber = phoneNumber.replace(/^\+/, "");
       }
-
+ 
       // Step 2: Proceed with payout
       const payoutBody = {
         amount: request.refundAmount,
@@ -425,26 +397,26 @@ export function RefundReq() {
         userId: request.user._id,
         externalId: request.transactionId,
       };
-
+ 
       console.log("📤 Payout request body:", payoutBody);
-
-      const payoutRes = await fetch(`${import.meta.env.VITE_BASE_URL}/payout`, {
+ 
+      const payoutRes = await fetch(`${import.meta.env.VITE_BASE_URL || 'https://sandbox.fapshi.com'}/payout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "apiuser": import.meta.env.VITE_API_USER,
-          "apikey": import.meta.env.VITE_API_KEY,
+          "apiuser": import.meta.env.VITE_API_USER || 'f046347f-8d27-40cd-af94-90bc44f3d2c7',
+          "apikey": import.meta.env.VITE_API_KEY || 'FAK_TEST_177a608c18c0db8c50be',
         },
         body: JSON.stringify(payoutBody),
       });
-
+ 
       console.log("📡 Payout response status:", payoutRes.status);
       const payoutData = await payoutRes.json();
-
+ 
       // FIXED: Check for payout success/failure
       let payoutError = '';
       let isSuccess = false;
-
+ 
       if (payoutRes.status >= 400) {
         // HTTP error (400, 500, etc.)
         payoutError = payoutData.message || `Payout failed with status ${payoutRes.status}`;
@@ -461,25 +433,25 @@ export function RefundReq() {
         // Default success case
         isSuccess = true;
       }
-
+ 
       // Store payout response with proper typing - include error if any
-      setApiResponse(prev => ({
+      setApiResponse((prev: ApiResponseData | null) => ({
         ...prev,
         payoutRequest: {
-          url: `${import.meta.env.VITE_BASE_URL}/payout`,
+          url: `${import.meta.env.VITE_BASE_URL || 'https://sandbox.fapshi.com'}/payout`,
           status: payoutRes.status,
           data: payoutData,
           requestBody: payoutBody,
-          error: payoutError || undefined
+          error: payoutError || undefined // Use undefined instead of empty string for no error
         }
       }));
-
+ 
       if (isSuccess) {
         // SUCCESS CASE
         const transactionId = payoutData.transId || payoutData.transactionId || 'N/A';
         const notes = `Refund processed successfully via Fapshi. Transaction ID: ${transactionId}`;
         setAdminNotes(notes);
-
+ 
         // Update backend to 'refunded' status
         try {
           const res = await axios.put(`/refund-request/${request._id}`, {
@@ -490,7 +462,7 @@ export function RefundReq() {
           console.log("✅ Refund request updated in backend:", res.data);
           toast.success("Refund processed successfully!");
           setTimeout(() => handleCloseModal(), 1500);
-          dispatch(getAdminRefundReq());
+          dispatch(getAdminRefundReq()); // Refresh the list
         } catch (err: any) {
           console.error("❌Failed to update refund request in backend:", err.response?.data || err.message);
           toast.error("Failed to update refund status in backend!");
@@ -500,7 +472,7 @@ export function RefundReq() {
         // FAILURE CASE
         const notes = adminNotes || `Refund failed: ${payoutError}`;
         setAdminNotes(notes);
-
+ 
         // Update backend to 'rejected' status
         try {
           const res = await axios.put(`/refund-request/${request._id}`, {
@@ -509,24 +481,25 @@ export function RefundReq() {
           });
           console.log("ℹ️ Backend notes updated for failed refund:", res.data);
           toast.error(`Refund failed: ${payoutError}`);
-          dispatch(getAdminRefundReq());
+          dispatch(getAdminRefundReq()); // Refresh the list
         } catch (err: any) {
           console.error("❌ Failed to update backend notes for failed refund:", err.response?.data || err.message);
           toast.error("Failed to update backend after refund failure!");
         }
       }
-
+ 
     } catch (err: any) {
       console.group("❌ Error during refund process");
       console.error("Full error object:", err);
       console.error("Error message:", err.message);
       console.error("Error stack:", err.stack);
       console.groupEnd();
-
+ 
       const errorMsg = err.message || "Unknown error occurred";
-      
+      alert("❌ Something went wrong while processing the refund.");
+ 
       // Store error in API response with proper typing
-      setApiResponse(prev => ({
+      setApiResponse((prev: ApiResponseData | null) => ({
         ...prev,
         error: {
           message: err.message,
@@ -534,16 +507,14 @@ export function RefundReq() {
           fullError: err
         }
       }));
-
+ 
       // Auto-fill admin notes with error
       setAdminNotes(`System error: ${errorMsg}. Please check API response for technical details.`);
-      toast.error("Something went wrong while processing the refund.");
     } finally {
       setLoadingRefund(false);
       console.log("🟡 Refund process ended for:", request.transactionId);
     }
   };
-
   const handleSaveAdminNotes = async () => {
     if (selectedRequest && adminNotes.trim()) {
       try {
@@ -553,7 +524,7 @@ export function RefundReq() {
         });
         console.log("✅ Admin notes saved:", res.data);
         toast.success("Admin notes saved successfully!");
-        dispatch(getAdminRefundReq());
+        dispatch(getAdminRefundReq()); // Refresh the list
       } catch (err: any) {
         console.error("❌ Failed to save admin notes:", err.response?.data || err.message);
         toast.error(`Failed to save admin notes: ${err.response?.data?.message || err.message}`);
@@ -584,14 +555,11 @@ export function RefundReq() {
     'Actions'
   ];
 
-  // Show loading only on initial load
-  if (initialLoad) {
+  if (loading) {
     return (
-      <DashboardContent>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-          <CircularProgress />
-        </Box>
-      </DashboardContent>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+      </Box>
     );
   }
 
@@ -693,10 +661,10 @@ export function RefundReq() {
                       </Avatar>
                       <Box textAlign="left">
                         <Typography variant="body2" fontWeight="medium">
-                          {request.user?.name || 'N/A'}
+                          {request.user?.name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          {request.user?.email || 'N/A'}
+                          {request.user?.email}
                         </Typography>
                       </Box>
                     </Box>
@@ -705,7 +673,7 @@ export function RefundReq() {
                   {/* Event Date */}
                   <TableCell align="center">
                     <Typography variant="body2">
-                      {request?.eventDate ? formatEventDate(request.eventDate) : 'N/A'}
+                      {formatEventDate(request.eventDate)}
                     </Typography>
                   </TableCell>
 
@@ -716,7 +684,7 @@ export function RefundReq() {
                       fontWeight="bold"
                       color="error.main"
                     >
-                      {request?.refundAmount || 0} XAF
+                      {request.refundAmount} XAF
                     </Typography>
                   </TableCell>
 
@@ -733,19 +701,14 @@ export function RefundReq() {
                           +{request.tickets.length - 2} more
                         </Typography>
                       )}
-                      {!request.tickets?.length && (
-                        <Typography variant="caption" color="text.secondary">
-                          No tickets
-                        </Typography>
-                      )}
                     </Box>
                   </TableCell>
 
                   {/* Status */}
                   <TableCell align="center">
                     <Chip
-                      label={(request.refundStatus || 'pending').charAt(0).toUpperCase() + (request.refundStatus || 'pending').slice(1)}
-                      color={getStatusColor(request.refundStatus || 'pending')}
+                      label={request.refundStatus.charAt(0).toUpperCase() + request.refundStatus.slice(1)}
+                      color={getStatusColor(request.refundStatus)}
                       size="small"
                     />
                   </TableCell>
@@ -753,7 +716,7 @@ export function RefundReq() {
                   {/* Request Date */}
                   <TableCell align="center">
                     <Typography variant="body2">
-                      {request.createdAt ? formatEventDate(request.createdAt) : 'N/A'}
+                      {formatEventDate(request.createdAt)}
                     </Typography>
                   </TableCell>
 
@@ -768,6 +731,7 @@ export function RefundReq() {
                       >
                         View
                       </Button>
+
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -865,9 +829,9 @@ export function RefundReq() {
                 {/* Left Column - Status and Basic Info */}
                 <Grid item xs={12} lg={8}>
                   <StatusCard
-                    status={selectedRequest.refundStatus || 'pending'}
-                    amount={selectedRequest.refundAmount || 0}
-                    date={selectedRequest.createdAt || new Date().toISOString()}
+                    status={selectedRequest.refundStatus}
+                    amount={selectedRequest.refundAmount}
+                    date={selectedRequest.createdAt}
                   />
 
                   {/* User Information */}
@@ -887,10 +851,10 @@ export function RefundReq() {
                           </Avatar>
                           <Box>
                             <Typography variant="body1" fontWeight="bold">
-                              {selectedRequest.user?.name || 'N/A'}
+                              {selectedRequest.user?.name}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                              {selectedRequest.user?.email || 'N/A'}
+                              {selectedRequest.user?.email}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
                               Phone: {selectedRequest.user?.phone || 'N/A'}
@@ -910,32 +874,27 @@ export function RefundReq() {
                       </Typography>
                       <Stack spacing={2}>
                         {selectedRequest.tickets?.map((ticket, index) => (
-                          <Box key={ticket._id || index} sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+                          <Box key={ticket._id} sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
                             <Grid container spacing={2} alignItems="center">
                               <Grid item xs={12} sm={6}>
                                 <Typography variant="body1" fontWeight="medium">
-                                  {ticket.ticketType || 'Unknown Ticket'}
+                                  {ticket.ticketType}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                  Quantity: {ticket.quantity || 0}
+                                  Quantity: {ticket.quantity}
                                 </Typography>
                               </Grid>
                               <Grid item xs={12} sm={6} textAlign={{ xs: 'left', sm: 'right' }}>
                                 <Typography variant="body1" fontWeight="bold">
-                                  {ticket.unitPrice || 0} XAF
+                                  {formatCurrency(ticket.unitPrice)}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                  Total: {(ticket.unitPrice || 0) * (ticket.quantity || 0)} XAF
+                                  Total: {formatCurrency(ticket.unitPrice * ticket.quantity)}
                                 </Typography>
                               </Grid>
                             </Grid>
                           </Box>
                         ))}
-                        {!selectedRequest.tickets?.length && (
-                          <Typography variant="body2" color="text.secondary" textAlign="center" py={2}>
-                            No ticket information available
-                          </Typography>
-                        )}
                       </Stack>
                     </CardContent>
                   </Card>
@@ -1046,7 +1005,7 @@ export function RefundReq() {
                             Event Date
                           </Typography>
                           <Typography variant="body1" fontWeight="medium">
-                            {selectedRequest.eventDate ? formatEventDate(selectedRequest.eventDate) : 'N/A'}
+                            {formatEventDate(selectedRequest.eventDate)}
                           </Typography>
                         </Box>
                         <Box>
@@ -1054,7 +1013,7 @@ export function RefundReq() {
                             Event ID
                           </Typography>
                           <Typography variant="body1" fontWeight="medium">
-                            {selectedRequest.event?._id || 'N/A'}
+                            {selectedRequest.event?._id}
                           </Typography>
                         </Box>
                       </Stack>
@@ -1074,7 +1033,7 @@ export function RefundReq() {
                             Payment Method
                           </Typography>
                           <Typography variant="body1" fontWeight="medium" textTransform="capitalize">
-                            {selectedRequest.paymentMethod?.replace('_', ' ') || 'N/A'}
+                            {selectedRequest.paymentMethod?.replace('_', ' ')}
                           </Typography>
                         </Box>
                         <Box>
@@ -1082,7 +1041,7 @@ export function RefundReq() {
                             Transaction ID
                           </Typography>
                           <Typography variant="body1" fontWeight="medium" fontFamily="monospace" fontSize="0.8rem">
-                            {selectedRequest.transactionId || 'N/A'}
+                            {selectedRequest.transactionId}
                           </Typography>
                         </Box>
                         <Box>
@@ -1090,7 +1049,7 @@ export function RefundReq() {
                             Order Total
                           </Typography>
                           <Typography variant="body1" fontWeight="bold" color="primary.main">
-                            {selectedRequest.totalAmount || 0} XAF
+                            {formatCurrency(selectedRequest.totalAmount)}
                           </Typography>
                         </Box>
                         <Box>
@@ -1098,7 +1057,7 @@ export function RefundReq() {
                             Refund Amount
                           </Typography>
                           <Typography variant="h6" fontWeight="bold" color="success.main">
-                            {selectedRequest.refundAmount || 0} XAF
+                            {formatCurrency(selectedRequest.refundAmount)}
                           </Typography>
                         </Box>
                       </Stack>
@@ -1113,7 +1072,7 @@ export function RefundReq() {
                         Refund Reason
                       </Typography>
                       <Typography variant="body1" sx={{ mt: 1, p: 2, bgcolor: 'grey.50', borderRadius: 1, fontStyle: 'italic' }}>
-                        {selectedRequest.reason || 'No reason provided'}
+                        {selectedRequest.reason}
                       </Typography>
 
                       {selectedRequest.adminNotes && selectedRequest.refundStatus !== 'rejected' && (
@@ -1138,37 +1097,23 @@ export function RefundReq() {
                   <Button variant="outlined" onClick={handleCloseModal}>
                     Close
                   </Button>
-                  
-                  {/* Show appropriate action buttons based on status */}
-                  {selectedRequest.refundStatus === 'pending' && (
+                  {selectedRequest.refundStatus === 'processed' && (
                     <>
-                      <Button 
-                        variant="contained" 
-                        color="error" 
-                        onClick={() => handleReject(selectedRequest)}
-                      >
+                      <Button variant="contained" color="error" onClick={() => handleReject(selectedRequest)}>
                         Reject Request
                       </Button>
                       <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => handleApprove(selectedRequest)}
+                        disabled={loadingRefund || isProcessRefundDisabled(selectedRequest)}
+                        onClick={() => handleProceedRefund(selectedRequest)}
                       >
-                        Approve Request
+                        {loadingRefund ? "Processing..." : "Proceed Refund"}
                       </Button>
                     </>
                   )}
-                  
-                  {selectedRequest.refundStatus === 'approved' && (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      disabled={loadingRefund || isProcessRefundDisabled(selectedRequest)}
-                      onClick={() => handleProceedRefund(selectedRequest)}
-                    >
-                      {loadingRefund ? "Processing..." : "Proceed Refund"}
-                    </Button>
-                  )}
+
+
                 </Stack>
               </Box>
             </>

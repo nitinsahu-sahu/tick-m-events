@@ -16,7 +16,11 @@ import {
   Description as DescriptionIcon,
   CheckCircle as CheckIcon,
   Cancel as CancelIcon,
-  AccessTime as TimeIcon
+  AccessTime as TimeIcon,
+  Category as CategoryIcon,
+  Star as StarIcon,
+  Phone as PhoneIcon,
+  Business as BusinessIcon
 } from "@mui/icons-material";
 import { useRef } from "react";
 
@@ -159,78 +163,17 @@ const LogoStamp = styled(Box)(({ theme }) => ({
   boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
 }));
 
-interface DetailsModalProps {
+interface ProposalDetailsModalProps {
   open: boolean;
   onClose: () => void;
   data: any;
+  title?: string;
 }
 
-export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) => {
+export const ProposalDetailsModal = ({ open, onClose, data, title = "Proposal Details" }: ProposalDetailsModalProps) => {
   const printRef = useRef<HTMLDivElement>(null);
-  console.log(data,'...');
-  
+
   if (!data) return null;
-
-  // Helper function to get data based on projectType
- const getEventData = () => {
-  if (data.projectType === "EventReq") {
-    return {
-      eventData: data.eventId,
-      serviceRequest: data.serviceRequestId,
-      organizer: data.organizerId,
-      provider: data.providerId,
-      projectStatus: data.projectStatus,
-      providerStatus: data.providerStatus,
-      orgStatus: data.orgStatus,
-      winningBid: data.winningBid,
-      providerProposal: data.providerProposal,
-      providerHasProposed: data.providerHasProposed,
-      serviceTime: data.serviceTime,
-      eventLocation: data.eventLocation,
-      orgBudget: data.orgBudget,
-      orgRequirement: data.orgRequirement
-    };
-  }
-  
-  // For "Bid" project type
-  return {
-    eventData: data.projectId?.eventId,
-    serviceRequest: data.projectId,
-    organizer: data.projectId?.createdBy,
-    provider: data.providerId,
-    projectStatus: data.projectStatus,
-    providerStatus: data.status,
-    orgStatus: data.isOrgnizerAccepted ? "accepted" : "pending",
-    winningBid: data.winningBid,
-    providerProposal: {
-      amount: data.bidAmount,
-      days: data.deliveryTime,
-      message: data.proposal
-    },
-    providerHasProposed: true,
-    serviceTime: data.projectId?.serviceTime,
-    eventLocation: data.projectId?.eventLocation,
-    orgBudget: data.projectId?.orgBudget,
-    orgRequirement: data.projectId?.orgRequirement
-  };
-};
-
-  const {
-    eventData,
-    serviceRequest,
-    organizer,
-    provider,
-    projectStatus,
-    providerStatus,
-    orgStatus,
-    winningBid,
-    providerProposal,
-    providerHasProposed,
-    serviceTime,
-    eventLocation,
-    orgBudget,
-    orgRequirement
-  } = getEventData();
 
   const handlePrint = () => {
     const printContent = printRef.current;
@@ -247,7 +190,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Service Request - ${eventData?.eventName || 'Details'}</title>
+          <title>Proposal Details - ${data?.providerId?.name || 'Provider'}</title>
           <meta charset="utf-8">
           <style>
             @media print {
@@ -284,10 +227,10 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
         <LogoSection sx={{ justifyContent: 'space-between' }}>
           <Box flex={1}>
             <Typography variant="h4" fontWeight="bold" sx={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-              📋 Service Request Details
+              📋 Proposal Details
             </Typography>
             <Typography variant="subtitle1" sx={{ opacity: 0.9, mt: 1 }}>
-              Project Type: <strong>{data.projectType}</strong>
+              Provider: <strong>{data?.providerId?.name || "N/A"}</strong>
             </Typography>
           </Box>
           <LogoStamp>
@@ -296,7 +239,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
         </LogoSection>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" sx={{ opacity: 0.9 }}>
-            Organized by: <strong>{organizer?.name || "N/A"}</strong>
+            Event: <strong>{data?.eventId?.eventName || "N/A"}</strong>
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.9 }}>
             Generated on: {new Date().toLocaleDateString('en-US', {
@@ -310,172 +253,30 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
 
       <Box sx={{ py: 3 }}>
         <Grid container spacing={3}>
-          {/* Left Column */}
+          {/* Left Column - Provider & Proposal Details */}
           <Grid item xs={12} md={6}>
             <Paper className="section-paper">
               <SectionHeader variant="h6">
-                <EventIcon /> Event Information
+                <PersonIcon /> Provider Information
               </SectionHeader>
               <Stack spacing={2}>
                 <DetailItem>
                   <DetailLabel variant="body2">
-                    <EventIcon sx={{ fontSize: 18 }} />
-                    Event Name:
+                    <PersonIcon sx={{ fontSize: 18 }} />
+                    Name:
                   </DetailLabel>
                   <DetailValue variant="body2">
-                    {eventData?.eventName || "N/A"}
+                    {data?.providerId?.name || "N/A"}
                   </DetailValue>
                 </DetailItem>
 
                 <DetailItem>
                   <DetailLabel variant="body2">
-                    <ScheduleIcon sx={{ fontSize: 18 }} />
-                    Date & Time:
+                    <BusinessIcon sx={{ fontSize: 18 }} />
+                    Username:
                   </DetailLabel>
                   <DetailValue variant="body2">
-                    {eventData?.date ? new Date(eventData.date).toLocaleDateString() : "N/A"} at {eventData?.time || "N/A"}
-                  </DetailValue>
-                </DetailItem>
-
-                <DetailItem>
-                  <DetailLabel variant="body2">
-                    <LocationIcon sx={{ fontSize: 18 }} />
-                    Location:
-                  </DetailLabel>
-                  <DetailValue variant="body2">
-                    {eventLocation || eventData?.location || "N/A"}
-                  </DetailValue>
-                </DetailItem>
-
-                <DetailItem>
-                  <DetailLabel variant="body2">Project Status:</DetailLabel>
-                  <DetailValue variant="body2">
-                    <StatusChip
-                      label={projectStatus || "N/A"}
-                      color={
-                        projectStatus === 'active' ? 'success' :
-                        projectStatus === 'completed' ? 'primary' :
-                        projectStatus === 'cancelled' ? 'error' : 'default'
-                      }
-                    />
-                  </DetailValue>
-                </DetailItem>
-              </Stack>
-            </Paper>
-
-            <Paper className="section-paper" sx={{ mt: 2 }}>
-              <SectionHeader variant="h6">
-                <DescriptionIcon /> Service Request
-              </SectionHeader>
-              <Stack spacing={2}>
-                <DetailItem>
-                  <DetailLabel variant="body2">Service Type:</DetailLabel>
-                  <DetailValue variant="body2">
-                    <StatusChip
-                      label={serviceRequest?.serviceType || "N/A"}
-                      color="primary"
-                      size="small"
-                    />
-                  </DetailValue>
-                </DetailItem>
-
-                <DetailItem>
-                  <DetailLabel variant="body2">
-                    <MoneyIcon sx={{ fontSize: 18 }} />
-                    Budget:
-                  </DetailLabel>
-                  <DetailValue variant="body2">
-                    {orgBudget || serviceRequest?.budget || "N/A"}
-                  </DetailValue>
-                </DetailItem>
-
-                <DetailItem>
-                  <DetailLabel variant="body2">Organizer Status:</DetailLabel>
-                  <DetailValue variant="body2">
-                    <StatusChip
-                      label={orgStatus || "N/A"}
-                      color={
-                        orgStatus === 'accepted' ? 'success' :
-                        orgStatus === 'rejected' ? 'error' :
-                        orgStatus === 'request' ? 'info' : 'default'
-                      }
-                    />
-                  </DetailValue>
-                </DetailItem>
-
-                {winningBid && (
-                  <DetailItem>
-                    <DetailLabel variant="body2">Winning Bid:</DetailLabel>
-                    <DetailValue variant="body2">
-                      <StatusChip
-                        label={`${winningBid} XAF`}
-                        color="success"
-                        size="small"
-                        variant="outlined"
-                      />
-                    </DetailValue>
-                  </DetailItem>
-                )}
-              </Stack>
-            </Paper>
-
-            {providerHasProposed && providerProposal && (
-              <Paper className="section-paper" sx={{ mt: 2 }}>
-                <SectionHeader variant="h6">
-                  <CheckIcon /> Provider Proposal
-                </SectionHeader>
-                <Stack spacing={2}>
-                  <DetailItem>
-                    <DetailLabel variant="body2">Proposed Amount:</DetailLabel>
-                    <DetailValue variant="body2">
-                      <StatusChip
-                        label={`${providerProposal?.amount} XAF` || 'N/A'}
-                        color={providerProposal?.amount ? "success" : "default"}
-                        size="small"
-                        variant="outlined"
-                      />
-                    </DetailValue>
-                  </DetailItem>
-
-                  <DetailItem>
-                    <DetailLabel variant="body2">
-                      <TimeIcon sx={{ fontSize: 18 }} />
-                      Duration:
-                    </DetailLabel>
-                    <DetailValue variant="body2">
-                      {providerProposal?.days || 'N/A'} days
-                    </DetailValue>
-                  </DetailItem>
-
-                  <DetailItem>
-                    <DetailLabel variant="body2">Provider Status:</DetailLabel>
-                    <DetailValue variant="body2">
-                      <StatusChip
-                        label={providerStatus || "N/A"}
-                        color={
-                          providerStatus === 'accepted' ? 'success' :
-                          providerStatus === 'rejected' ? 'error' :
-                          providerStatus === 'request' ? 'info' : 'default'
-                        }
-                      />
-                    </DetailValue>
-                  </DetailItem>
-                </Stack>
-              </Paper>
-            )}
-          </Grid>
-
-          {/* Right Column */}
-          <Grid item xs={12} md={6}>
-            <Paper className="section-paper">
-              <SectionHeader variant="h6">
-                <PersonIcon /> Organizer Details
-              </SectionHeader>
-              <Stack spacing={2}>
-                <DetailItem>
-                  <DetailLabel variant="body2">Name:</DetailLabel>
-                  <DetailValue variant="body2">
-                    {organizer?.name || "N/A"}
+                    {data?.providerId?.username || "N/A"}
                   </DetailValue>
                 </DetailItem>
 
@@ -485,69 +286,242 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
                     Email:
                   </DetailLabel>
                   <DetailValue variant="body2">
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        maxWidth: { xs: 120, sm: 180 },
-                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                        filter: 'blur(4px)',
-                        userSelect: 'none',
-                        WebkitUserSelect: 'none',
-                        MozUserSelect: 'none',
-                      }}
-                    >
-                      {organizer?.email || "N/A"}
-                    </Typography>
+                    {data?.providerId?.email || "N/A"}
+                  </DetailValue>
+                </DetailItem>
+
+                <DetailItem>
+                  <DetailLabel variant="body2">
+                    <CategoryIcon sx={{ fontSize: 18 }} />
+                    Service Category:
+                  </DetailLabel>
+                  <DetailValue variant="body2">
+                    <StatusChip
+                      label={data?.providerId?.serviceCategory || "N/A"}
+                      color="primary"
+                      size="small"
+                    />
+                  </DetailValue>
+                </DetailItem>
+
+                <DetailItem>
+                  <DetailLabel variant="body2">
+                    <StarIcon sx={{ fontSize: 18 }} />
+                    Rating:
+                  </DetailLabel>
+                  <DetailValue variant="body2">
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Box display="flex">
+                        {[...Array(5)].map((_, index) => (
+                          <StarIcon
+                            key={index}
+                            fontSize="small"
+                            sx={{
+                              color: index < Math.floor(data?.providerId?.averageRating || 0) ? '#f39c12' : '#ddd',
+                            }}
+                          />
+                        ))}
+                      </Box>
+                      <Typography variant="body2">
+                        ({data?.providerId?.averageRating || 0}/5) • {data?.providerId?.reviewCount || 0} reviews
+                      </Typography>
+                    </Box>
+                  </DetailValue>
+                </DetailItem>
+
+                {data?.providerId?.address && (
+                  <DetailItem>
+                    <DetailLabel variant="body2">
+                      <LocationIcon sx={{ fontSize: 18 }} />
+                      Address:
+                    </DetailLabel>
+                    <DetailValue variant="body2">
+                      {data.providerId.address}
+                    </DetailValue>
+                  </DetailItem>
+                )}
+
+                <DetailItem>
+                  <DetailLabel variant="body2">Verification Status:</DetailLabel>
+                  <DetailValue variant="body2">
+                    <StatusChip
+                      label={data?.providerId?.isVerified ? "Verified" : "Not Verified"}
+                      color={data?.providerId?.isVerified ? "success" : "default"}
+                      icon={data?.providerId?.isVerified ? <CheckIcon /> : <CancelIcon />}
+                    />
                   </DetailValue>
                 </DetailItem>
               </Stack>
             </Paper>
 
-            {eventData?.description && (
-              <Paper className="section-paper" sx={{ mt: 2 }}>
-                <SectionHeader variant="h6">
-                  <DescriptionIcon /> Event Description
-                </SectionHeader>
-                <HtmlContent dangerouslySetInnerHTML={{ __html: eventData.description }} />
-              </Paper>
-            )}
+            <Paper className="section-paper" sx={{ mt: 2 }}>
+              <SectionHeader variant="h6">
+                <MoneyIcon /> Proposal Details
+              </SectionHeader>
+              <Stack spacing={2}>
+                <DetailItem>
+                  <DetailLabel variant="body2">Proposed Amount:</DetailLabel>
+                  <DetailValue variant="body2">
+                    <StatusChip
+                      label={`${data?.providerProposal?.amount || 0} XAF`}
+                      color="success"
+                      size="small"
+                      variant="outlined"
+                    />
+                  </DetailValue>
+                </DetailItem>
 
-            {serviceRequest?.description && (
-              <Paper className="section-paper" sx={{ mt: 2 }}>
-                <SectionHeader variant="h6">
-                  <DescriptionIcon /> Service Details
-                </SectionHeader>
-                <HtmlContent dangerouslySetInnerHTML={{ __html: serviceRequest.description }} />
-              </Paper>
-            )}
+                <DetailItem>
+                  <DetailLabel variant="body2">
+                    <TimeIcon sx={{ fontSize: 18 }} />
+                    Estimated Days:
+                  </DetailLabel>
+                  <DetailValue variant="body2">
+                    {data?.providerProposal?.days || "N/A"} days
+                  </DetailValue>
+                </DetailItem>
 
-            {orgRequirement && (
+                <DetailItem>
+                  <DetailLabel variant="body2">Provider Status:</DetailLabel>
+                  <DetailValue variant="body2">
+                    <StatusChip
+                      label={data?.providerStatus || "N/A"}
+                      color={
+                        data?.providerStatus === 'accepted' ? 'success' :
+                        data?.providerStatus === 'rejected' ? 'error' :
+                        data?.providerStatus === 'pending' ? 'warning' : 'default'
+                      }
+                    />
+                  </DetailValue>
+                </DetailItem>
+
+                <DetailItem>
+                  <DetailLabel variant="body2">Project Status:</DetailLabel>
+                  <DetailValue variant="body2">
+                    <StatusChip
+                      label={data?.projectStatus || "N/A"}
+                      color={
+                        data?.projectStatus === 'active' ? 'success' :
+                        data?.projectStatus === 'completed' ? 'primary' :
+                        data?.projectStatus === 'cancelled' ? 'error' : 'default'
+                      }
+                    />
+                  </DetailValue>
+                </DetailItem>
+
+                {data?.winningBid && data.winningBid > 0 && (
+                  <DetailItem>
+                    <DetailLabel variant="body2">Winning Bid:</DetailLabel>
+                    <DetailValue variant="body2">
+                      <StatusChip
+                        label={`${data.winningBid} XAF`}
+                        color="success"
+                        size="small"
+                      />
+                    </DetailValue>
+                  </DetailItem>
+                )}
+              </Stack>
+            </Paper>
+          </Grid>
+
+          {/* Right Column - Event & Requirements */}
+          <Grid item xs={12} md={6}>
+            <Paper className="section-paper">
+              <SectionHeader variant="h6">
+                <EventIcon /> Event Information
+              </SectionHeader>
+              <Stack spacing={2}>
+                <DetailItem>
+                  <DetailLabel variant="body2">Event Name:</DetailLabel>
+                  <DetailValue variant="body2">
+                    {data?.eventId?.eventName || "N/A"}
+                  </DetailValue>
+                </DetailItem>
+
+                <DetailItem>
+                  <DetailLabel variant="body2">
+                    <ScheduleIcon sx={{ fontSize: 18 }} />
+                    Event Date:
+                  </DetailLabel>
+                  <DetailValue variant="body2">
+                    {data?.eventId?.date ? new Date(data.eventId.date).toLocaleDateString() : "N/A"} at {data?.eventId?.time || "N/A"}
+                  </DetailValue>
+                </DetailItem>
+
+                <DetailItem>
+                  <DetailLabel variant="body2">
+                    <LocationIcon sx={{ fontSize: 18 }} />
+                    Event Location:
+                  </DetailLabel>
+                  <DetailValue variant="body2">
+                    {data?.eventLocation || data?.eventId?.location || "N/A"}
+                  </DetailValue>
+                </DetailItem>
+
+                <DetailItem>
+                  <DetailLabel variant="body2">
+                    <ScheduleIcon sx={{ fontSize: 18 }} />
+                    Service Time:
+                  </DetailLabel>
+                  <DetailValue variant="body2">
+                    {data?.serviceTime ? new Date(data.serviceTime).toLocaleString() : "N/A"}
+                  </DetailValue>
+                </DetailItem>
+              </Stack>
+            </Paper>
+
+            {data?.orgRequirement && (
               <Paper className="section-paper" sx={{ mt: 2 }}>
                 <SectionHeader variant="h6">
                   <DescriptionIcon /> Organizer Requirements
                 </SectionHeader>
                 <HtmlContent>
-                  {typeof orgRequirement === 'string' && orgRequirement.startsWith('<') ? 
-                    <div dangerouslySetInnerHTML={{ __html: orgRequirement }} /> : 
-                    <Typography>{orgRequirement}</Typography>
+                  {typeof data.orgRequirement === 'string' && data.orgRequirement.startsWith('<') ? 
+                    <div dangerouslySetInnerHTML={{ __html: data.orgRequirement }} /> : 
+                    <Typography>{data.orgRequirement}</Typography>
                   }
                 </HtmlContent>
               </Paper>
             )}
 
-            {providerHasProposed && providerProposal?.message && (
+            {data?.providerProposal?.message && (
               <Paper className="section-paper" sx={{ mt: 2 }}>
                 <SectionHeader variant="h6">
-                  <DescriptionIcon /> Provider Message
+                  <DescriptionIcon /> Provider&apos;s Message
                 </SectionHeader>
                 <HtmlContent>
-                  {typeof providerProposal.message === 'string' && providerProposal.message.startsWith('<') ? 
-                    <div dangerouslySetInnerHTML={{ __html: providerProposal.message }} /> : 
-                    <Typography>{providerProposal.message}</Typography>
+                  {typeof data.providerProposal.message === 'string' && data.providerProposal.message.startsWith('<') ? 
+                    <div dangerouslySetInnerHTML={{ __html: data.providerProposal.message }} /> : 
+                    <Typography>{data.providerProposal.message}</Typography>
+                  }
+                </HtmlContent>
+              </Paper>
+            )}
+
+            {data?.providerId?.experience && (
+              <Paper className="section-paper" sx={{ mt: 2 }}>
+                <SectionHeader variant="h6">
+                  <BusinessIcon /> Provider Experience
+                </SectionHeader>
+                <HtmlContent>
+                  {typeof data.providerId.experience === 'string' && data.providerId.experience.startsWith('<') ? 
+                    <div dangerouslySetInnerHTML={{ __html: data.providerId.experience }} /> : 
+                    <Typography>{data.providerId.experience}</Typography>
+                  }
+                </HtmlContent>
+              </Paper>
+            )}
+
+            {data?.orgAdditionalRequirement && (
+              <Paper className="section-paper" sx={{ mt: 2 }}>
+                <SectionHeader variant="h6">
+                  <DescriptionIcon /> Additional Requirements
+                </SectionHeader>
+                <HtmlContent>
+                  {typeof data.orgAdditionalRequirement === 'string' && data.orgAdditionalRequirement.startsWith('<') ? 
+                    <div dangerouslySetInnerHTML={{ __html: data.orgAdditionalRequirement }} /> : 
+                    <Typography>{data.orgAdditionalRequirement}</Typography>
                   }
                 </HtmlContent>
               </Paper>
@@ -571,7 +545,7 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
           <LogoStamp sx={{ width: 24, height: 24, fontSize: '8px', marginRight: '8px' }}>
             TM
           </LogoStamp>
-          Tick-M Events Official Document - Project Type: {data.projectType}
+          Tick-M Events Official Document - Proposal Details
         </Box>
       </Box>
     </div>
@@ -601,10 +575,10 @@ export const ServiceRequestModal = ({ open, onClose, data }: DetailsModalProps) 
       }}>
         <Box sx={{ flex: 1 }}>
           <Typography variant="h5" fontWeight="bold">
-            Service Request Details
+            {title}
           </Typography>
           <Typography variant="subtitle2" sx={{ opacity: 0.9 }}>
-            {eventData?.eventName || "Service Project"} - {data.projectType}
+            {data?.providerId?.name || "Provider"} - {data?.eventId?.eventName || "Event"}
           </Typography>
         </Box>
 

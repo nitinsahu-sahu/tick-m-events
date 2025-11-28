@@ -1,15 +1,17 @@
-// Parent Component
-import { Box, Button, Paper, Tab, Tabs, Typography, Grid, TextField, CardContent, Card, Modal, Divider, Chip } from "@mui/material";
+import { Box, Button, Paper, Tab, Tabs, Typography, Grid, TextField, Modal, Divider, Chip } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { MatrixOneCard } from "src/components/matrix-three-cards/matrix-one-cards";
-import { getRequestsByProvider, sendProviderProposal, getProposalById, updateProviderProposal, markRequestAsCompleted } from "src/redux/actions/service-request";
+import { toast } from 'react-toastify';
+
+import { formatTimeTo12Hour } from "src/hooks/formate-time";
+import { getRequestsByProvider, sendProviderProposal, getProposalById, updateProviderProposal } from "src/redux/actions/service-request";
 import { AppDispatch, RootState } from "src/redux/store";
 
 import { RequestTabSection } from "./request-tab-section";
-import { metrics, availableProjectsTableHeaders } from "./utills";
+import { availableProjectsTableHeaders } from "./utills";
 import { SignedTab } from "./projectsTabs/signed";
 import { ConfirmedTab } from "./projectsTabs/confirmed";
+
 
 interface Project {
     _id: string;
@@ -113,6 +115,28 @@ export function TabWithTableView() {
         setSelectedProject(null);
     };
 
+    const handleUpdateProposal = async () => {
+        console.log("update");
+        const proposalData = {
+            amount: Number(amount),
+            days: Number(days),
+            message: description,
+        };
+        const res = await dispatch(updateProviderProposal(selectedProject?._id, proposalData) as any);
+        if (res?.status === 200) {
+            toast.success(res?.data?.message);
+
+            setAmount('');
+            setDays('');
+            setDescription('');
+            setModalOpen(false);
+            setSelectedProject(null);
+            dispatch(getRequestsByProvider()); // Refresh
+        } else {
+            setModalOpen(false);
+
+        }
+    }
     const handleSubmitProposal = async () => {
         if (!amount || !days || !description || !selectedProject) return;
 
@@ -122,19 +146,12 @@ export function TabWithTableView() {
             message: description,
         };
 
-        let res;
-
-        if (selectedProject.providerHasProposed) {
-            // Call update proposal API
-            res = await dispatch(updateProviderProposal(selectedProject._id, proposalData) as any);
-        } else {
-            // Call create proposal API
-            res = await dispatch(sendProviderProposal(selectedProject._id, proposalData) as any);
-         
-        }
+        const res = await dispatch(sendProviderProposal(selectedProject._id, proposalData) as any);
         console.log(res);
 
         if (res?.status === 200) {
+            toast.success(res?.data?.message);
+
             setAmount('');
             setDays('');
             setDescription('');
@@ -142,7 +159,7 @@ export function TabWithTableView() {
             setSelectedProject(null);
             dispatch(getRequestsByProvider()); // Refresh
         } else {
-                        setModalOpen(false);
+            setModalOpen(false);
 
         }
     };
@@ -260,12 +277,14 @@ export function TabWithTableView() {
                                 <Grid container spacing={2}>
                                     <Grid item xs={12} sm={6}>
                                         <DetailItem title="Event Date" value={selectedProject?.eventId?.date ? new Date(selectedProject.eventId.date).toLocaleDateString() : 'N/A'} />
+
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
-                                        <DetailItem title="Event Time" value={selectedProject?.eventId?.time || 'N/A'} />
+                                        <DetailItem title="Service Time" value={formatTimeTo12Hour(selectedProject?.eventId?.time)} />
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <DetailItem title="Service Time" value={selectedProject?.serviceTime ? new Date(selectedProject.serviceTime).toLocaleString() : 'N/A'} />
+
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <DetailItem title="Location" value={selectedProject?.eventId?.location || selectedProject?.eventLocation || 'N/A'} />
@@ -422,22 +441,45 @@ export function TabWithTableView() {
                                         >
                                             Cancel
                                         </Button>
-                                        <Button
-                                            variant="contained"
-                                            sx={{
-                                                backgroundColor: "#0B2E4C",
-                                                borderRadius: "10px",
-                                                textTransform: "none",
-                                                paddingX: 3,
-                                                "&:hover": {
-                                                    backgroundColor: "#09304a",
-                                                },
-                                            }}
-                                            onClick={handleSubmitProposal}
-                                            disabled={!amount || !days || !description}
-                                        >
-                                            {selectedProject?.providerHasProposed ? "Update Proposal" : "Submit Proposal"}
-                                        </Button>
+                                        {
+                                            selectedProject?.providerHasProposed ? (
+                                                <Button
+                                                    variant="contained"
+                                                    sx={{
+                                                        backgroundColor: "#0B2E4C",
+                                                        borderRadius: "10px",
+                                                        textTransform: "none",
+                                                        paddingX: 3,
+                                                        "&:hover": {
+                                                            backgroundColor: "#09304a",
+                                                        },
+                                                    }}
+                                                    onClick={handleUpdateProposal}
+                                                    disabled={!amount || !days || !description}
+                                                >
+                                                    Update Proposal
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    variant="contained"
+                                                    sx={{
+                                                        backgroundColor: "#0B2E4C",
+                                                        borderRadius: "10px",
+                                                        textTransform: "none",
+                                                        paddingX: 3,
+                                                        "&:hover": {
+                                                            backgroundColor: "#09304a",
+                                                        },
+                                                    }}
+                                                    onClick={handleSubmitProposal}
+                                                    disabled={!amount || !days || !description}
+                                                >
+                                                    Submit Proposal
+                                                </Button>
+                                            )
+                                        }
+
+
                                     </Grid>
                                 </Grid>
                             </Box>

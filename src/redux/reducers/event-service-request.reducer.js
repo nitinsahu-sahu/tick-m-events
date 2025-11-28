@@ -5,8 +5,8 @@ const initialState = {
     completedRequests: [],
     signedReqests: [],
     pendingRequests: [],
-    totalRequests:[],
-    allActiveProjects:[],
+    totalRequests: [],
+    allActiveProjects: [],
     proposal: null,
     total: 0,
     currentPage: 1,
@@ -71,11 +71,11 @@ const eventServiceRequestReducer = (state, action) => {
                 ...state,
                 loading: false,
                 message: action.payload.message,
-                allActiveProjects:action.payload.allActiveProjects,
+                allActiveProjects: action.payload.allActiveProjects,
                 completedRequests: action.payload.completedRequests,
                 signedReqests: action.payload.signedReqests,
                 pendingRequests: action.payload.pendingRequests,
-                totalRequests:action.payload.totalRequests
+                totalRequests: action.payload.totalRequests
             };
 
         case serviceRequestConstants.GET_REQUESTED_SERVICE_FAILURE:
@@ -98,31 +98,6 @@ const eventServiceRequestReducer = (state, action) => {
             };
 
         case serviceRequestConstants.ORGANIZER_SERVICE_TO_PROVIDER_FAILURE:
-            return {
-                ...state,
-                loading: false,
-                error: action.payload.message,
-            };
-
-        // Provider sends proposal
-        case serviceRequestConstants.SEND_PROVIDER_PROPOSAL_REQUEST:
-            return {
-                ...state,
-                loading: true,
-                error: null,
-            };
-
-        case serviceRequestConstants.SEND_PROVIDER_PROPOSAL_SUCCESS:
-            return {
-                ...state,
-                loading: false,
-                message: action.payload.message,
-                requests: state.requests.map((req) =>
-                    req._id === action.payload.updatedRequest._id ? action.payload.updatedRequest : req
-                ),
-            };
-
-        case serviceRequestConstants.SEND_PROVIDER_PROPOSAL_FAILURE:
             return {
                 ...state,
                 loading: false,

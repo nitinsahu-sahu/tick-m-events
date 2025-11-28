@@ -331,17 +331,17 @@ export function RefundReq() {
     }
   };
 
- const handleProceedRefund = async (request: RefundRequestTyp) => {
+  const handleProceedRefund = async (request: RefundRequestTyp) => {
     try {
       console.log("🟢 Starting refund process for:", request);
       setLoadingRefund(true);
       setApiResponse(null);
- 
+
       // Step 1: Check payment status
       const transId = request.transactionId;
       console.log("🔍 Checking payment status for transId:", transId);
- 
-      const statusRes = await fetch(`${import.meta.env.VITE_Live_URL}/payment-status/${transId}`, {
+
+      const statusRes = await fetch(`${import.meta.env.VITE_BASE_URL || 'https://sandbox.fapshi.com'}/payment-status/${transId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -349,10 +349,20 @@ export function RefundReq() {
           "apikey": import.meta.env.VITE_API_KEY || 'FAK_TEST_177a608c18c0db8c50be',
         },
       });
- 
+      const safeJson = async (response: Response) => {
+        try {
+          const clone = response.clone(); // 🔥 so we don't consume the original
+          const text = await clone.text();
+          return text ? JSON.parse(text) : {};
+        } catch {
+          return {};
+        }
+      };
+
       console.log("📡 Payment status response status:", statusRes.status);
-      const statusData = await statusRes.json();
- 
+      const statusData = await safeJson(statusRes);
+      console.log("RAW TEXT:", await statusRes.text());
+
       // Check if transaction not found or other error
       let paymentError = '';
       if (statusRes.status === 404) {
@@ -362,7 +372,7 @@ export function RefundReq() {
       } else if (statusData?.status !== "SUCCESSFUL") {
         paymentError = `Transaction status: ${statusData.status}. Refund cannot proceed.`;
       }
- 
+
       // Store payment status response with proper typing
       setApiResponse((prev: ApiResponseData | null) => ({
         ...prev,
@@ -373,20 +383,20 @@ export function RefundReq() {
           error: paymentError
         }
       }));
- 
+
       if (paymentError) {
         setAdminNotes(`Payment status check failed: ${paymentError}`);
         return;
       }
- 
+
       console.log("✅ Transaction successful. Proceeding with payout...");
- 
+
       let phoneNumber = request.user.phone || "";
       // Ensure it includes country code (Cameroon = 237)
       if (phoneNumber && !phoneNumber.startsWith("237")) {
         phoneNumber = phoneNumber.replace(/^\+/, "");
       }
- 
+
       // Step 2: Proceed with payout
       const payoutBody = {
         amount: request.refundAmount,
@@ -397,9 +407,9 @@ export function RefundReq() {
         userId: request.user._id,
         externalId: request.transactionId,
       };
- 
+
       console.log("📤 Payout request body:", payoutBody);
- 
+
       const payoutRes = await fetch(`${import.meta.env.VITE_BASE_URL || 'https://sandbox.fapshi.com'}/payout`, {
         method: "POST",
         headers: {
@@ -409,14 +419,14 @@ export function RefundReq() {
         },
         body: JSON.stringify(payoutBody),
       });
- 
+
       console.log("📡 Payout response status:", payoutRes.status);
-      const payoutData = await payoutRes.json();
- 
+      const payoutData = await safeJson(payoutRes);
+
       // FIXED: Check for payout success/failure
       let payoutError = '';
       let isSuccess = false;
- 
+
       if (payoutRes.status >= 400) {
         // HTTP error (400, 500, etc.)
         payoutError = payoutData.message || `Payout failed with status ${payoutRes.status}`;
@@ -433,7 +443,7 @@ export function RefundReq() {
         // Default success case
         isSuccess = true;
       }
- 
+
       // Store payout response with proper typing - include error if any
       setApiResponse((prev: ApiResponseData | null) => ({
         ...prev,
@@ -445,13 +455,13 @@ export function RefundReq() {
           error: payoutError || undefined // Use undefined instead of empty string for no error
         }
       }));
- 
+
       if (isSuccess) {
         // SUCCESS CASE
         const transactionId = payoutData.transId || payoutData.transactionId || 'N/A';
         const notes = `Refund processed successfully via Fapshi. Transaction ID: ${transactionId}`;
         setAdminNotes(notes);
- 
+
         // Update backend to 'refunded' status
         try {
           const res = await axios.put(`/refund-request/${request._id}`, {
@@ -472,7 +482,7 @@ export function RefundReq() {
         // FAILURE CASE
         const notes = adminNotes || `Refund failed: ${payoutError}`;
         setAdminNotes(notes);
- 
+
         // Update backend to 'rejected' status
         try {
           const res = await axios.put(`/refund-request/${request._id}`, {
@@ -487,17 +497,17 @@ export function RefundReq() {
           toast.error("Failed to update backend after refund failure!");
         }
       }
- 
+
     } catch (err: any) {
       console.group("❌ Error during refund process");
       console.error("Full error object:", err);
       console.error("Error message:", err.message);
       console.error("Error stack:", err.stack);
       console.groupEnd();
- 
+
       const errorMsg = err.message || "Unknown error occurred";
       alert("❌ Something went wrong while processing the refund.");
- 
+
       // Store error in API response with proper typing
       setApiResponse((prev: ApiResponseData | null) => ({
         ...prev,
@@ -507,7 +517,7 @@ export function RefundReq() {
           fullError: err
         }
       }));
- 
+
       // Auto-fill admin notes with error
       setAdminNotes(`System error: ${errorMsg}. Please check API response for technical details.`);
     } finally {
@@ -562,6 +572,7 @@ export function RefundReq() {
       </Box>
     );
   }
+
 
   return (
     <DashboardContent>

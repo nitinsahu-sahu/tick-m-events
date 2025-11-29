@@ -2,13 +2,16 @@ import { useState } from 'react';
 import { Box, Button, Card, Divider, Grid, IconButton, TextField, Typography } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
+import { useNavigate } from 'react-router-dom';
+
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { formatEventDate, formatTimeTo12Hour } from "src/hooks/formate-time";
 import { availablePromoCodes, PromoCode } from './utill';
 import { PurchaseModal } from './tickte-purchase-modal';
 
 export function TrackingSystem({ tickets, location, date, time, eventId, eventName }: any) {
-    
+  const navigate = useNavigate();
+
     // Initialize state for ticket quantities
     const [ticketQuantities, setTicketQuantities] = useState<Record<string, number>>(() => {
         const initialQuantities: Record<string, number> = {};
@@ -196,6 +199,24 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
 
     const handleBuyClick = () => {
         if (calculateSubtotal() <= 0) return;
+        const selectedTickets = getSelectedTickets();
+        const queryParams = new URLSearchParams({
+            eventId,
+            eventName,
+            selected: encodeURIComponent(JSON.stringify(selectedTickets)),
+            total: calculateTotal().toString(),
+            promo: appliedPromo ? appliedPromo.code : ""
+        });
+        // Check if user is logged in
+        const redirectUrl = `/ticket-purchase-process?${queryParams.toString()}`;
+        const isLoggedIn = localStorage.getItem("token");
+
+        if (!isLoggedIn) {
+            navigate(`/sign-in?redirect=${encodeURIComponent(redirectUrl)}`);
+            return;
+        }
+
+        navigate(redirectUrl);;
         setModalOpen(true);
     };
 
@@ -244,7 +265,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                             ticket?.tickets.map((item: any) => {
                                 const totalTickets = getTotalTicketsAsNumber(item.totalTickets);
                                 const availableTickets = item.isLimitedSeat ? totalTickets : null;
-                                
+
                                 return (
                                     <Box key={item._id} mb={3}>
                                         <Typography fontWeight="bold" textTransform="capitalize" fontSize={{ xs: "18px", sm: "22px", md: "26px" }}>

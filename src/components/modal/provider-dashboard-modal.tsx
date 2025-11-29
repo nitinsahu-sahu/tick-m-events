@@ -172,6 +172,7 @@ interface ProposalDetailsModalProps {
 
 export const ProposalDetailsModal = ({ open, onClose, data, title = "Proposal Details" }: ProposalDetailsModalProps) => {
   const printRef = useRef<HTMLDivElement>(null);
+console.log(data);
 
   if (!data) return null;
 
@@ -290,7 +291,7 @@ export const ProposalDetailsModal = ({ open, onClose, data, title = "Proposal De
                   </DetailValue>
                 </DetailItem>
 
-                <DetailItem>
+                {/* <DetailItem>
                   <DetailLabel variant="body2">
                     <CategoryIcon sx={{ fontSize: 18 }} />
                     Service Category:
@@ -302,9 +303,9 @@ export const ProposalDetailsModal = ({ open, onClose, data, title = "Proposal De
                       size="small"
                     />
                   </DetailValue>
-                </DetailItem>
+                </DetailItem> */}
 
-                <DetailItem>
+                {/* <DetailItem>
                   <DetailLabel variant="body2">
                     <StarIcon sx={{ fontSize: 18 }} />
                     Rating:
@@ -327,7 +328,7 @@ export const ProposalDetailsModal = ({ open, onClose, data, title = "Proposal De
                       </Typography>
                     </Box>
                   </DetailValue>
-                </DetailItem>
+                </DetailItem> */}
 
                 {data?.providerId?.address && (
                   <DetailItem>

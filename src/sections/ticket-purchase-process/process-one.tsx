@@ -42,18 +42,36 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         [ticketQuantities]
     );
 
+     const selectedTicketsFromUrl = useMemo(() => {
+        const raw = searchParams.get("selected");
+        if (!raw) return [];
+ 
+        try {
+            return JSON.parse(raw);
+        } catch {
+            return [];
+        }
+    }, [searchParams]);
+    
     // Initialize ticket quantities
     useEffect(() => {
         if (tickets.length > 0) {
             const initialQuantities: Record<string, number> = {};
+
             tickets.forEach((ticket: any) => {
                 ticket.tickets.forEach((item: any) => {
-                    initialQuantities[item._id] = ticketQuantities[item._id] || 0;
+                    // Find this ticket in the URL data
+                    const found = selectedTicketsFromUrl.find(
+                        (sel: any) => sel.ticketName === item.ticketType
+                    );
+
+                    initialQuantities[item._id] = found ? found.quantity : 0;
                 });
             });
+
             setTicketQuantities(initialQuantities);
         }
-    }, [tickets, ticketQuantities]);
+    }, [tickets, selectedTicketsFromUrl]);
 
     const fetchEvents = useCallback(async () => {
         try {

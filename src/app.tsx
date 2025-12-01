@@ -16,10 +16,6 @@ import { getPromotionLogo } from './redux/actions/customization/promotion-logo';
 import { statisticsPerformanceFetch } from './redux/actions/provider/statisticsAndPerformance';
 import { getReservationContracts } from './redux/actions/provider/reservation-contract';
 
-
-
-// ----------------------------------------------------------------------
-
 export default function App() {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state?.auth);
@@ -27,7 +23,6 @@ export default function App() {
   useScrollToTop();
   useEffect(() => {
     dispatch(getReservationContracts());
-
     dispatch(wishlistEventFetch())
     dispatch(eventFetch());
     dispatch(eventOrderFetch())
@@ -82,9 +77,7 @@ export default function App() {
           draggable: true,
           progress: undefined,
         });
-      } else {
-        console.log('⛔ Ignored: Notification not intended for this user');
-      }
+      } 
     };
 
     return () => {

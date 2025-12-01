@@ -1,6 +1,5 @@
-// SignInView.jsx
 import { useState, useCallback, useEffect } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { InputAdornment, Typography, IconButton, TextField, Button, Grid, Box, Link } from '@mui/material';
 import { toast } from 'react-toastify';
@@ -11,8 +10,6 @@ import { login } from 'src/redux/actions';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { ForgotPasswordModal } from 'src/components/modal/reset-password-modal';
 
-
-// ----------------------------------------------------------------------
 
 export function SignInView() {
   const dispatch = useDispatch();
@@ -25,7 +22,7 @@ export function SignInView() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-
+  const [searchParams] = useSearchParams();
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
@@ -55,11 +52,17 @@ export function SignInView() {
         navigate(redirectData.redirectTo);
         return;
       }
-      navigate('/')
+  
+      const redirect = searchParams.get('redirect');
+      if (redirect) {
+        window.location.href = decodeURIComponent(redirect);
+      } else {
+        window.location.href = '/';
+      }
     } else {
       toast.error(result?.message);
     }
-  }, [formData, dispatch, navigate]);
+  }, [formData, dispatch, navigate, searchParams]);
 
   useEffect(() => {
     if (authenticate) {

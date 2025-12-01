@@ -1,16 +1,16 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Box, Button, Card, CardContent, Grid, Typography } from '@mui/material';
-import QrCodeIcon from '@mui/icons-material/QrCode';
+import { Box, Button, Card, Grid, Typography } from '@mui/material';
 import { useSelector } from 'react-redux';
 
 import { PageTitleSection } from 'src/components/page-title-section';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { MatrixThreeCard } from 'src/components/matrix-three-cards/matrix-three-cards';
 import { RootState } from 'src/redux/store';
-import { all } from 'axios';
+
 import axios from "../../../redux/helper/axios";
 import { TicketHistoryCancelRefundCard } from '../t-h-c-r';
 import { TicketCard } from '../ticket-card';
+import { UpcomingQrTicket } from '../upcoming-qr-tickets';
 
 
 interface EventDetails {
@@ -79,7 +79,7 @@ export function TicketManagementView() {
     setVisibleHistoryCount(prev => prev + 4);
   };
   useEffect(() => {
-  async function fetchTickets() {
+    async function fetchTickets() {
       try {
         const response = await axios.get(`/event-order/user/${_id}`);
         const allTickets: Ticket[] = response.data;
@@ -380,37 +380,6 @@ export function TicketManagementView() {
         </Box>
       )}
 
-
-      {/* {activeTab === 'History' && (
-        <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
-          <Typography
-            variant="h5"
-            fontWeight={600}
-            mb={3}
-            fontSize={{ xs: '20px', sm: '26px', md: '34px' }}
-          >
-            Ticket History
-          </Typography>
-          <Grid container spacing={3}>
-            {ticketHistoryItems.length > 0 ? (
-              ticketHistoryItems.map((ticket, index) => (
-                <TicketHistoryCancelRefundCard
-                  key={index}
-                  items={ticket}
-                  index={index}
-                  type="History"
-                  onDownloadInvoice={() => handleDownloadInvoice(tickets[index])}
-                />
-              ))
-            ) : (
-              <Typography variant="body1" color="textSecondary">
-                No ticket history available.
-              </Typography>
-            )}
-
-          </Grid>
-        </Box>
-      )} */}
       {activeTab === 'History' && (
         <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
           <Typography
@@ -453,7 +422,6 @@ export function TicketManagementView() {
           )}
         </Box>
       )}
-
 
       {activeTab === 'Cancellations & Refunds' && (
         <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
@@ -529,85 +497,9 @@ export function TicketManagementView() {
         </Box>
       )}
 
-
       {/* QR Code Section (Shown regardless of tab) */}
-      {upcomingQrTicket && upcomingQrTicket.eventDetails ? (
-        <Box boxShadow={3} borderRadius={3} mt={3} p={{ xs: 1, md: 3 }}>
-          <Typography
-            variant="h5"
-            fontWeight={600}
-            mb={3}
-            fontSize={{ xs: '20px', sm: '26px', md: '34px' }}
-          >
-            QR Code & Ticket Validation
-          </Typography>
-          <Box display="flex" justifyContent="center">
-            <Card
-              sx={{
-                width: { xs: '100%', sm: '400px', md: '450px', lg: '500px' },
-                p: 3,
-                borderRadius: 3,
-                boxShadow: 3,
-                textAlign: 'center',
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textAlign: 'center',
-                  mb: 2,
-                }}
-              >
-                <Typography
-                  variant="body1"
-                  fontWeight={600}
-                  fontSize={{ xs: '18px', sm: '22px', md: '26px' }}
-                >
-                  {upcomingQrTicket.eventDetails.eventName}
-                </Typography>
-                <Typography variant="body1" color="text.secondary" mb={2}>
-                  {upcomingQrTicket.eventDetails.date} - {upcomingQrTicket.tickets?.[0]?.ticketType}
-                </Typography>
-                <Button variant="contained" sx={{ mt: 2, backgroundColor: '#0a2540', color: '#fff' }}>
-                  <img
-                    src={upcomingQrTicket.qrCode}
-                    alt="QR Code"
-                    style={{ width: 180, height: 180, marginBottom: 16 }}
-                  />
-                </Button>
-              </Box>
-            </Card>
-          </Box>
-          <Box display="flex" justifyContent="center" mt={2}>
-            <Button
-              variant="contained"
-              sx={{ backgroundColor: 'red', color: '#fff', fontWeight: 'bold' }}
-            >
-              {upcomingQrTicket?.verifyEntry ? 'Valid' : 'Pending Validation'}
-            </Button>
-          </Box>
-        </Box>
-      ) : (
-        <Box display="flex" justifyContent="center">
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
-              mb: 2,
-            }}
-          >
-            <Typography variant="h6" color="text.secondary" fontWeight="500" textAlign="center">
-              {/* <QrCodeIcon sx={{ fontSize: 100, mb: 1 }} /> */}
-              No upcoming event
-            </Typography>
-          </Box>
-        </Box>
+      {upcomingQrTicket && upcomingQrTicket.eventDetails && (
+        <UpcomingQrTicket upcomingQrTicket={upcomingQrTicket} />
       )}
     </DashboardContent>
   );

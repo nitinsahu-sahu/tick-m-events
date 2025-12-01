@@ -22,7 +22,7 @@ export function TicketCard({ ticket }: any) {
     // Check if refund is eligible
     const isPartialRefundAllowed = policy?.partialRefund;
     const partialRefundPercent = parseInt(policy?.partialRefundPercent || "0", 10);
-
+ const refundablePercent = 100 - partialRefundPercent;
     // Check full refund eligibility
     const isFullRefundEligible = isPolicyEnabled && isFullRefundAllowed && daysBefore >= fullRefundDays;
 
@@ -510,7 +510,7 @@ export function TicketCard({ ticket }: any) {
                                 <>
                                     <Typography variant="h6" color="warning.main" mb={1}>⚠️ Partial Refund Eligible</Typography>
                                     <Typography variant="body2" mb={2}>
-                                        You’ll receive <strong>{partialRefundPercent}%</strong> of your ticket price.
+                                         You’ll receive <strong>{refundablePercent}%</strong> of your ticket price.
                                     </Typography>
                                     <Button
                                         variant="contained"

@@ -4,10 +4,7 @@ import { Navigate } from 'react-router-dom';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { varAlpha } from 'src/theme/styles';
 
-
 export type UserRole = 'organizer' | 'admin' | 'provider' | 'participant';
-
-
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles: UserRole[];
@@ -42,8 +39,6 @@ export const RoleProtectedRoute = ({
   }
 
   return <>
-
-    
     {children}
   </>;
 };

@@ -1,14 +1,16 @@
 import { lazy, Suspense } from 'react';
 import { Box, LinearProgress, linearProgressClasses } from '@mui/material';
 import { useSelector } from 'react-redux';
+import { Outlet } from 'react-router-dom';
+
 import { RootState } from 'src/redux/store';
 import { varAlpha } from 'src/theme/styles';
-import { Outlet } from 'react-router-dom';
 
 // Lazy load dashboard components
 const HomePage = lazy(() => import('../pages/home'));
 const HomeAndRecommendationsPage = lazy(() => import('../pages/home-and-recommendations'));
 const HomeAndGlobalPage = lazy(() => import('../pages/home-and-global-view'));
+const GlobalPage = lazy(() => import('../pages/global-home'));
 const MarketplaceAndServiceProviderSupervisionPage = lazy(() => import('../pages/marketplace-&-service-provider-supervision'));
 
 const renderFallback = (
@@ -46,7 +48,7 @@ export function MultipleDashboard() {
                         case 'provider':
                             return <HomeAndGlobalPage />;
                         default:
-                            return <HomeAndRecommendationsPage />;
+                            return <GlobalPage />;
                     }
                 })()}
             </Box>

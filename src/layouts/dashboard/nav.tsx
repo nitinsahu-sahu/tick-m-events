@@ -141,7 +141,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
   return (
     <>
       <Logo />
-      <HeadingCommon baseSize="13px" title={`Account ID: ${user?.__id || user?.name}`} mt={1} textTransform="none"/>
+      <HeadingCommon baseSize="13px" title={`Account ID: ${user?.__id || user?.name}`} mt={1} textTransform="none" />
       {slots?.topArea}
       <DashboardHF title="MAIN MENU" />
       <Scrollbar fillContent>
@@ -196,7 +196,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                         sx={{
                           fontFamily: "Poppins, sans-serif",
                           fontWeight: 600,
-                          fontSize: { xs: 11, sm: 13, md: 15 }
+                          fontSize: { xs: 10, sm: 11, md: 12 }
                         }}
                       >
                         {item.title}
@@ -278,7 +278,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                                   component="span"
                                   flexGrow={1}
                                   sx={{
-                                    fontSize: { xs: 10, sm: 12, md: 14 }
+                                    fontSize: { xs: 9, sm: 10, md: 11 }
                                   }}
                                 >{child.title}</Box>
                               </ListItemButton>

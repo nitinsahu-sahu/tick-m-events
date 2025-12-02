@@ -118,7 +118,7 @@ export function MissionSection() {
                                 py: 1.2,
                                 "&:hover": { backgroundColor: "#102c44" },
                             }}
-                             onClick={() => navigate("/sign-in")}
+                             onClick={() => navigate("/login")}
                         >
                             Get Started Now →
                         </Button>
@@ -342,7 +342,7 @@ export function MissionSection() {
                                 py: 1.2,
                                 "&:hover": { backgroundColor: "#102c44" },
                             }}
-                             onClick={() => navigate("/sign-in")}
+                             onClick={() => navigate("/login")}
                         >
                             Get Started Now →
                         </Button>

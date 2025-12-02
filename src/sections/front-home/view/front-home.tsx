@@ -46,11 +46,9 @@ export function FrontHome() {
     useEffect(() => {
         const fetchEvent = async () => {
             await dispatch(eventByIdFetch(eventId));
-
         };
-
-        fetchEvent(); // Call the async function inside useEffect
-    }, [dispatch, eventId]); // Add dependencies
+        fetchEvent(); 
+    }, [dispatch, eventId]); 
     useEffect(() => {
         dispatch(getPromotionLogo())
     }, [dispatch]);
@@ -64,7 +62,7 @@ export function FrontHome() {
                 eventId: _id,
                 redirectTo: redirectUrl
             }));
-            navigate("/sign-in", { state: { from: redirectUrl } });
+            navigate("/login", { state: { from: redirectUrl } });
             return;
         }
 

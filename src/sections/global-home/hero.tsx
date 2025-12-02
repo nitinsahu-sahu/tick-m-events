@@ -120,12 +120,8 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
         });
         setTab(0);
     };
-
-    // Function to handle button clicks (redirect to registration/login)
     const handleButtonClick = (path: string) => {
-        // Replace with your actual routing logic
         navigate(path);
-        // Example: router.push('/auth/register') or window.location.href = '/auth/login'
     };
 
     return (
@@ -301,8 +297,8 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                         >
                             {[
                                 { text: "Create my event", path: "/register" },
-                                { text: "I'm looking for an event", path: "/login" },
-                                { text: "I find a service provider", path: "/login" },
+                                { text: "I'm looking for an event", path: "/sign-in" },
+                                { text: "I find a service provider", path: "/sign-in" },
                             ].map((item, index) => (
                                 <Grid item
                                     key={index}

@@ -73,7 +73,7 @@ export function UserPopover() {
 
   const handleLogout = async () => {
     await dispatch(logout() as any);
-    navigate("/sign-in");
+    navigate("/login");
   };
 
   // Conditionals for popover content

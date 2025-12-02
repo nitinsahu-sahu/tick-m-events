@@ -48,7 +48,7 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
         eventName: event.eventName,
         redirectTo: redirectUrl
       }));
-      navigate('/sign-in');
+      navigate('/login');
     } else {
       window.open(redirectUrl, '_blank');
     }

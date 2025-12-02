@@ -301,8 +301,8 @@ export default function HeroSection({ events, onEventsFiltered }: HeroSectionPro
                         >
                             {[
                                 { text: "Create my event", path: "/register" },
-                                { text: "I'm looking for an event", path: "/sign-in" },
-                                { text: "I find a service provider", path: "/sign-in" },
+                                { text: "I'm looking for an event", path: "/login" },
+                                { text: "I find a service provider", path: "/login" },
                             ].map((item, index) => (
                                 <Grid item
                                     key={index}

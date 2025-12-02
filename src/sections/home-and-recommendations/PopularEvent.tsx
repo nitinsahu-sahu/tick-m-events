@@ -17,6 +17,7 @@ interface ApiResult {
 }
 
 export function PopularEvent({ event, handleEventDetails, flag }: any) {
+
   const dispatch = useDispatch<AppDispatch>();
   const { authenticate } = useSelector((state: RootState) => state?.auth)
   const navigate = useNavigate();
@@ -71,7 +72,7 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
       </Box>
 
       <CardContent sx={{ textAlign: 'center', position: 'relative' }}>
-        <Link to={`/our-event/${event._id}`} target='__blank' style={{ textDecoration: 'none' }}>
+        <Link to={`/our-event/${event.urlSlug || event._id}`} target='__blank' style={{ textDecoration: 'none' }}>
 
           <Avatar
             src={event?.customization?.eventLogo?.url || `/assets/images/home-and-recommendations/${event.image}`}
@@ -149,7 +150,7 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
                       variant="contained"
                       onClick={() => {
                         if (text === "View Details") {
-                          navigate(`/our-event/${event._id}`)
+                          navigate(`/our-event/${event.urlSlug || event._id}`)
 
                           // handleViewEvent({ selectedViewEvent: event });
                         } else if (text === "Share") {
@@ -161,7 +162,7 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
 
                           // Get plain text description
                           const plainDescription = stripHtml(event?.description || '');
-                          const eventUrl = `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${event?._id}`;
+                          const eventUrl = `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${event?.urlSlug}`;
                           const eventTitle = `*${event?.eventName || "Exciting Event"}*`;
                           const eventDate = `*Date:* ${formatEventDate(event?.date)}`;
                           const eventTime = `*Time:* ${formatTimeTo12Hour(event?.time)}`;

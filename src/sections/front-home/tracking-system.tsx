@@ -2,15 +2,17 @@ import { useState } from 'react';
 import { Box, Button, Card, Divider, Grid, IconButton, TextField, Typography } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
-import { useNavigate } from 'react-router-dom';
-
 import { HeadingCommon } from "src/components/multiple-responsive-heading/heading";
 import { formatEventDate, formatTimeTo12Hour } from "src/hooks/formate-time";
-import { availablePromoCodes, PromoCode } from './utill';
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux'; // Added
+import { promotionValidate } from "src/redux/actions/promotionAndOffer"; // Added
+import { AppDispatch } from "src/redux/store"; // Added
 import { PurchaseModal } from './tickte-purchase-modal';
 
 export function TrackingSystem({ tickets, location, date, time, eventId, eventName }: any) {
-  const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>(); // Added
+    const navigate = useNavigate();
 
     // Initialize state for ticket quantities
     const [ticketQuantities, setTicketQuantities] = useState<Record<string, number>>(() => {
@@ -22,20 +24,23 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
         });
         return initialQuantities;
     });
+
     const [modalOpen, setModalOpen] = useState(false);
+
     // Promo code state
     const [promoInput, setPromoInput] = useState('');
-    const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
+    const [appliedPromo, setAppliedPromo] = useState<any>(null); // Changed to any
     const [promoError, setPromoError] = useState('');
+    const [isValidatingPromo, setIsValidatingPromo] = useState(false); // Added loading state
+
     // Check if event has passed
     const eventDateTime = new Date(`${date}T${time}`);
     const currentDateTime = new Date();
     const isEventPassed = currentDateTime > eventDateTime;
 
-    // Handle increment - Fixed TypeScript error
+    // Handle increment
     const handleIncrement = (ticketId: string, maxTickets: number | null) => {
         setTicketQuantities(prev => {
-            // If there's a max tickets limit and we've reached it, don't increment
             if (maxTickets !== null && prev[ticketId] >= maxTickets) {
                 return prev;
             }
@@ -49,7 +54,6 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
     // Handle decrement
     const handleDecrement = (ticketId: string) => {
         setTicketQuantities(prev => {
-            // Don't go below 0
             if (prev[ticketId] <= 0) {
                 return prev;
             }
@@ -66,8 +70,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
             return price;
         }
         if (typeof price === 'string') {
-            // Extract numeric value from price string (assuming format like "10,000 XAF")
-            return parseFloat(price.replace(/[^0-9.]/g, ''));
+            return parseFloat(price.replace(/[^0-9.]/g, '')) || 0;
         }
         return 0;
     };
@@ -78,7 +81,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
             return totalTickets;
         }
         if (typeof totalTickets === 'string') {
-            return parseInt(totalTickets, 10);
+            return parseInt(totalTickets, 10) || 0;
         }
         return 0;
     };
@@ -96,85 +99,183 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
         return subtotal;
     };
 
-    // Apply promo code
-    const applyPromoCode = () => {
+    // Get selected tickets for promo validation - UPDATED to match ProcessOne format
+    const getSelectedTicketsForPromoValidation = () => {
+        const selected: Array<{
+            ticketId: string;
+            ticketType: string;
+            quantity: number;
+            unitPrice: number;
+        }> = [];
+
+        tickets?.forEach((ticket: any) => {
+            ticket.tickets.forEach((item: any) => {
+                const quantity = ticketQuantities[item._id] || 0;
+                if (quantity > 0) {
+                    selected.push({
+                        ticketId: item.id || item._id, // Use item.id to match ProcessOne
+                        ticketType: item.ticketType,
+                        quantity,
+                        unitPrice: getPriceAsNumber(item.price)
+                    });
+                }
+            });
+        });
+
+        return selected;
+    };
+
+    // Apply promo code with backend validation - EXACT SAME as ProcessOne
+    const applyPromoCode = async () => {
         setPromoError('');
-        const promo = availablePromoCodes.find(p => p.code === promoInput.toUpperCase());
 
-        if (!promo) {
-            setPromoError('Invalid promo code');
+        const selectedTickets = getSelectedTicketsForPromoValidation();
+        if (!promoInput || !eventId) {
+            setPromoError('Promo code and Event ID are required');
             return;
         }
 
-        const subtotal = calculateSubtotal();
-
-        // Check minimum purchase if required
-        if (promo.minPurchase && subtotal < promo.minPurchase) {
-            setPromoError(`Minimum purchase of ${promo.minPurchase.toLocaleString()} XAF required`);
+        // Check if any tickets are selected
+        if (selectedTickets.length === 0) {
+            setPromoError('Please select tickets first');
             return;
         }
 
-        setAppliedPromo(promo);
+        // Check if subtotal is valid
+        if (calculateSubtotal() <= 0) {
+            setPromoError('Please select tickets with price > 0');
+            return;
+        }
+
+        setIsValidatingPromo(true);
+
+        try {
+            // EXACT SAME API CALL as ProcessOne
+            const result = await dispatch(promotionValidate(
+                promoInput.toUpperCase(),
+                eventId,
+                selectedTickets
+            ));
+
+            if (result.success) {
+                console.log('✅ Promo details:', result.promo);
+                setAppliedPromo(result.promo);
+            } else {
+                setPromoError(result.message || 'Invalid promo code');
+                setAppliedPromo(null);
+            }
+        } catch (error: any) {
+            console.error("Error applying promo:", error);
+            setPromoError('Something went wrong');
+            setAppliedPromo(null);
+        } finally {
+            setIsValidatingPromo(false);
+        }
     };
 
     // Remove promo code
     const removePromoCode = () => {
         setAppliedPromo(null);
         setPromoInput('');
+        setPromoError('');
     };
 
-    // Calculate discount based on applied promo
+    // Calculate discount based on applied promo - UPDATED to match ProcessOne logic
     const calculateDiscount = () => {
         if (!appliedPromo) return 0;
 
-        const subtotal = calculateSubtotal();
+        // Backend-calculated discount
+        if ("calculation" in appliedPromo && appliedPromo.calculation != null) {
+            return Number(appliedPromo.calculation) || 0;
+        }
 
-        switch (appliedPromo.type) {
-            case 'percentage':
-                // Type guard to ensure value exists for percentage type
-                if (appliedPromo.value === undefined) {
-                    console.error('Percentage promo code is missing value');
-                    return 0;
-                }
-                return subtotal * (appliedPromo.value / 100);
+        let discount = 0;
 
-            case 'simple':
-                // Type guard to ensure value exists for simple type
-                if (appliedPromo.value === undefined) {
-                    console.error('Simple promo code is missing value');
-                    return 0;
-                }
-                return Math.min(appliedPromo.value, subtotal);
+        // Percentage Discount
+        if (
+            appliedPromo.type === "percentage" ||
+            appliedPromo.type === "percentageDiscount"
+        ) {
+            tickets?.forEach((ticketGroup: any) => {
+                ticketGroup.tickets.forEach((item: any) => {
+                    const qty = ticketQuantities[item._id] || 0;
+                    const price = getPriceAsNumber(item.price);
 
-            case 'group': {
-                let totalFreeItems = 0;
-                tickets?.forEach((ticket: any) => {
-                    ticket.tickets.forEach((item: any) => {
-                        const quantity = ticketQuantities[item._id] || 0;
-                        if (quantity > 0) {
-                            const price = getPriceAsNumber(item.price);
-                            const freeItems = Math.floor(quantity / appliedPromo.groupBuy!) * appliedPromo.groupGet!;
-                            totalFreeItems += freeItems * price;
-                        }
-                    });
+                    // Check if promo applies to specific tickets
+                    const isApplicable =
+                        appliedPromo.ticketSelection === item.id ||
+                        (Array.isArray(appliedPromo.ticketSelection) &&
+                            appliedPromo.ticketSelection.includes(item.id)) ||
+                        appliedPromo.ticketSelection === item._id ||
+                        (Array.isArray(appliedPromo.ticketSelection) &&
+                            appliedPromo.ticketSelection.includes(item._id));
+
+                    if (isApplicable) {
+                        discount += qty * price * (appliedPromo.value / 100);
+                    }
                 });
-                return totalFreeItems;
+            });
+
+            return discount;
+        }
+
+        // Flat Value Discount
+        if (
+            appliedPromo.type === "simple" ||
+            appliedPromo.type === "fixedValueDiscount"
+        ) {
+            const subtotal = calculateSubtotal();
+            return Math.min(appliedPromo.value, subtotal);
+        }
+
+        // Group Buy Discount
+        if (appliedPromo.type === "group") {
+            if (!("groupBuy" in appliedPromo) || !("groupGet" in appliedPromo))
+                return 0;
+
+            let totalFreeItems = 0;
+
+            tickets?.forEach((ticketGroup: any) => {
+                ticketGroup.tickets.forEach((item: any) => {
+                    const quantity = ticketQuantities[item._id] || 0;
+                    const price = getPriceAsNumber(item.price);
+
+                    const freeItems =
+                        Math.floor(quantity / appliedPromo.groupBuy) *
+                        appliedPromo.groupGet;
+
+                    totalFreeItems += freeItems * price;
+                });
+            });
+
+            return totalFreeItems;
+        }
+
+        // Early Buyer Discount
+        if (appliedPromo.type === "earlyBuyer") {
+            const subtotal = calculateSubtotal();
+
+            if (appliedPromo.earlyBuyerDiscountType === "percentage") {
+                return subtotal * (appliedPromo.value / 100);
             }
 
-            default:
-                return 0;
+            if (appliedPromo.earlyBuyerDiscountType === "fixed") {
+                return Math.min(appliedPromo.value, subtotal);
+            }
         }
+
+        return 0;
     };
 
     // Calculate total after discount
     const calculateTotal = () => {
         const subtotal = calculateSubtotal();
         const discount = calculateDiscount();
-        return Math.max(0, subtotal - discount); // Ensure total doesn't go below 0
+        return Math.max(0, subtotal - discount);
     };
 
-    // Get selected tickets data
-    const getSelectedTickets = () => {
+    // Get selected tickets for purchase (kept original format)
+    const getSelectedTicketsForPurchase = () => {
         const selected: Array<{
             ticketName: string;
             quantity: number;
@@ -199,24 +300,25 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
 
     const handleBuyClick = () => {
         if (calculateSubtotal() <= 0) return;
-        const selectedTickets = getSelectedTickets();
+        const selectedTickets = getSelectedTicketsForPurchase();
         const queryParams = new URLSearchParams({
             eventId,
             eventName,
-            selected: encodeURIComponent(JSON.stringify(selectedTickets)),
+            selected: JSON.stringify(selectedTickets),
             total: calculateTotal().toString(),
             promo: appliedPromo ? appliedPromo.code : ""
         });
+
         // Check if user is logged in
         const redirectUrl = `/ticket-purchase-process?${queryParams.toString()}`;
         const isLoggedIn = localStorage.getItem("token");
 
         if (!isLoggedIn) {
-            navigate(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+            navigate(`/sign-in?redirect=${encodeURIComponent(redirectUrl)}`);
             return;
         }
 
-        navigate(redirectUrl);;
+        navigate(redirectUrl);
         setModalOpen(true);
     };
 
@@ -226,7 +328,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
         return `${priceNumber.toLocaleString()} XAF`;
     };
 
-    // Format event time for display - Fixed ESLint error
+    // Format event time for display
     const eventTimeDisplay = `Event Time: ${formatEventDate(date)}, ${formatTimeTo12Hour(time)}`;
 
     return (
@@ -313,14 +415,17 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                             <strong>Subtotal:</strong> {`${calculateSubtotal().toLocaleString()} XAF`}
                         </Typography>
 
-                        {/* Promo Code Display */}
+                        {/* Promo Code Display - UPDATED to match ProcessOne */}
                         {appliedPromo && (
                             <Box>
                                 <Typography fontSize={{ xs: "0.9rem", md: "1rem" }} sx={{ color: "green" }}>
-                                    <strong>Promo Applied:</strong> {`${appliedPromo.code} (`}
-                                    {appliedPromo.type === 'percentage' && `${appliedPromo.value}% off)`}
-                                    {appliedPromo.type === 'simple' && `${appliedPromo.value!.toLocaleString()} XAF off)`}
-                                    {appliedPromo.type === 'group' && `Buy ${appliedPromo.groupBuy} Get ${appliedPromo.groupGet} free)`}
+                                    <strong>Promo Applied:</strong> {appliedPromo.code} (
+                                    {appliedPromo.type === 'percentage' && `${appliedPromo.value}% off`}
+                                    {appliedPromo.type === 'simple' && `${appliedPromo.value?.toLocaleString()} XAF off`}
+                                    {appliedPromo.type === 'group' && `Buy ${appliedPromo.groupBuy} Get ${appliedPromo.groupGet} free`}
+                                    {appliedPromo.type === 'earlyBuyer' &&
+                                        `${appliedPromo.value}${appliedPromo.earlyBuyerDiscountType === 'percentage' ? '%' : ' XAF'} off (Early Buyer)`}
+                                    )
                                 </Typography>
                                 <Typography fontSize={{ xs: "0.9rem", md: "1rem" }}>
                                     <strong>Discount:</strong> {`-${calculateDiscount().toLocaleString()} XAF`}
@@ -345,7 +450,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                             <strong>Net Amount To Pay:</strong> {`${calculateTotal().toLocaleString()} XAF`}
                         </Typography>
 
-                        {/* Promo Code */}
+                        {/* Promo Code - UPDATED with loading state */}
                         <Grid container spacing={2} sx={{ marginTop: "1px" }}>
                             <Grid item xs={12} sm={8} md={8}>
                                 <TextField
@@ -355,8 +460,10 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                                     size="small"
                                     placeholder="Enter Promo Code"
                                     value={promoInput}
-                                    onChange={(e) => setPromoInput(e.target.value)}
-                                    disabled={!!appliedPromo}
+                                    onChange={(e) => setPromoInput(e.target.value.toUpperCase())} // Auto uppercase
+                                    disabled={!!appliedPromo || isValidatingPromo}
+                                    error={!!promoError}
+                                    helperText={promoError}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={4} md={4}>
@@ -367,14 +474,19 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                                         paddingY: "9px",
                                         fontSize: { xs: "10px", sm: "11px", md: "12px" },
                                         backgroundColor: "#0B2E4C",
-                                        color: "#fff"
+                                        color: "#fff",
+                                        '&:disabled': {
+                                            backgroundColor: '#ccc'
+                                        }
                                     }}
                                     onClick={appliedPromo ? removePromoCode : applyPromoCode}
+                                    disabled={isValidatingPromo || calculateSubtotal() <= 0}
                                 >
-                                    {appliedPromo ? 'Remove' : 'Apply'} Promo Code
+                                    {isValidatingPromo ? 'Validating...' : appliedPromo ? 'Remove' : 'Apply'} Promo Code
                                 </Button>
                             </Grid>
                         </Grid>
+
                         {/* Purchase Buttons */}
                         <Grid container spacing={2} mt={1}>
                             <Grid item xs={12} sm={12}>
@@ -393,7 +505,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                                 onClose={() => setModalOpen(false)}
                                 eventName={eventName}
                                 eventId={eventId}
-                                selectedTickets={getSelectedTickets()}
+                                selectedTickets={getSelectedTicketsForPurchase()}
                                 totalAmount={calculateTotal()}
                             />
                         </Grid>
@@ -403,7 +515,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
                     </Card>
                 </Grid>
 
-                {/* Location Map Section */}
+                {/* Location Map Section (unchanged) */}
                 <Grid item xs={12} sm={6} md={6} alignContent={{ md: "center" }}>
                     <Card
                         variant="outlined"

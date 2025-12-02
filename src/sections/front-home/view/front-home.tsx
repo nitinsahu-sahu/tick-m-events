@@ -62,7 +62,7 @@ export function FrontHome() {
                 eventId: _id,
                 redirectTo: redirectUrl
             }));
-            navigate("/login", { state: { from: redirectUrl } });
+            navigate("/sign-in", { state: { from: redirectUrl } });
             return;
         }
 

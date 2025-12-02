@@ -22,7 +22,7 @@ interface Event {
 export function ProcessOne({ onTicketsSelected, onNext }: any) {
     const dispatch = useDispatch<AppDispatch>();
     const { basicDetails, eventWithDetails } = useSelector((state: RootState) => state?.event);
-
+    const [promoAppliedFromUrl, setPromoAppliedFromUrl] = useState(false);
     const [events, setEvents] = useState<Event[]>(basicDetails || []);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -45,22 +45,19 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
     const selectedTicketsFromUrl = useMemo(() => {
         const raw = searchParams.get("selected");
         if (!raw) return [];
-
         try {
             return JSON.parse(raw);
         } catch {
             return [];
         }
     }, [searchParams]);
-
+    const promoFromUrl = searchParams.get("promo");
     // Initialize ticket quantities
     useEffect(() => {
         if (tickets.length > 0) {
             const initialQuantities: Record<string, number> = {};
-
             tickets.forEach((ticket: any) => {
                 ticket.tickets.forEach((item: any) => {
-                    // Find this ticket in the URL data
                     const found = selectedTicketsFromUrl.find(
                         (sel: any) => sel.ticketName === item.ticketType
                     );
@@ -68,7 +65,6 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
                     initialQuantities[item._id] = found ? found.quantity : 0;
                 });
             });
-
             setTicketQuantities(initialQuantities);
         }
     }, [tickets, selectedTicketsFromUrl]);
@@ -140,6 +136,55 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
     }, [tickets, ticketQuantities]);
 
     // ✅ Single calculateDiscount function
+    // const calculateDiscount = useCallback((): number => {
+    //     if (!appliedPromo) return 0;
+
+    //     const subtotal = calculateSubtotal();
+
+    //     // Backend-calculated discount
+    //     if ('calculation' in appliedPromo && appliedPromo.calculation != null) {
+    //         return Number(appliedPromo.calculation) || 0;
+    //     }
+
+    //     // Type narrowing
+    //     switch (appliedPromo.type) {
+    //         case 'percentage':
+    //         case 'percentageDiscount':
+    //             return ('value' in appliedPromo ? subtotal * appliedPromo.value / 100 : 0);
+
+    //         case 'simple':
+    //         case 'fixedValueDiscount':
+    //             return ('value' in appliedPromo ? Math.min(appliedPromo.value, subtotal) : 0);
+
+    //         case 'group': {
+    //             if (!('groupBuy' in appliedPromo) || !('groupGet' in appliedPromo)) return 0;
+
+    //             let totalFreeItems = 0;
+    //             tickets.forEach((ticket: any) => {
+    //                 ticket.tickets.forEach((item: any) => {
+    //                     const quantity = ticketQuantities[item._id] || 0;
+    //                     if (quantity > 0) {
+    //                         const price = parseFloat(item.price) || 0;
+    //                         const freeItems = Math.floor(quantity / appliedPromo.groupBuy) * appliedPromo.groupGet;
+    //                         totalFreeItems += freeItems * price;
+    //                     }
+    //                 });
+    //             });
+    //             return totalFreeItems;
+    //         }
+
+    //         case 'earlyBuyer': {
+    //             if (!('earlyBuyerDiscountType' in appliedPromo) || !('value' in appliedPromo)) return 0;
+    //             if (appliedPromo.earlyBuyerDiscountType === 'percentage') return subtotal * appliedPromo.value / 100;
+    //             if (appliedPromo.earlyBuyerDiscountType === 'fixed') return Math.min(appliedPromo.value, subtotal);
+    //             return 0;
+    //         }
+
+    //         default:
+    //             return 0;
+    //     }
+    // }, [appliedPromo, tickets, ticketQuantities, calculateSubtotal]);
+
     const calculateDiscount = useCallback((): number => {
         if (!appliedPromo) return 0;
 
@@ -175,7 +220,7 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
             return discount;
         }
 
-        // Flat Value Discount
+        // Flat Value Discount 
         if (
             appliedPromo.type === "simple" ||
             appliedPromo.type === "fixedValueDiscount"
@@ -279,10 +324,26 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         }
     }, [promoInput, eventId, getSelectedTickets, dispatch]);
 
+    // Auto apply promo if present in URL
+    useEffect(() => {
+        if (
+            promoFromUrl &&
+            !promoAppliedFromUrl &&
+            eventId &&
+            tickets.length > 0 &&
+            !appliedPromo
+        ) {
+            setPromoInput(promoFromUrl.toUpperCase());
+            applyPromoCode();
+            setPromoAppliedFromUrl(true); // prevents future re-trigger
+        }
+    }, [promoFromUrl, promoAppliedFromUrl, eventId, tickets, appliedPromo, applyPromoCode]);
+
     const removePromoCode = useCallback(() => {
         setAppliedPromo(null);
         setPromoInput('');
         setPromoError('');
+        setPromoAppliedFromUrl(true); // prevent auto re-apply even though URL still has promo
     }, []);
 
     const handleDecrement = useCallback((ticketId: string) => {

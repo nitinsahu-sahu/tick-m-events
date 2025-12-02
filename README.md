@@ -143,7 +143,7 @@ UI elements are based on Minimal UI Kit:
 
 Use your browser or API-connected components to test:
 
-* Login flow
+* SignIn flow
 * Events dashboard
 * Ticket scanning (QR scan page)
 * Real-time socket updates

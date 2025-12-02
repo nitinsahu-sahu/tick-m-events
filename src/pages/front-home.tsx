@@ -14,8 +14,7 @@ import { FrontHome } from 'src/sections/front-home/view';
 export default function Page() {
   const dispatch = useDispatch<AppDispatch>();
   const { eventId } = useParams();
-  const { _id, eventName, date, time, portraitImage, category, eventType, coverImage, location, formate, description,
-    organizer, customization, tickets, visibility, averageRating, reviewCount, review
+  const { _id, eventName, coverImage, description
   } = useSelector((state: RootState) => state?.event?.eventWithDetails);
   useEffect(() => {
     const fetchEvent = async () => {

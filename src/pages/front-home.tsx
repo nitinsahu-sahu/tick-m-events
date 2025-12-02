@@ -31,7 +31,7 @@ export default function Page() {
         <meta property="og:image" content={coverImage?.url} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:url" content={`${import.meta.env.VITE_Live_URL}/our-event/${_id}`} />
+        <meta property="og:url" content={`${import.meta.env.VITE_Live_URL||'https://tick-m-events.vercel.app'}/our-event/${_id}`} />
         <meta property="og:type" content="website" />
 
         {/* Twitter Card tags (optional but recommended) */}

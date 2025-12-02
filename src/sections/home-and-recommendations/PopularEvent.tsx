@@ -154,7 +154,7 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
 
                           // handleViewEvent({ selectedViewEvent: event });
                         } else if (text === "Share") {
-                          const stripHtml = (html:any) => {
+                          const stripHtml = (html: any) => {
                             const tempDiv = document.createElement('div');
                             tempDiv.innerHTML = html;
                             return tempDiv.textContent || tempDiv.innerText || '';
@@ -162,7 +162,7 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
 
                           // Get plain text description
                           const plainDescription = stripHtml(event?.description || '');
-                          const eventUrl = `${import.meta.env.VITE_Live_URL}/our-event/${event?._id}`;
+                          const eventUrl = `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${event?._id}`;
                           const eventTitle = `*${event?.eventName || "Exciting Event"}*`;
                           const eventDate = `*Date:* ${formatEventDate(event?.date)}`;
                           const eventTime = `*Time:* ${formatTimeTo12Hour(event?.time)}`;

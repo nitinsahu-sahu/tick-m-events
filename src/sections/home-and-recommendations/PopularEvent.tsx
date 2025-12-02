@@ -41,13 +41,12 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
     const redirectUrl = `/ticket-purchase-process?eventId=${event._id}`
 
     if (!authenticate) {
-      // Store ticket data in session storage before redirecting to login
       sessionStorage.setItem('pendingPurchase', JSON.stringify({
         eventId: event._id,
         eventName: event.eventName,
         redirectTo: redirectUrl
       }));
-      navigate('/login');
+      navigate('/sign-in');
     } else {
       window.open(redirectUrl, '_blank');
     }
@@ -167,7 +166,8 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
                           const eventDate = `*Date:* ${formatEventDate(event?.date)}`;
                           const eventTime = `*Time:* ${formatTimeTo12Hour(event?.time)}`;
                           const description = `*Description:* ${plainDescription}`;
-                          const message = `${eventTitle}\n${eventDate}\n${eventTime}\n${description}\n\n*Event Link:* ${eventUrl}\n\nCheck it out! 🎉`;
+                          const cover = `*Cover:* ${event?.coverImage?.url}`;
+                          const message = `${eventTitle}\n${eventDate}\n${eventTime}\n${description}\n\n*Event Link:* ${eventUrl}\n${cover}\nCheck it out! 🎉`;
                           const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
                           window.open(whatsappUrl, '_blank');
                         } else if (text === "Wishlist") {

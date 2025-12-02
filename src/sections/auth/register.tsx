@@ -187,7 +187,7 @@ export function Register() {
                     message: "",
                     referrerName: ""
                 });
-                navigate("/login");
+                navigate("/sign-in");
             } else {
                 toast.error(result?.message);
             }
@@ -537,7 +537,7 @@ export function Register() {
                         Already have an account?
                         <Link
                             component={RouterLink}
-                            to="/login"
+                            to="/sign-in"
                             sx={{
                                 ml: 0.5,
                                 textDecoration: 'none',

@@ -48,7 +48,7 @@ const LAZY_IMPORTS = {
   ProviderBidsPage: lazy(() => import('src/pages/projects/provider-bids-list')),
   HomePage: lazy(() => import('src/pages/home')),
   SocialShare: lazy(() => import('src/pages/social-share')),
-  LoginPage: lazy(() => import('src/pages/auth/login')),
+  SignInPage: lazy(() => import('src/pages/auth/sign-in')),
   RegisterPage: lazy(() => import('src/pages/auth/register')),
   FrontHomePage: lazy(() => import('src/pages/front-home')),
   EventsPage: lazy(() => import('src/pages/events')),
@@ -151,7 +151,8 @@ const PUBLIC_ROUTES = [
   { path: '/event-list', element: <LAZY_IMPORTS.EventListPage />, isPublic: true, layout: 'none' },
   { path: '/home', element: <GlobalHome />, isPublic: true, layout: 'none' },
   { path: '/about-us', element: <LAZY_IMPORTS.AboutUsPage />, isPublic: true, layout: 'none' },
-  { path: '/login', element: <LAZY_IMPORTS.LoginPage />, isPublic: true, layout: 'auth' },
+  { path: '/sign-in', element: <LAZY_IMPORTS.SignInPage />, isPublic: true, layout: 'auth' },
+  
   { path: '/register', element: <LAZY_IMPORTS.RegisterPage />, isPublic: true, layout: 'auth' },
   { path: '/contact-us', element: <LAZY_IMPORTS.ContactPage />, isPublic: true, layout: 'none' },
   { path: '/our-event/:eventId', element: <LAZY_IMPORTS.FrontHomePage />, isPublic: true, layout: 'none' },

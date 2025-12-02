@@ -40,7 +40,7 @@ export function PurchaseModal({
                 totalAmount,
                 redirectTo: redirectUrl
             }));
-            navigate('/login');
+            navigate('/sign-in');
         } else {
             window.open(redirectUrl, '_blank');
         }

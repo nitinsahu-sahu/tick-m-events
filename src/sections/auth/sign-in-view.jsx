@@ -1,3 +1,4 @@
+// SignInView.jsx
 import { useState, useCallback, useEffect } from 'react';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,10 +11,12 @@ import { login } from 'src/redux/actions';
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
 import { ForgotPasswordModal } from 'src/components/modal/reset-password-modal';
 
+// ----------------------------------------------------------------------
 
 export function SignInView() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [active, setActive] = useState("google");
   const { authenticate } = useSelector(state => state.auth);
   const [formData, setFormData] = useState({
@@ -22,7 +25,7 @@ export function SignInView() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const [searchParams] = useSearchParams();
+
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
@@ -52,25 +55,27 @@ export function SignInView() {
         navigate(redirectData.redirectTo);
         return;
       }
-
+      // If user came from BUY (redirect URL), send them back
+      // Example after login success
       const redirect = searchParams.get('redirect');
       if (redirect) {
         window.location.href = decodeURIComponent(redirect);
       } else {
         window.location.href = '/';
       }
+      // Otherwise go to home
+      navigate('/');
+
     } else {
       toast.error(result?.message);
     }
   }, [formData, dispatch, navigate, searchParams]);
 
   useEffect(() => {
-  if (authenticate) {
-    navigate("/");
-  } else {
-    navigate("/sign-in");
-  }
-}, [authenticate, navigate]);
+    if (authenticate) {
+      navigate("/", { replace: true });
+    }
+  }, [authenticate, navigate]);
 
   const renderForm = (
     <>

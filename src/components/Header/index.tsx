@@ -181,7 +181,7 @@ export default function Header() {
 
           {/* Right Controls */}
           <Box display="flex" alignItems="center" gap={1}>
-            <Link to="/login" style={{ textDecoration: "none" }}>
+            <Link to="/sign-in" style={{ textDecoration: "none" }}>
               <Button
                 sx={{
                   color: "#0d2a4d",
@@ -197,7 +197,7 @@ export default function Header() {
                   }
                 }}
               >
-                <PersonIcon fontSize="small" /> Login
+                <PersonIcon fontSize="small" /> SignIn
               </Button>
             </Link>
 

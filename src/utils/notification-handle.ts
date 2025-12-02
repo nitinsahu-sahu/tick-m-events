@@ -16,7 +16,6 @@ const notifications = useMemo(
   () => (Array.isArray(rawNotifications) ? rawNotifications : []),
   [rawNotifications]
 );
-  // ✅ Fetch notifications on mount/login
   useEffect(() => {
     if (user?.email) {
       dispatch(fetchUserNotifications(user.email));

@@ -37,8 +37,8 @@ export function FrontHome() {
     const { promotionLogos, loading } = useSelector((state: RootState) => state.customization);
 
     const { eventId } = useParams();
-    const { _id, eventName, date, time, portraitImage, category, eventType, coverImage, location, formate, description,
-        organizer, customization, tickets, visibility, averageRating, reviewCount, review
+    const { _id, eventName, date, time, portraitImage, coverImage, location, formate, description,
+        organizer, customization, tickets, averageRating, reviewCount, review
     } = useSelector((state: RootState) => state?.event?.eventWithDetails);
 
     const wishlist = useSelector((state: RootState) => state.event.wishlist);
@@ -47,8 +47,8 @@ export function FrontHome() {
         const fetchEvent = async () => {
             await dispatch(eventByIdFetch(eventId));
         };
-        fetchEvent(); 
-    }, [dispatch, eventId]); 
+        fetchEvent();
+    }, [dispatch, eventId]);
     useEffect(() => {
         dispatch(getPromotionLogo())
     }, [dispatch]);

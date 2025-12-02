@@ -212,7 +212,7 @@ export function TrackingSystem({ tickets, location, date, time, eventId, eventNa
         const isLoggedIn = localStorage.getItem("token");
 
         if (!isLoggedIn) {
-            navigate(`/sign-in?redirect=${encodeURIComponent(redirectUrl)}`);
+            navigate(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
             return;
         }
 

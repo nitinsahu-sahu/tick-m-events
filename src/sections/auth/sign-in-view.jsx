@@ -52,7 +52,7 @@ export function SignInView() {
         navigate(redirectData.redirectTo);
         return;
       }
-  
+
       const redirect = searchParams.get('redirect');
       if (redirect) {
         window.location.href = decodeURIComponent(redirect);
@@ -65,10 +65,12 @@ export function SignInView() {
   }, [formData, dispatch, navigate, searchParams]);
 
   useEffect(() => {
-    if (authenticate) {
-      navigate("/", { replace: true });
-    }
-  }, [authenticate, navigate]);
+  if (authenticate) {
+    navigate("/");
+  } else {
+    navigate("/sign-in");
+  }
+}, [authenticate, navigate]);
 
   const renderForm = (
     <>

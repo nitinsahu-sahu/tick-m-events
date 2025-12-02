@@ -42,17 +42,17 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         [ticketQuantities]
     );
 
-     const selectedTicketsFromUrl = useMemo(() => {
+    const selectedTicketsFromUrl = useMemo(() => {
         const raw = searchParams.get("selected");
         if (!raw) return [];
- 
+
         try {
             return JSON.parse(raw);
         } catch {
             return [];
         }
     }, [searchParams]);
-    
+
     // Initialize ticket quantities
     useEffect(() => {
         if (tickets.length > 0) {
@@ -143,51 +143,86 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
     const calculateDiscount = useCallback((): number => {
         if (!appliedPromo) return 0;
 
-        const subtotal = calculateSubtotal();
-
         // Backend-calculated discount
-        if ('calculation' in appliedPromo && appliedPromo.calculation != null) {
+        if ("calculation" in appliedPromo && appliedPromo.calculation != null) {
             return Number(appliedPromo.calculation) || 0;
         }
 
-        // Type narrowing
-        switch (appliedPromo.type) {
-            case 'percentage':
-            case 'percentageDiscount':
-                return ('value' in appliedPromo ? subtotal * appliedPromo.value / 100 : 0);
+        let discount = 0;
 
-            case 'simple':
-            case 'fixedValueDiscount':
-                return ('value' in appliedPromo ? Math.min(appliedPromo.value, subtotal) : 0);
+        // Percentage Discount (your promo AC123)
+        if (
+            appliedPromo.type === "percentage" ||
+            appliedPromo.type === "percentageDiscount"
+        ) {
+            tickets.forEach((ticketGroup: any) => {
+                ticketGroup.tickets.forEach((item: any) => {
+                    const qty = ticketQuantities[item._id] || 0;
+                    const price = item.price === "Free" ? 0 : Number(item.price);
 
-            case 'group': {
-                if (!('groupBuy' in appliedPromo) || !('groupGet' in appliedPromo)) return 0;
+                    // IMPORTANT FIX (your promo uses item.id not item._id)
+                    const isApplicable =
+                        appliedPromo.ticketSelection === item.id ||
+                        (Array.isArray(appliedPromo.ticketSelection) &&
+                            appliedPromo.ticketSelection.includes(item.id));
 
-                let totalFreeItems = 0;
-                tickets.forEach((ticket: any) => {
-                    ticket.tickets.forEach((item: any) => {
-                        const quantity = ticketQuantities[item._id] || 0;
-                        if (quantity > 0) {
-                            const price = parseFloat(item.price) || 0;
-                            const freeItems = Math.floor(quantity / appliedPromo.groupBuy) * appliedPromo.groupGet;
-                            totalFreeItems += freeItems * price;
-                        }
-                    });
+                    if (isApplicable) {
+                        discount += qty * price * (appliedPromo.value / 100);
+                    }
                 });
-                return totalFreeItems;
-            }
+            });
 
-            case 'earlyBuyer': {
-                if (!('earlyBuyerDiscountType' in appliedPromo) || !('value' in appliedPromo)) return 0;
-                if (appliedPromo.earlyBuyerDiscountType === 'percentage') return subtotal * appliedPromo.value / 100;
-                if (appliedPromo.earlyBuyerDiscountType === 'fixed') return Math.min(appliedPromo.value, subtotal);
-                return 0;
-            }
-
-            default:
-                return 0;
+            return discount;
         }
+
+        // Flat Value Discount
+        if (
+            appliedPromo.type === "simple" ||
+            appliedPromo.type === "fixedValueDiscount"
+        ) {
+            const subtotal = calculateSubtotal();
+            return Math.min(appliedPromo.value, subtotal);
+        }
+
+        // Group Buy Discount
+        if (appliedPromo.type === "group") {
+            if (!("groupBuy" in appliedPromo) || !("groupGet" in appliedPromo))
+                return 0;
+
+            let totalFreeItems = 0;
+
+            tickets.forEach((ticketGroup: any) => {
+                ticketGroup.tickets.forEach((item: any) => {
+                    const quantity = ticketQuantities[item._id] || 0;
+                    const price = Number(item.price) || 0;
+
+                    const freeItems =
+                        Math.floor(quantity / appliedPromo.groupBuy) *
+                        appliedPromo.groupGet;
+
+                    totalFreeItems += freeItems * price;
+                });
+            });
+
+            return totalFreeItems;
+        }
+
+        // Early Buyer
+        if (appliedPromo.type === "earlyBuyer") {
+            const subtotal = calculateSubtotal();
+
+            if (appliedPromo.earlyBuyerDiscountType === "percentage") {
+                return subtotal * (appliedPromo.value / 100);
+            }
+
+            if (appliedPromo.earlyBuyerDiscountType === "fixed") {
+                return Math.min(appliedPromo.value, subtotal);
+            }
+        }
+
+        return 0;
     }, [appliedPromo, tickets, ticketQuantities, calculateSubtotal]);
+
 
     const calculateTotal = useCallback(() =>
         Math.max(0, calculateSubtotal() - calculateDiscount()),

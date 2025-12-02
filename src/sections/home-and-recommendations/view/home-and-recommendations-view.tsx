@@ -221,27 +221,11 @@ export function HomeAndRecommendationsView() {
     ...unreadNotifications,
     ...timeLeftNotification,
     { text: latestEventText, eventId: latestEventActivity?.metadata?.params?.eventId },
-    // { text: 'A festival is happening 2km from you!', disabled: false },
-    // { text: 'Reminder: DJ Party this weekend!' },
-    // { text: 'Exclusive Pass offer expires soon!' },
   ].filter((item, index) => !hiddenNotifIds.includes(item._id || String(index)));
-
-  // const visibleNotifications = [
-  //   ...unreadNotifications,
-  //   { text: getTimeLeft(upcomingTickets), eventId: upcomingQrTicket?.eventId },
-  //   { text: latestEventText, eventId: latestEventActivity?.metadata?.params?.eventId },
-  //   // { text: 'A festival is happening 2km from you!', disabled: false },
-  //   // { text: 'Reminder: DJ Party this weekend!' },
-  //   // { text: 'Exclusive Pass offer expires soon!' },
-  // ].filter((item, index) => !hiddenNotifIds.includes(item._id || String(index)));
-
-  
 
   return (
     <DashboardContent>
       <PageTitleSection title="Home & Recommendations" />
-      {/* UpComingCard component */}
-
       <Box sx={{ width: '100%', overflowX: 'auto' }}>
         <HeadingCommon title="My Active Tickets" weight={600} baseSize="34px" variant="h5" />
 

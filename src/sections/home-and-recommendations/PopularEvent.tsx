@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { HeadingCommon } from 'src/components/multiple-responsive-heading/heading';
-import { formatTimeTo12Hour } from 'src/hooks/formate-time';
+import { formatEventDate, formatTimeTo12Hour } from 'src/hooks/formate-time';
 import { AppDispatch, RootState } from 'src/redux/store';
 import { eventAddToWishlist } from 'src/redux/actions/event.action';
 import { Link, useNavigate } from 'react-router-dom';
@@ -17,7 +17,6 @@ interface ApiResult {
 }
 
 export function PopularEvent({ event, handleEventDetails, flag }: any) {
-
   const dispatch = useDispatch<AppDispatch>();
   const { authenticate } = useSelector((state: RootState) => state?.auth)
   const navigate = useNavigate();
@@ -155,11 +154,20 @@ export function PopularEvent({ event, handleEventDetails, flag }: any) {
 
                           // handleViewEvent({ selectedViewEvent: event });
                         } else if (text === "Share") {
+                          const stripHtml = (html:any) => {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = html;
+                            return tempDiv.textContent || tempDiv.innerText || '';
+                          };
+
+                          // Get plain text description
+                          const plainDescription = stripHtml(event?.description || '');
                           const eventUrl = `${import.meta.env.VITE_Live_URL}/our-event/${event?._id}`;
                           const eventTitle = `*${event?.eventName || "Exciting Event"}*`;
-                          const eventDate = `*Date:* ${event?.date}`;
+                          const eventDate = `*Date:* ${formatEventDate(event?.date)}`;
                           const eventTime = `*Time:* ${formatTimeTo12Hour(event?.time)}`;
-                          const message = `${eventTitle}\n\n${eventDate}\n${eventTime}\n\n*Event Link:* ${eventUrl}\n\nCheck it out!`;
+                          const description = `*Description:* ${plainDescription}`;
+                          const message = `${eventTitle}\n${eventDate}\n${eventTime}\n${description}\n\n*Event Link:* ${eventUrl}\n\nCheck it out! 🎉`;
                           const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
                           window.open(whatsappUrl, '_blank');
                         } else if (text === "Wishlist") {

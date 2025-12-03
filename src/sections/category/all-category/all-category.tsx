@@ -194,7 +194,7 @@ export function AllCategoriesView() {
                               textOverflow: 'ellipsis',
                               WebkitLineClamp: 2,
                               WebkitBoxOrient: 'vertical',
-                              color: 'text.primary', 
+                              color: 'text.primary',
                             }}
                           />
                           <Box sx={{ flexGrow: 1 }} /> {/* Spacer to push content down */}
@@ -244,28 +244,24 @@ export function AllCategoriesView() {
                             </Marquee>
                           </Box>
                           <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Button
-                              size="small"
-                              variant="contained"
+                            <Typography
                               sx={{
                                 borderRadius: 2,
                                 fontSize: '12px',
                                 px: 2,
                                 py: 1,
+                                color:"#fff",
                                 backgroundColor: 'primary.main',
                                 whiteSpace: 'nowrap',
                                 fontWeight: 600,
-                                '&:hover': {
-                                  backgroundColor: 'primary.dark',
-                                },
                               }}
                             >
                               {cat.events.length} Events
-                            </Button>
+                            </Typography>
 
                             <Button
                               component={Link}
-                              to={`/category/${cat?._id}`}
+                              to={`/category/${cat?.urlSlug || cat?._id}`}
                               size="small"
                               target="_blank"
                               variant="outlined"

@@ -1,19 +1,19 @@
 import { Box, Typography, Card, CardContent, Grid, FormControlLabel, Radio, TextField, Switch, Button, RadioGroup } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { toast } from 'react-toastify';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "src/redux/store";
-import { eventPublicationCreate } from "src/redux/actions/event.action";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "src/redux/store";
+import { eventByIdFetch, eventPublicationCreate, uncompletdeventByIdFetch } from "src/redux/actions/event.action";
 
 export function StepperStepFour() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(false);
-    const eventId = searchParams.get('eventId'); // Get existing eventId
-
+    const [slug, setSlug] = useState("");
+    const eventId = searchParams.get('eventId');
     const [publicationData, setPublicationData] = useState({
         visibilityType: "public", // default to public
         customUrl: '',
@@ -22,35 +22,26 @@ export function StepperStepFour() {
         status: "publish"
     });
 
+    useEffect(() => {
+        const fetchEventData = async () => {
+            try {
+                const result = await dispatch(uncompletdeventByIdFetch(eventId));
+                setSlug(result?.urlSlug); // Check the actual structure
+            } catch (error) {
+                console.error('Error fetching event:', error);
+            }
+        };
+
+        if (eventId) {
+            fetchEventData();
+        }
+    }, [dispatch, eventId]);
+
     const rawBaseUrl = import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app';
-    // remove trailing slash if present
     const baseUrl = rawBaseUrl.replace(/\/$/, "");
-
-    // always generate with single slash
-    const link = `${baseUrl}/our-event/${eventId}`;
-
-
-    // const link = publicationData.visibilityType === "private" ?
-    //     `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${eventId}` :
-    //     `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event`;
-
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = event.target;
-
-        setPublicationData(prevData => ({
-            ...prevData,
-            [name]: type === 'checkbox' || type === 'switch' ? checked : value
-        }));
-    };
-
+    const link = `${baseUrl}/our-event/${slug}`;
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
-
-        // Generate the appropriate URL based on the selected visibility type
-        // const newUrl = value === "private"
-        //     ? `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event/${eventId}`
-        //     : `${import.meta.env.VITE_Live_URL || 'https://tick-m-events.vercel.app'}/our-event`;
-
         const newUrl = `${baseUrl}/our-event/${eventId}`;
         setPublicationData(prevData => ({
             ...prevData,
@@ -58,19 +49,16 @@ export function StepperStepFour() {
             customUrl: newUrl    // Update the customUrl with the generated URL
         }));
     };
-
     const handleEventCreate = useCallback(async (event: React.FormEvent, isDraft: boolean = false) => {
         event.preventDefault();
         setLoading(true);
         const formEventPublicatinData = new FormData();
         setLoading(true);
-        // Update the status based on which button was clicked
         const submissionData = {
             ...publicationData,
             status: isDraft ? "draft" : "publish"
         };
 
-        // Convert boolean values to strings before appending
         formEventPublicatinData.append("autoShareOnSocialMedia", submissionData.autoShareOnSocialMedia.toString());
         formEventPublicatinData.append("customUrl", submissionData.customUrl);
         formEventPublicatinData.append("homepageHighlighting", submissionData.homepageHighlighting.toString());
@@ -78,7 +66,6 @@ export function StepperStepFour() {
         formEventPublicatinData.append("status", submissionData.status);
 
         try {
-            // Get current search params
             const ticketCustomId = searchParams.get('ticketConfigId');
             const eventCustomizationId = searchParams.get('eventCustomiztionId');
 

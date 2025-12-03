@@ -72,7 +72,7 @@ export default function BrowseByType() {
               </CardContent>
               <Box
                 component={Link}
-                to={`/category/${cat?._id}`}
+                to={`/category/${cat?.urlSlug||cat?._id}`}
                 target="_blank"
                 sx={{
                   position: "absolute",

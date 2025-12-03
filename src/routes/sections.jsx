@@ -212,8 +212,6 @@ export function Router() {
   useEffect(() => {
     const checkAuth = async () => {
       const aaa = await dispatch(isUserLoggedIn());
-      console.log(aaa,'aaa');
-      
       setIsCheckingAuth(false);
     };
 

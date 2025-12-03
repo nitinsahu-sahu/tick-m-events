@@ -25,20 +25,40 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title> {`Event - ${CONFIG.appName}`}</title>
+        <title>{eventName ? `${eventName} | Tick-M Event` : "Loading Event..."}</title>
+
+        <meta
+          name="description"
+          content={description?.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 150)}
+        />
+
+        {/* Canonical URL */}
+        <link
+          rel="canonical"
+          href={`https://tick-m.cloud/our-event/${_id}`}
+        />
+
+        {/* OpenGraph for WhatsApp / Facebook */}
         <meta property="og:title" content={eventName} />
-        <meta property="og:description" content={description?.replace(/<[^>]*>/g, '').substring(0, 160)} />
-        <meta property="og:image" content={coverImage?.url} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:url" content={`${import.meta.env.VITE_Live_URL||'https://tick-m-events.vercel.app'}/our-event/${_id}`} />
+        <meta
+          property="og:description"
+          content={description?.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 150)}
+        />
+        <meta property="og:image" content={coverImage} />
+        <meta
+          property="og:url"
+          content={`https://tick-m.cloud/our-event/${_id}`}
+        />
         <meta property="og:type" content="website" />
 
-        {/* Twitter Card tags (optional but recommended) */}
+        {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={eventName} />
-        <meta name="twitter:description" content={description?.replace(/<[^>]*>/g, '').substring(0, 160)} />
-        <meta name="twitter:image" content={coverImage?.url} />
+        <meta
+          name="twitter:description"
+          content={description?.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 150)}
+        />
+        <meta name="twitter:image" content={coverImage} />
       </Helmet>
 
       <FrontHome />

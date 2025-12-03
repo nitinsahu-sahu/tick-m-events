@@ -238,7 +238,7 @@ export const eventCustomizationCreate = ({ formEventCustomizeData, eventId, tick
             }
         });
         console.log(response);
-        
+
         dispatch({
             type: eventConstants.EVENT_CUSTOMIZTION_CREATE_SUCCESS,
             payload: {
@@ -349,6 +349,36 @@ export const eventByIdFetch = (eventId) => async (dispatch) => {
         });
     }
 };
+
+export const uncompletdeventByIdFetch = (eventId) => async (dispatch) => {
+    dispatch({ type: eventConstants.UNEVENT_BY_ID_REQUEST });
+
+    try {
+        const response = await axios.get(`/event/uncompleted/${eventId}`);
+        dispatch({
+            type: eventConstants.UNEVENT_BY_ID_SUCCESS,
+            payload: {
+                message: response?.data?.message,
+                DDD: response?.data?.event,
+            },
+        });
+        return {
+            type: eventConstants.UNEVENT_BY_ID_SUCCESS,
+            message: response?.data?.message,
+            urlSlug: response?.data?.event?.urlSlug,
+        };
+    } catch (error) {
+        dispatch({
+            type: eventConstants.UNEVENT_BY_ID_FAILURE,
+            payload: { message: error?.response?.data?.message || "Server error", error: error.status },
+        });
+        return {
+            type: eventConstants.UNEVENT_BY_ID_FAILURE,
+            message: error?.response?.data?.message,
+        };
+    }
+};
+
 
 export const fetchAllCategories = () => async (dispatch) => {
     dispatch({ type: eventConstants.EVENT_CATEGORY_FETCH_REQUEST });

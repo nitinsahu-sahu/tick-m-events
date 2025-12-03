@@ -135,56 +135,6 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         return subtotal;
     }, [tickets, ticketQuantities]);
 
-    // ✅ Single calculateDiscount function
-    // const calculateDiscount = useCallback((): number => {
-    //     if (!appliedPromo) return 0;
-
-    //     const subtotal = calculateSubtotal();
-
-    //     // Backend-calculated discount
-    //     if ('calculation' in appliedPromo && appliedPromo.calculation != null) {
-    //         return Number(appliedPromo.calculation) || 0;
-    //     }
-
-    //     // Type narrowing
-    //     switch (appliedPromo.type) {
-    //         case 'percentage':
-    //         case 'percentageDiscount':
-    //             return ('value' in appliedPromo ? subtotal * appliedPromo.value / 100 : 0);
-
-    //         case 'simple':
-    //         case 'fixedValueDiscount':
-    //             return ('value' in appliedPromo ? Math.min(appliedPromo.value, subtotal) : 0);
-
-    //         case 'group': {
-    //             if (!('groupBuy' in appliedPromo) || !('groupGet' in appliedPromo)) return 0;
-
-    //             let totalFreeItems = 0;
-    //             tickets.forEach((ticket: any) => {
-    //                 ticket.tickets.forEach((item: any) => {
-    //                     const quantity = ticketQuantities[item._id] || 0;
-    //                     if (quantity > 0) {
-    //                         const price = parseFloat(item.price) || 0;
-    //                         const freeItems = Math.floor(quantity / appliedPromo.groupBuy) * appliedPromo.groupGet;
-    //                         totalFreeItems += freeItems * price;
-    //                     }
-    //                 });
-    //             });
-    //             return totalFreeItems;
-    //         }
-
-    //         case 'earlyBuyer': {
-    //             if (!('earlyBuyerDiscountType' in appliedPromo) || !('value' in appliedPromo)) return 0;
-    //             if (appliedPromo.earlyBuyerDiscountType === 'percentage') return subtotal * appliedPromo.value / 100;
-    //             if (appliedPromo.earlyBuyerDiscountType === 'fixed') return Math.min(appliedPromo.value, subtotal);
-    //             return 0;
-    //         }
-
-    //         default:
-    //             return 0;
-    //     }
-    // }, [appliedPromo, tickets, ticketQuantities, calculateSubtotal]);
-
     const calculateDiscount = useCallback((): number => {
         if (!appliedPromo) return 0;
 
@@ -302,8 +252,8 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
         setPromoError('');
 
         const selectedTickets = getSelectedTickets();
-        if (!promoInput || !eventId) {
-            setPromoError('Promo code and Event ID are required');
+        if (!promoInput) {
+            setPromoError('Promo code required');
             return;
         }
 
@@ -331,13 +281,28 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
             !promoAppliedFromUrl &&
             eventId &&
             tickets.length > 0 &&
+            Object.keys(ticketQuantities).length > 0 &&  // ensure initialized
+            Object.values(ticketQuantities).some(q => q > 0) &&  // ensure actual quantities exist
             !appliedPromo
         ) {
+            // Set promo input
             setPromoInput(promoFromUrl.toUpperCase());
-            applyPromoCode();
-            setPromoAppliedFromUrl(true); // prevents future re-trigger
+
+            // Delay apply slightly to ensure quantities settle
+            setTimeout(() => {
+                applyPromoCode();
+                setPromoAppliedFromUrl(true);
+            }, 50);
         }
-    }, [promoFromUrl, promoAppliedFromUrl, eventId, tickets, appliedPromo, applyPromoCode]);
+    }, [
+        promoFromUrl,
+        promoAppliedFromUrl,
+        eventId,
+        tickets,
+        ticketQuantities,
+        appliedPromo,
+        applyPromoCode
+    ]);
 
     const removePromoCode = useCallback(() => {
         setAppliedPromo(null);
@@ -431,10 +396,28 @@ export function ProcessOne({ onTicketsSelected, onNext }: any) {
             {/* Promo Code */}
             <Grid container spacing={2} sx={{ mt: 1 }}>
                 <Grid item xs={12} sm={8} md={8}>
-                    <TextField fullWidth required variant="outlined" size="small" placeholder="Enter Promo Code" value={promoInput} onChange={(e) => setPromoInput(e.target.value.toUpperCase())} disabled={!!appliedPromo} />
+                    <TextField
+                        fullWidth
+                        required
+                        variant="outlined"
+                        size="small"
+                        placeholder="Enter Promo Code"
+                        value={promoInput}
+                        onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                        disabled={!!appliedPromo}
+                    />
                 </Grid>
                 <Grid item xs={12} sm={4} md={4}>
-                    <Button variant="contained" fullWidth sx={{ paddingY: "9px", fontSize: { xs: "10px", sm: "11px", md: "12px" }, backgroundColor: "#0B2E4C", color: "#fff" }} onClick={appliedPromo ? removePromoCode : applyPromoCode}>
+                    <Button
+                        variant="contained"
+                        fullWidth
+                        sx={{
+                            paddingY: "9px",
+                            fontSize: { xs: "10px", sm: "11px", md: "12px" },
+                            backgroundColor: "#0B2E4C", color: "#fff"
+                        }}
+                        onClick={appliedPromo ? removePromoCode : applyPromoCode}
+                    >
                         {appliedPromo ? 'Remove' : 'Apply'} Promo Code
                     </Button>
                 </Grid>

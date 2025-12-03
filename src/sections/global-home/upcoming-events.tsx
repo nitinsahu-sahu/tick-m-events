@@ -78,8 +78,8 @@ export default function UpcomingEvents({ title, des, filterdEvent, loading }: an
         <Typography>No upcoming events found</Typography>
       ) : (
         <Grid container spacing={{ xs: 3, md: 4 }}>
-          {filterdEvent.map((ev: any) => (
-            <Grid key={ev.id} item xs={12} sm={6} md={4}>
+          {filterdEvent.map((ev: any,index:any) => (
+            <Grid key={index} item xs={12} sm={6} md={4}>
               <Card
                 sx={{
                   borderRadius: 3,
@@ -202,7 +202,7 @@ export default function UpcomingEvents({ title, des, filterdEvent, loading }: an
                     </Typography>
                     <Button
                       component={Link}
-                      to={`/our-event/${ev._id}`}
+                      to={`/our-event/${ev.urlSlug||ev._id}`}
                       variant="contained"
                       size="small"
                       sx={{

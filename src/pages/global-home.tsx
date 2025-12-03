@@ -9,7 +9,18 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title> {`Home - ${CONFIG.appName}`}</title>
+        <title>Tick-M Cloud | Discover & Book Events</title>
+        <meta
+          name="description"
+          content="Find events, book tickets, explore service providers on Tick-M Cloud."
+        />
+        <meta property="og:title" content="Tick-M Cloud" />
+        <meta
+          property="og:description"
+          content="Discover unforgettable events across Africa. Book easily."
+        />
+        <meta property="og:image" content="https://tick-m.cloud/banner.png" />
+        <meta property="og:type" content="website" />
       </Helmet>
 
       <GlobalHome />

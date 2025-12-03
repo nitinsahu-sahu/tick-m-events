@@ -35,6 +35,7 @@ interface Event {
     public_id: string;
     url: string;
   };
+  urlSlug:string;
   portraitImage: {
     public_id: string;
     url: string;
@@ -64,7 +65,7 @@ export function VisibilityAndAccessSettingsView() {
         <PageTitleSection
           title="Visibility And Access Settings"
         />
-        <VisibilityType eventId={selectedEvent?._id} visibility={selectedEvent?.visibility} />
+        <VisibilityType eventId={selectedEvent?.urlSlug} visibility={selectedEvent?.visibility} />
 
         <EventCustomization eventId={selectedEvent?._id} />
 

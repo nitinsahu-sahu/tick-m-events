@@ -17,7 +17,7 @@ export function SingleCategoriesView() {
   useEffect(() => {
     dispatch(categoryByIdFetch(categoryId));
   }, [dispatch, categoryId]);
-  
+
 
   return (
     <Box key={_id}>
@@ -133,7 +133,7 @@ export function SingleCategoriesView() {
           px: { xs: 2, sm: 3, md: 4 },
           maxWidth: '1400px',
           mx: 'auto',
-          mb: 8, 
+          mb: 8,
         }}
       >
         <Typography
@@ -194,7 +194,7 @@ export function SingleCategoriesView() {
                     },
                   }}
                 >
-                  <PopularEvent event={event} flag='singleCagetory'/>
+                  <PopularEvent event={event} flag='singleCagetory' />
                 </Box>
               </Grid>
             ))

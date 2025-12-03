@@ -5,8 +5,6 @@ import {
   Box,
   Button,
   IconButton,
-  Select,
-  MenuItem,
   Drawer,
   List,
   ListItem,
@@ -15,12 +13,15 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import PersonIcon from "@mui/icons-material/Person";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/store";
 
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-
+  const { authenticate } = useSelector((state: RootState) => state?.auth);
+  const navigate = useNavigate()
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -36,8 +37,8 @@ export default function Header() {
           { text: "About", path: "/about-us" },
           { text: "Contact", path: "/contact-us" },
         ].map((item, index) => (
-          <ListItem 
-            button 
+          <ListItem
+            button
             key={index}
             component={Link}
             to={item.path}
@@ -109,9 +110,9 @@ export default function Header() {
             </Link>
 
             <Link to="/event-list" style={{ textDecoration: "none", color: "inherit" }}>
-              <Typography 
-                sx={{ 
-                  cursor: "pointer", 
+              <Typography
+                sx={{
+                  cursor: "pointer",
                   fontWeight: 600,
                   '&:hover': {
                     color: "#0d2a4d",
@@ -121,11 +122,11 @@ export default function Header() {
                 Events
               </Typography>
             </Link>
-            
+
             <Link to="#" style={{ textDecoration: "none", color: "inherit" }}>
-              <Typography 
-                sx={{ 
-                  cursor: "pointer", 
+              <Typography
+                sx={{
+                  cursor: "pointer",
                   fontWeight: 600,
                   '&:hover': {
                     color: "#0d2a4d",
@@ -135,11 +136,11 @@ export default function Header() {
                 Blog
               </Typography>
             </Link>
-            
+
             <Link to="#" style={{ textDecoration: "none", color: "inherit" }}>
-              <Typography 
-                sx={{ 
-                  cursor: "pointer", 
+              <Typography
+                sx={{
+                  cursor: "pointer",
                   fontWeight: 600,
                   '&:hover': {
                     color: "#0d2a4d",
@@ -149,11 +150,11 @@ export default function Header() {
                 B2B Marketplace
               </Typography>
             </Link>
-            
+
             <Link to="/about-us" style={{ textDecoration: "none", color: "inherit" }}>
-              <Typography 
-                sx={{ 
-                  cursor: "pointer", 
+              <Typography
+                sx={{
+                  cursor: "pointer",
                   fontWeight: 600,
                   '&:hover': {
                     color: "#0d2a4d",
@@ -163,11 +164,11 @@ export default function Header() {
                 About
               </Typography>
             </Link>
-            
+
             <Link to="/contact-us" style={{ textDecoration: "none", color: "inherit" }}>
-              <Typography 
-                sx={{ 
-                  cursor: "pointer", 
+              <Typography
+                sx={{
+                  cursor: "pointer",
                   fontWeight: 600,
                   '&:hover': {
                     color: "#0d2a4d",
@@ -181,25 +182,52 @@ export default function Header() {
 
           {/* Right Controls */}
           <Box display="flex" alignItems="center" gap={1}>
-            <Link to="/sign-in" style={{ textDecoration: "none" }}>
-              <Button
-                sx={{
-                  color: "#0d2a4d",
-                  fontSize: { xs: "10px", sm: "12px" },
-                  textTransform: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  minWidth: "auto",
-                  border: "1px solid #0d2a4d",
-                  '&:hover': {
-                    backgroundColor: "#0d2a4d",
-                    color: "white",
-                  }
-                }}
-              >
-                <PersonIcon fontSize="small" /> SignIn
-              </Button>
-            </Link>
+            {
+              authenticate ? (
+                <Button
+                  variant="contained"
+                  onClick={() => navigate("/")}
+                  sx={{
+                    color: "#0d2a4d",
+                    fontSize: { xs: "10px", sm: "12px" },
+                    textTransform: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    minWidth: "auto",
+                    border: "1px solid #0d2a4d",
+                    '&:hover': {
+                      backgroundColor: "#0d2a4d",
+                      color: "white",
+                    },
+                  }}
+                >
+                  Dashboard
+                </Button>
+              ) : (
+                <Link to="/sign-in" style={{ textDecoration: "none" }}>
+                  <Button
+                    sx={{
+                      color: "#0d2a4d",
+                      fontSize: { xs: "10px", sm: "12px" },
+                      textTransform: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      minWidth: "auto",
+                      border: "1px solid #0d2a4d",
+                      '&:hover': {
+                        backgroundColor: "#0d2a4d",
+                        color: "white",
+                      },
+
+                    }}
+                  >
+                    <PersonIcon fontSize="small" /> Sign In
+                  </Button>
+                </Link>
+              )
+            }
+
+
 
             {/* Language Selector */}
             {/* <Box display="flex" alignItems="center" gap={0.5}>
@@ -226,7 +254,7 @@ export default function Header() {
             <IconButton
               edge="end"
               color="inherit"
-              sx={{ 
+              sx={{
                 display: { xs: "flex", md: "none" },
                 color: "#0d2a4d"
               }}

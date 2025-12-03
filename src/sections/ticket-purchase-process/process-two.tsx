@@ -401,17 +401,49 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                   <TextField
                     fullWidth
                     name={`age-${index}`}
-                     label="Age (optional)"
+                    label="Age (optional)"
                     value={participant.age}
-                    onChange={(e) => handleChange(index, 'age', e.target.value)}
+                    onChange={(e) => {
+                      let value = e.target.value;
+
+                      // Allow only digits max 3 length
+                      if (!/^\d{0,3}$/.test(value)) return;
+
+                      // Auto-delete age > 150 (invalid human age)
+                      if (Number(value) > 150) {
+                        value = value.slice(0, -1); // removes last typed character
+                      }
+
+                      handleChange(index, "age", value);
+                    }}
                     placeholder="Age"
-                    type="number"
+                    type="text"
+                    inputProps={{
+                      inputMode: "numeric",
+                      pattern: "[0-9]*"
+                    }}
                     variant="outlined"
                     InputLabelProps={{ shrink: true }}
-                    error={formTouched && !participant.age}
-                    helperText=""
+                    error={Boolean(
+                      formTouched &&
+                      participant.age &&
+                      (
+                        participant.age.length > 3 ||
+                        Number(participant.age) > 150
+                      )
+                    )}
+                    helperText={
+                      participant.age && participant.age.length > 3
+                        ? "Age cannot exceed 3 digits"
+                        : participant.age && Number(participant.age) > 150
+                          ? "Human age cannot exceed 150 years"
+                          : ""
+                    }
+                    FormHelperTextProps={{
+                      sx: { color: "red", fontWeight: "bold" }  // 🔥 Make helper text red
+                    }}
                   />
-                   <TextField
+                  <TextField
                     select
                     fullWidth
                     required
@@ -421,7 +453,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                     onChange={(e) => handleChange(index, 'gender', e.target.value)}
                     SelectProps={{ native: true }}
                     variant="outlined"
-                     InputLabelProps={{ shrink: true }}
+                    InputLabelProps={{ shrink: true }}
                     error={formTouched && !participant.gender}
                     helperText={formTouched && !participant.gender ? 'Please Select Gender' : ''}
                   >
@@ -430,7 +462,7 @@ export function ProcessTwo({ onOrderDetailsUpdate, onBack, onNext, ticketCount }
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
                   </TextField>
-                  
+
                 </Box>
               </Grid>
             ))}

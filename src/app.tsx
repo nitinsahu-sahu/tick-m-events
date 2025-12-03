@@ -25,13 +25,14 @@ export default function App() {
     dispatch(getReservationContracts());
     dispatch(wishlistEventFetch())
     dispatch(eventFetch());
-    dispatch(eventOrderFetch())
     dispatch(todayEventFetch());
     dispatch(getPromotionLogo())
     dispatch(recommTrandingPopularEventFetch());
-    dispatch(statisticsPerformanceFetch());
+    if (user.role === "provider") {
+      dispatch(statisticsPerformanceFetch());
+    }
 
-  }, [dispatch]);
+  }, [dispatch,user.role]);
 
   useEffect(() => {
     const channel = new BroadcastChannel('fcm-messages');
@@ -77,7 +78,7 @@ export default function App() {
           draggable: true,
           progress: undefined,
         });
-      } 
+      }
     };
 
     return () => {

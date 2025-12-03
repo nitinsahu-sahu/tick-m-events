@@ -152,7 +152,7 @@ const PUBLIC_ROUTES = [
   { path: '/home', element: <GlobalHome />, isPublic: true, layout: 'none' },
   { path: '/about-us', element: <LAZY_IMPORTS.AboutUsPage />, isPublic: true, layout: 'none' },
   { path: '/sign-in', element: <LAZY_IMPORTS.SignInPage />, isPublic: true, layout: 'auth' },
-  
+
   { path: '/register', element: <LAZY_IMPORTS.RegisterPage />, isPublic: true, layout: 'auth' },
   { path: '/contact-us', element: <LAZY_IMPORTS.ContactPage />, isPublic: true, layout: 'none' },
   { path: '/our-event/:eventId', element: <LAZY_IMPORTS.FrontHomePage />, isPublic: true, layout: 'none' },
@@ -211,15 +211,13 @@ export function Router() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      await dispatch(isUserLoggedIn());
+      const aaa = await dispatch(isUserLoggedIn());
       setIsCheckingAuth(false);
     };
 
     checkAuth();
   }, [dispatch]);
 
- 
- 
   const routes = useMemo(() => {
     const protectedChildren = PROTECTED_ROUTES.map((route) => ({
       path: route.path,
@@ -258,7 +256,7 @@ export function Router() {
 
   const routing = useRoutes(routes);
 
-   if (isCheckingAuth) {
+  if (isCheckingAuth) {
     return renderFallback;
   }
 

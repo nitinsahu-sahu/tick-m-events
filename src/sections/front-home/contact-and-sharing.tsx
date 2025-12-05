@@ -121,7 +121,7 @@ export function ContactAndSharing({ organizer }: ContactAndSharingProps) {
                 </Typography>
 
                 <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
+                    <Grid item xs={12} sm={12}>
                         <Button
                             onClick={handleOpen}
                             fullWidth
@@ -136,7 +136,7 @@ export function ContactAndSharing({ organizer }: ContactAndSharingProps) {
                             Contact the Organizer
                         </Button>
                     </Grid>
-                    <Grid item xs={12} sm={6}>
+                    {/* <Grid item xs={12} sm={6}>
                         <Button
                             onClick={handleContactClick}
                             disabled={loading}
@@ -153,7 +153,7 @@ export function ContactAndSharing({ organizer }: ContactAndSharingProps) {
                         >
                             {loading ? 'Processing...' : 'Contact Us - 1000 XAF'}
                         </Button>
-                    </Grid>
+                    </Grid> */}
                 </Grid>
 
                 {error && (
